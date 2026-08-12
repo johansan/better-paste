@@ -1,0 +1,24 @@
+# MD013 - Line length
+MD013: false
+
+# MD022 - Headings should be surrounded by blank lines
+MD022: false
+
+# MD024 - Multiple headings with the same content
+MD024: false
+
+# MD031 - Fenced code blocks should be surrounded by blank lines
+MD031: false
+
+# MD032 - Lists should be surrounded by blank lines
+MD032: false
+
+# MD036 - Emphasis used instead of a heading
+MD036: false
+
+# MD040 - Fenced code blocks should have a language
+# The README's before/after blocks are pasted output, not code in any language
+MD040: false
+
+# MD041 - First line should be a top-level heading
+MD041: true

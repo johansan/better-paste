@@ -41,8 +41,3 @@ const CONTROL_PATTERN = new RegExp('[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001
 export function stripAnsi(text: string): string {
     return text.replace(OSC_PATTERN, '').replace(CSI_PATTERN, '').replace(SIMPLE_ESCAPE_PATTERN, '').replace(CONTROL_PATTERN, '');
 }
-
-/** Returns true when the text contains anything `stripAnsi` would remove. */
-export function hasAnsi(text: string): boolean {
-    return stripAnsi(text) !== text;
-}

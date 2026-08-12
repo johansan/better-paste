@@ -84,8 +84,3 @@ export function runTextPipeline(input: string, settings: BetterPasteSettings): T
 
     return { text, changed: text !== input, aiTextCleaned, terminalCleaned, urlsCleaned };
 }
-
-export { cleanAiText, normalizeInvisibleCharacters, replacePunctuation } from './aiText';
-export { cleanTerminalText } from './terminalText';
-export { buildUrlCleanupOptions, cleanUrl, cleanUrlsInText } from './urlCleanup';
-export { stripAnsi } from './ansi';

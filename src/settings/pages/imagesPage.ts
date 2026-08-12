@@ -43,11 +43,11 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
 }
 
 /** The Image options sub-page. */
-export function createImageOptionsDefinitions(): SettingGroupItem[] {
+function createImageOptionsDefinitions(): SettingGroupItem[] {
     return [
         {
             name: 'File names',
-            desc: 'How saved pictures are named. A name taken from the source is the most recognisable, but some sites serve pictures under a meaningless name.',
+            desc: 'How saved pictures are named. A name taken from the source is the most recognizable, but some sites serve pictures under a meaningless name.',
             control: {
                 type: 'dropdown',
                 key: 'imageFilenameFormat',

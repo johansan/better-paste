@@ -2,6 +2,8 @@
 
 An Obsidian plugin that cleans up content on its way into your notes.
 
+The only network access is downloading a picture that pasted content linked to, so the note holds the image rather than a link to someone else's server. There is no telemetry and no server behind this plugin. See [Network use and privacy](#network-use-and-privacy).
+
 Four rules, each independently configurable and each able to be turned off:
 
 1. **Images** — when the clipboard describes a picture by link rather than by bitmap, as Safari does, download it into the vault and embed the local copy.
@@ -69,6 +71,24 @@ Safari's "Copy image" is the case worth calling out. It puts _both_ the decoded 
 Rich content is deliberately left to Obsidian's own HTML-to-Markdown conversion rather than reimplemented; Better Paste only post-processes the result.
 
 When a download fails or times out, the original link stays in the note. Nothing is lost, and a notice tells you what happened.
+
+## Network use and privacy
+
+Better Paste makes network requests in exactly one situation, and it is worth being precise about it.
+
+**What it does.** When you paste content that references a picture by http(s) address — a Safari page selection, a Markdown image link, a bare link ending in `.png` — the plugin downloads that picture so the note holds a local copy instead of a link to somebody else's server. The request goes to the address the pasted content named, using Obsidian's own `requestUrl`, and nothing else is fetched.
+
+**What it never does.**
+
+- No telemetry, no analytics, no crash reporting, no usage counting.
+- No server belonging to this plugin. There isn't one.
+- Nothing is fetched at startup, in the background, or on a timer. A request only ever happens as the direct result of a paste you made.
+- No code is downloaded or executed. Downloaded bytes are only ever written to a file, and only when the response is a recognised image type.
+- Your clipboard is never transmitted. It is transformed in memory and not retained; the plugin keeps no history.
+
+**What is stored.** Downloaded pictures go to the attachment location your vault is configured to use. Settings live in `.obsidian/plugins/better-paste/data.json`. Nothing leaves the vault.
+
+**Worth knowing.** Downloading an image reveals your IP address to whoever serves it, exactly as visiting the page would. Turn off **Save pasted images into the vault** if that matters for a given vault, and pictures already on the clipboard will still be saved, since saving those touches no network at all.
 
 ## Why a plugin and not a Mac app
 
@@ -192,7 +212,7 @@ One consequence worth knowing: a note with `image-width` also takes screenshot p
 
 A paste is left alone when the cursor sits inside a fenced code block or the frontmatter block. Pasting terminal output into a fence is an act of preservation, so rejoining its lines there would destroy the thing you were protecting.
 
-These behaviours have one sensible value and are simply how the plugin works: escape sequences and stray control characters are stripped from terminal output, the shared indentation is removed, runs of blank lines collapse, trailing spaces go, fenced code is never rejoined, images embedded in the clipboard as `data:` URIs are always saved, images over 50 MB or slower than 30 seconds are left as links, and scroll-to-text `#:~:text=` fragments are dropped from links while real anchors are kept.
+These behaviors have one sensible value and are simply how the plugin works: escape sequences and stray control characters are stripped from terminal output, the shared indentation is removed, runs of blank lines collapse, trailing spaces go, fenced code is never rejoined, images embedded in the clipboard as `data:` URIs are always saved, images over 50 MB or slower than 30 seconds are left as links, and scroll-to-text `#:~:text=` fragments are dropped from links while real anchors are kept.
 
 ## Development
 

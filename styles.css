@@ -79,6 +79,6 @@
 }
 
 /* The tester rows lay their preview out below the label rather than beside it */
-.setting-item:has(> .better-paste-preview) {
+.setting-item.better-paste-tester {
     display: block;
 }

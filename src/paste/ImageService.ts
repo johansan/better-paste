@@ -250,7 +250,7 @@ export class ImageService {
 }
 
 /** Decodes a data: URI into raw bytes. */
-export function decodeDataUri(url: string): FetchedImage | null {
+function decodeDataUri(url: string): FetchedImage | null {
     const separator = url.indexOf(',');
     if (separator < 0) return null;
 

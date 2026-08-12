@@ -112,14 +112,14 @@ export function trimUrlTail(url: string): string {
  * means the site on any top-level domain, which is how one rule covers google.com,
  * google.se and google.co.uk together.
  */
-export function normalizeDomain(domain: string): { domain: string; anyTld: boolean } {
+function normalizeDomain(domain: string): { domain: string; anyTld: boolean } {
     const cleaned = domain.trim().toLowerCase().replace(/^\*\./, '');
     const anyTld = cleaned.endsWith('.*');
     return { domain: anyTld ? cleaned.slice(0, -2) : cleaned, anyTld };
 }
 
 /** True when `host` is the rule's site, a subdomain of it, or it under another top-level domain. */
-export function hostMatchesRule(host: string, rule: DomainRule): boolean {
+function hostMatchesRule(host: string, rule: DomainRule): boolean {
     if (!rule.anyTld) return host === rule.domain || host.endsWith(`.${rule.domain}`);
 
     const labels = host.split('.');

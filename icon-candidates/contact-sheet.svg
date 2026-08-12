@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="460" viewBox="0 0 900 460">
+<rect width="900" height="460" fill="#ffffff"/>
+<g font-family="-apple-system,sans-serif" font-size="18" fill="#333">
+<g transform="translate(40,30) scale(1.8)" fill="none" stroke="#000">
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M37 19.5 H27.5 a6.25 6.25 0 0 0 -6.25 6.25 V81.5 a6.25 6.25 0 0 0 6.25 6.25 H72.5 a6.25 6.25 0 0 0 6.25 -6.25 V25.75 a6.25 6.25 0 0 0 -6.25 -6.25 H63" stroke-width="8"/>
+    <rect x="37" y="12.25" width="26" height="14.5" rx="5" stroke-width="8"/>
+    <polygon points="50 36 55.6 50.4 70 56 55.6 61.6 50 76 44.4 61.6 30 56 44.4 50.4" fill="currentColor" stroke="none"/>
+  </g>
+</g>
+<text x="130" y="230" text-anchor="middle">A  sparkle</text>
+<g transform="translate(106,260) scale(0.24)" fill="none" stroke="#000">
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M37 19.5 H27.5 a6.25 6.25 0 0 0 -6.25 6.25 V81.5 a6.25 6.25 0 0 0 6.25 6.25 H72.5 a6.25 6.25 0 0 0 6.25 -6.25 V25.75 a6.25 6.25 0 0 0 -6.25 -6.25 H63" stroke-width="8"/>
+    <rect x="37" y="12.25" width="26" height="14.5" rx="5" stroke-width="8"/>
+    <polygon points="50 36 55.6 50.4 70 56 55.6 61.6 50 76 44.4 61.6 30 56 44.4 50.4" fill="currentColor" stroke="none"/>
+  </g>
+</g>
+<g transform="translate(76,260) scale(0.48)" fill="none" stroke="#000">
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M37 19.5 H27.5 a6.25 6.25 0 0 0 -6.25 6.25 V81.5 a6.25 6.25 0 0 0 6.25 6.25 H72.5 a6.25 6.25 0 0 0 6.25 -6.25 V25.75 a6.25 6.25 0 0 0 -6.25 -6.25 H63" stroke-width="8"/>
+    <rect x="37" y="12.25" width="26" height="14.5" rx="5" stroke-width="8"/>
+    <polygon points="50 36 55.6 50.4 70 56 55.6 61.6 50 76 44.4 61.6 30 56 44.4 50.4" fill="currentColor" stroke="none"/>
+  </g>
+</g>
+<g transform="translate(270,30) scale(1.8)" fill="none" stroke="#000">
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M37 19.5 H27.5 a6.25 6.25 0 0 0 -6.25 6.25 V81.5 a6.25 6.25 0 0 0 6.25 6.25 H72.5 a6.25 6.25 0 0 0 6.25 -6.25 V25.75 a6.25 6.25 0 0 0 -6.25 -6.25 H63" stroke-width="8"/>
+    <rect x="37" y="12.25" width="26" height="14.5" rx="5" stroke-width="8"/>
+    <g stroke-width="4">
+      <line x1="34.5" y1="40" x2="65.5" y2="40"/>
+      <line x1="34.5" y1="52" x2="65.5" y2="52"/>
+    </g>
+    <polygon points="55 57 58.4 65.6 67 69 58.4 72.4 55 81 51.6 72.4 43 69 51.6 65.6" fill="currentColor" stroke="none"/>
+  </g>
+</g>
+<text x="360" y="230" text-anchor="middle">B  lines + sparkle</text>
+<g transform="translate(336,260) scale(0.24)" fill="none" stroke="#000">
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M37 19.5 H27.5 a6.25 6.25 0 0 0 -6.25 6.25 V81.5 a6.25 6.25 0 0 0 6.25 6.25 H72.5 a6.25 6.25 0 0 0 6.25 -6.25 V25.75 a6.25 6.25 0 0 0 -6.25 -6.25 H63" stroke-width="8"/>
+    <rect x="37" y="12.25" width="26" height="14.5" rx="5" stroke-width="8"/>
+    <g stroke-width="4">
+      <line x1="34.5" y1="40" x2="65.5" y2="40"/>
+      <line x1="34.5" y1="52" x2="65.5" y2="52"/>
+    </g>
+    <polygon points="55 57 58.4 65.6 67 69 58.4 72.4 55 81 51.6 72.4 43 69 51.6 65.6" fill="currentColor" stroke="none"/>
+  </g>
+</g>
+<g transform="translate(306,260) scale(0.48)" fill="none" stroke="#000">
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M37 19.5 H27.5 a6.25 6.25 0 0 0 -6.25 6.25 V81.5 a6.25 6.25 0 0 0 6.25 6.25 H72.5 a6.25 6.25 0 0 0 6.25 -6.25 V25.75 a6.25 6.25 0 0 0 -6.25 -6.25 H63" stroke-width="8"/>
+    <rect x="37" y="12.25" width="26" height="14.5" rx="5" stroke-width="8"/>
+    <g stroke-width="4">
+      <line x1="34.5" y1="40" x2="65.5" y2="40"/>
+      <line x1="34.5" y1="52" x2="65.5" y2="52"/>
+    </g>
+    <polygon points="55 57 58.4 65.6 67 69 58.4 72.4 55 81 51.6 72.4 43 69 51.6 65.6" fill="currentColor" stroke="none"/>
+  </g>
+</g>
+<g transform="translate(500,30) scale(1.8)" fill="none" stroke="#000">
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M37 19.5 H27.5 a6.25 6.25 0 0 0 -6.25 6.25 V81.5 a6.25 6.25 0 0 0 6.25 6.25 H72.5 a6.25 6.25 0 0 0 6.25 -6.25 V25.75 a6.25 6.25 0 0 0 -6.25 -6.25 H63" stroke-width="8"/>
+    <rect x="37" y="12.25" width="26" height="14.5" rx="5" stroke-width="8"/>
+    <g stroke-width="4">
+      <line x1="34.5" y1="41" x2="52" y2="41"/>
+      <line x1="34.5" y1="54" x2="44" y2="54"/>
+    </g>
+    <rect x="32.5" y="68" width="35" height="7" rx="3.5" fill="currentColor" stroke="none"/>
+  </g>
+</g>
+<text x="590" y="230" text-anchor="middle">C  rejoined line</text>
+<g transform="translate(566,260) scale(0.24)" fill="none" stroke="#000">
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M37 19.5 H27.5 a6.25 6.25 0 0 0 -6.25 6.25 V81.5 a6.25 6.25 0 0 0 6.25 6.25 H72.5 a6.25 6.25 0 0 0 6.25 -6.25 V25.75 a6.25 6.25 0 0 0 -6.25 -6.25 H63" stroke-width="8"/>
+    <rect x="37" y="12.25" width="26" height="14.5" rx="5" stroke-width="8"/>
+    <g stroke-width="4">
+      <line x1="34.5" y1="41" x2="52" y2="41"/>
+      <line x1="34.5" y1="54" x2="44" y2="54"/>
+    </g>
+    <rect x="32.5" y="68" width="35" height="7" rx="3.5" fill="currentColor" stroke="none"/>
+  </g>
+</g>
+<g transform="translate(536,260) scale(0.48)" fill="none" stroke="#000">
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M37 19.5 H27.5 a6.25 6.25 0 0 0 -6.25 6.25 V81.5 a6.25 6.25 0 0 0 6.25 6.25 H72.5 a6.25 6.25 0 0 0 6.25 -6.25 V25.75 a6.25 6.25 0 0 0 -6.25 -6.25 H63" stroke-width="8"/>
+    <rect x="37" y="12.25" width="26" height="14.5" rx="5" stroke-width="8"/>
+    <g stroke-width="4">
+      <line x1="34.5" y1="41" x2="52" y2="41"/>
+      <line x1="34.5" y1="54" x2="44" y2="54"/>
+    </g>
+    <rect x="32.5" y="68" width="35" height="7" rx="3.5" fill="currentColor" stroke="none"/>
+  </g>
+</g>
+<text x="450" y="330" text-anchor="middle" font-size="15" fill="#888">above: 180px  ·  below: 48px and 24px (ribbon size)</text>
+<g transform="translate(370,360) scale(0.9)" fill="none" stroke="#000">
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <rect x="19.88" y="12.42" width="66.42" height="75.21" rx="6.25" stroke-width="8"/>
+    <g stroke-width="4">
+      <line x1="13.29" y1="24.38" x2="28.5" y2="24.38"/>
+      <line x1="13.29" y1="37.21" x2="28.5" y2="37.21"/>
+      <line x1="13.29" y1="50" x2="28.5" y2="50"/>
+      <line x1="13.29" y1="62.79" x2="28.5" y2="62.79"/>
+      <line x1="13.29" y1="75.63" x2="28.5" y2="75.63"/>
+    </g>
+    <g stroke-width="3.5">
+      <circle cx="28.5" cy="24.38" r="1.38"/>
+      <circle cx="28.5" cy="37.21" r="1.38"/>
+      <circle cx="28.5" cy="50" r="1.38"/>
+      <circle cx="28.5" cy="62.79" r="1.38"/>
+      <circle cx="28.5" cy="75.63" r="1.38"/>
+    </g>
+    <polygon points="52.77 53.33 36.22 49.08 70.07 34.18 57.25 69.38 52.77 53.33" fill="currentColor" stroke="none"/>
+  </g>
+</g>
+<text x="450" y="450" text-anchor="middle" font-size="15" fill="#888">reference: Notebook Navigator</text>
+</g></svg>

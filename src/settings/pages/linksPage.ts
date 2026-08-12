@@ -92,7 +92,7 @@ export function createLinkLandingDefinitions(context: SettingsPageContext): Sett
 }
 
 /** The Sites to leave alone sub-page: the rule list, plus a tester to check a rule works. */
-export function createSitesPageDefinitions(context: SettingsPageContext): SettingDefinitionItem[] {
+function createSitesPageDefinitions(context: SettingsPageContext): SettingDefinitionItem[] {
     // Wrapped in a group so styles.css can reach the textarea: only a group carries a class
     return [
         {
@@ -129,6 +129,9 @@ export function createSitesPageDefinitions(context: SettingsPageContext): Settin
 
 /** Live preview so a rule can be checked without leaving settings. */
 function renderUrlTester(setting: Setting, context: SettingsPageContext): void {
+    // Marks the row so styles.css can lay the preview out below the label, which
+    // avoids needing :has() on the parent
+    setting.settingEl.addClass('better-paste-tester');
     const container = setting.settingEl.createDiv({ cls: 'better-paste-preview' });
     const input = container.createEl('input', { type: 'text', attr: { placeholder: URL_SAMPLE } });
     const output = container.createDiv({ cls: 'better-paste-preview-output' });

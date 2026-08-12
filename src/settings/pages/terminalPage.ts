@@ -42,7 +42,7 @@ export function createTerminalLandingDefinitions(context: SettingsPageContext): 
     return [
         {
             name: 'Clean up terminal output',
-            desc: 'Put back together the paragraphs your terminal broke apart at the edge of its window, and drop the indentation it added. Colour codes are removed; code fences, tables and list items are left exactly as they are.',
+            desc: 'Put back together the paragraphs your terminal broke apart at the edge of its window, and drop the indentation it added. Color codes are removed; code fences, tables and list items are left exactly as they are.',
             aliases: ['wrap', 'unwrap', 'rejoin', 'ansi', 'console', 'shell', 'indent', 'bullet', 'list', 'markdown'],
             control: { type: 'toggle', key: 'terminalEnabled', defaultValue: DEFAULT_SETTINGS.terminalEnabled }
         },
@@ -58,7 +58,7 @@ export function createTerminalLandingDefinitions(context: SettingsPageContext): 
 }
 
 /** The Terminal options sub-page. */
-export function createTerminalOptionsDefinitions(context: SettingsPageContext): SettingGroupItem[] {
+function createTerminalOptionsDefinitions(context: SettingsPageContext): SettingGroupItem[] {
     return [
         {
             name: 'When to rejoin a broken line',
@@ -100,6 +100,9 @@ export function createTerminalOptionsDefinitions(context: SettingsPageContext): 
 
 /** Live preview of the terminal rules, which are easiest to judge by example. */
 function renderTerminalTester(setting: Setting, context: SettingsPageContext): void {
+    // Marks the row so styles.css can lay the preview out below the label, which
+    // avoids needing :has() on the parent
+    setting.settingEl.addClass('better-paste-tester');
     const container = setting.settingEl.createDiv({ cls: 'better-paste-preview' });
     const input = container.createEl('textarea', { attr: { placeholder: TERMINAL_SAMPLE, rows: '5' } });
     const output = container.createDiv({ cls: 'better-paste-preview-output' });
