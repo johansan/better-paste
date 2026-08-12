@@ -17,6 +17,7 @@
  */
 
 import { trimUrlTail } from '../transforms/urlCleanup';
+import { IMAGE_EXTENSIONS } from '../settings/constants';
 import type { BetterPasteSettings } from '../settings/types';
 
 /** Where an image reference came from, which decides how it is rewritten. */
@@ -35,10 +36,7 @@ export interface ImageReference {
 }
 
 /** Subset of settings the reference finder reads. */
-export type ImageReferenceOptions = Pick<
-    BetterPasteSettings,
-    'downloadRemoteImages' | 'downloadDataUriImages' | 'downloadBareImageUrls' | 'imageExtensions'
->;
+export type ImageReferenceOptions = Pick<BetterPasteSettings, 'imageLinkPaste'>;
 
 /** Markdown image: ![alt](url "optional title") */
 const MARKDOWN_IMAGE = /!\[([^\]\n]*)\]\(\s*<?([^)<>\s]+)>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
@@ -95,16 +93,14 @@ export function extensionOfUrl(url: string): string | null {
 }
 
 /** True when a bare URL points at something that looks like an image file. */
-function looksLikeImageUrl(url: string, options: ImageReferenceOptions): boolean {
+function looksLikeImageUrl(url: string): boolean {
     const extension = extensionOfUrl(url);
-    return extension !== null && options.imageExtensions.some(candidate => candidate.toLowerCase() === extension);
+    return extension !== null && IMAGE_EXTENSIONS.some(candidate => candidate.toLowerCase() === extension);
 }
 
-/** True when the plugin is configured to download this particular source. */
-function isEnabledSource(url: string, options: ImageReferenceOptions): boolean {
-    if (isDataImageUri(url)) return options.downloadDataUriImages;
-    if (isHttpUrl(url)) return options.downloadRemoteImages;
-    return false;
+/** True when this is a source the plugin knows how to pull into the vault. */
+function isSupportedSource(url: string): boolean {
+    return isDataImageUri(url) || isHttpUrl(url);
 }
 
 /**
@@ -125,7 +121,7 @@ export function findImageReferences(text: string, options: ImageReferenceOptions
     MARKDOWN_IMAGE.lastIndex = 0;
     for (let match = MARKDOWN_IMAGE.exec(text); match !== null; match = MARKDOWN_IMAGE.exec(text)) {
         const url = match[2];
-        if (!isEnabledSource(url, options)) continue;
+        if (!isSupportedSource(url)) continue;
         if (!claim(match.index, match.index + match[0].length)) continue;
         found.push({ token: match[0], index: match.index, url, alt: match[1] ?? '', kind: 'markdown' });
     }
@@ -133,18 +129,18 @@ export function findImageReferences(text: string, options: ImageReferenceOptions
     HTML_IMAGE.lastIndex = 0;
     for (let match = HTML_IMAGE.exec(text); match !== null; match = HTML_IMAGE.exec(text)) {
         const url = match[1] ?? match[2] ?? match[3] ?? '';
-        if (!isEnabledSource(url, options)) continue;
+        if (!isSupportedSource(url)) continue;
         if (!claim(match.index, match.index + match[0].length)) continue;
         const altMatch = HTML_ALT.exec(match[0]);
         const alt = altMatch ? (altMatch[1] ?? altMatch[2] ?? altMatch[3] ?? '') : '';
         found.push({ token: match[0], index: match.index, url, alt, kind: 'html' });
     }
 
-    if (options.downloadBareImageUrls && options.downloadRemoteImages) {
+    if (options.imageLinkPaste === 'image') {
         BARE_URL.lastIndex = 0;
         for (let match = BARE_URL.exec(text); match !== null; match = BARE_URL.exec(text)) {
             const url = trimUrlTail(match[0]);
-            if (!looksLikeImageUrl(url, options)) continue;
+            if (!looksLikeImageUrl(url)) continue;
             if (!claim(match.index, match.index + url.length)) continue;
             found.push({ token: url, index: match.index, url, alt: '', kind: 'bare' });
         }

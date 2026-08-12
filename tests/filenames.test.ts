@@ -18,7 +18,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { applyFileNameTemplate, baseNameFromUrl, buildFileNameTokens, resolveExtension, sanitizeFileName } from '../src/utils/filenames';
-import { DEFAULT_IMAGE_EXTENSIONS } from '../src/settings/defaults';
+import { IMAGE_EXTENSIONS } from '../src/settings/constants';
 
 describe('sanitizeFileName', () => {
     it('removes characters that are illegal in a vault path', () => {
@@ -62,23 +62,23 @@ describe('baseNameFromUrl', () => {
 
 describe('resolveExtension', () => {
     it('prefers the content type', () => {
-        expect(resolveExtension('image/png', 'https://example.com/a.jpg', DEFAULT_IMAGE_EXTENSIONS)).toBe('png');
+        expect(resolveExtension('image/png', 'https://example.com/a.jpg', IMAGE_EXTENSIONS)).toBe('png');
     });
 
     it('normalises jpeg to jpg', () => {
-        expect(resolveExtension('image/jpeg', 'https://example.com/a', DEFAULT_IMAGE_EXTENSIONS)).toBe('jpg');
+        expect(resolveExtension('image/jpeg', 'https://example.com/a', IMAGE_EXTENSIONS)).toBe('jpg');
     });
 
     it('ignores content type parameters', () => {
-        expect(resolveExtension('image/png; charset=binary', 'https://example.com/a', DEFAULT_IMAGE_EXTENSIONS)).toBe('png');
+        expect(resolveExtension('image/png; charset=binary', 'https://example.com/a', IMAGE_EXTENSIONS)).toBe('png');
     });
 
     it('falls back to the URL extension', () => {
-        expect(resolveExtension(undefined, 'https://example.com/a.webp', DEFAULT_IMAGE_EXTENSIONS)).toBe('webp');
+        expect(resolveExtension(undefined, 'https://example.com/a.webp', IMAGE_EXTENSIONS)).toBe('webp');
     });
 
     it('rejects a response that is not an image', () => {
-        expect(resolveExtension('text/html', 'https://example.com/a', DEFAULT_IMAGE_EXTENSIONS)).toBeNull();
+        expect(resolveExtension('text/html', 'https://example.com/a', IMAGE_EXTENSIONS)).toBeNull();
     });
 
     it('rejects an extension that is not in the allow list', () => {
@@ -86,13 +86,13 @@ describe('resolveExtension', () => {
     });
 
     it('accepts a bare file name as well as a URL', () => {
-        expect(resolveExtension('', 'image.png', DEFAULT_IMAGE_EXTENSIONS)).toBe('png');
+        expect(resolveExtension('', 'image.png', IMAGE_EXTENSIONS)).toBe('png');
     });
 
     it('trusts the clipboard file name over a differently typed source URL', () => {
         // Safari decodes a page's .webp into a PNG on the clipboard; the bytes are PNG
-        expect(resolveExtension('', 'image.png', DEFAULT_IMAGE_EXTENSIONS)).toBe('png');
-        expect(resolveExtension('image/png', 'photo.webp', DEFAULT_IMAGE_EXTENSIONS)).toBe('png');
+        expect(resolveExtension('', 'image.png', IMAGE_EXTENSIONS)).toBe('png');
+        expect(resolveExtension('image/png', 'photo.webp', IMAGE_EXTENSIONS)).toBe('png');
     });
 });
 

@@ -1,7 +1,7 @@
 {
   "name": "better-paste",
   "version": "1.0.0",
-  "description": "Clean up what you paste: materialize remote images into the vault, strip tracking parameters from URLs, and unwrap hard-wrapped terminal output.",
+  "description": "Clean up what you paste: save images into the vault, strip tracking from links, unwrap terminal output, and normalise AI typography.",
   "main": "main.js",
   "type": "module",
   "engines": {

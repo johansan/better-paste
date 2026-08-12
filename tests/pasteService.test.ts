@@ -460,6 +460,64 @@ describe('handleEditorPaste: rich content', () => {
     });
 });
 
+describe('leaving a paste alone', () => {
+    const TRACKED = 'https://example.com/a?utm_source=x';
+
+    it('skips a note that opts out with the disable property', () => {
+        const { service } = build();
+        const editor = new FakeEditor('---\nbetter-paste: false\n---\n\n');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: TRACKED }), editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe('---\nbetter-paste: false\n---\n\n');
+    });
+
+    it('still processes a note whose property says yes', () => {
+        const { service } = build();
+        const editor = new FakeEditor('---\nbetter-paste: true\n---\n\n');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: TRACKED }), editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe('---\nbetter-paste: true\n---\n\nhttps://example.com/a');
+    });
+
+    it('skips a paste landing inside a code fence', () => {
+        // Pasting terminal output into a fence is an act of preservation; rejoining its
+        // lines there would destroy the thing being preserved
+        const { service } = build();
+        const editor = new FakeEditor('Notes\n\n```sh\n');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: TRACKED }), editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe('Notes\n\n```sh\n');
+    });
+
+    it('processes again once the fence has closed', () => {
+        const { service } = build();
+        const editor = new FakeEditor('Notes\n\n```sh\nls\n```\n\n');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: TRACKED }), editor.asEditor(), INFO)).toBe(true);
+    });
+
+    it('skips a paste inside the frontmatter block', () => {
+        const { service } = build();
+        const editor = new FakeEditor('---\ntitle: ', '---\ntitle: '.length);
+        // The note closes its block further down, past the cursor
+        const withBody = new FakeEditor('---\ntitle: \n---\n\nBody', '---\ntitle: '.length);
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: TRACKED }), withBody.asEditor(), INFO)).toBe(false);
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: TRACKED }), editor.asEditor(), INFO)).toBe(true);
+    });
+
+    it('does not leave a disabled note alone when the command is used explicitly', () => {
+        // An explicit command means the user asked for the rules by name, so the property
+        // must not suppress it. The selection is real, or this would pass vacuously.
+        const { service } = build();
+        const document = '---\nbetter-paste: false\n---\n\nhttps://example.com/a?utm_source=x';
+        const editor = selecting(document, 'https://example.com/a?utm_source=x');
+
+        service.cleanSelection(editor.asEditor());
+        expect(editor.getValue()).toBe('---\nbetter-paste: false\n---\n\nhttps://example.com/a');
+    });
+});
+
 describe('cleanSelection', () => {
     it('cleans the selected text in place', () => {
         const { service } = build();

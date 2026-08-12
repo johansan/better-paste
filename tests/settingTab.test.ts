@@ -17,11 +17,19 @@
  */
 
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { App, SettingDefinition, SettingDefinitionControl, SettingDefinitionItem } from 'obsidian';
+import type {
+    App,
+    SettingDefinition,
+    SettingDefinitionControl,
+    SettingDefinitionGroup,
+    SettingDefinitionItem,
+    SettingDefinitionPage
+} from 'obsidian';
 import { BetterPasteSettingTab } from '../src/settings/SettingTab';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import type BetterPastePlugin from '../src/main';
 import type { BetterPasteSettings } from '../src/settings/types';
+import { SHIPPED_DOMAIN_RULES } from '../src/settings/constants';
 
 /** Minimal plugin double exposing only what the setting tab touches. */
 function fakePlugin(overrides: Partial<BetterPasteSettings> = {}) {
@@ -40,15 +48,40 @@ function makeTab(plugin: ReturnType<typeof fakePlugin>): BetterPasteSettingTab {
     return new BetterPasteSettingTab({} as App, plugin as unknown as BetterPastePlugin);
 }
 
-/** Flattens the definition tree into the individual setting rows. */
+/** A definition that holds other definitions: a group, a list, or a sub-page. */
+type Container = SettingDefinitionGroup | SettingDefinitionPage;
+
+function isContainer(item: SettingDefinitionItem): item is Container {
+    return 'type' in item && (item.type === 'group' || item.type === 'list' || item.type === 'page');
+}
+
+/** Flattens the definition tree into the individual setting rows, descending into pages. */
 function flatten(items: SettingDefinitionItem[]): SettingDefinition[] {
     const rows: SettingDefinition[] = [];
     for (const item of items) {
-        if ('type' in item && (item.type === 'group' || item.type === 'list')) {
-            rows.push(...flatten(item.items ?? []));
-        } else {
-            rows.push(item as SettingDefinition);
-        }
+        if (isContainer(item)) rows.push(...flatten([...(item.items ?? [])]));
+        else rows.push(item);
+    }
+    return rows;
+}
+
+/** Every sub-page in the tree, at any depth. */
+function pages(items: SettingDefinitionItem[]): SettingDefinitionPage[] {
+    const found: SettingDefinitionPage[] = [];
+    for (const item of items) {
+        if (!isContainer(item)) continue;
+        if (item.type === 'page') found.push(item);
+        found.push(...pages([...(item.items ?? [])]));
+    }
+    return found;
+}
+
+/** Rows on the landing page itself, not inside any sub-page. */
+function landingRows(items: SettingDefinitionItem[]): SettingDefinitionItem[] {
+    const rows: SettingDefinitionItem[] = [];
+    for (const item of items) {
+        if (isContainer(item) && item.type !== 'page') rows.push(...landingRows([...(item.items ?? [])]));
+        else rows.push(item);
     }
     return rows;
 }
@@ -57,18 +90,13 @@ function controlRows(tab: BetterPasteSettingTab): SettingDefinitionControl[] {
     return flatten(tab.getSettingDefinitions()).filter((row): row is SettingDefinitionControl => row.control !== undefined);
 }
 
-/** The stub base class counts refreshDomState calls; the shipped typings do not expose that. */
-function refreshCount(tab: BetterPasteSettingTab): number {
-    return (tab as unknown as { refreshCount: number }).refreshCount;
-}
-
 /** Evaluates a row's visibility, which may be a boolean or a predicate. */
-function isVisible(row: SettingDefinition | undefined): boolean | undefined {
+function isVisible(row: { visible?: boolean | (() => boolean) } | undefined): boolean | undefined {
     if (!row) return undefined;
     return typeof row.visible === 'function' ? row.visible() : row.visible;
 }
 
-describe('BetterPasteSettingTab definitions', () => {
+describe('settings tree', () => {
     let plugin: ReturnType<typeof fakePlugin>;
     let tab: BetterPasteSettingTab;
 
@@ -85,26 +113,24 @@ describe('BetterPasteSettingTab definitions', () => {
         }
     });
 
-    it('reads the current value back for every control', () => {
-        for (const row of controlRows(tab)) {
-            const key = row.control.key;
-            const value = tab.getControlValue(key);
-            expect(value, `no value for "${key}"`).toBeDefined();
-            // List settings are arrays in storage but strings in the editor
-            if (key.endsWith('.text')) expect(typeof value).toBe('string');
-            else expect(value).toEqual(plugin.settings[key as keyof BetterPasteSettings]);
-        }
-    });
-
-    it('covers every setting except the ones with no control of their own', () => {
+    it('every setting has a control somewhere in the tree', () => {
         const covered = new Set(
             controlRows(tab).map(row => {
                 const key = row.control.key;
                 return key.endsWith('.text') ? key.slice(0, -'.text'.length) : key;
             })
         );
-        const missing = Object.keys(DEFAULT_SETTINGS).filter(key => !covered.has(key));
-        expect(missing).toEqual([]);
+        expect(Object.keys(DEFAULT_SETTINGS).filter(key => !covered.has(key))).toEqual([]);
+    });
+
+    it('reads the current value back for every control', () => {
+        for (const row of controlRows(tab)) {
+            const key = row.control.key;
+            const value = tab.getControlValue(key);
+            expect(value, `no value for "${key}"`).toBeDefined();
+            if (key.endsWith('.text')) expect(typeof value).toBe('string');
+            else expect(value).toEqual(plugin.settings[key as keyof BetterPasteSettings]);
+        }
     });
 
     it('gives every row a name', () => {
@@ -113,71 +139,124 @@ describe('BetterPasteSettingTab definitions', () => {
         }
     });
 
-    it('writes a plain setting through and persists it', async () => {
-        await tab.setControlValue('terminalMinWrapWidth', 80);
-        expect(plugin.settings.terminalMinWrapWidth).toBe(80);
-        expect(plugin.saveCount()).toBe(1);
+    it('keeps the landing page short', () => {
+        // The point of the sub-pages is that the first screen stays scannable
+        expect(landingRows(tab.getSettingDefinitions()).length).toBeLessThanOrEqual(14);
     });
 
-    it('splits a line-separated list setting back into entries', async () => {
-        await tab.setControlValue('urlDomainRules.text', 'example.com: a, b\n\nother.com');
-        expect(plugin.settings.urlDomainRules).toEqual(['example.com: a, b', 'other.com']);
-    });
-
-    it('splits a comma-separated list setting back into entries', async () => {
-        await tab.setControlValue('imageExtensions.text', 'png, jpg\nwebp');
-        expect(plugin.settings.imageExtensions).toEqual(['png', 'jpg', 'webp']);
-    });
-
-    it('joins list settings for display using the right separator', () => {
-        expect(tab.getControlValue('urlDomainRules.text')).toContain('\n');
-        expect(tab.getControlValue('imageExtensions.text')).toBe(DEFAULT_SETTINGS.imageExtensions.join(', '));
-    });
-
-    it('hides the dependent image settings when the feature is off', () => {
-        const off = makeTab(fakePlugin({ imagesEnabled: false }));
-        const hidden = flatten(off.getSettingDefinitions()).filter(
-            row => row.control?.key.startsWith('image') || row.control?.key.startsWith('download')
-        );
-        for (const row of hidden) {
-            if (row.control?.key === 'imagesEnabled') continue;
-            expect(isVisible(row), `"${row.control?.key}" should be hidden`).toBe(false);
+    it('puts the detail on sub-pages, declared so search can still reach it', () => {
+        const found = pages(tab.getSettingDefinitions());
+        expect(found.map(page => page.name)).toEqual(['Image options', 'Sites where parameters matter', 'Terminal options']);
+        // `items` keeps a page in the searchable tree; the imperative `page` form does not
+        for (const page of found) {
+            expect(page.items, `"${page.name}" has no items`).toBeDefined();
+            expect(page.page, `"${page.name}" uses the imperative form`).toBeUndefined();
         }
     });
 
-    it('shows the custom image folder only in custom mode', () => {
-        const folderRow = (settings: Partial<BetterPasteSettings>) =>
-            flatten(makeTab(fakePlugin(settings)).getSettingDefinitions()).find(row => row.control?.key === 'imageFolder');
+    it('shows the state of a sub-page on its link', () => {
+        const found = pages(tab.getSettingDefinitions());
+        const sites = found.find(page => page.name === 'Sites where parameters matter');
+        const terminal = found.find(page => page.name === 'Terminal options');
 
-        expect(isVisible(folderRow({ imageFolderMode: 'obsidian' }))).toBe(false);
-        expect(isVisible(folderRow({ imageFolderMode: 'custom' }))).toBe(true);
+        expect(typeof sites?.displayValue === 'function' ? sites.displayValue() : sites?.displayValue).toMatch(/^\d+ sites$/);
+        expect(typeof terminal?.displayValue === 'function' ? terminal.displayValue() : terminal?.displayValue).toBe('Indented lines only');
     });
 
-    it('shows the tracking parameter list only in tracking mode', () => {
-        const row = (mode: 'all' | 'tracking') =>
-            flatten(makeTab(fakePlugin({ urlStripMode: mode })).getSettingDefinitions()).find(
-                item => item.control?.key === 'urlTrackingParams.text'
-            );
+    it('gives every master toggle search terms for what it hides', () => {
+        // A rule that is off hides its own settings, and a hidden row is dropped from search
+        const masters = ['imagesEnabled', 'urlEnabled', 'terminalEnabled', 'aiTextEnabled'];
+        for (const key of masters) {
+            const row = controlRows(tab).find(candidate => candidate.control.key === key);
+            expect(row?.aliases?.length, `"${key}" has no aliases`).toBeGreaterThan(0);
+        }
+    });
+});
 
-        expect(isVisible(row('all'))).toBe(false);
-        expect(isVisible(row('tracking'))).toBe(true);
+describe('settings values', () => {
+    let plugin: ReturnType<typeof fakePlugin>;
+    let tab: BetterPasteSettingTab;
+
+    beforeEach(() => {
+        plugin = fakePlugin();
+        tab = makeTab(plugin);
     });
 
-    it('re-evaluates dependent settings after a plain change', async () => {
-        const before = refreshCount(tab);
+    it('writes a plain setting through and persists it', async () => {
+        await tab.setControlValue('terminalRejoinMode', 'any');
+        expect(plugin.settings.terminalRejoinMode).toBe('any');
+        expect(plugin.saveCount()).toBe(1);
+    });
+
+    it('shows every site rule, shipped ones included, so they can be edited', () => {
+        const shown = String(tab.getControlValue('urlDomainRules.text')).split('\n');
+        expect(shown).toHaveLength(SHIPPED_DOMAIN_RULES.length);
+        expect(shown).toContain('youtube.com | v, t, list, index, start');
+    });
+
+    it('stores only what the user changed, so later releases can still add rules', async () => {
+        const shown = String(tab.getControlValue('urlDomainRules.text'));
+        await tab.setControlValue('urlDomainRules.text', `${shown}\nmine.example | id`);
+        expect(plugin.settings.urlDomainRules).toEqual(['mine.example | id']);
+    });
+
+    it('remembers a rule the user deleted from the field', async () => {
+        const kept = String(tab.getControlValue('urlDomainRules.text'))
+            .split('\n')
+            .filter(line => !line.startsWith('youtube.com'))
+            .join('\n');
+
+        await tab.setControlValue('urlDomainRules.text', kept);
+        expect(plugin.settings.urlDomainRules).toEqual(['!youtube.com']);
+        expect(String(tab.getControlValue('urlDomainRules.text'))).not.toContain('youtube.com |');
+    });
+
+    it('round-trips an unedited list to no stored changes', async () => {
+        await tab.setControlValue('urlDomainRules.text', String(tab.getControlValue('urlDomainRules.text')));
+        expect(plugin.settings.urlDomainRules).toEqual([]);
+    });
+
+    it('rejects a site rule that is not a domain', () => {
+        const row = controlRows(tab).find(candidate => candidate.control.key === 'urlDomainRules.text');
+        const validate = row?.control.validate as ((value: string) => string | void) | undefined;
+        expect(validate?.('example.com: id')).toBeUndefined();
+        expect(validate?.('youtube,com: v')).toContain('youtube,com');
+    });
+});
+
+describe('dependent settings', () => {
+    function rowFor(key: string, settings: Partial<BetterPasteSettings> = {}) {
+        return controlRows(makeTab(fakePlugin(settings))).find(row => row.control.key === key);
+    }
+
+    function pageFor(name: string, settings: Partial<BetterPasteSettings> = {}) {
+        return pages(makeTab(fakePlugin(settings)).getSettingDefinitions()).find(page => page.name === name);
+    }
+
+    it('hides the image detail when the rule is off', () => {
+        expect(isVisible(pageFor('Image options', { imagesEnabled: false }))).toBe(false);
+        expect(isVisible(pageFor('Image options', { imagesEnabled: true }))).toBe(true);
+    });
+
+    it('hides the link detail when the rule is off', () => {
+        expect(isVisible(rowFor('urlStripMode', { urlEnabled: false }))).toBe(false);
+        expect(isVisible(pageFor('Sites where parameters matter', { urlEnabled: false }))).toBe(false);
+    });
+
+    it('hides the terminal page when the rule is off', () => {
+        expect(isVisible(pageFor('Terminal options', { terminalEnabled: false }))).toBe(false);
+        expect(isVisible(pageFor('Terminal options', { terminalEnabled: true }))).toBe(true);
+    });
+
+    it('hides the punctuation choice when AI cleanup is off', () => {
+        expect(isVisible(rowFor('aiTextPlainPunctuation', { aiTextEnabled: false }))).toBe(false);
+        expect(isVisible(rowFor('aiTextPlainPunctuation', { aiTextEnabled: true }))).toBe(true);
+    });
+
+    it('re-evaluates dependent settings after a change', async () => {
+        const tab = makeTab(fakePlugin());
+        const before = (tab as unknown as { refreshCount: number }).refreshCount;
         await tab.setControlValue('imagesEnabled', false);
-        expect(refreshCount(tab)).toBe(before + 1);
-    });
-
-    it('restores a list to its defaults from the action row', async () => {
-        plugin.settings.urlDomainRules = ['only.example.com'];
-        const restore = flatten(tab.getSettingDefinitions()).find(row => row.name.startsWith('Restore default site exceptions'));
-        expect(restore?.action).toBeTypeOf('function');
-
-        restore?.action?.(null as unknown as HTMLElement, 0);
-        await Promise.resolve();
-        await Promise.resolve();
-
-        expect(plugin.settings.urlDomainRules).toEqual(DEFAULT_SETTINGS.urlDomainRules);
+        expect((tab as unknown as { refreshCount: number }).refreshCount).toBe(before + 1);
     });
 });

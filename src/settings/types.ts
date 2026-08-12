@@ -17,95 +17,83 @@
  */
 
 /**
- * How query parameters are removed from pasted URLs.
- * - 'all': drop every parameter unless a domain rule or keep list preserves it
- * - 'tracking': drop only parameters matching the tracking pattern list
+ * How much of a pasted link is removed.
+ * - 'all': drop every query parameter unless a site rule keeps it
+ * - 'tracking': drop only parameters known to be tracking
  */
 export type UrlStripMode = 'all' | 'tracking';
 
 /**
- * What happens to bullet characters when terminal text is cleaned up.
- * - 'preserve': leave the original bullet character untouched
- * - 'markdown': rewrite bullets to Markdown list syntax so Obsidian renders a real list
+ * How readily a line is treated as the continuation of the one above it.
+ * - 'indented': only when it is indented further than the line that started the paragraph
+ * - 'any': whenever the line above looks full, which suits terminals that do not indent
+ * - 'never': leave every line break alone, for column-aligned output such as `git log --graph`
+ */
+export type TerminalRejoinMode = 'indented' | 'any' | 'never';
+
+/**
+ * What happens to bullet characters in terminal output.
+ * - 'preserve': leave the original character alone
+ * - 'markdown': rewrite to a Markdown list item so Obsidian renders a real list
  */
 export type TerminalBulletMode = 'preserve' | 'markdown';
 
+/** Naming scheme for saved images. */
+export type ImageFilenameFormat = 'source' | 'source-date' | 'date-time';
+
 /**
- * Where downloaded images are written.
- * - 'obsidian': follow the vault's own attachment location setting
- * - 'custom': always use the folder configured in `imageFolder`
+ * What a pasted link that points straight at a picture turns into.
+ * - 'image': download the picture and show it
+ * - 'link': leave the link alone
  */
-export type ImageFolderMode = 'obsidian' | 'custom';
+export type ImageLinkPaste = 'image' | 'link';
 
 export interface BetterPasteSettings {
-    /** Run transforms automatically on regular paste. When false, only the explicit commands apply them. */
-    interceptPaste: boolean;
-    /** Show a notice summarising what each paste changed. */
-    showNotices: boolean;
+    /* Pasting */
 
-    /** Master switch for rich clipboard and image handling. */
+    /** Run the rules automatically on paste. When off, only the commands apply them. */
+    interceptPaste: boolean;
+    /** Show a notice summarising what a paste changed. Failures are always reported. */
+    showNotices: boolean;
+    /** Remove blank space from the start and end of whatever was pasted. */
+    trimPaste: boolean;
+
+    /* Images */
+
+    /** Save pasted pictures into the vault instead of leaving them as links. */
     imagesEnabled: boolean;
-    /** Download http(s) images referenced by pasted HTML into the vault. */
-    downloadRemoteImages: boolean;
-    /** Save inline data: URI images from pasted HTML into the vault. */
-    downloadDataUriImages: boolean;
-    /** Treat a pasted bare image URL as an embed and download it. */
-    downloadBareImageUrls: boolean;
-    /** Where downloaded images are stored. */
-    imageFolderMode: ImageFolderMode;
-    /** Vault-relative folder used when imageFolderMode is 'custom'. */
-    imageFolder: string;
-    /** Filename template. Supports {{name}}, {{host}}, {{date}}, {{time}}, {{timestamp}}. */
-    imageFilenameTemplate: string;
-    /** Reject downloads larger than this many megabytes. 0 disables the limit. */
-    imageMaxSizeMb: number;
-    /** Abort a download that takes longer than this many seconds. */
-    imageTimeoutSeconds: number;
-    /** File extensions accepted as images. */
-    imageExtensions: string[];
-    /**
-     * Frontmatter property naming the width pasted images get in that note, for example
-     * "image-width: 400". Blank turns the feature off.
-     */
+    /** Naming scheme for saved images. */
+    imageFilenameFormat: ImageFilenameFormat;
+    /** What a pasted link that points straight at a picture turns into. */
+    imageLinkPaste: ImageLinkPaste;
+    /** Frontmatter property setting the width of images pasted into a note. Blank disables it. */
     imageSizeProperty: string;
 
-    /** Master switch for URL cleaning. */
-    urlEnabled: boolean;
-    /** Whether to strip all parameters or only known tracking parameters. */
-    urlStripMode: UrlStripMode;
-    /** Glob patterns for tracking parameters, used in 'tracking' mode. */
-    urlTrackingParams: string[];
-    /** Glob patterns for parameters that survive on every domain, in both modes. */
-    urlKeepParams: string[];
-    /** Per-domain rules: "domain" keeps every parameter, "domain: a, b" keeps only a and b. */
-    urlDomainRules: string[];
-    /** Remove ':~:text=' scroll-to-text fragments. */
-    urlStripTextFragments: boolean;
-    /** Remove every '#fragment'. */
-    urlStripAllFragments: boolean;
-    /** Remove a trailing slash from the path. */
-    urlStripTrailingSlash: boolean;
+    /* Links */
 
-    /** Master switch for terminal text cleanup. */
+    /** Remove tracking from pasted links. */
+    urlEnabled: boolean;
+    /** Whether to drop every parameter or only known tracking ones. */
+    urlStripMode: UrlStripMode;
+    /**
+     * The user's own site rules, merged over the shipped list at read time so that
+     * updates to the shipped rules keep reaching people who have added their own.
+     */
+    urlDomainRules: string[];
+
+    /* Terminal text */
+
+    /** Rejoin paragraphs a terminal broke across lines. */
     terminalEnabled: boolean;
-    /** Join hard-wrapped continuation lines back into one paragraph. */
-    terminalUnwrapLines: boolean;
-    /** Only treat a line as a continuation when it is indented further than its paragraph's first line. */
-    terminalRequireIndent: boolean;
-    /** A line only counts as wrapped when the line above it is at least this long. */
-    terminalMinWrapWidth: number;
-    /** Remove the common leading indentation shared by all lines. */
-    terminalDedent: boolean;
-    /** Strip ANSI escape sequences (colours, cursor moves). */
-    terminalStripAnsi: boolean;
-    /** Collapse runs of blank lines into a single blank line. */
-    terminalCollapseBlankLines: boolean;
-    /** Remove trailing spaces from every line. */
-    terminalTrimTrailingWhitespace: boolean;
-    /** Never unwrap lines inside fenced code blocks. */
-    terminalPreserveCodeBlocks: boolean;
-    /** How bullet characters are treated. */
+    /** How readily a line is treated as a continuation. */
+    terminalRejoinMode: TerminalRejoinMode;
+    /** What happens to bullet characters. */
     terminalBulletMode: TerminalBulletMode;
-    /** Characters that start a new list item and therefore a new paragraph. */
-    terminalListMarkers: string[];
+
+    /* AI text */
+
+    /** Normalise the typography that AI assistants produce. */
+    aiTextEnabled: boolean;
+    /** Replace typographic punctuation with its plain ASCII equivalent. */
+    aiTextPlainPunctuation: boolean;
 }

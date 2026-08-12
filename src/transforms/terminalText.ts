@@ -17,22 +17,11 @@
  */
 
 import { stripAnsi } from './ansi';
+import { LIST_MARKERS, MIN_WRAP_WIDTH, WRAP_TOLERANCE } from '../settings/constants';
 import type { BetterPasteSettings } from '../settings/types';
 
-/** Subset of settings the terminal cleaner reads, so tests can build one without a full settings object. */
-export type TerminalCleanupOptions = Pick<
-    BetterPasteSettings,
-    | 'terminalUnwrapLines'
-    | 'terminalRequireIndent'
-    | 'terminalMinWrapWidth'
-    | 'terminalDedent'
-    | 'terminalStripAnsi'
-    | 'terminalCollapseBlankLines'
-    | 'terminalTrimTrailingWhitespace'
-    | 'terminalPreserveCodeBlocks'
-    | 'terminalBulletMode'
-    | 'terminalListMarkers'
->;
+/** Subset of settings this rule reads, so tests can build one without a full settings object. */
+export type TerminalCleanupOptions = Pick<BetterPasteSettings, 'terminalRejoinMode' | 'terminalBulletMode'>;
 
 /** Markdown constructs that always begin their own block and never continue the previous paragraph. */
 const NUMBERED_LIST = /^\s*\d{1,9}[.)]\s/;
@@ -66,21 +55,55 @@ function isBlank(line: string): boolean {
 }
 
 /**
+ * Works out the column the terminal wrapped at, from the text itself.
+ *
+ * A terminal breaks every long line at the same column, so wrapped lines cluster just
+ * below it. When at least two lines sit near the longest one, that length is taken as the
+ * wrap column. A single long line is an outlier rather than evidence, so the conservative
+ * floor is used instead — which also covers text that was never wrapped at all.
+ *
+ * This replaces asking the user for a threshold they cannot know: the answer depends on
+ * how wide their terminal window happened to be when they copied.
+ */
+export function inferWrapWidth(lines: readonly string[]): number {
+    // Fenced content is copied verbatim, so a long JSON line inside a log dump must not
+    // drag the threshold above the prose the user actually wants rejoined
+    const prose: string[] = [];
+    let insideFence = false;
+    for (const line of lines) {
+        if (FENCE.test(line)) {
+            insideFence = !insideFence;
+            continue;
+        }
+        if (!insideFence && !isBlank(line)) prose.push(line);
+    }
+
+    const lengths = prose.map(line => line.trimEnd().length);
+    if (lengths.length < 2) return MIN_WRAP_WIDTH;
+
+    // Spread would blow the argument limit on a large pasted log
+    const longest = lengths.reduce((max, length) => (length > max ? length : max), 0);
+    const nearLongest = lengths.filter(length => length >= longest - WRAP_TOLERANCE).length;
+    if (nearLongest < 2) return MIN_WRAP_WIDTH;
+
+    return Math.max(MIN_WRAP_WIDTH, longest - WRAP_TOLERANCE);
+}
+
+/**
  * Returns the bullet marker a line starts with, or null. A marker only counts when it is
  * followed by whitespace, so "-1 degree" and "*emphasis*" are not mistaken for list items.
  */
-function listMarkerOf(line: string, markers: readonly string[]): string | null {
+function listMarkerOf(line: string): string | null {
     const body = line.slice(leadingWhitespace(line).length);
-    for (const marker of markers) {
-        if (!marker) continue;
+    for (const marker of LIST_MARKERS) {
         if (body.startsWith(marker) && /\s/.test(body.charAt(marker.length))) return marker;
     }
     return null;
 }
 
 /** True when the line opens a Markdown block that must not be merged into the previous paragraph. */
-function startsNewBlock(line: string, markers: readonly string[]): boolean {
-    if (listMarkerOf(line, markers) !== null) return true;
+function startsNewBlock(line: string): boolean {
+    if (listMarkerOf(line) !== null) return true;
     if (NUMBERED_LIST.test(line)) return true;
     if (HEADING.test(line)) return true;
     if (BLOCKQUOTE.test(line)) return true;
@@ -116,8 +139,8 @@ export function dedent(lines: readonly string[]): string[] {
  * Rewrites a non-Markdown bullet character to a Markdown list dash, preserving indentation.
  * Lines that already use '-', '*' or '+' are left alone.
  */
-function toMarkdownBullet(line: string, markers: readonly string[]): string {
-    const marker = listMarkerOf(line, markers);
+function toMarkdownBullet(line: string): string {
+    const marker = listMarkerOf(line);
     if (marker === null || marker === '-' || marker === '*' || marker === '+') return line;
 
     const indent = leadingWhitespace(line);
@@ -134,11 +157,12 @@ interface Paragraph {
 
 /**
  * Groups lines into paragraphs. A paragraph continues across a line break only when the
- * previous line looks hard wrapped: long enough to have hit the terminal's wrap column,
+ * previous line looks hard wrapped: long enough to have reached the terminal's wrap column,
  * and followed by a line that does not open a new Markdown block.
  */
-function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptions): Paragraph[] {
-    const markers = options.terminalListMarkers;
+function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptions, wrapWidth: number): Paragraph[] {
+    const rejoin = options.terminalRejoinMode;
+    const requireIndent = rejoin === 'indented';
     const paragraphs: Paragraph[] = [];
     let current: Paragraph | null = null;
     let insideFence = false;
@@ -159,7 +183,7 @@ function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptio
             continue;
         }
 
-        if (fenceToggle && options.terminalPreserveCodeBlocks) {
+        if (fenceToggle) {
             current = null;
             insideFence = true;
             paragraphs.push({ lines: [line], verbatim: true });
@@ -170,12 +194,13 @@ function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptio
         const first = current?.lines[0];
 
         const continues =
+            rejoin !== 'never' &&
             current !== null &&
             previous !== undefined &&
             first !== undefined &&
-            !startsNewBlock(line, markers) &&
-            previous.trimEnd().length >= options.terminalMinWrapWidth &&
-            (!options.terminalRequireIndent || indentWidth(line) > indentWidth(first));
+            !startsNewBlock(line) &&
+            previous.trimEnd().length >= wrapWidth &&
+            (!requireIndent || indentWidth(line) > indentWidth(first));
 
         if (continues && current) {
             current.lines.push(line);
@@ -193,20 +218,18 @@ function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptio
  * that terminal output puts in front of prose. Indentation is kept for list items, which
  * use it for nesting, and for indented code blocks.
  */
-function renderParagraph(paragraph: Paragraph, options: TerminalCleanupOptions): string {
+function renderParagraph(paragraph: Paragraph, preserveIndent: boolean): string {
     if (paragraph.verbatim) return paragraph.lines.join('\n');
 
-    const markers = options.terminalListMarkers;
     const first = paragraph.lines[0];
+    const joined = paragraph.lines.map((line, index) => (index === 0 ? line.trimEnd() : line.trim())).join(' ');
 
-    const joined = options.terminalUnwrapLines
-        ? paragraph.lines.map((line, index) => (index === 0 ? line.trimEnd() : line.trim())).join(' ')
-        : paragraph.lines.join('\n');
-
-    if (!options.terminalDedent) return joined;
+    // In the never mode the line breaks are the layout, so what is left of the indentation
+    // after the shared dedent is content too
+    if (preserveIndent) return joined;
 
     // A residual indent below the code-block threshold is wrapping decoration, not structure
-    const isStructural = listMarkerOf(first, markers) !== null || NUMBERED_LIST.test(first);
+    const isStructural = listMarkerOf(first) !== null || NUMBERED_LIST.test(first);
     if (isStructural || indentWidth(first) >= INDENTED_CODE_WIDTH) return joined;
 
     return joined.replace(/^[ \t]+/, '');
@@ -222,25 +245,20 @@ export interface TerminalCleanupResult {
  * indentation, and rejoins paragraphs that the terminal hard wrapped at its window width.
  */
 export function cleanTerminalText(input: string, options: TerminalCleanupOptions): TerminalCleanupResult {
-    let text = input.replace(/\r\n?/g, '\n');
+    const text = stripAnsi(input.replace(/\r\n?/g, '\n'));
 
-    if (options.terminalStripAnsi) text = stripAnsi(text);
+    const lines = dedent(text.split('\n').map(line => line.replace(/[ \t]+$/, '')));
+    const wrapWidth = inferWrapWidth(lines);
 
-    let lines = text.split('\n');
+    const preserveIndent = options.terminalRejoinMode === 'never';
+    const rendered = groupParagraphs(lines, options, wrapWidth).map(paragraph => renderParagraph(paragraph, preserveIndent));
 
-    if (options.terminalTrimTrailingWhitespace) lines = lines.map(line => line.replace(/[ \t]+$/, ''));
-    if (options.terminalDedent) lines = dedent(lines);
-
-    const rendered = groupParagraphs(lines, options).map(paragraph => renderParagraph(paragraph, options));
-
-    let output = rendered.join('\n');
-
-    if (options.terminalCollapseBlankLines) output = output.replace(/\n{3,}/g, '\n\n');
+    let output = rendered.join('\n').replace(/\n{3,}/g, '\n\n');
 
     if (options.terminalBulletMode === 'markdown') {
         output = output
             .split('\n')
-            .map(line => toMarkdownBullet(line, options.terminalListMarkers))
+            .map(line => toMarkdownBullet(line))
             .join('\n');
     }
 

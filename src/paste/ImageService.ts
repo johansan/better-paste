@@ -16,19 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TFolder, normalizePath, requestUrl } from 'obsidian';
+import { requestUrl } from 'obsidian';
 import type { App, TFile } from 'obsidian';
 import { findImageReferences, isDataImageUri, isHttpUrl, replaceImageReferences } from './imageReferences';
 import type { ImageReference } from './imageReferences';
 import { applyFileNameTemplate, buildFileNameTokens, resolveExtension } from '../utils/filenames';
+import { FILENAME_TEMPLATES, IMAGE_EXTENSIONS, IMAGE_TIMEOUT_SECONDS, MAX_IMAGE_SIZE_MB } from '../settings/constants';
 import { logWarning } from '../utils/logger';
 import type { BetterPasteSettings } from '../settings/types';
 
 /** Number of images fetched at once, high enough to feel instant without flooding the network. */
 const MAX_CONCURRENT_DOWNLOADS = 4;
-
-/** Attempts made to find a free filename before giving up on a download. */
-const MAX_FILENAME_ATTEMPTS = 100;
 
 interface FetchedImage {
     data: ArrayBuffer;
@@ -133,7 +131,7 @@ export class ImageService {
             // The clipboard bitmap is authoritative for the format: Safari re-encodes a
             // page's .webp as PNG, so the file's own type and name decide the extension.
             // The source URL is only used for naming, never for the format.
-            const extension = resolveExtension(file.type, file.name || source, settings.imageExtensions);
+            const extension = resolveExtension(file.type, file.name || source, IMAGE_EXTENSIONS);
             if (!extension) {
                 logWarning(`Skipped a pasted image: ${file.type || 'unknown type'} is not a recognised image type`);
                 return null;
@@ -141,7 +139,7 @@ export class ImageService {
 
             const data = await file.arrayBuffer();
 
-            const maxBytes = settings.imageMaxSizeMb * 1024 * 1024;
+            const maxBytes = MAX_IMAGE_SIZE_MB * 1024 * 1024;
             if (maxBytes > 0 && data.byteLength > maxBytes) {
                 logWarning(`Skipped a pasted image: ${Math.round(data.byteLength / 1024 / 1024)} MB exceeds the size limit`);
                 return null;
@@ -165,16 +163,16 @@ export class ImageService {
         size: string | null
     ): Promise<string | null> {
         try {
-            const fetched = await this.fetchImage(reference.url, settings);
+            const fetched = await this.fetchImage(reference.url);
             if (!fetched) return null;
 
-            const extension = resolveExtension(fetched.contentType, reference.url, settings.imageExtensions);
+            const extension = resolveExtension(fetched.contentType, reference.url, IMAGE_EXTENSIONS);
             if (!extension) {
                 logWarning(`Skipped ${reference.url}: not a recognised image type`);
                 return null;
             }
 
-            const maxBytes = settings.imageMaxSizeMb * 1024 * 1024;
+            const maxBytes = MAX_IMAGE_SIZE_MB * 1024 * 1024;
             if (maxBytes > 0 && fetched.data.byteLength > maxBytes) {
                 logWarning(`Skipped ${reference.url}: ${Math.round(fetched.data.byteLength / 1024 / 1024)} MB exceeds the size limit`);
                 return null;
@@ -199,11 +197,11 @@ export class ImageService {
     }
 
     /** Retrieves image bytes from an http(s) URL or decodes them from a data: URI. */
-    private async fetchImage(url: string, settings: BetterPasteSettings): Promise<FetchedImage | null> {
+    private async fetchImage(url: string): Promise<FetchedImage | null> {
         if (isDataImageUri(url)) return decodeDataUri(url);
         if (!isHttpUrl(url)) return null;
 
-        const timeoutMs = Math.max(1, settings.imageTimeoutSeconds) * 1000;
+        const timeoutMs = IMAGE_TIMEOUT_SECONDS * 1000;
         let timer: ReturnType<typeof setTimeout> | undefined;
 
         try {
@@ -241,48 +239,13 @@ export class ImageService {
         fallbackName?: string
     ): Promise<TFile | null> {
         const tokens = buildFileNameTokens(url, new Date(), fallbackName);
-        const baseName = applyFileNameTemplate(settings.imageFilenameTemplate, tokens);
+        const baseName = applyFileNameTemplate(FILENAME_TEMPLATES[settings.imageFilenameFormat], tokens);
         const fileName = `${baseName}.${extension}`;
 
-        if (settings.imageFolderMode === 'obsidian') {
-            const path = await this.app.fileManager.getAvailablePathForAttachment(fileName, sourcePath);
-            return this.app.vault.createBinary(path, data);
-        }
-
-        const folder = normalizePath(settings.imageFolder.trim() || '/');
-        await this.ensureFolder(folder);
-
-        // getAvailablePathForAttachment ignores a custom folder, so dedupe by hand
-        for (let attempt = 0; attempt < MAX_FILENAME_ATTEMPTS; attempt++) {
-            const candidateName = attempt === 0 ? fileName : `${baseName} ${attempt}.${extension}`;
-            const candidatePath = folder === '/' ? candidateName : `${folder}/${candidateName}`;
-            if (this.app.vault.getAbstractFileByPath(candidatePath)) continue;
-
-            try {
-                return await this.app.vault.createBinary(candidatePath, data);
-            } catch (error) {
-                // Another write may have taken the name between the check and the create
-                if (attempt === MAX_FILENAME_ATTEMPTS - 1) throw error;
-            }
-        }
-
-        logWarning(`Could not find a free filename for ${fileName}`);
-        return null;
-    }
-
-    /** Creates the configured attachment folder when it does not exist yet. */
-    private async ensureFolder(folder: string): Promise<void> {
-        if (folder === '/' || folder === '') return;
-
-        const existing = this.app.vault.getAbstractFileByPath(folder);
-        if (existing instanceof TFolder) return;
-
-        try {
-            await this.app.vault.createFolder(folder);
-        } catch (error) {
-            // A concurrent paste may have created it first, which is not an error for us
-            if (!this.app.vault.getAbstractFileByPath(folder)) throw error;
-        }
+        // getAvailablePathForAttachment honours the vault's own attachment location and
+        // resolves any name collision, so there is nothing for the plugin to decide here
+        const path = await this.app.fileManager.getAvailablePathForAttachment(fileName, sourcePath);
+        return this.app.vault.createBinary(path, data);
     }
 }
 

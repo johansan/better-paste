@@ -70,7 +70,7 @@ export default class BetterPastePlugin extends Plugin {
 
         this.addCommand({
             id: 'toggle-automatic-processing',
-            name: 'Toggle automatic processing',
+            name: 'Toggle automatic cleanup',
             callback: () => {
                 void this.toggleAutomaticProcessing();
             }

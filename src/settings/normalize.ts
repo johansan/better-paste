@@ -17,14 +17,14 @@
  */
 
 import { DEFAULT_SETTINGS } from './defaults';
-import type { BetterPasteSettings, ImageFolderMode, TerminalBulletMode, UrlStripMode } from './types';
-
-/** Bounds for the numeric settings, applied when loading data written by an older version. */
-const LIMITS = {
-    imageMaxSizeMb: { min: 0, max: 1024 },
-    imageTimeoutSeconds: { min: 1, max: 300 },
-    terminalMinWrapWidth: { min: 1, max: 400 }
-} as const;
+import type {
+    BetterPasteSettings,
+    ImageFilenameFormat,
+    ImageLinkPaste,
+    TerminalBulletMode,
+    TerminalRejoinMode,
+    UrlStripMode
+} from './types';
 
 function asBoolean(value: unknown, fallback: boolean): boolean {
     return typeof value === 'boolean' ? value : fallback;
@@ -34,15 +34,9 @@ function asString(value: unknown, fallback: string): string {
     return typeof value === 'string' ? value : fallback;
 }
 
-function asNumber(value: unknown, fallback: number, min: number, max: number): number {
-    if (typeof value !== 'number' || !Number.isFinite(value)) return fallback;
-    return Math.min(max, Math.max(min, Math.round(value)));
-}
-
-function asStringArray(value: unknown, fallback: readonly string[]): string[] {
-    if (!Array.isArray(value)) return [...fallback];
-    const entries = value.filter((entry): entry is string => typeof entry === 'string');
-    return entries.length > 0 || value.length === 0 ? entries : [...fallback];
+function asStringArray(value: unknown): string[] {
+    if (!Array.isArray(value)) return [];
+    return value.filter((entry): entry is string => typeof entry === 'string');
 }
 
 function asEnum<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
@@ -51,11 +45,14 @@ function asEnum<T extends string>(value: unknown, allowed: readonly T[], fallbac
 
 const URL_STRIP_MODES: readonly UrlStripMode[] = ['all', 'tracking'];
 const BULLET_MODES: readonly TerminalBulletMode[] = ['preserve', 'markdown'];
-const FOLDER_MODES: readonly ImageFolderMode[] = ['obsidian', 'custom'];
+const REJOIN_MODES: readonly TerminalRejoinMode[] = ['indented', 'any', 'never'];
+const FILENAME_FORMATS: readonly ImageFilenameFormat[] = ['source', 'source-date', 'date-time'];
+const IMAGE_LINK_PASTE: readonly ImageLinkPaste[] = ['image', 'link'];
 
 /**
  * Builds a complete settings object from whatever was stored on disk. Every field is
- * validated so a hand-edited or outdated data.json cannot put the plugin in a broken state.
+ * validated so a hand-edited data.json cannot put the plugin in a broken state, and any
+ * key that is not a current setting is simply dropped.
  */
 export function normalizeSettings(raw: unknown): BetterPasteSettings {
     const data = (typeof raw === 'object' && raw !== null ? raw : {}) as Partial<Record<keyof BetterPasteSettings, unknown>>;
@@ -64,50 +61,24 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
     return {
         interceptPaste: asBoolean(data.interceptPaste, defaults.interceptPaste),
         showNotices: asBoolean(data.showNotices, defaults.showNotices),
+        trimPaste: asBoolean(data.trimPaste, defaults.trimPaste),
 
         imagesEnabled: asBoolean(data.imagesEnabled, defaults.imagesEnabled),
-        downloadRemoteImages: asBoolean(data.downloadRemoteImages, defaults.downloadRemoteImages),
-        downloadDataUriImages: asBoolean(data.downloadDataUriImages, defaults.downloadDataUriImages),
-        downloadBareImageUrls: asBoolean(data.downloadBareImageUrls, defaults.downloadBareImageUrls),
-        imageFolderMode: asEnum(data.imageFolderMode, FOLDER_MODES, defaults.imageFolderMode),
-        imageFolder: asString(data.imageFolder, defaults.imageFolder),
-        imageFilenameTemplate:
-            asString(data.imageFilenameTemplate, defaults.imageFilenameTemplate).trim() || defaults.imageFilenameTemplate,
-        imageMaxSizeMb: asNumber(data.imageMaxSizeMb, defaults.imageMaxSizeMb, LIMITS.imageMaxSizeMb.min, LIMITS.imageMaxSizeMb.max),
-        imageTimeoutSeconds: asNumber(
-            data.imageTimeoutSeconds,
-            defaults.imageTimeoutSeconds,
-            LIMITS.imageTimeoutSeconds.min,
-            LIMITS.imageTimeoutSeconds.max
-        ),
-        imageExtensions: asStringArray(data.imageExtensions, defaults.imageExtensions),
+        imageFilenameFormat: asEnum(data.imageFilenameFormat, FILENAME_FORMATS, defaults.imageFilenameFormat),
+        imageLinkPaste: asEnum(data.imageLinkPaste, IMAGE_LINK_PASTE, defaults.imageLinkPaste),
         imageSizeProperty: asString(data.imageSizeProperty, defaults.imageSizeProperty).trim(),
 
         urlEnabled: asBoolean(data.urlEnabled, defaults.urlEnabled),
         urlStripMode: asEnum(data.urlStripMode, URL_STRIP_MODES, defaults.urlStripMode),
-        urlTrackingParams: asStringArray(data.urlTrackingParams, defaults.urlTrackingParams),
-        urlKeepParams: asStringArray(data.urlKeepParams, defaults.urlKeepParams),
-        urlDomainRules: asStringArray(data.urlDomainRules, defaults.urlDomainRules),
-        urlStripTextFragments: asBoolean(data.urlStripTextFragments, defaults.urlStripTextFragments),
-        urlStripAllFragments: asBoolean(data.urlStripAllFragments, defaults.urlStripAllFragments),
-        urlStripTrailingSlash: asBoolean(data.urlStripTrailingSlash, defaults.urlStripTrailingSlash),
+        // Only the user's own rules are stored; the shipped list is merged in at read time
+        urlDomainRules: asStringArray(data.urlDomainRules),
 
         terminalEnabled: asBoolean(data.terminalEnabled, defaults.terminalEnabled),
-        terminalUnwrapLines: asBoolean(data.terminalUnwrapLines, defaults.terminalUnwrapLines),
-        terminalRequireIndent: asBoolean(data.terminalRequireIndent, defaults.terminalRequireIndent),
-        terminalMinWrapWidth: asNumber(
-            data.terminalMinWrapWidth,
-            defaults.terminalMinWrapWidth,
-            LIMITS.terminalMinWrapWidth.min,
-            LIMITS.terminalMinWrapWidth.max
-        ),
-        terminalDedent: asBoolean(data.terminalDedent, defaults.terminalDedent),
-        terminalStripAnsi: asBoolean(data.terminalStripAnsi, defaults.terminalStripAnsi),
-        terminalCollapseBlankLines: asBoolean(data.terminalCollapseBlankLines, defaults.terminalCollapseBlankLines),
-        terminalTrimTrailingWhitespace: asBoolean(data.terminalTrimTrailingWhitespace, defaults.terminalTrimTrailingWhitespace),
-        terminalPreserveCodeBlocks: asBoolean(data.terminalPreserveCodeBlocks, defaults.terminalPreserveCodeBlocks),
+        terminalRejoinMode: asEnum(data.terminalRejoinMode, REJOIN_MODES, defaults.terminalRejoinMode),
         terminalBulletMode: asEnum(data.terminalBulletMode, BULLET_MODES, defaults.terminalBulletMode),
-        terminalListMarkers: asStringArray(data.terminalListMarkers, defaults.terminalListMarkers)
+
+        aiTextEnabled: asBoolean(data.aiTextEnabled, defaults.aiTextEnabled),
+        aiTextPlainPunctuation: asBoolean(data.aiTextPlainPunctuation, defaults.aiTextPlainPunctuation)
     };
 }
 
@@ -119,10 +90,25 @@ export function parseLines(value: string): string[] {
         .filter(line => line.trim().length > 0);
 }
 
-/** Splits a settings field that accepts either newlines or commas as separators. */
-export function parseTokens(value: string): string[] {
-    return value
-        .split(/[\n,]/)
-        .map(token => token.trim())
-        .filter(token => token.length > 0);
+/** Reports site rule lines that will not parse, so the settings UI can flag them. */
+export function findInvalidDomainRules(value: string): string[] {
+    const invalid: string[] = [];
+
+    for (const line of parseLines(value)) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('#')) continue;
+
+        const body = trimmed.startsWith('!') ? trimmed.slice(1).trim() : trimmed;
+        const site = body.split(/[|:]/)[0].trim();
+
+        // "*.example.com" and "example.*" are both accepted spellings
+        const anyTld = site.endsWith('.*');
+        const domain = (anyTld ? site.slice(0, -2) : site).replace(/^\*\./, '');
+
+        const labels = /^[a-z0-9-]+(\.[a-z0-9-]+)*$/i.test(domain);
+        const looksLikeDomain = labels && (anyTld || domain.includes('.') || domain === 'localhost');
+        if (!looksLikeDomain) invalid.push(trimmed);
+    }
+
+    return invalid;
 }

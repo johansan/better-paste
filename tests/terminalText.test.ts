@@ -17,7 +17,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { cleanTerminalText, dedent } from '../src/transforms/terminalText';
+import { cleanTerminalText, dedent, inferWrapWidth } from '../src/transforms/terminalText';
 import type { TerminalCleanupOptions } from '../src/transforms/terminalText';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 
@@ -40,6 +40,39 @@ describe('dedent', () => {
 
     it('leaves lines alone when there is no shared prefix', () => {
         expect(dedent(['a', '  b'])).toEqual(['a', '  b']);
+    });
+});
+
+describe('inferWrapWidth', () => {
+    it('ignores lines inside a code fence', () => {
+        // A JSON log dump must not drag the threshold above the prose around it
+        const prose = 'The deployment finished but three of the health checks did not come back in';
+        const withFence = [prose, '  time, so the rollout has been paused pending a manual review.', '```', 'x'.repeat(120), '```'];
+
+        expect(inferWrapWidth(withFence)).toBe(inferWrapWidth(withFence.slice(0, 2)));
+    });
+
+    it('rejoins prose that sits next to a long code block', () => {
+        const input = [
+            'The deployment finished but three of the health checks did not come back in',
+            '  time, so the rollout has been paused pending a manual review by an operator.',
+            '',
+            '```',
+            '{"level":"info","ts":"2026-08-12T19:44:02Z","msg":"health check timed out","attempt":3,"service":"api"}',
+            '```'
+        ].join('\n');
+
+        expect(cleanTerminalText(input, options()).text).toContain('did not come back in time, so the rollout has been paused');
+    });
+
+    it('falls back to the floor when a single long line is an outlier', () => {
+        expect(inferWrapWidth(['short', 'x'.repeat(200), 'also short'])).toBe(60);
+    });
+
+    it('survives a log with more lines than a function call can take arguments', () => {
+        // Math.max(...lengths) would throw RangeError here
+        const many = Array.from({ length: 200_000 }, (_unused, index) => `line ${index}`);
+        expect(() => inferWrapWidth(many)).not.toThrow();
     });
 });
 
@@ -108,8 +141,19 @@ describe('cleanTerminalText', () => {
             'Not indented so not a continuation'
         ].join('\n');
         expect(cleanTerminalText(input, options()).text).toBe(input);
-        expect(cleanTerminalText(input, options({ terminalRequireIndent: false })).text).toBe(
+        expect(cleanTerminalText(input, options({ terminalRejoinMode: 'any' })).text).toBe(
             'A line that is comfortably longer than the sixty character wrap threshold Not indented so not a continuation'
+        );
+    });
+
+    it('never rejoins in the never mode, but still strips and dedents', () => {
+        const input = [
+            '    \u001B[31mA line that is comfortably longer than any plausible wrap column for this test',
+            '      continued here.\u001B[0m'
+        ].join('\n');
+
+        expect(cleanTerminalText(input, options({ terminalRejoinMode: 'never' })).text).toBe(
+            ['A line that is comfortably longer than any plausible wrap column for this test', '  continued here.'].join('\n')
         );
     });
 

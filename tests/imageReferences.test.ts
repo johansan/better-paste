@@ -84,10 +84,11 @@ describe('findImageReferences', () => {
         expect(found[0].kind).toBe('markdown');
     });
 
-    it('respects the per-source toggles', () => {
-        expect(findImageReferences('![](https://example.com/a.png)', options({ downloadRemoteImages: false }))).toHaveLength(0);
-        expect(findImageReferences('![](data:image/png;base64,AA)', options({ downloadDataUriImages: false }))).toHaveLength(0);
-        expect(findImageReferences('https://example.com/a.png', options({ downloadBareImageUrls: false }))).toHaveLength(0);
+    it('leaves a pasted image link alone when that is the choice', () => {
+        const asLink = options({ imageLinkPaste: 'link' });
+        expect(findImageReferences('https://example.com/a.png', asLink)).toHaveLength(0);
+        // A picture inside copied content is a different question, and still saved
+        expect(findImageReferences('![](https://example.com/a.png)', asLink)).toHaveLength(1);
     });
 
     it('returns references sorted by position', () => {

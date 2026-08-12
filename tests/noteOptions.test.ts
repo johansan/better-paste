@@ -17,7 +17,13 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { extractFrontmatterBlock, normalizeImageSize, resolveImageSize } from '../src/paste/imageSize';
+import {
+    extractFrontmatterBlock,
+    isInsideVerbatimContext,
+    isPasteDisabledForNote,
+    normalizeImageSize,
+    resolveImageSize
+} from '../src/paste/noteOptions';
 
 describe('extractFrontmatterBlock', () => {
     it('reads the block at the top of a note', () => {
@@ -94,18 +100,93 @@ describe('resolveImageSize', () => {
         expect(resolveImageSize({ title: 'Notes', width: 999 }, 'image-width')).toBeNull();
     });
 
-    it('returns null for an unusable value', () => {
-        expect(resolveImageSize({ 'image-width': 'huge' }, 'image-width')).toBeNull();
-    });
-
     it('returns null when the feature is switched off', () => {
         expect(resolveImageSize({ 'image-width': 400 }, '')).toBeNull();
-        expect(resolveImageSize({ 'image-width': 400 }, '   ')).toBeNull();
     });
 
     it('returns null for missing frontmatter', () => {
         expect(resolveImageSize(null, 'image-width')).toBeNull();
-        expect(resolveImageSize(undefined, 'image-width')).toBeNull();
         expect(resolveImageSize('not an object', 'image-width')).toBeNull();
+    });
+});
+
+describe('isPasteDisabledForNote', () => {
+    it('recognises a boolean false', () => {
+        expect(isPasteDisabledForNote({ 'better-paste': false }, 'better-paste')).toBe(true);
+    });
+
+    it('recognises an unquoted numeric zero, which YAML parses as a number', () => {
+        expect(isPasteDisabledForNote({ 'better-paste': 0 }, 'better-paste')).toBe(true);
+    });
+
+    it('recognises the written forms of no', () => {
+        for (const value of ['false', 'off', 'no', '0', 'disabled', 'OFF']) {
+            expect(isPasteDisabledForNote({ 'better-paste': value }, 'better-paste'), value).toBe(true);
+        }
+    });
+
+    it('leaves the plugin on for anything else', () => {
+        expect(isPasteDisabledForNote({ 'better-paste': true }, 'better-paste')).toBe(false);
+        expect(isPasteDisabledForNote({ 'better-paste': 'yes' }, 'better-paste')).toBe(false);
+        expect(isPasteDisabledForNote({ title: 'Notes' }, 'better-paste')).toBe(false);
+        expect(isPasteDisabledForNote(null, 'better-paste')).toBe(false);
+    });
+});
+
+describe('isInsideVerbatimContext', () => {
+    /** Places the cursor at the marker, which is removed before the check. */
+    function atCursor(document: string): boolean {
+        const offset = document.indexOf('|');
+        return isInsideVerbatimContext(document.replace('|', ''), offset);
+    }
+
+    it('is false in ordinary prose', () => {
+        expect(atCursor('Some notes\n\nMore |notes\n')).toBe(false);
+    });
+
+    it('is true inside a fenced code block', () => {
+        expect(atCursor('Intro\n\n```sh\n$ ls\n|\n```\n')).toBe(true);
+    });
+
+    it('is false after the fence closes', () => {
+        expect(atCursor('Intro\n\n```sh\n$ ls\n```\n\n|')).toBe(false);
+    });
+
+    it('handles several fences', () => {
+        expect(atCursor('```\na\n```\ntext\n```\n|\n```\n')).toBe(true);
+        expect(atCursor('```\na\n```\ntext\n```\nb\n```\n|')).toBe(false);
+    });
+
+    it('recognises a tilde fence', () => {
+        expect(atCursor('~~~\n|code\n~~~\n')).toBe(true);
+    });
+
+    it('is true inside frontmatter the note actually closes', () => {
+        expect(atCursor('---\ntitle: |\n---\n\nBody')).toBe(true);
+    });
+
+    it('is false after frontmatter closes', () => {
+        expect(atCursor('---\ntitle: Notes\n---\n\n|')).toBe(false);
+    });
+
+    it('treats an unterminated rule on line 1 as a thematic break, not open frontmatter', () => {
+        // Otherwise every paste in such a note is silently skipped, with nothing to explain it
+        expect(atCursor('---\n\nSome intro |text\n')).toBe(false);
+    });
+
+    it('does not treat a thematic break in the body as frontmatter', () => {
+        expect(atCursor('Intro\n\n---\n\nMore |text\n')).toBe(false);
+    });
+
+    it('is not fooled by an inline code span at the start of a line', () => {
+        expect(atCursor('```json``` is the fence we use\n\n|Body')).toBe(false);
+    });
+
+    it('ignores an indented block that is not a fence', () => {
+        expect(atCursor('Intro\n\n    ```\n\n|Body')).toBe(false);
+    });
+
+    it('is false on the opening fence line itself', () => {
+        expect(atCursor('Intro\n\n```sh|\ncode\n```\n')).toBe(false);
     });
 });

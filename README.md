@@ -2,11 +2,12 @@
 
 An Obsidian plugin that cleans up content on its way into your notes.
 
-Three rules, each independently configurable and each able to be turned off:
+Four rules, each independently configurable and each able to be turned off:
 
 1. **Images** — when the clipboard describes a picture by link rather than by bitmap, as Safari does, download it into the vault and embed the local copy.
 2. **URLs** — strip tracking parameters from pasted links, with per-site exceptions for the sites where parameters actually matter.
 3. **Terminal text** — rejoin paragraphs that a terminal hard wrapped at its window width and drop the indentation it added.
+4. **AI text** — turn the typographic punctuation that AI assistants produce into plain hyphens and straight quotes, and strip the invisible characters that come with it.
 
 ## What it looks like
 
@@ -41,6 +42,8 @@ pastes as:
 https://support.claude.com/en/articles/16266773-how-claude-marks-ai-generated-content
 ```
 
+**AI text.** `“The result — which nobody expected — was fine,” he said.` becomes `"The result - which nobody expected - was fine," he said.` — dashes to hyphens, curly quotes to straight, and any no-break or zero-width characters that came along are gone.
+
 **Images.** Copy a region of a Safari page and the images arrive as `https://` links. Better Paste downloads them and leaves `![[picture.png]]` behind, so the note still works offline and survives the source site going away.
 
 ## Installing
@@ -67,37 +70,111 @@ Rich content is deliberately left to Obsidian's own HTML-to-Markdown conversion 
 
 When a download fails or times out, the original link stays in the note. Nothing is lost, and a notice tells you what happened.
 
+## Why a plugin and not a Mac app
+
+A menu bar app would clean every paste in every application, which sounds like the better product. It was investigated properly and rejected, for one reason: **a plugin knows where the paste is going, and an app does not.** Every rule here is better for knowing.
+
+Consider what saving an image actually involves. Better Paste uses the bitmap but names it from the HTML source URL, files it wherever _this vault_ keeps attachments — which can mean "beside this note" or "in a subfolder under this note" — resolves the path _relative to the note being edited_, picks wikilink or Markdown syntax to match the vault's setting, reads _this note's_ frontmatter for a width, and replaces the exact pasted range once the write finishes.
+
+None of that is available to an app with no vault, no note and no cursor. Ask what "save the image" should do when pasting into Mail, Word or Finder and there is no answer that is right in more than one of them. The most a menu bar app can manage is "prefer the bitmap when the clipboard offers both", which is one line of the feature above.
+
+The same asymmetry runs through the text rules, and there it prevents damage rather than merely enabling a feature:
+
+- **Pasting into a fenced code block is left alone.** Putting terminal output inside a fence is an act of preservation, so rejoining its lines there would destroy exactly what you were protecting. That check reads the document around the cursor. An app cannot see it, and would silently corrupt the paste.
+- **A note can opt out entirely** with `better-paste: false`, and set its own image width. Both are per-document decisions with no equivalent outside a document.
+- **Rich content stays Obsidian's job.** The plugin lets Obsidian convert HTML to Markdown and then post-processes the inserted range. An app would have to reimplement that conversion, worse.
+- **One paste is one undo.** The plugin edits through the editor, so the cleaned result is a normal editing step.
+
+There is also a plain cost difference. The plugin needs no permissions. A global paste interceptor needs Input Monitoring and the ability to post events, and on current macOS a further grant to read the clipboard programmatically — and Secure Input Mode switches all of it off, without warning, whenever a password field is focused anywhere on the system.
+
+Better Paste trades reach for control, deliberately. It works in one application and knows everything about what happens there.
+
 ## Commands
 
-| Command                     | What it does                                                                                   |
-| --------------------------- | ---------------------------------------------------------------------------------------------- |
-| Paste and clean up          | Pastes the clipboard's plain text through the rules, whether or not automatic processing is on |
-| Paste without processing    | Pastes the clipboard's plain text verbatim                                                     |
-| Clean up selection          | Applies the text rules to what you have selected                                               |
-| Toggle automatic processing | Flips the master switch, handy on a hotkey                                                     |
+| Command                  | What it does                                                                                   |
+| ------------------------ | ---------------------------------------------------------------------------------------------- |
+| Paste and clean up       | Pastes the clipboard's plain text through the rules, whether or not automatic processing is on |
+| Paste without processing | Pastes the clipboard's plain text verbatim                                                     |
+| Clean up selection       | Applies the text rules to what you have selected                                               |
+| Toggle Better Paste      | Flips the master switch, handy on a hotkey                                                     |
 
 None of these are bound to a key by default. Assign them under Settings → Hotkeys.
 
 ## Settings
 
+Sixteen settings, arranged as a landing page with three sub-pages. Everything that had only one sensible answer is now simply how the plugin behaves, rather than a question you have to answer.
+
 ### Pasting
 
-- **Process pasted content automatically** — apply the rules on every paste. Turn it off to use the commands only.
-- **Show a notice after each paste** — a one-line summary of what changed.
+- **Clean up every paste** — apply the rules whenever you paste. Turn it off to use the commands only.
+- **Trim space around the paste** — drop the blank lines and stray spaces that come with text copied from a web page or a PDF. Only the ends; the middle is left alone. On by default.
+- **Show a notice when a paste is changed** — a one-line summary. Failures are reported whatever this is set to.
 
-### Images and rich content
+### Images
 
-- **Save pasted images into the vault** — the master switch for image handling.
-- **Download linked images** / **Save inline images** / **Treat a pasted image URL as an image** — which sources are picked up: `http(s)` links in rich content, `data:` URIs, and bare image URLs pasted on their own.
-- **Save images to** — follow the vault's own attachment setting, or a specific folder.
-- **Filename** — a template. `{{name}}` (from the URL), `{{host}}`, `{{date}}`, `{{time}}`, `{{timestamp}}`. The extension is added for you.
-- **Maximum image size** and **Download timeout** — anything over the limit is left as a link.
-- **Image width property** — the frontmatter property that sets how wide images are in a note. See below.
-- **Image file types** — the extensions accepted as images.
+On the landing page: one toggle. Saved pictures go wherever the vault files attachments, which is Obsidian's own setting under Files and links — the plugin does not add a second place to answer that.
 
-#### Sizing images per note
+Behind **Image options**:
 
-Some notes want every image at the same width. Put the property in the note's frontmatter and Better Paste embeds pasted images at that size:
+- **File names** — a name from the source, a name and date, or a date and time.
+- **Paste an image link as the picture** — pasting a link ending in `.png` or `.jpg` saves that picture and shows it. Switch off to keep such a link as a link.
+- **Image width property** — see below.
+
+### Links
+
+On the landing page: the master toggle and **Which parameters to remove** — every parameter except where a site rule keeps it, or only the parameters known to be tracking.
+
+Behind **Site rules**: the full list, plus a live tester.
+
+```
+youtube.com | v, t, list, index, start     keep only these parameters
+gitlab.com                                 keep every parameter
+google.* | q, tbm, hl                      the site on any top-level domain
+mine.example | id                          your own rule
+```
+
+Thirty-three sites are filled in to start with — YouTube video IDs, Hacker News item IDs, Zoom passwords, Dropbox share keys, Figma node IDs and so on. Edit any of them, delete the ones you disagree with, add your own. A line that is not a site name is flagged as you type.
+
+Subdomains need no wildcard: `example.com` already covers `shop.example.com`, and `*.example.com` is accepted as the same thing. A trailing `.*` is the one that adds something — `google.*` matches `google.com`, `google.se` and `google.co.uk` with one rule, which is why a Google search keeps its `?q=` whichever country domain you are on.
+
+Only your _changes_ are saved rather than the whole list, so a site added in a later release still reaches you after you have edited it.
+
+A site rule is a whitelist in **every parameter** mode. In **only tracking** mode it can only ever rescue a parameter, never remove one — if you chose the cautious mode, an unfamiliar parameter survives.
+
+### Terminal text
+
+On the landing page: the master toggle. Behind **Terminal options**:
+
+- **How eagerly to rejoin lines** — _Cautious_ only rejoins a line indented under the one above, which is what most terminals do and what keeps ordinary multi-line text safe. _Eager_ rejoins any line that follows a full one; use it for tools that wrap without indenting, such as `git log`.
+- **Bullets** — leave `•` alone, or convert it to a real Markdown list item that folds and indents.
+- A live tester.
+
+The wrap column is worked out from the text itself. A terminal breaks every long line at the same place, so wrapped lines cluster just below it; when several lines sit near the longest, that length is the wrap column. Fenced code is excluded from the measurement, so a long line in a log dump does not stop the prose around it from being rejoined. This used to be a setting, which asked you to know how wide your terminal window was when you copied.
+
+### AI cleanup
+
+- **Clean up AI text** — assistants produce characters that look ordinary but are not, and they survive a copy and paste. A no-break space becomes a normal space; zero-width characters are dropped. The same characters are cleaned up whatever wrote them.
+- **Use plain punctuation** — `—` and `–` become `-`, and `“ ” ‘ ’` become `"` and `'`. Straight quotes also survive code and search better than curly ones. A matter of taste rather than tidiness, so switch it off if you set your punctuation on purpose.
+
+Several invisible characters are deliberately kept, because they are load-bearing rather than junk: the zero-width joiner holds a multi-part emoji together, the joiner and non-joiner are ordinary content in Persian, Arabic and the Indic scripts, the direction marks and isolates are what make mixed Arabic or Hebrew and Latin text render in the right order, and the ideographic space is the normal word space in CJK. Removing any of them would corrupt text rather than tidy it.
+
+The two halves of this rule run on either side of the terminal rule. Invisible characters go first, because a no-break space is not whitespace to a regular expression and would defeat the blank-line detection. Dashes go last, because a hyphen is a list marker: converting one early would make the terminal rule read that line as a bullet and refuse to rejoin the paragraph.
+
+## Per-note control
+
+Two frontmatter properties change what happens in a single note.
+
+**Leave a note alone entirely:**
+
+```yaml
+---
+better-paste: false
+---
+```
+
+Nothing is touched in that note. `off`, `no` and `0` work too. This is for notes that are deliberately verbatim — logs, transcripts, scratchpads. The commands still work if you invoke one by name: asking for the rules explicitly overrides the property.
+
+**Set the width of pasted images:**
 
 ```yaml
 ---
@@ -105,47 +182,17 @@ image-width: 400
 ---
 ```
 
-Images pasted into that note come out as `![[picture.png|400]]`, which is Obsidian's own size syntax — the same thing you would get by typing the width by hand. Markdown-link vaults get `![400](picture.png)` instead; both render identically.
+Images pasted into that note come out as `![[picture.png|400]]`, which is Obsidian's own size syntax — the same thing you would get by typing the width by hand. Markdown-link vaults get `![400](picture.png)` instead; both render identically. The value can be a width (`400`) or a width and height (`400x300`). A value Obsidian cannot use, such as `50%`, is ignored rather than written into the link.
 
-The value can be a width (`400`) or a width and height (`400x300`). A value Obsidian cannot use, such as `50%`, is ignored rather than written into the link. Rename the property under **Image width property**, or blank that setting to switch the feature off.
+Both properties are read from the note as it stands in the editor, not from Obsidian's metadata cache, so a property you just typed applies to the very next paste.
 
-The property is read from the note as it currently stands in the editor, not from Obsidian's metadata cache, so a width you just typed applies to the very next paste.
+One consequence worth knowing: a note with `image-width` also takes screenshot pastes away from Obsidian's own handler, since that handler has no way to apply the width. Notes without it are untouched.
 
-One consequence worth knowing: a note with this property also takes screenshot pastes away from Obsidian's own handler, since that handler has no way to apply the width. Notes without the property are untouched, and screenshots there keep going through Obsidian as usual.
+## What is not a setting
 
-### URL cleaning
+A paste is left alone when the cursor sits inside a fenced code block or the frontmatter block. Pasting terminal output into a fence is an act of preservation, so rejoining its lines there would destroy the thing you were protecting.
 
-**Parameters to remove** chooses the strategy:
-
-- **All parameters, except the exceptions below** (the default) removes everything after `?`. This is thorough, and relies on the site exceptions to keep working links working.
-- **Only known tracking parameters** removes just the names in the tracking list, leaving everything else alone.
-
-**Site exceptions** is the list that makes strip-everything safe. One rule per line:
-
-```
-youtube.com: v, t, list, index, start
-news.ycombinator.com: id
-gitlab.com
-```
-
-A rule with parameters keeps only those. A bare domain keeps all of them. Subdomains are matched automatically, so `wikipedia.org` also covers `en.wikipedia.org`. Lines starting with `#` are comments.
-
-The shipped list covers YouTube, Vimeo, Hacker News, Google search and maps, Zoom passwords, Dropbox share keys, Figma node IDs and others. Add your own; the button below the list puts the defaults back.
-
-Also here: **Always keep these parameters** (a global allow list, `*` wildcards accepted), **Remove highlight links** (drops the `:~:text=` fragment browsers add when you copy a link to selected text), **Remove all anchors**, and **Remove trailing slash**.
-
-**Try it** cleans a URL live so you can check a rule without leaving settings.
-
-### Terminal text
-
-- **Rejoin wrapped lines** — the core of the rule. Headings, list items, tables, blockquotes and code blocks are never merged into the line above.
-- **Only rejoin indented lines** (on by default) — a line only continues the paragraph above when it is indented further than the line that started it. This is what keeps ordinary multi-line text safe. Turning it off rejoins any line that follows a long one, which is more aggressive.
-- **Minimum line length** — a line only counts as wrapped when the line above it is at least this long, on the theory that a short line ended because the writer ended it.
-- **Remove leading indentation**, **Remove colour codes** (ANSI escapes), **Collapse blank lines**, **Trim trailing spaces**, **Preserve code blocks**.
-- **Bullets** — leave characters like `•` alone, or convert them to Markdown list items.
-- **List markers** — the characters that start a list item.
-
-**Try it** shows the cleaned result as you type.
+These behaviours have one sensible value and are simply how the plugin works: escape sequences and stray control characters are stripped from terminal output, the shared indentation is removed, runs of blank lines collapse, trailing spaces go, fenced code is never rejoined, images embedded in the clipboard as `data:` URIs are always saved, images over 50 MB or slower than 30 seconds are left as links, and scroll-to-text `#:~:text=` fragments are dropped from links while real anchors are kept.
 
 ## Development
 
@@ -159,7 +206,7 @@ npm run lint
 
 The repository root doubles as an Obsidian test vault: every build copies `main.js`, `manifest.json` and `styles.css` into `.obsidian/plugins/better-paste/`, so `Reload app without saving` picks up your changes.
 
-The text rules are pure functions in `src/transforms/` with no Obsidian dependency, which is where most of the test coverage sits. `src/paste/` holds the clipboard handling and the vault writes.
+The text rules are pure functions in `src/transforms/` with no Obsidian dependency, which is where most of the test coverage sits. `src/paste/` holds the clipboard handling and the vault writes. Each settings page is one module under `src/settings/pages/`; `SettingTab.ts` holds no setting rows itself, only the landing-page assembly and the bridge onto stored settings.
 
 ## License
 

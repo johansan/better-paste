@@ -19,9 +19,11 @@
 import { Notice, parseYaml } from 'obsidian';
 import type { Editor, MarkdownFileInfo, MarkdownView } from 'obsidian';
 import { runTextPipeline } from '../transforms';
-import { cleanUrlsInText } from '../transforms/urlCleanup';
+import { cleanAiText } from '../transforms/aiText';
+import { buildUrlCleanupOptions, cleanUrlsInText } from '../transforms/urlCleanup';
 import { htmlHasImages, imageSourcesFromHtml } from './imageReferences';
-import { extractFrontmatterBlock, resolveImageSize } from './imageSize';
+import { extractFrontmatterBlock, isInsideVerbatimContext, isPasteDisabledForNote, resolveImageSize } from './noteOptions';
+import { DISABLE_PROPERTY } from '../settings/constants';
 import type { ImageService } from './ImageService';
 import { logError } from '../utils/logger';
 import type { BetterPasteSettings } from '../settings/types';
@@ -31,6 +33,7 @@ const REALIGN_WINDOW = 512;
 
 /** Summary of everything a single paste changed, used to build the notice. */
 interface PasteSummary {
+    aiTextCleaned: boolean;
     terminalCleaned: boolean;
     urlsCleaned: number;
     imagesDownloaded: number;
@@ -77,6 +80,10 @@ export class PasteService {
         const settings = this.getSettings();
         if (!settings.interceptPaste) return false;
 
+        // A note or a code fence can opt out. Explicit commands deliberately ignore this:
+        // if the user asks for the rules by name, they get them.
+        if (this.shouldLeaveAlone(editor)) return false;
+
         const clipboard = event.clipboardData;
         if (!clipboard) return false;
 
@@ -114,6 +121,7 @@ export class PasteService {
         editor.replaceSelection(result.text);
 
         const summary: PasteSummary = {
+            aiTextCleaned: result.aiTextCleaned,
             terminalCleaned: result.terminalCleaned,
             urlsCleaned: result.urlsCleaned,
             imagesDownloaded: 0,
@@ -143,7 +151,13 @@ export class PasteService {
         const files = Array.from(clipboard.files);
         const sources = imageSourcesFromHtml(html);
 
-        const summary: PasteSummary = { terminalCleaned: false, urlsCleaned: 0, imagesDownloaded: 0, imagesFailed: 0 };
+        const summary: PasteSummary = {
+            aiTextCleaned: false,
+            terminalCleaned: false,
+            urlsCleaned: 0,
+            imagesDownloaded: 0,
+            imagesFailed: 0
+        };
         let embeds: string[] = [];
 
         try {
@@ -164,7 +178,13 @@ export class PasteService {
                       .filter(Boolean)
                       .map(source => `![${size ?? ''}](${source})`)
                       .join('\n');
-        if (!text) return;
+
+        if (!text) {
+            // Nothing to insert and the default paste was already suppressed, so this is
+            // the one path where staying quiet would lose the clipboard silently
+            this.notify(summary);
+            return;
+        }
 
         editor.replaceRange(text, editor.offsetToPos(fromOffset), editor.offsetToPos(toOffset));
         editor.setCursor(editor.offsetToPos(fromOffset + text.length));
@@ -182,6 +202,7 @@ export class PasteService {
         editor.replaceSelection(result.text);
 
         const summary: PasteSummary = {
+            aiTextCleaned: result.aiTextCleaned,
             terminalCleaned: result.terminalCleaned,
             urlsCleaned: result.urlsCleaned,
             imagesDownloaded: 0,
@@ -219,6 +240,7 @@ export class PasteService {
 
         editor.replaceSelection(result.text);
         this.notify({
+            aiTextCleaned: result.aiTextCleaned,
             terminalCleaned: result.terminalCleaned,
             urlsCleaned: result.urlsCleaned,
             imagesDownloaded: 0,
@@ -257,12 +279,26 @@ export class PasteService {
         inserted: string
     ): Promise<void> {
         const settings = this.getSettings();
-        const summary: PasteSummary = { terminalCleaned: false, urlsCleaned: 0, imagesDownloaded: 0, imagesFailed: 0 };
+        const summary: PasteSummary = {
+            aiTextCleaned: false,
+            terminalCleaned: false,
+            urlsCleaned: 0,
+            imagesDownloaded: 0,
+            imagesFailed: 0
+        };
 
         let text = inserted;
 
+        // Content copied out of a browser arrives as HTML, which is how most people paste
+        // an assistant's answer. Without this the character rule would never see it.
+        if (settings.aiTextEnabled) {
+            const cleaned = cleanAiText(text, settings);
+            summary.aiTextCleaned = cleaned.changed;
+            text = cleaned.text;
+        }
+
         if (settings.urlEnabled) {
-            const cleaned = cleanUrlsInText(text, settings);
+            const cleaned = cleanUrlsInText(text, buildUrlCleanupOptions(settings));
             text = cleaned.text;
             summary.urlsCleaned = cleaned.count;
         }
@@ -343,12 +379,30 @@ export class PasteService {
     private imageSizeFor(editor: Editor): string | null {
         const property = this.getSettings().imageSizeProperty;
         if (!property.trim()) return null;
+        return resolveImageSize(this.frontmatterOf(editor.getValue()), property);
+    }
 
-        const block = extractFrontmatterBlock(editor.getValue());
+    /**
+     * True when an automatic paste must be left completely alone: the note carries the
+     * disable property, or the cursor sits inside a code fence or the frontmatter block.
+     * Pasting terminal output into a fence is an act of preservation, so rejoining its
+     * lines there would destroy the thing the user was protecting.
+     */
+    private shouldLeaveAlone(editor: Editor): boolean {
+        // One read of the document serves both checks; this runs on every paste
+        const content = editor.getValue();
+        if (isPasteDisabledForNote(this.frontmatterOf(content), DISABLE_PROPERTY)) return true;
+
+        return isInsideVerbatimContext(content, editor.posToOffset(editor.getCursor('from')));
+    }
+
+    /** Parses the note's frontmatter from the editor buffer, or null when there is none. */
+    private frontmatterOf(content: string): unknown {
+        const block = extractFrontmatterBlock(content);
         if (block === null) return null;
 
         try {
-            return resolveImageSize(parseYaml(block), property);
+            return parseYaml(block);
         } catch {
             // Frontmatter that is mid-edit will not parse, which is not worth reporting
             return null;
@@ -362,18 +416,22 @@ export class PasteService {
 
     /** Shows a one-line summary of what the paste changed, when notices are enabled. */
     private notify(summary: PasteSummary): void {
+        // A failure is reported whether or not the user asked for notices: it is the one
+        // case where silence would leave them with a note they think is complete.
+        if (summary.imagesFailed > 0) {
+            const count = summary.imagesFailed;
+            new Notice(`Better Paste: ${count} image${count === 1 ? '' : 's'} could not be saved, the original link was kept`);
+        }
+
         if (!this.getSettings().showNotices) return;
 
         const parts: string[] = [];
+        if (summary.aiTextCleaned) parts.push('tidied AI text');
         if (summary.terminalCleaned) parts.push('cleaned up terminal text');
         if (summary.urlsCleaned > 0) parts.push(`cleaned ${summary.urlsCleaned} URL${summary.urlsCleaned === 1 ? '' : 's'}`);
         if (summary.imagesDownloaded > 0) {
             parts.push(`saved ${summary.imagesDownloaded} image${summary.imagesDownloaded === 1 ? '' : 's'}`);
         }
-        if (summary.imagesFailed > 0) {
-            parts.push(`${summary.imagesFailed} image${summary.imagesFailed === 1 ? '' : 's'} could not be downloaded`);
-        }
-
         if (parts.length === 0) return;
         new Notice(`Better Paste: ${parts.join(', ')}`);
     }
