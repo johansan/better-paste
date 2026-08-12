@@ -354,14 +354,25 @@ export interface UrlCleanupResult {
     count: number;
 }
 
+/** A span of text that URL cleaning must not touch. */
+export interface ProtectedRange {
+    start: number;
+    end: number;
+}
+
 /**
  * Cleans every http(s) URL found in `text`. Works on plain text and on Markdown, where
  * link targets such as `[label](url)` are matched by the same pattern.
  */
-export function cleanUrlsInText(text: string, options: UrlCleanupOptions): UrlCleanupResult {
+export function cleanUrlsInText(text: string, options: UrlCleanupOptions, protect: readonly ProtectedRange[] = []): UrlCleanupResult {
     let count = 0;
 
-    const result = text.replace(URL_PATTERN, match => {
+    const result = text.replace(URL_PATTERN, (match, offset: number) => {
+        // A URL that is about to be fetched as an image is left exactly as it was. A
+        // signed link from a CDN carries its token in the query, and stripping that
+        // before the request turns a working image into a 403.
+        if (protect.some(range => offset < range.end && offset + match.length > range.start)) return match;
+
         const url = trimUrlTail(match);
         const tail = match.slice(url.length);
         const cleaned = cleanUrl(url, options);

@@ -146,7 +146,7 @@ describe('settings tree', () => {
 
     it('puts the detail on sub-pages, declared so search can still reach it', () => {
         const found = pages(tab.getSettingDefinitions());
-        expect(found.map(page => page.name)).toEqual(['Image options', 'Sites where parameters matter', 'Terminal options']);
+        expect(found.map(page => page.name)).toEqual(['More about images', 'Sites where parameters matter', 'More about terminal text']);
         // `items` keeps a page in the searchable tree; the imperative `page` form does not
         for (const page of found) {
             expect(page.items, `"${page.name}" has no items`).toBeDefined();
@@ -157,7 +157,7 @@ describe('settings tree', () => {
     it('shows the state of a sub-page on its link', () => {
         const found = pages(tab.getSettingDefinitions());
         const sites = found.find(page => page.name === 'Sites where parameters matter');
-        const terminal = found.find(page => page.name === 'Terminal options');
+        const terminal = found.find(page => page.name === 'More about terminal text');
 
         expect(typeof sites?.displayValue === 'function' ? sites.displayValue() : sites?.displayValue).toMatch(/^\d+ sites$/);
         expect(typeof terminal?.displayValue === 'function' ? terminal.displayValue() : terminal?.displayValue).toBe('Indented lines only');
@@ -234,8 +234,8 @@ describe('dependent settings', () => {
     }
 
     it('hides the image detail when the rule is off', () => {
-        expect(isVisible(pageFor('Image options', { imagesEnabled: false }))).toBe(false);
-        expect(isVisible(pageFor('Image options', { imagesEnabled: true }))).toBe(true);
+        expect(isVisible(pageFor('More about images', { imagesEnabled: false }))).toBe(false);
+        expect(isVisible(pageFor('More about images', { imagesEnabled: true }))).toBe(true);
     });
 
     it('hides the link detail when the rule is off', () => {
@@ -244,8 +244,8 @@ describe('dependent settings', () => {
     });
 
     it('hides the terminal page when the rule is off', () => {
-        expect(isVisible(pageFor('Terminal options', { terminalEnabled: false }))).toBe(false);
-        expect(isVisible(pageFor('Terminal options', { terminalEnabled: true }))).toBe(true);
+        expect(isVisible(pageFor('More about terminal text', { terminalEnabled: false }))).toBe(false);
+        expect(isVisible(pageFor('More about terminal text', { terminalEnabled: true }))).toBe(true);
     });
 
     it('hides the punctuation choice when AI cleanup is off', () => {

@@ -245,13 +245,36 @@ export interface TerminalCleanupResult {
  * indentation, and rejoins paragraphs that the terminal hard wrapped at its window width.
  */
 export function cleanTerminalText(input: string, options: TerminalCleanupOptions): TerminalCleanupResult {
-    const text = stripAnsi(input.replace(/\r\n?/g, '\n'));
+    const normalized = input.replace(/\r\n?/g, '\n');
+    const text = stripAnsi(normalized);
+    const hadEscapes = text !== normalized;
 
     const lines = dedent(text.split('\n').map(line => line.replace(/[ \t]+$/, '')));
     const wrapWidth = inferWrapWidth(lines);
 
     const preserveIndent = options.terminalRejoinMode === 'never';
-    const rendered = groupParagraphs(lines, options, wrapWidth).map(paragraph => renderParagraph(paragraph, preserveIndent));
+    const paragraphs = groupParagraphs(lines, options, wrapWidth);
+
+    // Dedenting, trimming and collapsing blank lines are only wanted on text that came
+    // from a terminal. Nothing here identifies itself as terminal output unless it
+    // carried escape sequences or was actually rejoined, and applying them anyway would
+    // quietly flatten pasted code, nested lists and Markdown's two-space line breaks.
+    // The "never" mode is the exception: choosing it is an explicit request to strip and
+    // dedent without rejoining anything.
+    const rejoined = paragraphs.some(paragraph => !paragraph.verbatim && paragraph.lines.length > 1);
+
+    if (!preserveIndent && !hadEscapes && !rejoined) {
+        // Converting bullets is a separate, explicit request, so it still applies. The
+        // whitespace work does not.
+        if (options.terminalBulletMode !== 'markdown') return { text: input, changed: false };
+        const converted = input
+            .split('\n')
+            .map(line => toMarkdownBullet(line))
+            .join('\n');
+        return { text: converted, changed: converted !== input };
+    }
+
+    const rendered = paragraphs.map(paragraph => renderParagraph(paragraph, preserveIndent));
 
     let output = rendered.join('\n').replace(/\n{3,}/g, '\n\n');
 

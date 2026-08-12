@@ -21,7 +21,7 @@ import type { Editor, MarkdownFileInfo, MarkdownView } from 'obsidian';
 import { runTextPipeline } from '../transforms';
 import { cleanAiText } from '../transforms/aiText';
 import { buildUrlCleanupOptions, cleanUrlsInText } from '../transforms/urlCleanup';
-import { htmlHasImages, imageSourcesFromHtml } from './imageReferences';
+import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './imageReferences';
 import { extractFrontmatterBlock, isInsideVerbatimContext, isPasteDisabledForNote, resolveImageSize } from './noteOptions';
 import { DISABLE_PROPERTY } from '../settings/constants';
 import type { ImageService } from './ImageService';
@@ -62,10 +62,17 @@ export function isPreformattedHtml(html: string): boolean {
 export class PasteService {
     private readonly getSettings: () => BetterPasteSettings;
     private readonly images: ImageService;
+    /** Set on unload, so an image write that is still in flight stops touching the editor. */
+    private disposed = false;
 
     constructor(getSettings: () => BetterPasteSettings, images: ImageService) {
         this.getSettings = getSettings;
         this.images = images;
+    }
+
+    /** Called from the plugin's onunload. */
+    dispose(): void {
+        this.disposed = true;
     }
 
     /**
@@ -148,6 +155,10 @@ export class PasteService {
     ): Promise<void> {
         const fromOffset = editor.posToOffset(editor.getCursor('from'));
         const toOffset = editor.posToOffset(editor.getCursor('to'));
+        // The document is untouched at this point, because the default paste was
+        // suppressed. If its length changes while the vault write runs, the user typed,
+        // and the offsets above no longer mean what they meant.
+        const lengthBefore = editor.getValue().length;
         const files = Array.from(clipboard.files);
         const sources = imageSourcesFromHtml(html);
 
@@ -179,15 +190,23 @@ export class PasteService {
                       .map(source => `![${size ?? ''}](${source})`)
                       .join('\n');
 
+        if (this.disposed) return;
+
         if (!text) {
             // Nothing to insert and the default paste was already suppressed, so this is
             // the one path where staying quiet would lose the clipboard silently
-            this.notify(summary);
+            this.notify(summary, { insertedNothing: true });
             return;
         }
 
-        editor.replaceRange(text, editor.offsetToPos(fromOffset), editor.offsetToPos(toOffset));
-        editor.setCursor(editor.offsetToPos(fromOffset + text.length));
+        if (editor.getValue().length === lengthBefore) {
+            editor.replaceRange(text, editor.offsetToPos(fromOffset), editor.offsetToPos(toOffset));
+            editor.setCursor(editor.offsetToPos(fromOffset + text.length));
+        } else {
+            // Somebody typed while the image was being written. Inserting at the recorded
+            // offsets would overwrite whatever they wrote, so go in at the cursor instead.
+            editor.replaceSelection(text);
+        }
 
         this.notify(summary);
     }
@@ -266,6 +285,7 @@ export class PasteService {
             const insertedLength = valueAfter.length - (lengthBefore - selectionLength);
             if (insertedLength <= 0) return;
 
+            if (this.disposed) return;
             const inserted = valueAfter.slice(startOffset, startOffset + insertedLength);
             void this.processRichRange(editor, info, startOffset, inserted);
         }, 0);
@@ -298,7 +318,10 @@ export class PasteService {
         }
 
         if (settings.urlEnabled) {
-            const cleaned = cleanUrlsInText(text, buildUrlCleanupOptions(settings));
+            // Same protection as the plain-text pipeline: an image about to be fetched
+            // keeps its query, since a signed link needs it
+            const protect = settings.imagesEnabled ? imageReferenceRanges(text, settings) : [];
+            const cleaned = cleanUrlsInText(text, buildUrlCleanupOptions(settings), protect);
             text = cleaned.text;
             summary.urlsCleaned = cleaned.count;
         }
@@ -314,6 +337,7 @@ export class PasteService {
             }
         }
 
+        if (this.disposed) return;
         if (text !== inserted) this.replaceRange(editor, startOffset, inserted, text);
         this.notify(summary);
     }
@@ -335,6 +359,7 @@ export class PasteService {
             logError('Image download failed', error);
         }
 
+        if (this.disposed) return;
         this.notify(summary);
     }
 
@@ -347,7 +372,12 @@ export class PasteService {
         const value = editor.getValue();
 
         let offset = value.startsWith(expected, startOffset) ? startOffset : -1;
-        if (offset < 0) offset = value.indexOf(expected, Math.max(0, startOffset - REALIGN_WINDOW));
+        if (offset < 0) {
+            // Bounded on both sides: the same URL can appear elsewhere in the note, and
+            // an unbounded search would happily rewrite that one instead
+            const found = value.indexOf(expected, Math.max(0, startOffset - REALIGN_WINDOW));
+            offset = found >= 0 && found <= startOffset + REALIGN_WINDOW ? found : -1;
+        }
         if (offset < 0) return;
 
         const cursorOffset = editor.posToOffset(editor.getCursor());
@@ -415,12 +445,18 @@ export class PasteService {
     }
 
     /** Shows a one-line summary of what the paste changed, when notices are enabled. */
-    private notify(summary: PasteSummary): void {
+    private notify(summary: PasteSummary, options: { insertedNothing?: boolean } = {}): void {
         // A failure is reported whether or not the user asked for notices: it is the one
         // case where silence would leave them with a note they think is complete.
         if (summary.imagesFailed > 0) {
             const count = summary.imagesFailed;
-            new Notice(`Better Paste: ${count} image${count === 1 ? '' : 's'} could not be saved, the original link was kept`);
+            const what = `${count} image${count === 1 ? '' : 's'} could not be saved`;
+            // A screenshot has no link to fall back to, so say what actually happened
+            new Notice(
+                options.insertedNothing
+                    ? `Better Paste: ${what}, so nothing was pasted. The clipboard still has it.`
+                    : `Better Paste: ${what}, the original link was kept`
+            );
         }
 
         if (!this.getSettings().showNotices) return;

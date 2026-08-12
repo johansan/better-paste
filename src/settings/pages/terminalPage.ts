@@ -48,7 +48,7 @@ export function createTerminalLandingDefinitions(context: SettingsPageContext): 
         },
         {
             type: 'page',
-            name: 'Terminal options',
+            name: 'More about terminal text',
             desc: 'How cautiously lines are rejoined, and what happens to bullets.',
             visible: enabled,
             displayValue: () => REJOIN_SUMMARY[context.settings().terminalRejoinMode],

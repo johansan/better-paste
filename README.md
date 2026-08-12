@@ -16,20 +16,19 @@ Four rules, each independently configurable and each able to be turned off:
 **Terminal output.** Copying from a terminal gives you the terminal's line breaks, not yours:
 
 ```
- I'll remove the extra debate confirmation, then trace the menu's main keyboard flows for other small, low-risk friction points. I'll
-  keep destructive actions explicit and verify the interaction behavior with the existing tests or a focused harness.
+ The deployment finished, but three of the health checks did not report back before the
+  timeout, so the rollout has been paused pending a manual review.
 
-• The extra step is isolated to the list's Enter handler, so the core change is straightforward. While tracing adjacent flows, I found
-  two likely friction points worth validating: selection can jump after the 20-second refresh, and pasted Discord items require the
-  uncommon Ctrl-D shortcut to save.
+• Two of the three recovered on their own within a minute, which suggests the checks are
+  racing the container's startup probe rather than failing outright.
 ```
 
 pastes as:
 
 ```
-I'll remove the extra debate confirmation, then trace the menu's main keyboard flows for other small, low-risk friction points. I'll keep destructive actions explicit and verify the interaction behavior with the existing tests or a focused harness.
+The deployment finished, but three of the health checks did not report back before the timeout, so the rollout has been paused pending a manual review.
 
-• The extra step is isolated to the list's Enter handler, so the core change is straightforward. While tracing adjacent flows, I found two likely friction points worth validating: selection can jump after the 20-second refresh, and pasted Discord items require the uncommon Ctrl-D shortcut to save.
+• Two of the three recovered on their own within a minute, which suggests the checks are racing the container's startup probe rather than failing outright.
 ```
 
 **URLs.** A link out of a newsletter:
@@ -76,7 +75,7 @@ When a download fails or times out, the original link stays in the note. Nothing
 
 Better Paste makes network requests in exactly one situation, and it is worth being precise about it.
 
-**What it does.** When you paste content that references a picture by http(s) address — a Safari page selection, a Markdown image link, a bare link ending in `.png` — the plugin downloads that picture so the note holds a local copy instead of a link to somebody else's server. The request goes to the address the pasted content named, using Obsidian's own `requestUrl`, and nothing else is fetched.
+**What it does.** When you paste content that references a picture by http(s) address — a Safari page selection, a Markdown image link, a bare link ending in `.png` — the plugin downloads that picture so the note holds a local copy instead of a link to somebody else's server. The address always comes from what you pasted; the plugin never chooses one. Link cleaning deliberately leaves those addresses untouched, so a signed link keeps the token it needs. The request uses Obsidian's own `requestUrl`, and nothing else is fetched.
 
 **What it never does.**
 
@@ -84,7 +83,7 @@ Better Paste makes network requests in exactly one situation, and it is worth be
 - No server belonging to this plugin. There isn't one.
 - Nothing is fetched at startup, in the background, or on a timer. A request only ever happens as the direct result of a paste you made.
 - No code is downloaded or executed. Downloaded bytes are only ever written to a file, and only when the response is a recognised image type.
-- Your clipboard is never transmitted. It is transformed in memory and not retained; the plugin keeps no history.
+- Nothing is uploaded. The clipboard is transformed in memory and not retained, and the plugin keeps no history. The one thing that does leave your machine is the address of an image you pasted, since it has to be requested to be fetched.
 
 **What is stored.** Downloaded pictures go to the attachment location your vault is configured to use. Settings live in `.obsidian/plugins/better-paste/data.json`. Nothing leaves the vault.
 
@@ -103,7 +102,7 @@ The same asymmetry runs through the text rules, and there it prevents damage rat
 - **Pasting into a fenced code block is left alone.** Putting terminal output inside a fence is an act of preservation, so rejoining its lines there would destroy exactly what you were protecting. That check reads the document around the cursor. An app cannot see it, and would silently corrupt the paste.
 - **A note can opt out entirely** with `better-paste: false`, and set its own image width. Both are per-document decisions with no equivalent outside a document.
 - **Rich content stays Obsidian's job.** The plugin lets Obsidian convert HTML to Markdown and then post-processes the inserted range. An app would have to reimplement that conversion, worse.
-- **One paste is one undo.** The plugin edits through the editor, so the cleaned result is a normal editing step.
+- **The paste is a normal editing step.** The plugin edits through the editor rather than the clipboard, so the result behaves like something you typed. An image that has to be downloaded lands in a second step once the file is written.
 
 There is also a plain cost difference. The plugin needs no permissions. A global paste interceptor needs Input Monitoring and the ability to post events, and on current macOS a further grant to read the clipboard programmatically — and Secure Input Mode switches all of it off, without warning, whenever a password field is focused anywhere on the system.
 
@@ -122,7 +121,7 @@ None of these are bound to a key by default. Assign them under Settings → Hotk
 
 ## Settings
 
-Sixteen settings, arranged as a landing page with three sub-pages. Everything that had only one sensible answer is now simply how the plugin behaves, rather than a question you have to answer.
+Fifteen settings, arranged as a landing page with three sub-pages. Everything that had only one sensible answer is now simply how the plugin behaves, rather than a question you have to answer.
 
 ### Pasting
 

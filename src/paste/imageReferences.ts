@@ -149,6 +149,14 @@ export function findImageReferences(text: string, options: ImageReferenceOptions
     return found.sort((a, b) => a.index - b.index);
 }
 
+/** The span each image reference occupies, for callers that must leave them alone. */
+export function imageReferenceRanges(text: string, options: ImageReferenceOptions): { start: number; end: number }[] {
+    return findImageReferences(text, options).map(reference => ({
+        start: reference.index,
+        end: reference.index + reference.token.length
+    }));
+}
+
 /**
  * Rebuilds `text` with each reference replaced by its resolved embed. References whose
  * download failed are left exactly as they were.

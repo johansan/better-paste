@@ -79,6 +79,12 @@ export default class BetterPastePlugin extends Plugin {
         this.addSettingTab(new BetterPasteSettingTab(this.app, this));
     }
 
+    onunload(): void {
+        // An image write may still be in flight; this stops it editing a note that the
+        // plugin no longer owns
+        this.pasteService.dispose();
+    }
+
     async loadSettings(): Promise<void> {
         this.settings = normalizeSettings(await this.loadData());
     }

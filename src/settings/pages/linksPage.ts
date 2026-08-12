@@ -61,7 +61,7 @@ export function createLinkLandingDefinitions(context: SettingsPageContext): Sett
         },
         {
             name: 'Which parameters to remove',
-            desc: 'Removing everything is thorough but relies on the site list to keep working links working. Removing only known tracking is cautious and leaves unfamiliar parameters alone.',
+            desc: 'Removing everything is thorough, and leans on the site rules to keep the parameters that matter. Removing only known tracking is cautious and leaves unfamiliar parameters alone.',
             visible: enabled,
             aliases: ['utm', 'tracking', 'query', 'parameters'],
             control: {

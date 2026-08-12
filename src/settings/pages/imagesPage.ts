@@ -34,7 +34,7 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
         },
         {
             type: 'page',
-            name: 'Image options',
+            name: 'More about images',
             desc: 'File names, image links, and per-note image width.',
             visible: enabled,
             items: createImageOptionsDefinitions()

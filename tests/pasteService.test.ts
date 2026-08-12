@@ -460,6 +460,36 @@ describe('handleEditorPaste: rich content', () => {
     });
 });
 
+describe('surviving an edit during the image write', () => {
+    const SAFARI_HTML = '<img src="https://example.com/photo.webp">';
+
+    it('does not overwrite text the user typed while the image was saving', async () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({ html: SAFARI_HTML, files: [fakeFile('image.png', 'image/png')] });
+
+        service.handleEditorPaste(event, editor.asEditor(), INFO);
+        // The vault write is in flight; the user keeps typing
+        editor.replaceSelection('typed while waiting');
+        await settle();
+
+        expect(editor.getValue()).toContain('typed while waiting');
+        expect(editor.getValue()).toContain('photo.png');
+    });
+
+    it('stops touching the editor once the plugin is unloaded', async () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({ html: SAFARI_HTML, files: [fakeFile('image.png', 'image/png')] });
+
+        service.handleEditorPaste(event, editor.asEditor(), INFO);
+        service.dispose();
+        await settle();
+
+        expect(editor.getValue()).toBe('');
+    });
+});
+
 describe('leaving a paste alone', () => {
     const TRACKED = 'https://example.com/a?utm_source=x';
 

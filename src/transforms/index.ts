@@ -19,6 +19,7 @@
 import { normalizeInvisibleCharacters, replacePunctuation } from './aiText';
 import { cleanTerminalText } from './terminalText';
 import { buildUrlCleanupOptions, cleanUrlsInText } from './urlCleanup';
+import { imageReferenceRanges } from '../paste/imageReferences';
 import type { BetterPasteSettings } from '../settings/types';
 
 export interface TextPipelineResult {
@@ -68,7 +69,10 @@ export function runTextPipeline(input: string, settings: BetterPasteSettings): T
     }
 
     if (settings.urlEnabled) {
-        const result = cleanUrlsInText(text, buildUrlCleanupOptions(settings));
+        // Anything that is about to be downloaded as an image is off limits to URL
+        // cleaning, which would otherwise strip the token out of a signed link
+        const protect = settings.imagesEnabled ? imageReferenceRanges(text, settings) : [];
+        const result = cleanUrlsInText(text, buildUrlCleanupOptions(settings), protect);
         urlsCleaned = result.count;
         text = result.text;
     }

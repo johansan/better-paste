@@ -105,9 +105,21 @@ describe('cleanTerminalText', () => {
         expect(result.changed).toBe(true);
     });
 
-    it('leaves short lines alone because they were not hard wrapped', () => {
+    it('leaves text alone entirely when nothing says it came from a terminal', () => {
+        // No escape sequences and no rejoin, so the indentation is somebody's content
         const input = ['Roses are red', '  Violets are blue'].join('\n');
-        expect(cleanTerminalText(input, options()).text).toBe('Roses are red\nViolets are blue');
+        expect(cleanTerminalText(input, options()).text).toBe(input);
+    });
+
+    it('does not flatten a Markdown hard line break', () => {
+        // Two trailing spaces are a line break in Markdown, not terminal padding
+        const input = 'first line  \nsecond line';
+        expect(cleanTerminalText(input, options()).text).toBe(input);
+    });
+
+    it('does not dedent pasted code', () => {
+        const input = ['    def hello():', '        return 1'].join('\n');
+        expect(cleanTerminalText(input, options()).text).toBe(input);
     });
 
     it('does not merge a nested list item into its parent', () => {
@@ -167,8 +179,10 @@ describe('cleanTerminalText', () => {
         expect(cleanTerminalText(input, options()).text).toBe('link');
     });
 
-    it('collapses runs of blank lines', () => {
-        expect(cleanTerminalText('a\n\n\n\nb', options()).text).toBe('a\n\nb');
+    it('collapses runs of blank lines once the text is recognised as terminal output', () => {
+        // The escape sequence is what identifies it; without one the spacing is left alone
+        expect(cleanTerminalText('\u001B[0ma\n\n\n\nb', options()).text).toBe('a\n\nb');
+        expect(cleanTerminalText('a\n\n\n\nb', options()).text).toBe('a\n\n\n\nb');
     });
 
     it('converts bullets to Markdown list syntax when asked', () => {
