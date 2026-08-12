@@ -1,0 +1,479 @@
+/*
+ * Better Paste - Plugin for Obsidian
+ * Copyright (c) 2026 Johan Sanneblad
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+import { describe, expect, it } from 'vitest';
+import { PasteService } from '../src/paste/PasteService';
+import type { ImageService } from '../src/paste/ImageService';
+import { findImageReferences, replaceImageReferences } from '../src/paste/imageReferences';
+import { DEFAULT_SETTINGS } from '../src/settings/defaults';
+import type { BetterPasteSettings } from '../src/settings/types';
+import { FakeEditor, fakeClipboardEvent, fakeFile } from './stubs/editor';
+import type { MarkdownFileInfo, MarkdownView } from 'obsidian';
+
+const INFO = { file: { path: 'Notes/Test.md' } } as unknown as MarkdownView | MarkdownFileInfo;
+
+/** Records what the paste handler asked the image service to save. */
+interface SavedClipboardImages {
+    files: readonly File[];
+    sources: readonly string[];
+    sourcePath: string;
+    size: string | null;
+}
+
+/** Image service double that resolves every reference to a predictable embed. */
+function fakeImages(settings: BetterPasteSettings, failing = false, saved?: SavedClipboardImages[]): ImageService {
+    return {
+        hasWork: (text: string) => settings.imagesEnabled && findImageReferences(text, settings).length > 0,
+        materializeImages: async (text: string, _sourcePath: string, size: string | null = null) => {
+            const references = findImageReferences(text, settings);
+            if (failing) return { text, downloaded: 0, failed: references.length };
+            const suffix = size ? `|${size}` : '';
+            const embeds = new Map(references.map((reference, index) => [reference.index, `![[image-${index}.png${suffix}]]`]));
+            return { text: replaceImageReferences(text, references, embeds), downloaded: embeds.size, failed: 0 };
+        },
+        saveClipboardImages: async (files: readonly File[], sources: readonly string[], sourcePath: string, size: string | null = null) => {
+            saved?.push({ files, sources, sourcePath, size });
+            if (failing) return { embeds: [], failed: files.length };
+            // Name the saved file after the source picture, as the real service does
+            const embeds = files.map((file, index) => {
+                const source = sources[index] ?? '';
+                const base = source ? (source.split('/').pop() ?? file.name).replace(/\.[a-z0-9]+$/i, '') : file.name;
+                return `![[${base}.png${size ? `|${size}` : ''}]]`;
+            });
+            return { embeds, failed: 0 };
+        }
+    } as unknown as ImageService;
+}
+
+function build(overrides: Partial<BetterPasteSettings> = {}, failing = false) {
+    const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, showNotices: false, ...overrides };
+    const saved: SavedClipboardImages[] = [];
+    const service = new PasteService(() => settings, fakeImages(settings, failing, saved));
+    return { settings, service, saved };
+}
+
+/** Lets queued timers and download promises settle. */
+async function settle(): Promise<void> {
+    for (let i = 0; i < 5; i++) await new Promise(resolve => setTimeout(resolve, 0));
+}
+
+/** Editor with `selected` highlighted, so tests never hand-count offsets. */
+function selecting(doc: string, selected: string): FakeEditor {
+    const start = doc.indexOf(selected);
+    return new FakeEditor(doc, start, start + selected.length);
+}
+
+describe('handleEditorPaste: plain text', () => {
+    it('takes over and inserts the cleaned text', () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({ plain: 'See https://example.com/a?utm_source=x' });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe('See https://example.com/a');
+    });
+
+    it('declines when nothing would change, letting Obsidian paste normally', () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({ plain: 'nothing to do here' });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe('');
+    });
+
+    it('replaces the selection rather than appending', () => {
+        const { service } = build();
+        const editor = selecting('start OLD end', 'OLD');
+        const event = fakeClipboardEvent({ plain: 'https://example.com/a?utm_source=x' });
+
+        service.handleEditorPaste(event, editor.asEditor(), INFO);
+        expect(editor.getValue()).toBe('start https://example.com/a end');
+    });
+
+    it('unwraps terminal output on paste', () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+        const plain = [
+            '• A bullet line that is comfortably past the sixty character wrap threshold and',
+            '  continues on the next line.'
+        ].join('\n');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain }), editor.asEditor(), INFO);
+        expect(editor.getValue()).toBe(
+            '• A bullet line that is comfortably past the sixty character wrap threshold and continues on the next line.'
+        );
+    });
+
+    it('does nothing when automatic processing is off', () => {
+        const { service } = build({ interceptPaste: false });
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({ plain: 'https://example.com/a?utm_source=x' });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe('');
+    });
+
+    it('leaves bitmap clipboard data to Obsidian', () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({ plain: 'https://example.com/a?utm_source=x', fileCount: 1 });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe('');
+    });
+
+    it('treats a terminal <pre> payload as plain text', () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({
+            plain: 'https://example.com/a?utm_source=x',
+            html: '<pre><span style="color:#fff">https://example.com/a?utm_source=x</span></pre>'
+        });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe('https://example.com/a');
+    });
+});
+
+describe('handleEditorPaste: Safari copy image', () => {
+    // The exact clipboard Safari produces for "Copy image": an <img> tag pointing at the
+    // page's .webp, plus the decoded bitmap as a PNG file. Trimmed of its style attribute.
+    const SAFARI_HTML =
+        '<head><meta charset="UTF-8"></head>' +
+        '<img src="https://www.tokentek.ai/_astro/gaia-2026-talk.J2oaR4rx_sdIoa.webp" ' +
+        'srcset="/_astro/gaia-2026-talk.J2oaR4rx_ZR6PvP.webp 480w, /_astro/gaia-2026-talk.J2oaR4rx_Z1XRRpv.webp 768w" ' +
+        'alt="Johan Sanneblad talar om agentisk utveckling" sizes="(max-width: 56rem) 100vw, 50vw" ' +
+        'loading="lazy" width="2000" height="1333" class="rounded">' +
+        '<br class="Apple-interchange-newline">';
+
+    function safariEvent(): ClipboardEvent {
+        return fakeClipboardEvent({ html: SAFARI_HTML, files: [fakeFile('image.png', 'image/png')] });
+    }
+
+    it('takes over instead of letting Obsidian insert an external link', async () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO)).toBe(true);
+        await settle();
+        expect(editor.getValue()).toBe('![[gaia-2026-talk.J2oaR4rx_sdIoa.png]]');
+    });
+
+    it('saves the clipboard bitmap rather than downloading the source URL', async () => {
+        const { service, saved } = build();
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO);
+        await settle();
+
+        expect(saved).toHaveLength(1);
+        expect(saved[0].files[0].type).toBe('image/png');
+        expect(saved[0].sources).toEqual(['https://www.tokentek.ai/_astro/gaia-2026-talk.J2oaR4rx_sdIoa.webp']);
+        expect(saved[0].sourcePath).toBe('Notes/Test.md');
+    });
+
+    it('ignores srcset so only the real source is used', async () => {
+        const { service, saved } = build();
+        service.handleEditorPaste(safariEvent(), new FakeEditor('').asEditor(), INFO);
+        await settle();
+        expect(saved[0].sources).toHaveLength(1);
+    });
+
+    it('replaces the selection the paste was aimed at', async () => {
+        const { service } = build();
+        const editor = selecting('start OLD end', 'OLD');
+
+        service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO);
+        await settle();
+        expect(editor.getValue()).toBe('start ![[gaia-2026-talk.J2oaR4rx_sdIoa.png]] end');
+    });
+
+    it('falls back to linking the picture when it cannot be saved', async () => {
+        const { service } = build({}, true);
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO);
+        await settle();
+        expect(editor.getValue()).toBe('![](https://www.tokentek.ai/_astro/gaia-2026-talk.J2oaR4rx_sdIoa.webp)');
+    });
+
+    it('leaves a plain bitmap paste with no HTML to Obsidian', () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({ files: [fakeFile('image.png', 'image/png')] });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe('');
+    });
+
+    it('leaves a non-image file paste to Obsidian', () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({ html: '<p>a note</p>', files: [fakeFile('notes.pdf', 'application/pdf')] });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
+    });
+
+    it('leaves the paste alone when image handling is off', () => {
+        const { service } = build({ imagesEnabled: false });
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe('');
+    });
+
+    it('handles several bitmaps in one paste', async () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({
+            html: '<img src="https://example.com/one.png"><img src="https://example.com/two.png">',
+            files: [fakeFile('image.png', 'image/png'), fakeFile('image2.png', 'image/png')]
+        });
+
+        service.handleEditorPaste(event, editor.asEditor(), INFO);
+        await settle();
+        expect(editor.getValue()).toBe('![[one.png]]\n![[two.png]]');
+    });
+});
+
+describe('image width from frontmatter', () => {
+    const SAFARI_HTML = '<img src="https://example.com/photo.webp" alt="a photo">';
+
+    function safariEvent(): ClipboardEvent {
+        return fakeClipboardEvent({ html: SAFARI_HTML, files: [fakeFile('image.png', 'image/png')] });
+    }
+
+    /** A note whose frontmatter asks for a width, with the cursor at the end. */
+    function noteAsking(width: string): FakeEditor {
+        return new FakeEditor(`---\nimage-width: ${width}\n---\n\n`);
+    }
+
+    it('sizes a clipboard bitmap to the width the note asks for', async () => {
+        const { service } = build();
+        const editor = noteAsking('400');
+
+        service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO);
+        await settle();
+        expect(editor.getValue()).toBe('---\nimage-width: 400\n---\n\n![[photo.png|400]]');
+    });
+
+    it('passes a width and height through', async () => {
+        const { service, saved } = build();
+        service.handleEditorPaste(safariEvent(), noteAsking('400x300').asEditor(), INFO);
+        await settle();
+        expect(saved[0].size).toBe('400x300');
+    });
+
+    it('sizes a downloaded image too', async () => {
+        const { service } = build();
+        const editor = noteAsking('250');
+        const event = fakeClipboardEvent({ plain: 'https://example.com/cat.png' });
+
+        service.handleEditorPaste(event, editor.asEditor(), INFO);
+        await settle();
+        expect(editor.getValue()).toBe('---\nimage-width: 250\n---\n\n![[image-0.png|250]]');
+    });
+
+    it('sizes images pulled out of rich content', async () => {
+        const { service } = build();
+        const editor = noteAsking('120');
+
+        const handled = service.handleEditorPaste(
+            fakeClipboardEvent({ html: '<p>x</p><img src="https://example.com/a.png">', plain: '' }),
+            editor.asEditor(),
+            INFO
+        );
+        expect(handled).toBe(false);
+        editor.replaceSelection('![](https://example.com/a.png)');
+        await settle();
+
+        expect(editor.getValue()).toBe('---\nimage-width: 120\n---\n\n![[image-0.png|120]]');
+    });
+
+    it('takes over a plain screenshot paste so the width still applies', async () => {
+        const { service, saved } = build();
+        const editor = noteAsking('400');
+        const event = fakeClipboardEvent({ files: [fakeFile('image.png', 'image/png')] });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        await settle();
+        expect(saved[0].size).toBe('400');
+    });
+
+    it('leaves a screenshot to Obsidian when the note asks for no width', () => {
+        const { service } = build();
+        const editor = new FakeEditor('---\ntitle: Notes\n---\n\n');
+        const event = fakeClipboardEvent({ files: [fakeFile('image.png', 'image/png')] });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
+    });
+
+    it('applies no width when the note has no frontmatter', async () => {
+        const { service, saved } = build();
+        service.handleEditorPaste(safariEvent(), new FakeEditor('').asEditor(), INFO);
+        await settle();
+        expect(saved[0].size).toBeNull();
+    });
+
+    it('ignores the property when the feature is switched off', async () => {
+        const { service, saved } = build({ imageSizeProperty: '' });
+        service.handleEditorPaste(safariEvent(), noteAsking('400').asEditor(), INFO);
+        await settle();
+        expect(saved[0].size).toBeNull();
+    });
+
+    it('honours a renamed property', async () => {
+        const { service, saved } = build({ imageSizeProperty: 'bildbredd' });
+        const editor = new FakeEditor('---\nbildbredd: 640\n---\n\n');
+
+        service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO);
+        await settle();
+        expect(saved[0].size).toBe('640');
+    });
+
+    it('ignores a value that is not a usable size', async () => {
+        const { service, saved } = build();
+        service.handleEditorPaste(safariEvent(), noteAsking('very wide').asEditor(), INFO);
+        await settle();
+        expect(saved[0].size).toBeNull();
+    });
+
+    it('sizes the fallback link when the image cannot be saved', async () => {
+        const { service } = build({}, true);
+        const editor = noteAsking('400');
+
+        service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO);
+        await settle();
+        expect(editor.getValue()).toBe('---\nimage-width: 400\n---\n\n![400](https://example.com/photo.webp)');
+    });
+});
+
+describe('handleEditorPaste: images in plain text', () => {
+    it('downloads a pasted image URL and embeds the local copy', async () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({ plain: 'https://example.com/cat.png' });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        await settle();
+        expect(editor.getValue()).toBe('![[image-0.png]]');
+    });
+
+    it('keeps the original URL when the download fails', async () => {
+        const { service } = build({}, true);
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({ plain: 'https://example.com/cat.png' });
+
+        service.handleEditorPaste(event, editor.asEditor(), INFO);
+        await settle();
+        expect(editor.getValue()).toBe('https://example.com/cat.png');
+    });
+
+    it('inserts at the right place when text precedes the paste', async () => {
+        const { service } = build();
+        const editor = new FakeEditor('intro\n\n', 7);
+        const event = fakeClipboardEvent({ plain: 'https://example.com/cat.png' });
+
+        service.handleEditorPaste(event, editor.asEditor(), INFO);
+        await settle();
+        expect(editor.getValue()).toBe('intro\n\n![[image-0.png]]');
+    });
+});
+
+describe('handleEditorPaste: rich content', () => {
+    /** Runs the rich path the way Obsidian does: our handler first, then the native insert. */
+    async function pasteRich(service: PasteService, editor: FakeEditor, html: string, converted: string): Promise<void> {
+        const handled = service.handleEditorPaste(fakeClipboardEvent({ html, plain: '' }), editor.asEditor(), INFO);
+        expect(handled).toBe(false);
+        editor.replaceSelection(converted);
+        await settle();
+    }
+
+    const RICH_HTML = '<p>text</p><img src="https://example.com/a.png"><a href="https://example.com/b?utm_source=x">link</a>';
+
+    it('cleans URLs and downloads images in the range Obsidian inserted', async () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+
+        await pasteRich(service, editor, RICH_HTML, 'text ![](https://example.com/a.png) [link](https://example.com/b?utm_source=x)');
+
+        expect(editor.getValue()).toBe('text ![[image-0.png]] [link](https://example.com/b)');
+    });
+
+    it('only touches the pasted range, leaving surrounding text alone', async () => {
+        const { service } = build();
+        const existing = 'before https://example.com/keep?utm_source=x after\n\n';
+        const editor = new FakeEditor(existing);
+
+        await pasteRich(service, editor, RICH_HTML, '[link](https://example.com/b?utm_source=x)');
+
+        expect(editor.getValue()).toBe(`${existing}[link](https://example.com/b)`);
+    });
+
+    it('replaces the selection the paste overwrote', async () => {
+        const { service } = build();
+        const editor = selecting('start OLD end', 'OLD');
+
+        await pasteRich(service, editor, RICH_HTML, '[link](https://example.com/b?utm_source=x)');
+
+        expect(editor.getValue()).toBe('start [link](https://example.com/b) end');
+    });
+
+    it('abandons the edit when the pasted text is gone', async () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+
+        const handled = service.handleEditorPaste(fakeClipboardEvent({ html: RICH_HTML, plain: '' }), editor.asEditor(), INFO);
+        expect(handled).toBe(false);
+        editor.replaceSelection('![](https://example.com/a.png)');
+
+        // The user undoes the paste and types something else before the download finishes
+        editor.replaceRange('unrelated', { line: 0, ch: 0 }, { line: 0, ch: 30 });
+        await settle();
+
+        expect(editor.getValue()).toBe('unrelated');
+    });
+
+    it('does no work when both rich-content rules are off', async () => {
+        const { service } = build({ urlEnabled: false, imagesEnabled: false });
+        const editor = new FakeEditor('');
+
+        await pasteRich(service, editor, RICH_HTML, '[link](https://example.com/b?utm_source=x)');
+
+        expect(editor.getValue()).toBe('[link](https://example.com/b?utm_source=x)');
+    });
+});
+
+describe('cleanSelection', () => {
+    it('cleans the selected text in place', () => {
+        const { service } = build();
+        const editor = selecting('keep https://example.com/a?utm_source=x keep', 'https://example.com/a?utm_source=x');
+
+        service.cleanSelection(editor.asEditor());
+        expect(editor.getValue()).toBe('keep https://example.com/a keep');
+    });
+
+    it('leaves the document alone when there is no selection', () => {
+        const { service } = build();
+        const editor = new FakeEditor('unchanged', 0, 0);
+
+        service.cleanSelection(editor.asEditor());
+        expect(editor.getValue()).toBe('unchanged');
+    });
+});

@@ -1,0 +1,11 @@
+{
+  "id": "better-paste",
+  "name": "Better Paste",
+  "version": "1.0.0",
+  "minAppVersion": "1.13.0",
+  "description": "Clean up what you paste: materialize remote images into the vault, strip tracking parameters from URLs, and unwrap hard-wrapped terminal output.",
+  "author": "Johan Sanneblad",
+  "authorUrl": "https://github.com/johansan",
+  "fundingUrl": "https://github.com/sponsors/johansan/",
+  "isDesktopOnly": false
+}
