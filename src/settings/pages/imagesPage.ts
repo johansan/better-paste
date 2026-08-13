@@ -21,6 +21,31 @@ import { DEFAULT_SETTINGS } from '../defaults';
 import { describeWithExample } from './context';
 import type { SettingsPageContext } from './context';
 
+/**
+ * Shows the rule by example, with the part of the address that is dropped struck through.
+ * What is left is the file name, which is what the default naming format saves it as.
+ *
+ * Built with plain DOM calls and guarded, because the settings definitions are also read
+ * outside a browser by the tests.
+ */
+function savingExample(): string | DocumentFragment {
+    const lead =
+        'Saves copied images as local files rather than inserting external links. This applies to Safari’s "Copy image", pictures inside copied web content, and images embedded in the clipboard. Images are saved to your vault attachment folder, named after the source:';
+    const address = 'https://images.example.com/2026/05/';
+    const file = 'skyline-8f21a.jpg';
+    const query = '?auto=format&w=2400';
+
+    if (typeof createFragment === 'undefined') return `${lead} ${address}${file}${query}`;
+
+    return createFragment(fragment => {
+        fragment.appendText(lead);
+        const example = fragment.createDiv({ cls: 'better-paste-example' });
+        example.createSpan({ cls: 'better-paste-example-removed', text: address });
+        example.createSpan({ text: file });
+        example.createSpan({ cls: 'better-paste-example-removed', text: query });
+    });
+}
+
 /** Rows shown directly under the Images heading on the landing page. */
 export function createImageLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
     const enabled = (): boolean => context.settings().imagesEnabled;
@@ -28,7 +53,7 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
     return [
         {
             name: 'Save pasted images into the vault',
-            desc: 'Saves copied images as local files rather than inserting external links. This applies to Safari’s "Copy image", pictures inside copied web content, and images embedded in the clipboard. Images are saved to your vault attachment folder.',
+            desc: savingExample(),
             aliases: ['download', 'attachment', 'safari', 'screenshot', 'picture', 'folder', 'file name', 'filename', 'width', 'size'],
             control: { type: 'toggle', key: 'imagesEnabled', defaultValue: DEFAULT_SETTINGS.imagesEnabled }
         },
