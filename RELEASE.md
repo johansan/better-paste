@@ -4,7 +4,7 @@ Notes for publishing Better Paste and getting it into the community directory.
 
 ## Before the first submission
 
-The submission mechanism changed. **There is no longer a pull request to `obsidianmd/obsidian-releases`.** That repository is now downstream of the directory — a bot mirrors `community-plugins.json` into it hourly, and pull requests are disabled. Any guide telling you to fork it is out of date.
+The submission mechanism changed. **There is no longer a pull request to `obsidianmd/obsidian-releases`.** That repository is now downstream of the directory. A bot mirrors `community-plugins.json` into it hourly, and pull requests are disabled. Any guide telling you to fork it is out of date.
 
 Submission is a form at [community.obsidian.md](https://community.obsidian.md), signed in with an **Obsidian account** (not GitHub), with your GitHub account connected so it can verify repository ownership.
 
@@ -29,7 +29,7 @@ npm version patch      # or minor / major - updates manifest.json and versions.j
 git push --follow-tags
 ```
 
-The tag must be the bare version with **no `v` prefix** — `1.0.0`, not `v1.0.0`. Obsidian resolves releases by exact tag match against `manifest.json`, and `.github/workflows/release.yml` fails the build if the two disagree.
+The tag must be the bare version with **no `v` prefix**, so `1.0.0` rather than `v1.0.0`. Obsidian resolves releases by exact tag match against `manifest.json`, and `.github/workflows/release.yml` fails the build if the two disagree.
 
 The workflow attaches `main.js`, `manifest.json` and `styles.css` as **three individual files**. Never a zip: Obsidian downloads them by name and does not unpack archives.
 
@@ -49,12 +49,12 @@ Submitting early is worth doing: the entry and its id are created at submission,
 
 Four sections, each rated Error, Warning, Recommendation or Pass. Only errors block.
 
-- **Manifest** — required keys, no disallowed keys, description format, forbidden words.
-- **Releases** — tag matches the manifest version, the three assets present individually.
-- **Source code** — the rules in `eslint-plugin-obsidianmd`, which `npm run lint` already runs.
-- **Build verification** — it rebuilds from source and compares against the released `main.js`. It uses the first of `build`, `build:plugin` or `compile` from `package.json`.
+- **Manifest** covers required keys, no disallowed keys, description format, forbidden words.
+- **Releases** covers the tag matching the manifest version, the three assets present individually.
+- **Source code** runs the rules in `eslint-plugin-obsidianmd`, which `npm run lint` already runs.
+- **Build verification** rebuilds from source and compares against the released `main.js`. It uses the first of `build`, `build:plugin` or `compile` from `package.json`.
 
-The scanner skips a fixed list of paths, which happens to include `tests`, `scripts`, `docs`, `esbuild.config.mjs`, `version-bump.mjs` and `.obsidian` — so the test-vault-in-the-repo-root arrangement is safe.
+The scanner skips a fixed list of paths, which happens to include `tests`, `scripts`, `docs`, `esbuild.config.mjs`, `version-bump.mjs` and `.obsidian`, so the test vault in the repo root is safe.
 
 ## Local quality gate
 

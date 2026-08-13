@@ -22,3 +22,7 @@ MD040: false
 
 # MD041 - First line should be a top-level heading
 MD041: true
+
+# MD033 - Inline HTML
+# <br/> is used for spacing between README sections, matching the sibling plugin
+MD033: false

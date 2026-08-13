@@ -1,41 +1,27 @@
 # Contributing
 
-Thank you for taking an interest in Better Paste.
+Better Paste is maintained by a single author. Pull requests from outside contributors are not accepted. Ideas are welcome as feature requests through GitHub issues.
 
 ## Bug reports
 
-The most useful bug report for this plugin is one that shows **what was on the clipboard**, because almost every problem comes down to which flavour was picked or how it was parsed.
+Open a bug report using the [bug report template](https://github.com/johansan/better-paste/issues/new?template=bug_report.md).
 
-Open <https://dynalist.io/clipboard> in the browser you copied from, paste there, and include what it prints. That page lists every type on the clipboard along with a preview, which is usually enough to identify the cause immediately.
+The most useful thing you can include is **what was on the clipboard**, because almost every problem comes down to which flavour was picked or how it was parsed. Open <https://dynalist.io/clipboard> in the browser or app you copied from, paste there, and include what it prints. That page lists every type on the clipboard with a preview, which is usually enough to identify the cause immediately.
 
-Also say which app you copied from, what you expected, and what you got.
+Also include the app you copied from, the Obsidian version, the plugin version, and your operating system.
+
+## Feature requests
+
+Use the [feature request template](https://github.com/johansan/better-paste/issues/new?template=feature_request.md). Describe the paste that goes wrong today and what you would like to happen instead. A concrete example is worth more than a description.
+
+Note that the plugin deliberately has few settings. A behaviour with one sensible answer is better as a constant than as a question every user has to answer.
+
+## Security issues
+
+Security issues follow a separate process. See [SECURITY.md](SECURITY.md).
 
 ## Pull requests
 
-Run the quality gate before opening one:
+Pull requests are not accepted. They are closed automatically without review.
 
-```bash
-./scripts/build.sh
-```
-
-It runs ESLint (including the Obsidian plugin rules), Stylelint, markdownlint, TypeScript, the test suite, Prettier and a dead-code check, and only builds if every one of them passes. CI runs the same script, so a green local run means a green build.
-
-A few conventions worth knowing:
-
-- **The text rules are pure functions.** Everything under `src/transforms/` has no Obsidian import and is unit tested directly. New rules belong there, not in the paste handling.
-- **A setting needs a defensible opposite state.** If one value is always right, make it a constant in `src/settings/constants.ts` instead. The plugin deliberately has few settings.
-- **Reference data lives in code, not in settings.** Shipped site rules and tracking parameters are constants; only the user's own changes are stored, so updates reach existing installs.
-- **Comments explain why, not what.**
-
-## Running it locally
-
-```bash
-npm install
-npm run dev
-```
-
-The repository root is itself an Obsidian vault, so a build deploys straight into it. `scripts/build-local.sh` also copies into `~/Notes` when that vault exists.
-
-## Licence
-
-Contributions are accepted under the GPL-3.0-or-later licence that covers the project.
+Better Paste is maintained by a single developer. Bug reports and feature requests through GitHub issues are the supported way to influence the project.
