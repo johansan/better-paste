@@ -537,6 +537,19 @@ describe('surviving an edit during the image write', () => {
 
         expect(editor.getValue()).toBe('https://example.com/cat.png');
     });
+
+    it('does not replace an older identical URL after the new paste is removed', async () => {
+        const { service } = build();
+        const url = 'https://example.com/cat.png';
+        const existing = `${url}\n`;
+        const editor = new FakeEditor(existing);
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
+        editor.replaceRange('', editor.offsetToPos(existing.length), editor.offsetToPos(existing.length + url.length));
+        await settle();
+
+        expect(editor.getValue()).toBe(existing);
+    });
 });
 
 describe('explicit paste commands', () => {
@@ -555,6 +568,26 @@ describe('explicit paste commands', () => {
             finishRead('new text');
             await paste;
             expect(editor.getValue()).toBe('unchanged');
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
+    it('does not delete a selection made while clipboard permission is pending', async () => {
+        const { service } = build();
+        const editor = selecting('start OLD keep', 'OLD');
+        let finishRead: (text: string) => void = () => undefined;
+        const clipboardText = new Promise<string>(resolve => {
+            finishRead = resolve;
+        });
+        vi.stubGlobal('navigator', { clipboard: { readText: () => clipboardText } });
+
+        try {
+            const paste = service.pasteRaw(editor.asEditor(), INFO);
+            editor.setSelection('start OLD '.length, 'start OLD keep'.length);
+            finishRead('NEW');
+            await paste;
+            expect(editor.getValue()).toBe('start NEW keep');
         } finally {
             vi.unstubAllGlobals();
         }

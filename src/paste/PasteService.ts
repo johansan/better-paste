@@ -40,6 +40,14 @@ interface PasteSummary {
     imagesFailed: number;
 }
 
+/** Editor state that identifies one inserted range while an image download is pending. */
+interface AsyncPasteRange {
+    startOffset: number;
+    inserted: string;
+    valueBefore: string;
+    valueAfter: string;
+}
+
 /** True when the clipboard carries exactly one image file. */
 export function isSingleImageFile(files: FileList | readonly File[]): boolean {
     const list = Array.from(files);
@@ -55,7 +63,19 @@ export function isPreformattedHtml(html: string): boolean {
     if (/<img\b/i.test(html)) return false;
     if (/<a\b[^>]*\bhref\s*=/i.test(html)) return false;
     if (/<table\b/i.test(html)) return false;
-    return /<pre\b/i.test(html);
+
+    // A terminal clipboard contains only its pre block plus wrappers and metadata. A web
+    // article may contain a pre block beside prose, which must keep Obsidian's rich conversion.
+    const content = html.replace(/<head\b[\s\S]*?<\/head\s*>/gi, '');
+    if (!/<pre\b/i.test(content)) return false;
+
+    const outsidePre = content
+        .replace(/<pre\b[\s\S]*?<\/pre\s*>/gi, '')
+        .replace(/<!--[\s\S]*?-->/g, '')
+        .replace(/<[^>]*>/g, '')
+        .replace(/&(?:nbsp|#160|#xA0);/gi, '')
+        .trim();
+    return outsidePre.length === 0;
 }
 
 /** Applies the paste rules to editor content, both on paste and from the plugin's commands. */
@@ -125,8 +145,12 @@ export class PasteService {
         const needsImages = this.images.hasWork(result.text);
         if (!result.changed && !needsImages) return false;
 
+        const targetFile = info.file;
+        const targetPath = targetFile?.path ?? '';
+        const valueBefore = editor.getValue();
         const startOffset = editor.posToOffset(editor.getCursor('from'));
         editor.replaceSelection(result.text);
+        const range: AsyncPasteRange = { startOffset, inserted: result.text, valueBefore, valueAfter: editor.getValue() };
 
         const summary: PasteSummary = {
             aiTextCleaned: result.aiTextCleaned,
@@ -136,7 +160,7 @@ export class PasteService {
             imagesFailed: 0
         };
 
-        if (needsImages) void this.runImagePass(editor, info, startOffset, result.text, summary);
+        if (needsImages) void this.runImagePass(editor, info, targetFile, targetPath, range, summary);
         else this.notify(summary);
 
         return true;
@@ -155,6 +179,7 @@ export class PasteService {
         size: string | null
     ): Promise<void> {
         const targetFile = info.file;
+        const targetPath = targetFile?.path ?? '';
         const fromOffset = editor.posToOffset(editor.getCursor('from'));
         const toOffset = editor.posToOffset(editor.getCursor('to'));
         // The document is untouched at this point, because the default paste was
@@ -174,7 +199,7 @@ export class PasteService {
         let embed: string | null = null;
 
         try {
-            embed = await this.images.saveClipboardImage(file, sources[0] ?? '', targetFile?.path ?? '', size);
+            embed = await this.images.saveClipboardImage(file, sources[0] ?? '', targetPath, size);
             if (embed) summary.imagesDownloaded = 1;
             else summary.imagesFailed = 1;
         } catch (error) {
@@ -212,12 +237,17 @@ export class PasteService {
     /** Command handler: pastes the clipboard's plain text through the full rule pipeline. */
     async pasteProcessed(editor: Editor, info: MarkdownView | MarkdownFileInfo): Promise<void> {
         const targetFile = info.file;
+        const targetPath = targetFile?.path ?? '';
+        const valueAtInvocation = editor.getValue();
+        const fromOffset = editor.posToOffset(editor.getCursor('from'));
+        const toOffset = editor.posToOffset(editor.getCursor('to'));
         const clipboardText = await this.readClipboardText();
         if (clipboardText === null || !this.canEdit(info, targetFile)) return;
 
         const result = runTextPipeline(clipboardText, this.getSettings());
-        const startOffset = editor.posToOffset(editor.getCursor('from'));
-        editor.replaceSelection(result.text);
+        const valueBefore = editor.getValue();
+        const startOffset = this.insertAfterClipboardRead(editor, valueAtInvocation, fromOffset, toOffset, result.text);
+        const range: AsyncPasteRange = { startOffset, inserted: result.text, valueBefore, valueAfter: editor.getValue() };
 
         const summary: PasteSummary = {
             aiTextCleaned: result.aiTextCleaned,
@@ -232,15 +262,18 @@ export class PasteService {
             return;
         }
 
-        await this.runImagePass(editor, info, startOffset, result.text, summary);
+        await this.runImagePass(editor, info, targetFile, targetPath, range, summary);
     }
 
     /** Command handler: pastes the clipboard's plain text with no transforms applied. */
     async pasteRaw(editor: Editor, info: MarkdownView | MarkdownFileInfo): Promise<void> {
         const targetFile = info.file;
+        const valueAtInvocation = editor.getValue();
+        const fromOffset = editor.posToOffset(editor.getCursor('from'));
+        const toOffset = editor.posToOffset(editor.getCursor('to'));
         const clipboardText = await this.readClipboardText();
         if (clipboardText === null || !this.canEdit(info, targetFile)) return;
-        editor.replaceSelection(clipboardText);
+        this.insertAfterClipboardRead(editor, valueAtInvocation, fromOffset, toOffset, clipboardText);
     }
 
     /** Command handler: applies the text rules to the current selection. */
@@ -277,18 +310,20 @@ export class PasteService {
         if (!settings.aiTextEnabled && !settings.urlEnabled && !settings.imagesEnabled) return;
 
         const targetFile = info.file;
+        const targetPath = targetFile?.path ?? '';
         const startOffset = editor.posToOffset(editor.getCursor('from'));
-        const lengthBefore = editor.getValue().length;
+        const valueBefore = editor.getValue();
+        const lengthBefore = valueBefore.length;
         const selectionLength = editor.getSelection().length;
 
         window.setTimeout(() => {
             const valueAfter = editor.getValue();
             const insertedLength = valueAfter.length - (lengthBefore - selectionLength);
-            if (insertedLength <= 0) return;
+            if (insertedLength <= 0 || !this.canEdit(info, targetFile)) return;
 
-            if (!this.canEdit(info, targetFile)) return;
             const inserted = valueAfter.slice(startOffset, startOffset + insertedLength);
-            void this.processRichRange(editor, info, targetFile, startOffset, inserted);
+            const range: AsyncPasteRange = { startOffset, inserted, valueBefore, valueAfter };
+            void this.processRichRange(editor, info, targetFile, targetPath, range);
         }, 0);
     }
 
@@ -297,8 +332,8 @@ export class PasteService {
         editor: Editor,
         info: MarkdownView | MarkdownFileInfo,
         targetFile: TFile | null,
-        startOffset: number,
-        inserted: string
+        targetPath: string,
+        range: AsyncPasteRange
     ): Promise<void> {
         const settings = this.getSettings();
         const summary: PasteSummary = {
@@ -309,7 +344,7 @@ export class PasteService {
             imagesFailed: 0
         };
 
-        let text = inserted;
+        let text = range.inserted;
 
         // Content copied out of a browser arrives as HTML, which is how most people paste
         // an assistant's answer. Without this the character rule would never see it.
@@ -330,7 +365,7 @@ export class PasteService {
 
         if (this.images.hasWork(text)) {
             try {
-                const result = await this.images.materializeImages(text, targetFile?.path ?? '', this.imageSizeFor(editor));
+                const result = await this.images.materializeImages(text, targetPath, this.imageSizeFor(editor));
                 text = result.text;
                 summary.imagesDownloaded = result.downloaded;
                 summary.imagesFailed = result.failed;
@@ -340,7 +375,7 @@ export class PasteService {
         }
 
         if (!this.canEdit(info, targetFile)) return;
-        if (text !== inserted) this.replaceRange(editor, startOffset, inserted, text);
+        if (text !== range.inserted) this.replaceRange(editor, range, text);
         this.notify(summary);
     }
 
@@ -348,17 +383,17 @@ export class PasteService {
     private async runImagePass(
         editor: Editor,
         info: MarkdownView | MarkdownFileInfo,
-        startOffset: number,
-        inserted: string,
+        targetFile: TFile | null,
+        targetPath: string,
+        range: AsyncPasteRange,
         summary: PasteSummary
     ): Promise<void> {
-        const targetFile = info.file;
         try {
-            const result = await this.images.materializeImages(inserted, targetFile?.path ?? '', this.imageSizeFor(editor));
+            const result = await this.images.materializeImages(range.inserted, targetPath, this.imageSizeFor(editor));
             if (!this.canEdit(info, targetFile)) return;
             summary.imagesDownloaded = result.downloaded;
             summary.imagesFailed = result.failed;
-            if (result.text !== inserted) this.replaceRange(editor, startOffset, inserted, result.text);
+            if (result.text !== range.inserted) this.replaceRange(editor, range, result.text);
         } catch (error) {
             logError('Image download failed', error);
         }
@@ -368,33 +403,55 @@ export class PasteService {
     }
 
     /**
-     * Replaces `expected` with `next` at `startOffset`. The text is re-located first because
-     * downloads are asynchronous and the user may have typed in the meantime; when it can no
-     * longer be found the edit is abandoned rather than applied to the wrong place.
+     * Replaces the inserted text after an image download. The range is re-located when the
+     * user typed elsewhere, but is abandoned when an identical value predates the paste.
      */
-    private replaceRange(editor: Editor, startOffset: number, expected: string, next: string): void {
+    private replaceRange(editor: Editor, range: AsyncPasteRange, next: string): void {
         const value = editor.getValue();
+        const { startOffset, inserted } = range;
 
-        let offset = value.startsWith(expected, startOffset) ? startOffset : -1;
-        if (offset < 0) {
+        let offset = value === range.valueAfter && value.startsWith(inserted, startOffset) ? startOffset : -1;
+        if (offset < 0 && !range.valueBefore.includes(inserted)) {
             // A shifted range is only safe to rewrite when it is unique nearby. Otherwise an
             // identical URL elsewhere in the note could be mistaken for the pasted one.
             const searchFrom = Math.max(0, startOffset - REALIGN_WINDOW);
             const searchTo = Math.min(value.length, startOffset + REALIGN_WINDOW);
-            const first = value.indexOf(expected, searchFrom);
+            const first = value.indexOf(inserted, searchFrom);
             if (first >= 0 && first <= searchTo) {
-                const second = value.indexOf(expected, first + expected.length);
+                const second = value.indexOf(inserted, first + inserted.length);
                 if (second < 0 || second > searchTo) offset = first;
             }
         }
         if (offset < 0) return;
 
         const cursorOffset = editor.posToOffset(editor.getCursor());
-        const cursorWasInRange = cursorOffset >= offset && cursorOffset <= offset + expected.length;
+        const cursorWasInRange = cursorOffset >= offset && cursorOffset <= offset + inserted.length;
 
-        editor.replaceRange(next, editor.offsetToPos(offset), editor.offsetToPos(offset + expected.length));
+        editor.replaceRange(next, editor.offsetToPos(offset), editor.offsetToPos(offset + inserted.length));
 
         if (cursorWasInRange) editor.setCursor(editor.offsetToPos(offset + next.length));
+    }
+
+    /** Inserts command text at the invocation range unless the note changed during clipboard access. */
+    private insertAfterClipboardRead(
+        editor: Editor,
+        valueAtInvocation: string,
+        fromOffset: number,
+        toOffset: number,
+        text: string
+    ): number {
+        if (editor.getValue() === valueAtInvocation) {
+            editor.replaceRange(text, editor.offsetToPos(fromOffset), editor.offsetToPos(toOffset));
+            editor.setCursor(editor.offsetToPos(fromOffset + text.length));
+            return fromOffset;
+        }
+
+        // Clipboard permission can leave the command waiting while the user edits. Insert at
+        // the current head without deleting a selection made after the command was invoked.
+        const cursor = editor.getCursor();
+        const offset = editor.posToOffset(cursor);
+        editor.replaceRange(text, cursor, cursor);
+        return offset;
     }
 
     /** Reads plain text from the system clipboard, reporting failures as a notice. */

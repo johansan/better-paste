@@ -48,6 +48,8 @@ export interface ImageMaterializeResult {
 export class ImageService {
     private readonly app: App;
     private readonly getSettings: () => BetterPasteSettings;
+    /** Path selection and creation stay together so equal source names cannot claim one file. */
+    private saveQueue: Promise<void> = Promise.resolve();
 
     constructor(app: App, getSettings: () => BetterPasteSettings) {
         this.app = app;
@@ -228,10 +230,17 @@ export class ImageService {
         const baseName = applyFileNameTemplate(FILENAME_TEMPLATES[settings.imageFilenameFormat], tokens);
         const fileName = `${baseName}.${extension}`;
 
-        // getAvailablePathForAttachment honours the vault's own attachment location and
-        // resolves any name collision, so there is nothing for the plugin to decide here
-        const path = await this.app.fileManager.getAvailablePathForAttachment(fileName, sourcePath);
-        return this.app.vault.createBinary(path, data);
+        const save = this.saveQueue.then(async () => {
+            // The availability check and create are one operation from this service's point
+            // of view, otherwise two concurrent downloads with the same name can race.
+            const path = await this.app.fileManager.getAvailablePathForAttachment(fileName, sourcePath);
+            return this.app.vault.createBinary(path, data);
+        });
+        this.saveQueue = save.then(
+            () => undefined,
+            () => undefined
+        );
+        return save;
     }
 }
 

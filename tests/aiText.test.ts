@@ -79,6 +79,18 @@ describe('cleanAiText: punctuation', () => {
         expect(replacePunctuation('\u201Cq\u201D').changed).toBe(true);
         expect(replacePunctuation(`a - b "q"`).changed).toBe(false);
     });
+
+    it('leaves punctuation inside Markdown code alone', () => {
+        const input = ['`\u201Cinline\u201D`', '```text', '\u201Cquoted\u201D\u2014value', '```', '\u201Cprose\u201D'].join('\n');
+        expect(replacePunctuation(input).text).toBe(
+            ['`\u201Cinline\u201D`', '```text', '\u201Cquoted\u201D\u2014value', '```', '"prose"'].join('\n')
+        );
+    });
+
+    it('does not create Markdown blocks from line-leading long dashes', () => {
+        expect(replacePunctuation('\u2014 A sentence').text).toBe('\\- A sentence');
+        expect(replacePunctuation('\u2014\u2014\u2014').text).toBe('\\---');
+    });
 });
 
 describe('cleanAiText: invisible characters', () => {

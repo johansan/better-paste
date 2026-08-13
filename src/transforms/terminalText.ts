@@ -81,6 +81,11 @@ function isBlank(line: string): boolean {
     return line.trim().length === 0;
 }
 
+/** True when Markdown renders the line ending as an intentional hard break. */
+function hasMarkdownHardBreak(line: string): boolean {
+    return / {2,}$|\\$/.test(line);
+}
+
 /**
  * Works out the column the terminal wrapped at, from the text itself.
  *
@@ -221,6 +226,14 @@ function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptio
             continue;
         }
 
+        // A hard break is content rather than terminal wrapping. Keep the marker and stop
+        // the following indented line from being joined onto it.
+        if (hasMarkdownHardBreak(line)) {
+            current = null;
+            paragraphs.push({ lines: [line], verbatim: true });
+            continue;
+        }
+
         const previous = current?.lines[current.lines.length - 1];
         const first = current?.lines[0];
 
@@ -280,7 +293,7 @@ export function cleanTerminalText(input: string, options: TerminalCleanupOptions
     const text = stripAnsi(normalized);
     const hadEscapes = text !== normalized;
 
-    const lines = dedent(text.split('\n').map(line => line.replace(/[ \t]+$/, '')));
+    const lines = dedent(text.split('\n'));
     const wrapWidth = inferWrapWidth(lines);
 
     const preserveIndent = options.terminalRejoinMode === 'never';

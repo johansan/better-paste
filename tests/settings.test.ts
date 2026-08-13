@@ -105,6 +105,14 @@ describe('isPreformattedHtml', () => {
     it('treats ordinary prose HTML as rich content', () => {
         expect(isPreformattedHtml('<p>Hello <b>world</b></p>')).toBe(false);
     });
+
+    it('treats prose containing a code block as rich content', () => {
+        expect(isPreformattedHtml('<h2>Example</h2><p>Run this:</p><pre><code>npm test</code></pre>')).toBe(false);
+    });
+
+    it('allows clipboard metadata around a terminal pre block', () => {
+        expect(isPreformattedHtml('<head><meta charset="UTF-8"></head><!--StartFragment--><pre>output</pre>')).toBe(true);
+    });
 });
 
 describe('isSingleImageFile', () => {
@@ -167,7 +175,7 @@ describe('runTextPipeline', () => {
         ].join('\n');
 
         expect(runTextPipeline(input, DEFAULT_SETTINGS).text).toBe(
-            '- he said, in a line that runs comfortably past the wrap column of this terminal window and then continued on the following line.'
+            '\\- he said, in a line that runs comfortably past the wrap column of this terminal window and then continued on the following line.'
         );
     });
 

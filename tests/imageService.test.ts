@@ -24,14 +24,23 @@ import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 
 function build() {
     const writes: { path: string; data: ArrayBuffer }[] = [];
+    const existing = new Set<string>();
     const app = {
         fileManager: {
-            getAvailablePathForAttachment: async (fileName: string) => `Attachments/${fileName}`,
+            getAvailablePathForAttachment: async (fileName: string) => {
+                const dot = fileName.lastIndexOf('.');
+                const base = dot >= 0 ? fileName.slice(0, dot) : fileName;
+                const extension = dot >= 0 ? fileName.slice(dot) : '';
+                let path = `Attachments/${fileName}`;
+                for (let suffix = 1; existing.has(path); suffix++) path = `Attachments/${base} ${suffix}${extension}`;
+                return path;
+            },
             generateMarkdownLink: (file: TFile, _sourcePath: string, _subpath?: string, alias?: string) =>
                 `[[${file.path}${alias ? `|${alias}` : ''}]]`
         },
         vault: {
             createBinary: async (path: string, data: ArrayBuffer) => {
+                existing.add(path);
                 writes.push({ path, data });
                 const file = new TFile();
                 file.path = path;
@@ -60,6 +69,15 @@ describe('ImageService', () => {
         const result = await service.materializeImages('![a cat](data:image/png;base64,AA==)', 'Notes/Test.md', '400');
 
         expect(result.text).toBe('![[Attachments/pasted-image.png|a cat|400]]');
+    });
+
+    it('gives concurrent images with the same source name separate files', async () => {
+        const { service, writes } = build();
+
+        const result = await service.materializeImages('![](data:image/png;base64,AA==) ![](data:image/png;base64,AQ==)', 'Notes/Test.md');
+
+        expect(result.downloaded).toBe(2);
+        expect(new Set(writes.map(write => write.path)).size).toBe(2);
     });
 
     it('rejects an oversized clipboard file before reading its bytes', async () => {

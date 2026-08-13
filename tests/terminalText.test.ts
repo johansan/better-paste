@@ -117,6 +117,14 @@ describe('cleanTerminalText', () => {
         expect(cleanTerminalText(input, options()).text).toBe(input);
     });
 
+    it('does not rejoin a long Markdown hard break', () => {
+        const spaces = 'A deliberate break on a line that is comfortably longer than the terminal wrap threshold  \n  next line';
+        const backslash = 'A deliberate break on a line that is comfortably longer than the terminal wrap threshold\\\n  next line';
+
+        expect(cleanTerminalText(spaces, options()).text).toBe(spaces);
+        expect(cleanTerminalText(backslash, options()).text).toBe(backslash);
+    });
+
     it('does not dedent pasted code', () => {
         const input = ['    def hello():', '        return 1'].join('\n');
         expect(cleanTerminalText(input, options()).text).toBe(input);

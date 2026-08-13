@@ -54,6 +54,11 @@ export class FakeEditor {
         this.head = this.anchor;
     }
 
+    setSelection(anchor: number, head: number): void {
+        this.anchor = anchor;
+        this.head = head;
+    }
+
     posToOffset(pos: EditorPosition): number {
         const lines = this.value.split('\n');
         let offset = 0;

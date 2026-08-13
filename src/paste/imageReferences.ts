@@ -40,10 +40,13 @@ export interface ImageReference {
 export type ImageReferenceOptions = Pick<BetterPasteSettings, 'imageLinkPaste'>;
 
 /** Markdown image: ![alt](url "optional title") */
-const MARKDOWN_IMAGE = /!\[([^\]\n]*)\]\(\s*<?((?:[^()<\s>]+|\([^()<\s>]*\))+)>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
+const MARKDOWN_IMAGE = /!\[((?:\\.|[^\]\\\n])*)\]\(\s*<?((?:[^()<\s>]+|\([^()<\s>]*\))+)>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
 
 /** Ordinary Markdown link, claimed so its destination is never mistaken for a bare image URL. */
-const MARKDOWN_LINK = /\[[^\]\n]*\]\(\s*<?(?:[^()<\s>]+|\([^()<\s>]*\))+>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
+const MARKDOWN_LINK = /\[(?:\\.|[^\]\\\n])*\]\(\s*<?(?:[^()<\s>]+|\([^()<\s>]*\))+>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
+
+/** Link definition, claimed so its destination is not rewritten as a bare image URL. */
+const MARKDOWN_DEFINITION = /^ {0,3}\[(?:\\.|[^\]\\\n])+\]:[ \t]*<?(?:[^()<\s>]+|\([^()<\s>]*\))+>?[^\n]*$/gm;
 
 /** Raw HTML image tag, which Obsidian leaves in place for some clipboard payloads. */
 const HTML_IMAGE = /<img\b[^>]*?\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))[^>]*>/gi;
@@ -135,6 +138,11 @@ export function findImageReferences(text: string, options: ImageReferenceOptions
 
     MARKDOWN_LINK.lastIndex = 0;
     for (let match = MARKDOWN_LINK.exec(text); match !== null; match = MARKDOWN_LINK.exec(text)) {
+        claim(match.index, match.index + match[0].length);
+    }
+
+    MARKDOWN_DEFINITION.lastIndex = 0;
+    for (let match = MARKDOWN_DEFINITION.exec(text); match !== null; match = MARKDOWN_DEFINITION.exec(text)) {
         claim(match.index, match.index + match[0].length);
     }
 

@@ -63,6 +63,12 @@ describe('findImageReferences', () => {
         expect(found[0].token).toBe('![](https://example.com/photo_(1).png)');
     });
 
+    it('finds a Markdown image with an escaped bracket in its alt text', () => {
+        const found = findImageReferences('![a \\] bracket](https://example.com/photo.png)', options());
+        expect(found).toHaveLength(1);
+        expect(found[0]).toMatchObject({ url: 'https://example.com/photo.png', alt: 'a \\] bracket', kind: 'markdown' });
+    });
+
     it('finds an HTML image tag and its alt text', () => {
         const found = findImageReferences('<img src="https://example.com/a.jpg" alt="hello">', options());
         expect(found).toHaveLength(1);
@@ -93,6 +99,11 @@ describe('findImageReferences', () => {
 
     it('does not treat a normal Markdown link target as a bare image URL', () => {
         expect(findImageReferences('[photo](https://example.com/cat.png)', options())).toHaveLength(0);
+    });
+
+    it('does not rewrite an image URL inside a Markdown link definition', () => {
+        const text = '![photo][cat]\n\n[cat]: https://example.com/cat.png "A cat"';
+        expect(findImageReferences(text, options())).toHaveLength(0);
     });
 
     it('does not treat code examples as image references', () => {

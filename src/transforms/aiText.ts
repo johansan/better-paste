@@ -17,6 +17,7 @@
  */
 
 import type { BetterPasteSettings } from '../settings/types';
+import { markdownCodeRanges, overlapsRange } from './markdownRanges';
 
 /** Subset of settings this rule reads, so tests can build one without a full settings object. */
 export type AiTextOptions = Pick<BetterPasteSettings, 'aiTextPlainPunctuation'>;
@@ -56,8 +57,8 @@ const SINGLE_QUOTES = new RegExp('[\\u2018\\u2019\\u201A\\u201B]', 'g');
 const EXOTIC_SPACES = new RegExp('[\\u00A0\\u1680\\u2000-\\u200A\\u202F\\u205F]', 'g');
 
 /**
- * Characters that occupy no width and carry no meaning in a note: soft hyphen, zero-width
- * space, and the byte order mark.
+ * Characters targeted by the cleanup: soft hyphen, zero-width space, and the byte order
+ * mark.
  *
  * The zero-width joiner and non-joiner are deliberately NOT here. They look equally
  * invisible but they are load-bearing: the joiner is what holds a multi-part emoji
@@ -106,7 +107,27 @@ export function normalizeInvisibleCharacters(input: string): AiTextResult {
  * item. Doing it last means the dash is still a dash while line structure is decided.
  */
 export function replacePunctuation(input: string): AiTextResult {
-    const text = input.replace(DASHES, '-').replace(DOUBLE_QUOTES, '"').replace(SINGLE_QUOTES, "'");
+    const protectedRanges = markdownCodeRanges(input);
+    const outsideCode = (match: string, offset: number, replacement: string): string =>
+        overlapsRange(protectedRanges, offset, offset + match.length) ? match : replacement;
+
+    let text = input
+        .replace(DASHES, (match, offset: number) => outsideCode(match, offset, '-'))
+        .replace(DOUBLE_QUOTES, (match, offset: number) => outsideCode(match, offset, '"'))
+        .replace(SINGLE_QUOTES, (match, offset: number) => outsideCode(match, offset, "'"));
+
+    // A long dash at the start of a line is prose. Escaping the replacement keeps it from
+    // becoming a list item or thematic break when Obsidian renders the Markdown.
+    const sourceLines = input.split('\n');
+    text = text
+        .split('\n')
+        .map((line, index) => {
+            if (!/^ {0,3}[\u2013\u2014]/.test(sourceLines[index] ?? '')) return line;
+            if (!/^ {0,3}(?:-(?:[ \t]|$)|-{3,}[ \t]*$)/.test(line)) return line;
+            return line.replace(/^([ ]{0,3})-/, '$1\\-');
+        })
+        .join('\n');
+
     return { text, changed: text !== input };
 }
 
