@@ -53,7 +53,7 @@ const RELEASE_NOTES: ReleaseNote[] = [
             'Tracking parameters are removed from pasted links. Thirty three sites ship with a rule that keeps the parameters they need, such as a YouTube video id or a Zoom password.',
             'Terminal output has its wrapped lines rejoined, and its color codes and indentation removed. Code fences, tables and list items are left as they are.',
             'Curly quotes, long dashes and invisible characters are replaced with their plain equivalents.',
-            'Four commands: `Paste and clean up`, `Paste without processing`, `Clean up selection` and `Toggle automatic cleanup`.',
+            'Four commands: `Paste`, `Paste without processing`, `Clean up selection` and `Toggle automatic cleanup`.',
             'A note can opt out with the `better-paste: false` property, or set the width of the images pasted into it with `image-width`.'
         ]
     }

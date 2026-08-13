@@ -63,8 +63,8 @@ export default class BetterPastePlugin extends Plugin {
         );
 
         this.addCommand({
-            id: 'paste-processed',
-            name: 'Paste and clean up',
+            id: 'paste',
+            name: 'Paste',
             editorCallback: (editor: Editor, info: MarkdownView | MarkdownFileInfo) => {
                 void this.pasteService.pasteProcessed(editor, info);
             }
@@ -79,7 +79,7 @@ export default class BetterPastePlugin extends Plugin {
         });
 
         this.addCommand({
-            id: 'clean-selection',
+            id: 'clean',
             name: 'Clean up selection',
             editorCallback: (editor: Editor) => {
                 this.pasteService.cleanSelection(editor);
@@ -87,7 +87,7 @@ export default class BetterPastePlugin extends Plugin {
         });
 
         this.addCommand({
-            id: 'toggle-automatic-cleanup',
+            id: 'toggle-cleanup',
             name: 'Toggle automatic cleanup',
             callback: () => {
                 void this.toggleAutomaticProcessing();

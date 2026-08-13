@@ -178,10 +178,10 @@ One consequence worth knowing. A note with `image-width` also takes screenshot p
 
 Set custom hotkeys for these in Obsidian's Hotkeys settings. None are bound by default.
 
-- `better-paste:paste-processed` **Paste and clean up.** Pastes the clipboard's plain text through the rules, whether or not automatic cleanup is on, and whether or not the note opted out.
+- `better-paste:paste` **Paste.** Pastes the clipboard's plain text through the rules, whether or not automatic cleanup is on, and whether or not the note opted out.
 - `better-paste:paste-raw` **Paste without processing.** Pastes the clipboard's plain text exactly as it is.
-- `better-paste:clean-selection` **Clean up selection.** Applies the text rules to whatever you have selected.
-- `better-paste:toggle-automatic-cleanup` **Toggle automatic cleanup.** Flips the master switch, which is handy on a hotkey.
+- `better-paste:clean` **Clean up selection.** Applies the text rules to whatever you have selected.
+- `better-paste:toggle-cleanup` **Toggle automatic cleanup.** Flips the master switch, which is handy on a hotkey.
 
 <br/>
 
