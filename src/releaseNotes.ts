@@ -49,12 +49,12 @@ const RELEASE_NOTES: ReleaseNote[] = [
         date: '2026-08-13',
         info: 'The first release of Better Paste.',
         new: [
-            'Pasted images are saved into the vault as attachments instead of linking to the site they came from. Covers Safari’s `Copy image`, pictures inside copied web content, and bitmaps already on the clipboard.',
-            'Tracking parameters are removed from pasted links. Thirty three sites ship with a rule that keeps the parameters they need, such as a YouTube video id or a Zoom password.',
-            'Terminal output has its wrapped lines rejoined, and its color codes and indentation removed. Code fences, tables and list items are left as they are.',
-            'Curly quotes, long dashes and invisible characters are replaced with their plain equivalents.',
+            'Saves pasted images into the vault as attachments. Covers Safari’s `Copy image`, pictures inside copied web content, and bitmaps already on the clipboard.',
+            'Removes tracking parameters from pasted links. Thirty-three sites ship with a rule that keeps the parameters they need.',
+            'Rejoins wrapped lines in terminal output, and removes color codes and indentation. Fenced code, tables and list items are left alone.',
+            'Replaces curly quotes, long dashes and invisible characters with plain equivalents.',
             'Four commands: `Paste`, `Paste without processing`, `Clean up selection` and `Toggle automatic cleanup`.',
-            'A note can opt out with the `better-paste: false` property, or set the width of the images pasted into it with `image-width`.'
+            'A note can opt out with the `better-paste: false` property, or set the width of pasted images with `image-width`.'
         ]
     }
 ];
