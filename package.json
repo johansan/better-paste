@@ -15,7 +15,7 @@
     "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\" --max-warnings=0",
     "lint:fix": "eslint \"src/**/*.ts\" \"tests/**/*.ts\" --max-warnings=0 --fix",
     "lint:styles": "stylelint \"styles.css\" --max-warnings=0",
-    "lint:docs": "markdownlint-cli2 README.md CONTRIBUTING.md SECURITY.md RELEASE.md",
+    "lint:docs": "markdownlint-cli2 README.md CONTRIBUTING.md SECURITY.md",
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write .",
