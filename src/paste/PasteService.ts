@@ -81,6 +81,7 @@ export function isPreformattedHtml(html: string): boolean {
     if (/<img\b/i.test(html)) return false;
     if (/<a\b[^>]*\bhref\s*=/i.test(html)) return false;
     if (/<table\b/i.test(html)) return false;
+    if (/<pre\b[^>]*>\s*<code\b/i.test(html)) return false;
 
     // A terminal clipboard contains only its pre block plus wrappers and metadata. A web
     // article may contain a pre block beside prose, which must keep Obsidian's rich conversion.
@@ -103,6 +104,8 @@ export class PasteService {
     private readonly titles: LinkTitleService;
     /** Set on unload, so awaited work that is still in flight stops touching the editor. */
     private disposed = false;
+    /** Ranges still awaiting work, kept aligned when another pending paste is rewritten. */
+    private readonly pendingRanges = new Set<AsyncPasteRange>();
 
     constructor(getSettings: () => BetterPasteSettings, images: ImageService, titles: LinkTitleService) {
         this.getSettings = getSettings;
@@ -113,6 +116,7 @@ export class PasteService {
     /** Called from the plugin's onunload. */
     dispose(): void {
         this.disposed = true;
+        this.pendingRanges.clear();
         this.images.dispose();
         this.titles.dispose();
     }
@@ -368,6 +372,7 @@ export class PasteService {
         targetPath: string,
         range: AsyncPasteRange
     ): Promise<void> {
+        this.pendingRanges.add(range);
         const settings = this.getSettings();
         const summary: PasteSummary = {
             aiTextCleaned: false,
@@ -408,9 +413,13 @@ export class PasteService {
             }
         }
 
-        if (!this.canEdit(info, targetFile)) return;
-        if (text !== range.inserted && !this.replaceRange(editor, range, text)) summary.imagesDownloaded = 0;
-        this.notify(summary);
+        try {
+            if (!this.canEdit(info, targetFile)) return;
+            if (text !== range.inserted && !this.replaceRange(editor, range, text)) summary.imagesDownloaded = 0;
+            this.notify(summary);
+        } finally {
+            this.pendingRanges.delete(range);
+        }
     }
 
     /** Downloads images inside an already-inserted range and swaps in the vault embeds. */
@@ -422,18 +431,23 @@ export class PasteService {
         range: AsyncPasteRange,
         summary: PasteSummary
     ): Promise<void> {
+        this.pendingRanges.add(range);
         try {
-            const result = await this.images.materializeImages(range.inserted, targetPath, this.imageSizeFor(editor));
-            if (!this.canEdit(info, targetFile)) return;
-            summary.imagesDownloaded = result.downloaded;
-            summary.imagesFailed = result.failed;
-            if (result.text !== range.inserted && !this.replaceRange(editor, range, result.text)) summary.imagesDownloaded = 0;
-        } catch (error) {
-            logError('Image download failed', error);
-        }
+            try {
+                const result = await this.images.materializeImages(range.inserted, targetPath, this.imageSizeFor(editor));
+                if (!this.canEdit(info, targetFile)) return;
+                summary.imagesDownloaded = result.downloaded;
+                summary.imagesFailed = result.failed;
+                if (result.text !== range.inserted && !this.replaceRange(editor, range, result.text)) summary.imagesDownloaded = 0;
+            } catch (error) {
+                logError('Image download failed', error);
+            }
 
-        if (!this.canEdit(info, targetFile)) return;
-        this.notify(summary);
+            if (!this.canEdit(info, targetFile)) return;
+            this.notify(summary);
+        } finally {
+            this.pendingRanges.delete(range);
+        }
     }
 
     /** Fetches the title for one already-inserted web address and turns it into a Markdown link. */
@@ -444,11 +458,16 @@ export class PasteService {
         range: AsyncPasteRange,
         summary: PasteSummary
     ): Promise<void> {
-        const link = await this.titles.materializeTitle(range.inserted);
-        if (!this.canEdit(info, targetFile)) return;
+        this.pendingRanges.add(range);
+        try {
+            const link = await this.titles.materializeTitle(range.inserted);
+            if (!this.canEdit(info, targetFile)) return;
 
-        if (link !== null && this.replaceRange(editor, range, link)) summary.linkTitlesFetched = 1;
-        this.notify(summary);
+            if (link !== null && this.replaceRange(editor, range, link)) summary.linkTitlesFetched = 1;
+            this.notify(summary);
+        } finally {
+            this.pendingRanges.delete(range);
+        }
     }
 
     /**
@@ -488,9 +507,27 @@ export class PasteService {
         const cursorWasInRange = cursorOffset >= offset && cursorOffset <= offset + inserted.length;
 
         editor.replaceRange(next, editor.offsetToPos(offset), editor.offsetToPos(offset + inserted.length));
+        this.realignPendingRanges(range, offset, inserted, next);
 
         if (cursorWasInRange) editor.setCursor(editor.offsetToPos(offset + next.length));
         return true;
+    }
+
+    /** Applies a completed rewrite to the snapshots held by other pending paste operations. */
+    private realignPendingRanges(completed: AsyncPasteRange, offset: number, previous: string, next: string): void {
+        const delta = next.length - previous.length;
+
+        for (const range of this.pendingRanges) {
+            if (range === completed || range.valueAfter.slice(offset, offset + previous.length) !== previous) continue;
+
+            range.valueAfter = range.valueAfter.slice(0, offset) + next + range.valueAfter.slice(offset + previous.length);
+            if (offset + previous.length <= range.startOffset) range.startOffset += delta;
+            range.beforeContext = range.valueAfter.slice(Math.max(0, range.startOffset - RANGE_CONTEXT), range.startOffset);
+            range.afterContext = range.valueAfter.slice(
+                range.startOffset + range.inserted.length,
+                range.startOffset + range.inserted.length + RANGE_CONTEXT
+            );
+        }
     }
 
     /** Inserts command text at the invocation range unless the note changed during clipboard access. */

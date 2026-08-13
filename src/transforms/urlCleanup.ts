@@ -58,7 +58,7 @@ export function buildUrlCleanupOptions(settings: Pick<BetterPasteSettings, 'urlS
  * trimmed afterwards by `trimUrlTail`, which is more reliable than trying to express
  * "not sentence-final punctuation" in the pattern itself.
  */
-const URL_PATTERN = /https?:\/\/[^\s<>"`\\]+/gi;
+const URL_PATTERN = /https?:\/\/[^\s<>"`\\\u201c\u201d]+/gi;
 
 /** Punctuation that is almost always sentence punctuation rather than part of the URL. */
 const TRAILING_PUNCTUATION = new Set(['.', ',', ';', ':', '!', '?', '"', "'", '`']);

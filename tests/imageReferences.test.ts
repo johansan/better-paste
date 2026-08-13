@@ -17,7 +17,13 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { extensionOfUrl, findImageReferences, isDataImageUri, replaceImageReferences } from '../src/paste/imageReferences';
+import {
+    extensionOfUrl,
+    findImageReferences,
+    imageSourcesFromHtml,
+    isDataImageUri,
+    replaceImageReferences
+} from '../src/paste/imageReferences';
 import type { ImageReferenceOptions } from '../src/paste/imageReferences';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 
@@ -69,10 +75,30 @@ describe('findImageReferences', () => {
         expect(found[0]).toMatchObject({ url: 'https://example.com/photo.png', alt: 'a \\] bracket', kind: 'markdown' });
     });
 
+    it('returns promptly for an incomplete Markdown link', () => {
+        expect(findImageReferences('[label](https://example.com/abcdefgh', options())).toHaveLength(0);
+    });
+
     it('finds an HTML image tag and its alt text', () => {
         const found = findImageReferences('<img src="https://example.com/a.jpg" alt="hello">', options());
         expect(found).toHaveLength(1);
         expect(found[0]).toMatchObject({ url: 'https://example.com/a.jpg', alt: 'hello', kind: 'html' });
+    });
+
+    it('keeps greater-than signs inside quoted HTML attributes', () => {
+        const text = '<img src="https://example.com/a.jpg" alt="A > B">';
+        const found = findImageReferences(text, options());
+
+        expect(found[0]).toMatchObject({ token: text, url: 'https://example.com/a.jpg', alt: 'A > B', kind: 'html' });
+        expect(replaceImageReferences(text, found, new Map([[found[0].index, '![[a.jpg]]']]))).toBe('![[a.jpg]]');
+    });
+
+    it('does not mistake data attributes for src and alt', () => {
+        const text = '<img data-src="https://example.com/lazy.jpg" src="https://example.com/actual.jpg" data-alt="Preview" alt="Actual">';
+        const found = findImageReferences(text, options());
+
+        expect(found[0]).toMatchObject({ url: 'https://example.com/actual.jpg', alt: 'Actual', kind: 'html' });
+        expect(imageSourcesFromHtml(text)).toEqual(['https://example.com/actual.jpg']);
     });
 
     it('finds a data URI image', () => {

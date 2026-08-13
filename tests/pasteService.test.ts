@@ -161,6 +161,15 @@ describe('handleEditorPaste: plain text', () => {
         expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
         expect(editor.getValue()).toBe('https://example.com/a');
     });
+
+    it('leaves a standalone browser code block to Obsidian', () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({ plain: 'const x = 1;\n', html: '<pre><code>const x = 1;</code></pre>' });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe('');
+    });
 });
 
 describe('handleEditorPaste: Safari copy image', () => {
@@ -416,6 +425,19 @@ describe('handleEditorPaste: images in plain text', () => {
         await settle();
 
         expect(editor.getValue()).toBe(`${url}\n![[image-0.png]] notes`);
+    });
+
+    it('replaces two identical image URLs pasted before either download finishes', async () => {
+        const { service } = build();
+        const url = 'https://example.com/cat.png';
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
+        editor.replaceSelection('\n');
+        service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('![[image-0.png]]\n![[image-0.png]]');
     });
 });
 

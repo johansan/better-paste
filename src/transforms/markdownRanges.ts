@@ -110,6 +110,7 @@ export function markdownCodeRanges(text: string): TextRange[] {
         } else {
             const opening = fenceDelimiterOf(line);
             if (opening) fence = { delimiter: opening, start: lineStart };
+            else if (/^(?: {4}|\t)/.test(line)) ranges.push({ start: lineStart, end: lineEnd });
             else collectInlineCode(line, lineStart, ranges);
         }
 

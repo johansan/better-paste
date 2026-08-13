@@ -116,6 +116,10 @@ describe('isPreformattedHtml', () => {
         expect(isPreformattedHtml('<h2>Example</h2><p>Run this:</p><pre><code>npm test</code></pre>')).toBe(false);
     });
 
+    it('treats a standalone browser code block as rich content', () => {
+        expect(isPreformattedHtml('<pre><code>npm test</code></pre>')).toBe(false);
+    });
+
     it('allows clipboard metadata around a terminal pre block', () => {
         expect(isPreformattedHtml('<head><meta charset="UTF-8"></head><!--StartFragment--><pre>output</pre>')).toBe(true);
     });
@@ -204,6 +208,17 @@ describe('runTextPipeline', () => {
         expect(runTextPipeline('  first\n\nsecond  ', DEFAULT_SETTINGS).text).toBe('first\n\nsecond');
     });
 
+    it('preserves indentation that makes the first line a Markdown code block', () => {
+        expect(runTextPipeline('    first code line\n    second code line', DEFAULT_SETTINGS).text).toBe(
+            '    first code line\n    second code line'
+        );
+    });
+
+    it('leaves URLs and punctuation inside indented Markdown code alone', () => {
+        const input = '    https://example.com/api?token=secret 2020\u20132024';
+        expect(runTextPipeline(input, DEFAULT_SETTINGS).text).toBe(input);
+    });
+
     it('trims after the other rules, not before', () => {
         // The terminal rule can leave a blank line at the end; the trim has to see it
         expect(runTextPipeline('text\n\n\n\n', DEFAULT_SETTINGS).text).toBe('text');
@@ -217,6 +232,12 @@ describe('runTextPipeline', () => {
 
     it('straightens quotes as part of the pipeline', () => {
         expect(runTextPipeline('\u201CIt\u2019s fine\u201D', DEFAULT_SETTINGS).text).toBe('"It\'s fine"');
+    });
+
+    it('keeps curly quotes around a URL while cleaning it', () => {
+        expect(runTextPipeline('See \u201Chttps://example.com/page?utm_source=news\u201D now.', DEFAULT_SETTINGS).text).toBe(
+            'See "https://example.com/page" now.'
+        );
     });
 
     it('skips a rule that is turned off', () => {

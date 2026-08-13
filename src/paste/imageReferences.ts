@@ -40,25 +40,29 @@ export interface ImageReference {
 export type ImageReferenceOptions = Pick<BetterPasteSettings, 'imageLinkPaste'>;
 
 /** Markdown image: ![alt](url "optional title") */
-const MARKDOWN_IMAGE = /!\[((?:\\.|[^\]\\\n])*)\]\(\s*<?((?:[^()<\s>]+|\([^()<\s>]*\))+)>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
+const MARKDOWN_IMAGE = /!\[((?:\\.|[^\]\\\n])*)\]\(\s*<?((?:[^()<\s>]|\([^()<\s>]*\))+)>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
 
 /** Ordinary Markdown link, claimed so its destination is never mistaken for a bare image URL. */
-const MARKDOWN_LINK = /\[(?:\\.|[^\]\\\n])*\]\(\s*<?(?:[^()<\s>]+|\([^()<\s>]*\))+>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
+const MARKDOWN_LINK = /\[(?:\\.|[^\]\\\n])*\]\(\s*<?(?:[^()<\s>]|\([^()<\s>]*\))+>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
 
 /** Link definition, claimed so its destination is not rewritten as a bare image URL. */
-const MARKDOWN_DEFINITION = /^ {0,3}\[(?:\\.|[^\]\\\n])+\]:[ \t]*<?(?:[^()<\s>]+|\([^()<\s>]*\))+>?[^\n]*$/gm;
+const MARKDOWN_DEFINITION = /^ {0,3}\[(?:\\.|[^\]\\\n])+\]:[ \t]*<?(?:[^()<\s>]|\([^()<\s>]*\))+>?[^\n]*$/gm;
 
-/** Raw HTML image tag, which Obsidian leaves in place for some clipboard payloads. */
-const HTML_IMAGE = /<img\b[^>]*?\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))[^>]*>/gi;
+/** Raw HTML image tag, including greater-than signs inside quoted attributes. */
+const HTML_IMAGE = /<img\b(?:[^"'<>]|"[^"]*"|'[^']*')*>/gi;
 
 /** Bare http(s) URL, filtered afterwards to those that point at an image file. */
-const BARE_URL = /https?:\/\/[^\s<>"`\\]+/gi;
+const BARE_URL = /https?:\/\/[^\s<>"`\\\u201c\u201d]+/gi;
 
 /** Tags and autolinks claimed before bare URLs, so an href is never rewritten as an image. */
 const HTML_TAG = /<(?:[^"'<>]|"[^"]*"|'[^']*')+>/g;
 
-/** Alt text of an HTML image tag. */
-const HTML_ALT = /\balt\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i;
+/** Reads an exact HTML attribute, without mistaking data-src or data-alt for it. */
+function htmlAttribute(tag: string, name: 'src' | 'alt'): string | null {
+    const pattern = new RegExp(`\\s${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i');
+    const match = pattern.exec(tag);
+    return match ? (match[1] ?? match[2] ?? match[3] ?? '') : null;
+}
 
 /**
  * Returns the `src` of every image tag in a clipboard HTML payload, in document order.
@@ -70,7 +74,8 @@ export function imageSourcesFromHtml(html: string): string[] {
 
     HTML_IMAGE.lastIndex = 0;
     for (let match = HTML_IMAGE.exec(html); match !== null; match = HTML_IMAGE.exec(html)) {
-        sources.push(match[1] ?? match[2] ?? match[3] ?? '');
+        const source = htmlAttribute(match[0], 'src');
+        if (source !== null) sources.push(source);
     }
 
     return sources;
@@ -148,11 +153,10 @@ export function findImageReferences(text: string, options: ImageReferenceOptions
 
     HTML_IMAGE.lastIndex = 0;
     for (let match = HTML_IMAGE.exec(text); match !== null; match = HTML_IMAGE.exec(text)) {
-        const url = match[1] ?? match[2] ?? match[3] ?? '';
-        if (!isSupportedSource(url)) continue;
+        const url = htmlAttribute(match[0], 'src');
+        if (url === null || !isSupportedSource(url)) continue;
         if (!claim(match.index, match.index + match[0].length)) continue;
-        const altMatch = HTML_ALT.exec(match[0]);
-        const alt = altMatch ? (altMatch[1] ?? altMatch[2] ?? altMatch[3] ?? '') : '';
+        const alt = htmlAttribute(match[0], 'alt') ?? '';
         found.push({ token: match[0], index: match.index, url, alt, kind: 'html' });
     }
 

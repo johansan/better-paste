@@ -34,6 +34,13 @@ export interface TextPipelineResult {
     urlsCleaned: number;
 }
 
+/** Trims surrounding paste noise while preserving indentation that makes the first line code. */
+function trimPasteEdges(text: string): string {
+    let trimmed = text.replace(/^(?:[ \t]*\r?\n)+/, '').replace(/(?:\r?\n[ \t]*)+$/, '');
+    if (!/^(?: {4}|\t)/.test(trimmed)) trimmed = trimmed.replace(/^[ \t]+/, '');
+    return trimmed.replace(/[ \t]+$/, '');
+}
+
 /**
  * Runs the synchronous text rules in order.
  *
@@ -84,7 +91,7 @@ export function runTextPipeline(input: string, settings: BetterPasteSettings): T
     }
 
     // Last, so it also clears whatever the rules above left at the edges
-    if (settings.trimPaste) text = text.trim();
+    if (settings.trimPaste) text = trimPasteEdges(text);
 
     return { text, changed: text !== input, aiTextCleaned, terminalCleaned, urlsCleaned };
 }
