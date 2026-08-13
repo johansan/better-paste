@@ -25,7 +25,7 @@ import { fileURLToPath } from 'node:url';
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 
-const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
+const projectRoot = dirname(fileURLToPath(import.meta.url));
 const releaseTypes = new Set(['patch', 'minor', 'major']);
 const versionFiles = ['manifest.json', 'package.json', 'package-lock.json', 'versions.json'];
 
@@ -135,26 +135,50 @@ function assertReleaseCommit(version) {
     }
 }
 
-async function confirmRelease(currentVersion, targetVersion) {
+async function readChoice(question) {
     if (!stdin.isTTY || !stdout.isTTY) {
-        throw new Error('Interactive confirmation is unavailable. Pass --yes to release non-interactively');
+        throw new Error('Interactive input is unavailable. Pass a release type and --yes to release non-interactively');
     }
 
     const prompt = createInterface({ input: stdin, output: stdout });
     try {
-        const answer = await prompt.question(`Release ${currentVersion} -> ${targetVersion} from main? [y/N] `);
-        return answer.trim().toLowerCase() === 'y' || answer.trim().toLowerCase() === 'yes';
+        return (await prompt.question(question)).trim();
     } finally {
         prompt.close();
     }
 }
 
+async function selectReleaseType(currentVersion) {
+    const versions = {
+        patch: nextVersion(currentVersion, 'patch'),
+        minor: nextVersion(currentVersion, 'minor'),
+        major: nextVersion(currentVersion, 'major')
+    };
+
+    console.log(`\nCurrent version: ${currentVersion}\n`);
+    console.log('Select release type:');
+    console.log(`  1) Patch (${versions.patch}) [default]`);
+    console.log(`  2) Minor (${versions.minor})`);
+    console.log(`  3) Major (${versions.major})`);
+
+    const choice = (await readChoice('\nEnter choice [1]: ')) || '1';
+    if (choice === '1') return 'patch';
+    if (choice === '2') return 'minor';
+    if (choice === '3') return 'major';
+    throw new Error(`Invalid choice: ${choice}`);
+}
+
+async function confirmRelease(currentVersion, targetVersion) {
+    const answer = (await readChoice(`Release ${currentVersion} -> ${targetVersion} from main? [y/N] `)).toLowerCase();
+    return answer === 'y' || answer === 'yes';
+}
+
 function printUsage() {
-    console.log(`Usage: npm run release -- <patch|minor|major> [--dry-run] [--yes]
+    console.log(`Usage: node release [patch|minor|major] [--dry-run] [--yes]
 
 Examples:
-  npm run release -- patch
-  npm run release -- minor --dry-run
+  node release
+  node release minor --dry-run
 
 The script requires a clean main branch that matches origin/main. It runs the full
 build, uses npm version to create the version commit and annotated bare tag, then
@@ -168,9 +192,9 @@ async function main() {
         return;
     }
 
-    const releaseType = args.find(argument => !argument.startsWith('--'));
+    let releaseType = args.find(argument => !argument.startsWith('--'));
     const unknown = args.filter(argument => argument !== releaseType && !['--dry-run', '--yes'].includes(argument));
-    if (!releaseType || !releaseTypes.has(releaseType) || unknown.length > 0) {
+    if ((releaseType && !releaseTypes.has(releaseType)) || unknown.length > 0) {
         printUsage();
         process.exitCode = 1;
         return;
@@ -179,9 +203,11 @@ async function main() {
     const dryRun = args.includes('--dry-run');
     const packageJson = readJson('package.json');
     const currentVersion = packageJson.version;
-    const targetVersion = nextVersion(currentVersion, releaseType);
 
     assertVersions(currentVersion);
+    const selectedFromMenu = releaseType === undefined;
+    releaseType ??= await selectReleaseType(currentVersion);
+    const targetVersion = nextVersion(currentVersion, releaseType);
     assertReleaseNotes(targetVersion);
     assertCleanMain();
     assertTagAvailable(targetVersion);
@@ -194,7 +220,7 @@ async function main() {
         return;
     }
 
-    if (!args.includes('--yes') && !(await confirmRelease(currentVersion, targetVersion))) {
+    if (!selectedFromMenu && !args.includes('--yes') && !(await confirmRelease(currentVersion, targetVersion))) {
         console.log('Release cancelled.');
         return;
     }
