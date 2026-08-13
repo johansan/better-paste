@@ -61,7 +61,7 @@ export function createLinkLandingDefinitions(context: SettingsPageContext): Sett
         },
         {
             name: 'Fetch titles for pasted links',
-            desc: 'When the clipboard contains only a non-image web address, fetch its page title and paste a Markdown link. The original address is kept if the title cannot be fetched.',
+            desc: 'When the clipboard contains only a non-image web address, fetch its page title and paste a Markdown link. Other selected text becomes the label without making a request. The original address is kept if the title cannot be fetched.',
             aliases: ['title', 'page', 'website', 'markdown link', 'download'],
             control: { type: 'toggle', key: 'fetchLinkTitles', defaultValue: DEFAULT_SETTINGS.fetchLinkTitles }
         },

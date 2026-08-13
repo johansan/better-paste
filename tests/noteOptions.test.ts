@@ -149,6 +149,21 @@ describe('isInsideVerbatimContext', () => {
         expect(atCursor('Intro\n\n```sh\n$ ls\n|\n```\n')).toBe(true);
     });
 
+    it('is true inside an inline code span', () => {
+        expect(atCursor('Run `curl |here` in a shell')).toBe(true);
+        expect(atCursor('Use ``a ` character |here`` in a shell')).toBe(true);
+        expect(atCursor('Use `|` in a shell')).toBe(true);
+    });
+
+    it('is false immediately after an inline code span', () => {
+        expect(atCursor('Run `curl here`| in a shell')).toBe(false);
+    });
+
+    it('is true on an indented code line', () => {
+        expect(atCursor('Intro\n\n    curl |here\n')).toBe(true);
+        expect(atCursor('Intro\n\n\tgrep |here\n')).toBe(true);
+    });
+
     it('is false after the fence closes', () => {
         expect(atCursor('Intro\n\n```sh\n$ ls\n```\n\n|')).toBe(false);
     });

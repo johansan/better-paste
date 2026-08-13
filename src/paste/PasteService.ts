@@ -25,6 +25,7 @@ import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './ima
 import { extractFrontmatterBlock, isInsideVerbatimContext, isPasteDisabledForNote, resolveImageSize } from './noteOptions';
 import { DISABLE_PROPERTY } from '../settings/constants';
 import type { ImageService } from './ImageService';
+import { escapeLinkTitle } from './LinkTitleService';
 import type { LinkTitleService } from './LinkTitleService';
 import { logError } from '../utils/logger';
 import type { BetterPasteSettings } from '../settings/types';
@@ -64,6 +65,12 @@ function asyncPasteRange(startOffset: number, inserted: string, valueBefore: str
         beforeContext: valueAfter.slice(Math.max(0, startOffset - RANGE_CONTEXT), startOffset),
         afterContext: valueAfter.slice(startOffset + inserted.length, startOffset + inserted.length + RANGE_CONTEXT)
     };
+}
+
+/** Builds a link from selected text, unless the selection is the pasted address itself. */
+function linkFromSelection(selection: string, clipboardText: string, url: string): string | null {
+    if (!selection.trim() || selection === clipboardText || selection === url) return null;
+    return `[${escapeLinkTitle(selection)}](${url})`;
 }
 
 /** True when the clipboard carries exactly one image file. */
@@ -133,7 +140,7 @@ export class PasteService {
         const settings = this.getSettings();
         if (!settings.interceptPaste) return false;
 
-        // A note or a code fence can opt out. Explicit commands deliberately ignore this:
+        // A note or Markdown code can opt out. Explicit commands deliberately ignore this:
         // if the user asks for the rules by name, they get them.
         if (this.shouldLeaveAlone(editor)) return false;
 
@@ -176,8 +183,10 @@ export class PasteService {
         const targetPath = targetFile?.path ?? '';
         const valueBefore = editor.getValue();
         const startOffset = editor.posToOffset(editor.getCursor('from'));
-        editor.replaceSelection(result.text);
-        const range = asyncPasteRange(startOffset, result.text, valueBefore, editor.getValue());
+        const selectedLink = needsTitle ? linkFromSelection(editor.getSelection(), plain, result.text) : null;
+        const inserted = selectedLink ?? result.text;
+        editor.replaceSelection(inserted);
+        const range = asyncPasteRange(startOffset, inserted, valueBefore, editor.getValue());
 
         const summary: PasteSummary = {
             aiTextCleaned: result.aiTextCleaned,
@@ -189,7 +198,7 @@ export class PasteService {
         };
 
         if (needsImages) void this.runImagePass(editor, info, targetFile, targetPath, range, summary);
-        else if (needsTitle) void this.runTitlePass(editor, info, targetFile, range, summary);
+        else if (needsTitle && selectedLink === null) void this.runTitlePass(editor, info, targetFile, range, summary);
         else this.notify(summary);
 
         return true;
@@ -276,8 +285,14 @@ export class PasteService {
 
         const result = runTextPipeline(clipboardText, this.getSettings());
         const valueBefore = editor.getValue();
-        const startOffset = this.insertAfterClipboardRead(editor, valueAtInvocation, fromOffset, toOffset, result.text);
-        const range = asyncPasteRange(startOffset, result.text, valueBefore, editor.getValue());
+        const needsImages = this.images.hasWork(result.text);
+        const needsTitle = this.titles.hasWork(result.text);
+        const invocationSelection = valueAtInvocation.slice(fromOffset, toOffset);
+        const selectedLink =
+            needsTitle && valueBefore === valueAtInvocation ? linkFromSelection(invocationSelection, clipboardText, result.text) : null;
+        const inserted = selectedLink ?? result.text;
+        const startOffset = this.insertAfterClipboardRead(editor, valueAtInvocation, fromOffset, toOffset, inserted);
+        const range = asyncPasteRange(startOffset, inserted, valueBefore, editor.getValue());
 
         const summary: PasteSummary = {
             aiTextCleaned: result.aiTextCleaned,
@@ -288,12 +303,12 @@ export class PasteService {
             linkTitlesFetched: 0
         };
 
-        if (this.images.hasWork(result.text)) {
+        if (needsImages) {
             await this.runImagePass(editor, info, targetFile, targetPath, range, summary);
             return;
         }
 
-        if (!this.titles.hasWork(result.text)) {
+        if (!needsTitle || selectedLink !== null) {
             this.notify(summary);
             return;
         }

@@ -112,7 +112,7 @@ Behind **Image handling**:
 
 **Which parameters to remove** offers every parameter except where a site rule keeps it, or only the parameters known to be tracking.
 
-**Fetch titles for pasted links** turns a clipboard containing one non-image web address into a Markdown link using the page title. It is off by default because it makes a request to the pasted address. Addresses inside prose and links that already carry their own label are left alone.
+**Fetch titles for pasted links** turns a clipboard containing one non-image web address into a Markdown link using the page title. When other text is selected, that text becomes the link label without making a request. It is off by default because fetching a title makes a request to the pasted address. Addresses inside prose and links that already carry their own label are left alone.
 
 Behind **Rules for preserving parameters**, the full rule list and a live tester:
 
@@ -219,7 +219,7 @@ Better Paste makes network requests in exactly three situations.
 
 ## 9 What is not a setting
 
-A paste is left alone when the cursor sits inside a fenced code block or the frontmatter block. Pasting terminal output into a fence is an act of preservation, so rejoining its lines there would destroy the thing you were protecting.
+A paste is left alone when the cursor sits inside inline code, an indented or fenced code block, or the frontmatter block. Pasting into code is an act of preservation, so applying text rules there would destroy the thing you were protecting.
 
 These behaviours have one sensible value and are simply how the plugin works. Escape sequences and stray control characters are stripped from terminal output, the shared indentation is removed, runs of blank lines collapse, trailing spaces go, fenced code is never rejoined, images embedded in the clipboard as `data:` URIs are always saved, images over 50 MB or slower than 30 seconds are left as links, and scroll to text `#:~:text=` fragments are dropped from links while real anchors are kept.
 

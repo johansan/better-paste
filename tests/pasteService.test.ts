@@ -59,7 +59,7 @@ function fakeImages(settings: BetterPasteSettings, failing = false, saved?: Save
 }
 
 /** Title service double that resolves a standalone web address to a predictable link. */
-function fakeTitles(settings: BetterPasteSettings): LinkTitleService {
+function fakeTitles(settings: BetterPasteSettings, fetched: string[]): LinkTitleService {
     const hasWork = (text: string): boolean =>
         settings.fetchLinkTitles &&
         /^https?:\/\/\S+$/i.test(text) &&
@@ -67,7 +67,10 @@ function fakeTitles(settings: BetterPasteSettings): LinkTitleService {
 
     return {
         hasWork,
-        materializeTitle: async (text: string) => (hasWork(text) ? `[Example page](${text})` : null),
+        materializeTitle: async (text: string) => {
+            fetched.push(text);
+            return hasWork(text) ? `[Example page](${text})` : null;
+        },
         dispose: () => undefined
     } as unknown as LinkTitleService;
 }
@@ -75,8 +78,9 @@ function fakeTitles(settings: BetterPasteSettings): LinkTitleService {
 function build(overrides: Partial<BetterPasteSettings> = {}, failing = false) {
     const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, showNotices: false, ...overrides };
     const saved: SavedClipboardImages[] = [];
-    const service = new PasteService(() => settings, fakeImages(settings, failing, saved), fakeTitles(settings));
-    return { settings, service, saved };
+    const fetchedTitles: string[] = [];
+    const service = new PasteService(() => settings, fakeImages(settings, failing, saved), fakeTitles(settings, fetchedTitles));
+    return { settings, service, saved, fetchedTitles };
 }
 
 /** Lets queued timers and download promises settle. */
@@ -460,6 +464,30 @@ describe('handleEditorPaste: link titles', () => {
         expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
     });
 
+    it('uses selected text as the link label without fetching a title', async () => {
+        const { service, fetchedTitles } = build({ fetchLinkTitles: true, urlEnabled: false });
+        const editor = selecting('Read the documentation next', 'documentation');
+        const url = 'https://example.com/page';
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe(`Read the [documentation](${url}) next`);
+        await settle();
+
+        expect(fetchedTitles).toEqual([]);
+    });
+
+    it('fetches a title when the selection is the pasted URL itself', async () => {
+        const { service, fetchedTitles } = build({ fetchLinkTitles: true, urlEnabled: false });
+        const url = 'https://example.com/page';
+        const editor = selecting(url, url);
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe(`[Example page](${url})`);
+        expect(fetchedTitles).toEqual([url]);
+    });
+
     it('finds the pasted URL after the user continues typing beside an older copy', async () => {
         const { service } = build({ fetchLinkTitles: true, urlEnabled: false });
         const url = 'https://example.com/page';
@@ -664,6 +692,21 @@ describe('surviving an edit during the image write', () => {
 });
 
 describe('explicit paste commands', () => {
+    it('uses the invocation selection as a URL label without fetching a title', async () => {
+        const { service, fetchedTitles } = build({ fetchLinkTitles: true, urlEnabled: false });
+        const editor = selecting('Read the documentation next', 'documentation');
+        const url = 'https://example.com/page';
+        vi.stubGlobal('navigator', { clipboard: { readText: async () => url } });
+
+        try {
+            await service.pasteProcessed(editor.asEditor(), INFO);
+            expect(editor.getValue()).toBe(`Read the [documentation](${url}) next`);
+            expect(fetchedTitles).toEqual([]);
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
     it('does not paste after the service is disposed during a clipboard read', async () => {
         const { service } = build();
         const editor = new FakeEditor('unchanged');
@@ -741,6 +784,34 @@ describe('leaving a paste alone', () => {
 
         expect(service.handleEditorPaste(fakeClipboardEvent({ plain: TRACKED }), editor.asEditor(), INFO)).toBe(false);
         expect(editor.getValue()).toBe(content);
+    });
+
+    it('skips a URL paste inside inline code', async () => {
+        const { service, fetchedTitles } = build({ fetchLinkTitles: true, urlEnabled: false, trimPaste: false });
+        const url = 'https://example.com/page';
+        const editor = new FakeEditor('Use ``', 'Use `'.length);
+
+        const handled = service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
+        if (!handled) editor.replaceSelection(url);
+        await settle();
+
+        expect(handled).toBe(false);
+        expect(editor.getValue()).toBe(`Use \`${url}\``);
+        expect(fetchedTitles).toEqual([]);
+    });
+
+    it('skips a URL paste on an indented code line', async () => {
+        const { service, fetchedTitles } = build({ fetchLinkTitles: true, urlEnabled: false, trimPaste: false });
+        const url = 'https://example.com/page';
+        const editor = new FakeEditor('    ');
+
+        const handled = service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
+        if (!handled) editor.replaceSelection(url);
+        await settle();
+
+        expect(handled).toBe(false);
+        expect(editor.getValue()).toBe(`    ${url}`);
+        expect(fetchedTitles).toEqual([]);
     });
 
     it('processes again once the fence has closed', () => {

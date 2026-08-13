@@ -24,6 +24,8 @@
  * cache, so a property the user just typed takes effect on the very next paste.
  */
 
+import { markdownCodeRanges } from '../transforms/markdownRanges';
+
 /** Accepts "400", "400x300", "400 x 300" and the multiplication sign variant. */
 const SIZE_PATTERN = /^(\d+)(?:\s*[x×]\s*(\d+))?$/i;
 
@@ -75,6 +77,32 @@ function closesFence(line: string, opening: FenceDelimiter): boolean {
         candidate.length >= opening.length &&
         candidate.rest.trim().length === 0
     );
+}
+
+/** True when the cursor splits matching backtick runs inserted as an empty code span. */
+function isBetweenPairedBackticks(line: string, cursor: number): boolean {
+    let left = 0;
+    while (line[cursor - left - 1] === '`') left += 1;
+
+    let right = 0;
+    while (line[cursor + right] === '`') right += 1;
+    if (left === 0 || left !== right) return false;
+
+    let slashes = 0;
+    for (let index = cursor - left - 1; index >= 0 && line[index] === '\\'; index--) slashes += 1;
+    return slashes % 2 === 0;
+}
+
+/** True when an insertion point is inside same-line or indented Markdown code. */
+function isInsideLineCode(line: string, cursor: number): boolean {
+    if (line.startsWith('\t')) return cursor >= 1;
+    if (line.startsWith('    ')) return cursor >= 4;
+    if (isBetweenPairedBackticks(line, cursor)) return true;
+
+    // An opening fence line changes state only after its newline. On every other line the
+    // shared Markdown range parser supplies the same backtick-span rules as the transforms.
+    if (fenceDelimiterOf(line) !== null) return false;
+    return markdownCodeRanges(line).some(range => cursor > range.start && cursor < range.end);
 }
 
 /** Extracts the YAML text of a note's frontmatter block, or null when there is none. */
@@ -140,10 +168,10 @@ export function isPasteDisabledForNote(frontmatter: unknown, property: string): 
 }
 
 /**
- * True when the cursor sits inside a fenced code block or the frontmatter block.
+ * True when the cursor sits inside Markdown code or the frontmatter block.
  *
- * Pasting terminal output into a code fence is a deliberate act of preservation, so
- * rejoining its lines there would destroy the very thing the user was protecting.
+ * Pasting into Markdown code is a deliberate act of preservation, so applying text rules
+ * there would destroy the very thing the user was protecting.
  *
  * Takes the whole note rather than only the text before the cursor: whether a frontmatter
  * block is closed can only be answered by looking past the cursor, and an unterminated
@@ -160,7 +188,10 @@ export function isInsideVerbatimContext(content: string, cursorOffset: number): 
         const lineEnd = offset + lines[index].length;
         const inFrontmatter = frontmatterEnd >= 0 && index <= frontmatterEnd;
 
-        if (cursorOffset <= lineEnd) return inFrontmatter || fence !== null;
+        if (cursorOffset <= lineEnd) {
+            const cursorInLine = cursorOffset - offset;
+            return inFrontmatter || fence !== null || isInsideLineCode(lines[index], cursorInLine);
+        }
 
         // Fence state changes after the cursor check, so a cursor on the opening line is not
         // yet inside the block while one on the closing line still is.
