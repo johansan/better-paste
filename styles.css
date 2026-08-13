@@ -152,17 +152,25 @@
     margin-bottom: var(--size-4-1);
 }
 
+/* The banner is fetched over the network, so the frame holds its 16:9 before the
+   bytes arrive. Without the reserved box the frame is zero high until the image
+   loads and every release note below it jumps down at that moment. Banners are
+   authored at 16:9 whatever their pixel size, so the frame can commit to the ratio
+   and cover has nothing to crop. Ship a banner at another ratio and it gets cut. */
 .better-paste-release-banner {
     margin-bottom: var(--size-4-3);
     border: 1px solid var(--background-modifier-border);
     border-radius: var(--radius-m);
     overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background-color: var(--background-secondary);
 }
 
 .better-paste-release-banner img {
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
 }
 
 .better-paste-release-info {
@@ -190,17 +198,22 @@
     font-weight: var(--font-semibold);
 }
 
+/* Reserves 16:9 before the network picture arrives, so the body text below does
+   not jump down when it loads. See the release banner above. */
 .better-paste-welcome-image {
     margin-bottom: var(--size-4-4);
     border: 1px solid var(--background-modifier-border);
     border-radius: var(--radius-m);
     overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background-color: var(--background-secondary);
 }
 
 .better-paste-welcome-image img {
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
 }
 
 .better-paste-welcome-body p {
