@@ -73,8 +73,8 @@ export default class BetterPastePlugin extends Plugin {
         this.addCommand({
             id: 'paste-raw',
             name: 'Paste without processing',
-            editorCallback: (editor: Editor) => {
-                void this.pasteService.pasteRaw(editor);
+            editorCallback: (editor: Editor, info: MarkdownView | MarkdownFileInfo) => {
+                void this.pasteService.pasteRaw(editor, info);
             }
         });
 

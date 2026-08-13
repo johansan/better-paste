@@ -82,11 +82,11 @@ describe('mergeDomainRules', () => {
 });
 
 describe('mergeDomainRules: precedence', () => {
-    it('drops a shipped rule for the subdomains of a removal too', () => {
-        // "!google" has to take out maps.google as well, or it does not mean what it says
+    it('drops only the shipped rule named by a removal', () => {
         const merged = mergeDomainRules(['!google.*']);
-        expect(merged.filter(rule => rule.domain.endsWith('google'))).toEqual([]);
-        expect(cleanUrl('https://maps.google.com/?q=x&ll=1', options('all', ['!google.*']))).toBe('https://maps.google.com/');
+        expect(merged.some(rule => rule.domain === 'google')).toBe(false);
+        expect(merged.some(rule => rule.domain === 'maps.google')).toBe(true);
+        expect(cleanUrl('https://maps.google.com/?q=x&ll=1', options('all', ['!google.*']))).toBe('https://maps.google.com/?q=x&ll=1');
     });
 
     it('lets a later user rule replace an earlier one for the same site', () => {
@@ -211,6 +211,12 @@ describe('cleanUrl', () => {
         expect(cleanUrl('https://example.com', options())).toBe('https://example.com');
     });
 
+    it('keeps apostrophes inside a URL while cleaning its parameters', () => {
+        const input = "[x](https://example.com/search?q=O'Reilly&utm_source=x)";
+        expect(cleanUrlsInText(input, options()).text).toBe('[x](https://example.com/search)');
+        expect(cleanUrlsInText(input, options('tracking')).text).toBe("[x](https://example.com/search?q=O'Reilly)");
+    });
+
     it('strips a scroll-to-text fragment but keeps the anchor', () => {
         expect(cleanUrl('https://example.com/a#section:~:text=hello', options())).toBe('https://example.com/a#section');
         expect(cleanUrl('https://example.com/a#:~:text=hello', options())).toBe('https://example.com/a');
@@ -273,6 +279,30 @@ describe('cleanUrlsInText', () => {
         const result = cleanUrlsInText('no links here', options());
         expect(result.count).toBe(0);
         expect(result.text).toBe('no links here');
+    });
+
+    it('leaves URLs inside fenced and inline code untouched', () => {
+        const input = [
+            '`https://example.com/inline?token=keep`',
+            '',
+            '```ts',
+            'const url = "https://example.com/fenced?token=keep";',
+            '```',
+            '',
+            'https://example.com/prose?token=remove'
+        ].join('\n');
+
+        expect(cleanUrlsInText(input, options()).text).toBe(
+            [
+                '`https://example.com/inline?token=keep`',
+                '',
+                '```ts',
+                'const url = "https://example.com/fenced?token=keep";',
+                '```',
+                '',
+                'https://example.com/prose'
+            ].join('\n')
+        );
     });
 
     it('does not move URL-safe query characters onto the cleaned path', () => {

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { PasteService } from '../src/paste/PasteService';
 import type { ImageService } from '../src/paste/ImageService';
 import { findImageReferences, replaceImageReferences } from '../src/paste/imageReferences';
@@ -505,6 +505,28 @@ describe('surviving an edit during the image write', () => {
         expect(editor.getValue()).toBe('');
     });
 
+    it('does not insert a clipboard image after the view switches notes', async () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+        const originalFile = { path: 'Notes/Original.md' };
+        let currentFile = originalFile;
+        const info = {
+            get file() {
+                return currentFile;
+            }
+        } as unknown as MarkdownView | MarkdownFileInfo;
+
+        service.handleEditorPaste(
+            fakeClipboardEvent({ html: SAFARI_HTML, files: [fakeFile('image.png', 'image/png')] }),
+            editor.asEditor(),
+            info
+        );
+        currentFile = { path: 'Notes/Other.md' };
+        await settle();
+
+        expect(editor.getValue()).toBe('');
+    });
+
     it('does not finish a URL replacement once the plugin is unloaded', async () => {
         const { service } = build();
         const editor = new FakeEditor('');
@@ -514,6 +536,28 @@ describe('surviving an edit during the image write', () => {
         await settle();
 
         expect(editor.getValue()).toBe('https://example.com/cat.png');
+    });
+});
+
+describe('explicit paste commands', () => {
+    it('does not paste after the service is disposed during a clipboard read', async () => {
+        const { service } = build();
+        const editor = new FakeEditor('unchanged');
+        let finishRead: (text: string) => void = () => undefined;
+        const clipboardText = new Promise<string>(resolve => {
+            finishRead = resolve;
+        });
+        vi.stubGlobal('navigator', { clipboard: { readText: () => clipboardText } });
+
+        try {
+            const paste = service.pasteRaw(editor.asEditor(), INFO);
+            service.dispose();
+            finishRead('new text');
+            await paste;
+            expect(editor.getValue()).toBe('unchanged');
+        } finally {
+            vi.unstubAllGlobals();
+        }
     });
 });
 

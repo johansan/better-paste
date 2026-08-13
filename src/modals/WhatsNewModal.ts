@@ -107,6 +107,7 @@ export class WhatsNewModal extends Modal {
         this.titleEl.setText("What's new in Better Paste");
 
         const scroll = this.contentEl.createDiv({ cls: 'better-paste-release-scroll' });
+        scroll.setAttrs({ tabindex: '0', role: 'region', 'aria-label': 'Release notes' });
         for (const note of this.releaseNotes) this.renderRelease(scroll, note);
 
         this.contentEl.createDiv({ cls: 'better-paste-modal-divider' });

@@ -73,6 +73,7 @@ describe('normalizeImageSize', () => {
 
     it('rounds a fractional number', () => {
         expect(normalizeImageSize(399.6)).toBe('400');
+        expect(normalizeImageSize(0.4)).toBeNull();
     });
 
     it('rejects values that are not sizes', () => {

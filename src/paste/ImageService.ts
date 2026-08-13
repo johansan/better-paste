@@ -28,6 +28,9 @@ import type { BetterPasteSettings } from '../settings/types';
 /** Number of images fetched at once, high enough to feel instant without flooding the network. */
 const MAX_CONCURRENT_DOWNLOADS = 4;
 
+/** Byte form of the image limit, shared by checks that run before and after decoding. */
+const MAX_IMAGE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+
 interface FetchedImage {
     data: ArrayBuffer;
     contentType?: string;
@@ -116,10 +119,14 @@ export class ImageService {
                 return null;
             }
 
+            if (MAX_IMAGE_BYTES > 0 && file.size > MAX_IMAGE_BYTES) {
+                logWarning(`Skipped a pasted image: ${Math.round(file.size / 1024 / 1024)} MB exceeds the size limit`);
+                return null;
+            }
+
             const data = await file.arrayBuffer();
 
-            const maxBytes = MAX_IMAGE_SIZE_MB * 1024 * 1024;
-            if (maxBytes > 0 && data.byteLength > maxBytes) {
+            if (MAX_IMAGE_BYTES > 0 && data.byteLength > MAX_IMAGE_BYTES) {
                 logWarning(`Skipped a pasted image: ${Math.round(data.byteLength / 1024 / 1024)} MB exceeds the size limit`);
                 return null;
             }
@@ -151,8 +158,7 @@ export class ImageService {
                 return null;
             }
 
-            const maxBytes = MAX_IMAGE_SIZE_MB * 1024 * 1024;
-            if (maxBytes > 0 && fetched.data.byteLength > maxBytes) {
+            if (MAX_IMAGE_BYTES > 0 && fetched.data.byteLength > MAX_IMAGE_BYTES) {
                 logWarning(`Skipped ${reference.url}: ${Math.round(fetched.data.byteLength / 1024 / 1024)} MB exceeds the size limit`);
                 return null;
             }
@@ -241,7 +247,15 @@ function decodeDataUri(url: string): FetchedImage | null {
 
     try {
         if (isBase64) {
-            const binary = atob(payload);
+            const compact = payload.replace(/\s/g, '');
+            const padding = compact.endsWith('==') ? 2 : compact.endsWith('=') ? 1 : 0;
+            const decodedSize = Math.max(0, Math.floor((compact.length * 3) / 4) - padding);
+            if (MAX_IMAGE_BYTES > 0 && decodedSize > MAX_IMAGE_BYTES) {
+                logWarning(`Skipped an inline image: ${Math.round(decodedSize / 1024 / 1024)} MB exceeds the size limit`);
+                return null;
+            }
+
+            const binary = atob(compact);
             const bytes = new Uint8Array(binary.length);
             for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
             return { data: bytes.buffer, contentType };

@@ -30,8 +30,11 @@ const ZWJ = '\u200D';
 const ZWNJ = '\u200C';
 const SOFT_HYPHEN = '\u00AD';
 const WORD_JOINER = '\u2060';
+const MONGOLIAN_VOWEL_SEPARATOR = '\u180E';
 const BOM = '\uFEFF';
 const RLO = '\u202E';
+const LRE = '\u202A';
+const PDF = '\u202C';
 const EM_DASH = '\u2014';
 const EN_DASH = '\u2013';
 
@@ -85,7 +88,7 @@ describe('cleanAiText: invisible characters', () => {
     });
 
     it('removes zero-width and formatting characters', () => {
-        expect(cleanAiText(`a${ZWSP}b${WORD_JOINER}c${SOFT_HYPHEN}d${BOM}e`, ON).text).toBe('abcde');
+        expect(cleanAiText(`a${ZWSP}b${SOFT_HYPHEN}c${BOM}d`, ON).text).toBe('abcd');
     });
 
     it('removes bidirectional overrides', () => {
@@ -103,6 +106,11 @@ describe('cleanAiText: invisible characters', () => {
         const LRM = '\u200E';
         const ISOLATE = '\u2067';
         expect(cleanAiText(`a${LRM}b${ISOLATE}c`, ON).text).toBe(`a${LRM}b${ISOLATE}c`);
+    });
+
+    it('keeps invisible characters that still carry text semantics', () => {
+        expect(cleanAiText(`a${WORD_JOINER}b${MONGOLIAN_VOWEL_SEPARATOR}c`, ON).text).toBe(`a${WORD_JOINER}b${MONGOLIAN_VOWEL_SEPARATOR}c`);
+        expect(cleanAiText(`a${LRE}b${PDF}c`, ON).text).toBe(`a${LRE}b${PDF}c`);
     });
 
     it('keeps the ideographic space, which is the word space in CJK text', () => {

@@ -26,7 +26,7 @@ export function createAiTextLandingDefinitions(context: SettingsPageContext): Se
     return [
         {
             name: 'Clean up AI text',
-            desc: 'Replaces hidden or special characters with their plain equivalents. A no-break space becomes a normal space, and zero-width characters are dropped. Emoji and non-Latin scripts are untouched.',
+            desc: 'Replaces hidden or special characters with their plain equivalents. A no-break space becomes a normal space, and selected zero-width characters are dropped. Emoji and non-Latin scripts are untouched.',
             aliases: [
                 'ai',
                 'chatgpt',

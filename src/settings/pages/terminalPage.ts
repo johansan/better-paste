@@ -104,8 +104,11 @@ function renderTerminalTester(setting: Setting, context: SettingsPageContext): v
     // avoids needing :has() on the parent
     setting.settingEl.addClass('better-paste-tester');
     const container = setting.settingEl.createDiv({ cls: 'better-paste-preview' });
-    const input = container.createEl('textarea', { attr: { placeholder: TERMINAL_SAMPLE, rows: '5' } });
+    const input = container.createEl('textarea', {
+        attr: { placeholder: TERMINAL_SAMPLE, rows: '5', 'aria-label': 'Terminal text to clean' }
+    });
     const output = container.createDiv({ cls: 'better-paste-preview-output' });
+    output.setAttrs({ role: 'status', 'aria-live': 'polite' });
 
     const render = (): void => {
         const source = input.value;

@@ -56,27 +56,27 @@ const SINGLE_QUOTES = new RegExp('[\\u2018\\u2019\\u201A\\u201B]', 'g');
 const EXOTIC_SPACES = new RegExp('[\\u00A0\\u1680\\u2000-\\u200A\\u202F\\u205F]', 'g');
 
 /**
- * Characters that occupy no width and carry no meaning in a note: soft hyphen, Mongolian
- * vowel separator, zero-width space, word joiner, and the byte order mark.
+ * Characters that occupy no width and carry no meaning in a note: soft hyphen, zero-width
+ * space, and the byte order mark.
  *
  * The zero-width joiner and non-joiner are deliberately NOT here. They look equally
  * invisible but they are load-bearing: the joiner is what holds a multi-part emoji
  * together, and both are ordinary letters-level content in Persian, Arabic and the Indic
  * scripts. Stripping them would corrupt text rather than tidy it.
  */
-const INVISIBLE = new RegExp('[\\u00AD\\u180E\\u200B\\u2060\\uFEFF]', 'g');
+const INVISIBLE = new RegExp('[\\u00AD\\u200B\\uFEFF]', 'g');
 
 /**
- * The deprecated bidirectional embeddings and overrides. Unicode itself has retired these
- * in favour of the isolates, and an override can make text render in an order that has
- * nothing to do with what it says.
+ * Bidirectional overrides can make text render in an order that has nothing to do with what
+ * it says. Embeddings and their terminator are kept because they still carry direction in
+ * existing text, even though isolates are preferred for new content.
  *
  * The direction marks U+200E and U+200F and the isolates U+2066-U+2069 are deliberately
  * NOT here, for the same reason as the zero-width joiner above: they are what makes mixed
  * Arabic or Hebrew and Latin text render in the right order. Removing them would corrupt
  * the display of correctly written text.
  */
-const BIDI_CONTROLS = new RegExp('[\\u202A-\\u202E]', 'g');
+const BIDI_CONTROLS = new RegExp('[\\u202D\\u202E]', 'g');
 
 export interface AiTextResult {
     text: string;
@@ -85,7 +85,7 @@ export interface AiTextResult {
 
 /**
  * Replaces the characters that look ordinary but are not: exotic spaces become plain
- * spaces, zero-width and direction-control characters are dropped.
+ * spaces, selected zero-width characters and bidirectional overrides are dropped.
  *
  * Runs before the other text rules, because a no-break space is not whitespace to a
  * regular expression. Leaving one in place would defeat the terminal rule's blank-line

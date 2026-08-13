@@ -133,8 +133,12 @@ function renderUrlTester(setting: Setting, context: SettingsPageContext): void {
     // avoids needing :has() on the parent
     setting.settingEl.addClass('better-paste-tester');
     const container = setting.settingEl.createDiv({ cls: 'better-paste-preview' });
-    const input = container.createEl('input', { type: 'text', attr: { placeholder: URL_SAMPLE } });
+    const input = container.createEl('input', {
+        type: 'text',
+        attr: { placeholder: URL_SAMPLE, 'aria-label': 'Link to clean' }
+    });
     const output = container.createDiv({ cls: 'better-paste-preview-output' });
+    output.setAttrs({ role: 'status', 'aria-live': 'polite' });
 
     const render = (): void => {
         const source = input.value.trim();

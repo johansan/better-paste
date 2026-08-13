@@ -18,6 +18,7 @@
 
 import { matchesAnyGlob } from '../utils/glob';
 import { SHIPPED_DOMAIN_RULES, TRACKING_PARAMS } from '../settings/constants';
+import { markdownCodeRanges, overlapsRange } from './markdownRanges';
 import type { BetterPasteSettings, UrlStripMode } from '../settings/types';
 
 /** How many labels a wildcard top-level domain may stand for, covering ".com" and ".co.uk". */
@@ -57,7 +58,7 @@ export function buildUrlCleanupOptions(settings: Pick<BetterPasteSettings, 'urlS
  * trimmed afterwards by `trimUrlTail`, which is more reliable than trying to express
  * "not sentence-final punctuation" in the pattern itself.
  */
-const URL_PATTERN = /https?:\/\/[^\s<>"'`\\]+/gi;
+const URL_PATTERN = /https?:\/\/[^\s<>"`\\]+/gi;
 
 /** Punctuation that is almost always sentence punctuation rather than part of the URL. */
 const TRAILING_PUNCTUATION = new Set(['.', ',', ';', ':', '!', '?', '"', "'", '`']);
@@ -203,10 +204,9 @@ export function mergeDomainRules(userRules: readonly string[]): DomainRule[] {
     for (const rule of parseDomainRules(kept)) byDomain.set(rule.domain, rule);
     const user = [...byDomain.values()];
 
-    // A removal covers subdomains, matching how a positive rule is applied: "!google.com"
-    // has to take out "maps.google.com" too, or it does not mean what it says
-    const isDisabled = (rule: DomainRule): boolean =>
-        [...disabled].some(target => rule.domain === target || rule.domain.endsWith(`.${target}`));
+    // Removals are exact because the settings field shows every shipped rule separately.
+    // Deleting google.* must not also delete a maps.google.* row the user left in place.
+    const isDisabled = (rule: DomainRule): boolean => disabled.has(rule.domain);
 
     const shipped = parseDomainRules(SHIPPED_DOMAIN_RULES).filter(rule => !byDomain.has(rule.domain) && !isDisabled(rule));
 
@@ -375,12 +375,13 @@ export interface ProtectedRange {
  */
 export function cleanUrlsInText(text: string, options: UrlCleanupOptions, protect: readonly ProtectedRange[] = []): UrlCleanupResult {
     let count = 0;
+    const protectedRanges = [...protect, ...markdownCodeRanges(text)];
 
     const result = text.replace(URL_PATTERN, (match, offset: number) => {
         // A URL that is about to be fetched as an image is left exactly as it was. A
         // signed link from a CDN carries its token in the query, and stripping that
         // before the request turns a working image into a 403.
-        if (protect.some(range => offset < range.end && offset + match.length > range.start)) return match;
+        if (overlapsRange(protectedRanges, offset, offset + match.length)) return match;
 
         const url = trimUrlTail(match);
         const tail = match.slice(url.length);

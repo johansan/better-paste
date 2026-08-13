@@ -25,6 +25,9 @@ const MAX_BASENAME_LENGTH = 80;
 /** Fallback used when a URL carries no usable name. */
 const FALLBACK_BASENAME = 'pasted-image';
 
+/** Basenames Windows reserves for devices, even when an extension is added. */
+const WINDOWS_RESERVED_NAME = /^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i;
+
 /** Content types mapped to the extension we store them under. */
 const CONTENT_TYPE_EXTENSIONS: Record<string, string> = {
     'image/png': 'png',
@@ -53,7 +56,16 @@ export function sanitizeFileName(name: string): string {
         .trim();
 
     if (!cleaned) return FALLBACK_BASENAME;
-    return cleaned.length > MAX_BASENAME_LENGTH ? cleaned.slice(0, MAX_BASENAME_LENGTH).trim() : cleaned;
+
+    // Array.from cuts at code-point boundaries, so the final character cannot be half of a
+    // surrogate pair. Clean the edge again because truncation may expose a trailing dot.
+    const truncated = [...cleaned]
+        .slice(0, MAX_BASENAME_LENGTH)
+        .join('')
+        .replace(/[.\s]+$/g, '')
+        .trim();
+    if (!truncated) return FALLBACK_BASENAME;
+    return WINDOWS_RESERVED_NAME.test(truncated) ? `_${truncated}` : truncated;
 }
 
 /** Returns the base name of a URL's path without its extension, or null when there is none. */
@@ -92,6 +104,11 @@ export function resolveExtension(contentType: string | undefined, url: string, a
     const isAllowed = (extension: string): boolean => allowed.some(candidate => candidate.toLowerCase() === extension);
 
     if (fromContentType && isAllowed(fromContentType)) return fromContentType;
+
+    // A named image URL may still return an HTML error page with status 200. Only fall
+    // back to its extension when the server omitted the type or used a generic binary type.
+    const genericBinary = normalized === 'application/octet-stream' || normalized === 'binary/octet-stream';
+    if (normalized && !normalized.startsWith('image/') && !genericBinary) return null;
 
     // Accepts a URL or a bare file name, so a clipboard file's own name can be used
     let path = url;

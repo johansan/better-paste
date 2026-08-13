@@ -17,6 +17,7 @@
  */
 
 import { trimUrlTail } from '../transforms/urlCleanup';
+import { markdownCodeRanges } from '../transforms/markdownRanges';
 import { IMAGE_EXTENSIONS } from '../settings/constants';
 import type { BetterPasteSettings } from '../settings/types';
 
@@ -39,16 +40,19 @@ export interface ImageReference {
 export type ImageReferenceOptions = Pick<BetterPasteSettings, 'imageLinkPaste'>;
 
 /** Markdown image: ![alt](url "optional title") */
-const MARKDOWN_IMAGE = /!\[([^\]\n]*)\]\(\s*<?([^)<>\s]+)>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
+const MARKDOWN_IMAGE = /!\[([^\]\n]*)\]\(\s*<?((?:[^()<\s>]+|\([^()<\s>]*\))+)>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
 
 /** Ordinary Markdown link, claimed so its destination is never mistaken for a bare image URL. */
-const MARKDOWN_LINK = /\[[^\]\n]*\]\(\s*<?[^)<>\s]+>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
+const MARKDOWN_LINK = /\[[^\]\n]*\]\(\s*<?(?:[^()<\s>]+|\([^()<\s>]*\))+>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
 
 /** Raw HTML image tag, which Obsidian leaves in place for some clipboard payloads. */
 const HTML_IMAGE = /<img\b[^>]*?\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))[^>]*>/gi;
 
 /** Bare http(s) URL, filtered afterwards to those that point at an image file. */
-const BARE_URL = /https?:\/\/[^\s<>"'`\\)\]]+/gi;
+const BARE_URL = /https?:\/\/[^\s<>"`\\)\]]+/gi;
+
+/** Tags and autolinks claimed before bare URLs, so an href is never rewritten as an image. */
+const HTML_TAG = /<(?:[^"'<>]|"[^"]*"|'[^']*')+>/g;
 
 /** Alt text of an HTML image tag. */
 const HTML_ALT = /\balt\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i;
@@ -113,7 +117,7 @@ function isSupportedSource(url: string): boolean {
  */
 export function findImageReferences(text: string, options: ImageReferenceOptions): ImageReference[] {
     const found: ImageReference[] = [];
-    const claimed: { start: number; end: number }[] = [];
+    const claimed: { start: number; end: number }[] = markdownCodeRanges(text);
 
     const claim = (start: number, end: number): boolean => {
         if (claimed.some(range => start < range.end && end > range.start)) return false;
@@ -142,6 +146,11 @@ export function findImageReferences(text: string, options: ImageReferenceOptions
         const altMatch = HTML_ALT.exec(match[0]);
         const alt = altMatch ? (altMatch[1] ?? altMatch[2] ?? altMatch[3] ?? '') : '';
         found.push({ token: match[0], index: match.index, url, alt, kind: 'html' });
+    }
+
+    HTML_TAG.lastIndex = 0;
+    for (let match = HTML_TAG.exec(text); match !== null; match = HTML_TAG.exec(text)) {
+        claim(match.index, match.index + match[0].length);
     }
 
     if (options.imageLinkPaste === 'image') {

@@ -8,8 +8,8 @@ Please report security issues privately through GitHub's [security advisory form
 
 Better Paste handles clipboard content, which is often sensitive. What it does with it:
 
-- **Nothing is sent anywhere.** There is no telemetry, no analytics and no server belonging to this plugin.
-- **The only network requests are image downloads**, made to the address of an image that pasted content referenced, and only when image saving is on. Nothing else is fetched, and no request is made unless you paste.
+- **No clipboard content or usage data is sent anywhere.** There is no telemetry, no analytics and no server belonging to this plugin.
+- **Network requests are limited to pictures.** The plugin downloads images referenced by pasted content when image saving is on. Welcome and release-notes dialogs also load their artwork from the plugin repository when they are shown. The welcome dialog opens automatically on first enable, and release notes can open automatically after an update.
 - **Downloaded images are written into your vault**, to the attachment location Obsidian is configured to use.
 - **Clipboard content is never stored.** It is transformed in memory during the paste and not retained; the plugin keeps no history.
 - **Settings are stored in your vault**, in `.obsidian/plugins/better-paste/data.json`.

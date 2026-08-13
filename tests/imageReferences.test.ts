@@ -56,6 +56,13 @@ describe('findImageReferences', () => {
         expect(found[0].url).toBe('https://example.com/render?id=7');
     });
 
+    it('finds a Markdown image whose URL contains parentheses', () => {
+        const found = findImageReferences('![](https://example.com/photo_(1).png)', options());
+        expect(found).toHaveLength(1);
+        expect(found[0].url).toBe('https://example.com/photo_(1).png');
+        expect(found[0].token).toBe('![](https://example.com/photo_(1).png)');
+    });
+
     it('finds an HTML image tag and its alt text', () => {
         const found = findImageReferences('<img src="https://example.com/a.jpg" alt="hello">', options());
         expect(found).toHaveLength(1);
@@ -86,6 +93,16 @@ describe('findImageReferences', () => {
 
     it('does not treat a normal Markdown link target as a bare image URL', () => {
         expect(findImageReferences('[photo](https://example.com/cat.png)', options())).toHaveLength(0);
+    });
+
+    it('does not treat code examples as image references', () => {
+        const text = ['`https://example.com/inline.png`', '```md', '![](https://example.com/fenced.png)', '```'].join('\n');
+        expect(findImageReferences(text, options())).toHaveLength(0);
+    });
+
+    it('does not treat autolinks or HTML attributes as image references', () => {
+        expect(findImageReferences('<https://example.com/cat.png>', options())).toHaveLength(0);
+        expect(findImageReferences('<a href="https://example.com/cat.png">cat</a>', options())).toHaveLength(0);
     });
 
     it('leaves a pasted image link alone when that is the choice', () => {

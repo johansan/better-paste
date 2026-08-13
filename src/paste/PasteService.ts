@@ -17,7 +17,7 @@
  */
 
 import { Notice, parseYaml } from 'obsidian';
-import type { Editor, MarkdownFileInfo, MarkdownView } from 'obsidian';
+import type { Editor, MarkdownFileInfo, MarkdownView, TFile } from 'obsidian';
 import { runTextPipeline } from '../transforms';
 import { cleanAiText } from '../transforms/aiText';
 import { buildUrlCleanupOptions, cleanUrlsInText } from '../transforms/urlCleanup';
@@ -154,6 +154,7 @@ export class PasteService {
         html: string,
         size: string | null
     ): Promise<void> {
+        const targetFile = info.file;
         const fromOffset = editor.posToOffset(editor.getCursor('from'));
         const toOffset = editor.posToOffset(editor.getCursor('to'));
         // The document is untouched at this point, because the default paste was
@@ -173,7 +174,7 @@ export class PasteService {
         let embed: string | null = null;
 
         try {
-            embed = await this.images.saveClipboardImage(file, sources[0] ?? '', this.sourcePathOf(info), size);
+            embed = await this.images.saveClipboardImage(file, sources[0] ?? '', targetFile?.path ?? '', size);
             if (embed) summary.imagesDownloaded = 1;
             else summary.imagesFailed = 1;
         } catch (error) {
@@ -186,7 +187,7 @@ export class PasteService {
         const source = sources[0] ?? '';
         const text = embed ?? (source ? `![${size ?? ''}](${source})` : '');
 
-        if (this.disposed) return;
+        if (!this.canEdit(info, targetFile)) return;
 
         if (!text) {
             // Nothing to insert and the default paste was already suppressed, so this is
@@ -210,8 +211,9 @@ export class PasteService {
 
     /** Command handler: pastes the clipboard's plain text through the full rule pipeline. */
     async pasteProcessed(editor: Editor, info: MarkdownView | MarkdownFileInfo): Promise<void> {
+        const targetFile = info.file;
         const clipboardText = await this.readClipboardText();
-        if (clipboardText === null) return;
+        if (clipboardText === null || !this.canEdit(info, targetFile)) return;
 
         const result = runTextPipeline(clipboardText, this.getSettings());
         const startOffset = editor.posToOffset(editor.getCursor('from'));
@@ -234,9 +236,10 @@ export class PasteService {
     }
 
     /** Command handler: pastes the clipboard's plain text with no transforms applied. */
-    async pasteRaw(editor: Editor): Promise<void> {
+    async pasteRaw(editor: Editor, info: MarkdownView | MarkdownFileInfo): Promise<void> {
+        const targetFile = info.file;
         const clipboardText = await this.readClipboardText();
-        if (clipboardText === null) return;
+        if (clipboardText === null || !this.canEdit(info, targetFile)) return;
         editor.replaceSelection(clipboardText);
     }
 
@@ -273,6 +276,7 @@ export class PasteService {
         const settings = this.getSettings();
         if (!settings.aiTextEnabled && !settings.urlEnabled && !settings.imagesEnabled) return;
 
+        const targetFile = info.file;
         const startOffset = editor.posToOffset(editor.getCursor('from'));
         const lengthBefore = editor.getValue().length;
         const selectionLength = editor.getSelection().length;
@@ -282,9 +286,9 @@ export class PasteService {
             const insertedLength = valueAfter.length - (lengthBefore - selectionLength);
             if (insertedLength <= 0) return;
 
-            if (this.disposed) return;
+            if (!this.canEdit(info, targetFile)) return;
             const inserted = valueAfter.slice(startOffset, startOffset + insertedLength);
-            void this.processRichRange(editor, info, startOffset, inserted);
+            void this.processRichRange(editor, info, targetFile, startOffset, inserted);
         }, 0);
     }
 
@@ -292,6 +296,7 @@ export class PasteService {
     private async processRichRange(
         editor: Editor,
         info: MarkdownView | MarkdownFileInfo,
+        targetFile: TFile | null,
         startOffset: number,
         inserted: string
     ): Promise<void> {
@@ -325,7 +330,7 @@ export class PasteService {
 
         if (this.images.hasWork(text)) {
             try {
-                const result = await this.images.materializeImages(text, this.sourcePathOf(info), this.imageSizeFor(editor));
+                const result = await this.images.materializeImages(text, targetFile?.path ?? '', this.imageSizeFor(editor));
                 text = result.text;
                 summary.imagesDownloaded = result.downloaded;
                 summary.imagesFailed = result.failed;
@@ -334,7 +339,7 @@ export class PasteService {
             }
         }
 
-        if (this.disposed) return;
+        if (!this.canEdit(info, targetFile)) return;
         if (text !== inserted) this.replaceRange(editor, startOffset, inserted, text);
         this.notify(summary);
     }
@@ -347,9 +352,10 @@ export class PasteService {
         inserted: string,
         summary: PasteSummary
     ): Promise<void> {
+        const targetFile = info.file;
         try {
-            const result = await this.images.materializeImages(inserted, this.sourcePathOf(info), this.imageSizeFor(editor));
-            if (this.disposed) return;
+            const result = await this.images.materializeImages(inserted, targetFile?.path ?? '', this.imageSizeFor(editor));
+            if (!this.canEdit(info, targetFile)) return;
             summary.imagesDownloaded = result.downloaded;
             summary.imagesFailed = result.failed;
             if (result.text !== inserted) this.replaceRange(editor, startOffset, inserted, result.text);
@@ -357,7 +363,7 @@ export class PasteService {
             logError('Image download failed', error);
         }
 
-        if (this.disposed) return;
+        if (!this.canEdit(info, targetFile)) return;
         this.notify(summary);
     }
 
@@ -442,9 +448,9 @@ export class PasteService {
         }
     }
 
-    /** Path of the note being edited, used to resolve relative attachment locations. */
-    private sourcePathOf(info: MarkdownView | MarkdownFileInfo): string {
-        return info.file?.path ?? '';
+    /** True when an awaited operation still belongs to the same open note. */
+    private canEdit(info: MarkdownView | MarkdownFileInfo, targetFile: TFile | null): boolean {
+        return !this.disposed && info.file === targetFile;
     }
 
     /** Shows a one-line summary of what the paste changed, when notices are enabled. */

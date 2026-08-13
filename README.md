@@ -141,10 +141,10 @@ The rule leaves text alone entirely unless something identifies it as terminal o
 
 ### 5.5 AI cleanup
 
-- **Clean up AI text** removes the characters that look ordinary but are not. A no-break space becomes a normal space and zero width characters are dropped. The same characters are cleaned up whatever wrote them.
+- **Clean up AI text** removes the characters that look ordinary but are not. A no-break space becomes a normal space and selected zero width characters are dropped. The same characters are cleaned up whatever wrote them.
 - **Use plain punctuation** turns long dashes into `-`, and `“ ” ‘ ’` into `"` and `'`. Straight quotes survive code and search better than curly ones. This one is a matter of taste rather than tidiness, so switch it off if you set your punctuation on purpose.
 
-Several invisible characters are deliberately kept, because they are load bearing rather than junk. The zero width joiner holds a multi part emoji together, the joiner and non-joiner are ordinary content in Persian, Arabic and the Indic scripts, the direction marks make mixed Arabic or Hebrew and Latin text render in the right order, and the ideographic space is the normal word space in CJK. Guillemets `«` `»` are left alone for the same reason, being real quotation marks in several languages.
+Several invisible characters are deliberately kept, because they carry meaning rather than being junk. The zero width joiner holds a multi part emoji together, the joiner and non-joiner are ordinary content in Persian, Arabic and the Indic scripts, the word joiner prevents a line break, direction marks and embeddings make mixed Arabic or Hebrew and Latin text render in the right order, and the ideographic space is the normal word space in CJK. Guillemets `«` `»` are left alone for the same reason, being real quotation marks in several languages.
 
 <br/>
 
@@ -195,13 +195,13 @@ Better Paste makes network requests in exactly two situations.
 
 **Pasting a picture.** When you paste content that references a picture by http(s) address, such as a Safari page selection, a Markdown image link, or a bare link ending in `.png`, the plugin downloads that picture so the note holds a local copy. The address always comes from what you pasted. The plugin never chooses one, and link cleaning deliberately leaves those addresses untouched so a signed link keeps the token it needs. The request uses Obsidian's own `requestUrl`.
 
-**Dialog artwork.** The welcome dialog and the What's new dialog each show a picture, loaded from this repository at `raw.githubusercontent.com` when the dialog opens. Nothing is sent with the request beyond what fetching any picture involves, and both dialogs simply leave the picture out when it cannot be fetched. The pictures are not bundled because Obsidian installs only `main.js`, `manifest.json` and `styles.css`.
+**Dialog artwork.** The welcome dialog and the What's new dialog each show a picture, loaded from this repository at `raw.githubusercontent.com` when the dialog opens. The welcome dialog opens automatically on first enable, and the What's new dialog can open automatically after an update. Nothing is sent with the request beyond what fetching any picture involves, and both dialogs simply leave the picture out when it cannot be fetched. The pictures are not bundled because Obsidian installs only `main.js`, `manifest.json` and `styles.css`.
 
 **What it never does.**
 
 - No telemetry, no analytics, no crash reporting, no usage counting.
 - No server belonging to this plugin. There is not one.
-- Nothing is fetched at startup, in the background, or on a timer. A request only ever happens as the direct result of a paste you made, or of a dialog you opened.
+- Nothing is fetched silently in the background or on a timer. A request only happens because pasted content referenced a picture or because a welcome or release-notes dialog is being shown.
 - No code is downloaded or executed. Downloaded bytes are only ever written to a file, and only when the response is a recognised image type.
 - Nothing is uploaded. The clipboard is transformed in memory and not retained, and the plugin keeps no history.
 

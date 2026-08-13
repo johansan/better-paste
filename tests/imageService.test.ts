@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { TFile } from 'obsidian';
 import type { App } from 'obsidian';
 import { ImageService } from '../src/paste/ImageService';
@@ -60,5 +60,28 @@ describe('ImageService', () => {
         const result = await service.materializeImages('![a cat](data:image/png;base64,AA==)', 'Notes/Test.md', '400');
 
         expect(result.text).toBe('![[Attachments/pasted-image.png|a cat|400]]');
+    });
+
+    it('rejects an oversized clipboard file before reading its bytes', async () => {
+        const { service, writes } = build();
+        let bytesRead = false;
+        const file = {
+            name: 'large.png',
+            type: 'image/png',
+            size: 51 * 1024 * 1024,
+            arrayBuffer: async () => {
+                bytesRead = true;
+                return new ArrayBuffer(0);
+            }
+        } as File;
+        const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+        try {
+            expect(await service.saveClipboardImage(file, '', 'Notes/Test.md')).toBeNull();
+            expect(bytesRead).toBe(false);
+            expect(writes).toHaveLength(0);
+        } finally {
+            warning.mockRestore();
+        }
     });
 });

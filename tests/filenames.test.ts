@@ -36,6 +36,20 @@ describe('sanitizeFileName', () => {
     it('caps very long names', () => {
         expect(sanitizeFileName('x'.repeat(200)).length).toBe(80);
     });
+
+    it('cleans the edge again after truncating', () => {
+        expect(sanitizeFileName(`${'a'.repeat(79)}.${'b'.repeat(10)}`)).toBe('a'.repeat(79));
+    });
+
+    it('does not split a Unicode code point while truncating', () => {
+        const name = `${'a'.repeat(79)}\u{1F600}more`;
+        expect(sanitizeFileName(name)).toBe(`${'a'.repeat(79)}\u{1F600}`);
+    });
+
+    it('avoids Windows device names', () => {
+        expect(sanitizeFileName('CON')).toBe('_CON');
+        expect(sanitizeFileName('com1')).toBe('_com1');
+    });
 });
 
 describe('baseNameFromUrl', () => {
@@ -79,6 +93,11 @@ describe('resolveExtension', () => {
 
     it('rejects a response that is not an image', () => {
         expect(resolveExtension('text/html', 'https://example.com/a', IMAGE_EXTENSIONS)).toBeNull();
+        expect(resolveExtension('text/html', 'https://example.com/error.png', IMAGE_EXTENSIONS)).toBeNull();
+    });
+
+    it('falls back to the URL for a generic binary response', () => {
+        expect(resolveExtension('application/octet-stream', 'https://example.com/a.png', IMAGE_EXTENSIONS)).toBe('png');
     });
 
     it('rejects an extension that is not in the allow list', () => {

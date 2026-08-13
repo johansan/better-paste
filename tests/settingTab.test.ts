@@ -233,6 +233,20 @@ describe('settings values', () => {
         expect(String(tab.getControlValue('urlDomainRules.text'))).not.toContain('youtube.com |');
     });
 
+    it('keeps specific Google rules when only the generic rule is deleted', async () => {
+        const kept = String(tab.getControlValue('urlDomainRules.text'))
+            .split('\n')
+            .filter(line => !line.startsWith('google.*'))
+            .join('\n');
+
+        await tab.setControlValue('urlDomainRules.text', kept);
+
+        const shown = String(tab.getControlValue('urlDomainRules.text'));
+        expect(shown.split('\n')).not.toContain('google.* | q, tbm, hl');
+        expect(shown).toContain('maps.google.* | q, ll, z');
+        expect(shown).toContain('docs.google.*');
+    });
+
     it('round-trips an unedited list to no stored changes', async () => {
         await tab.setControlValue('urlDomainRules.text', String(tab.getControlValue('urlDomainRules.text')));
         expect(plugin.settings.urlDomainRules).toEqual([]);

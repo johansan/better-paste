@@ -93,7 +93,8 @@ export function extractFrontmatterBlock(content: string): string | null {
  */
 export function normalizeImageSize(value: unknown): string | null {
     if (typeof value === 'number') {
-        return Number.isFinite(value) && value > 0 ? String(Math.round(value)) : null;
+        const rounded = Math.round(value);
+        return Number.isFinite(value) && rounded > 0 ? String(rounded) : null;
     }
 
     if (typeof value !== 'string') return null;
