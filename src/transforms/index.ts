@@ -18,7 +18,7 @@
 
 import { normalizeInvisibleCharacters, replacePunctuation } from './aiText';
 import { cleanTerminalText } from './terminalText';
-import { buildUrlCleanupOptions, cleanUrlsInText } from './urlCleanup';
+import { buildUrlCleanupOptions, cleanUrlsInText, httpUrlRanges } from './urlCleanup';
 import { imageReferenceRanges } from '../paste/imageReferences';
 import type { BetterPasteSettings } from '../settings/types';
 
@@ -57,7 +57,7 @@ export function runTextPipeline(input: string, settings: BetterPasteSettings): T
     let urlsCleaned = 0;
 
     if (settings.aiTextEnabled) {
-        const result = normalizeInvisibleCharacters(text);
+        const result = normalizeInvisibleCharacters(text, httpUrlRanges(text));
         aiTextCleaned = result.changed;
         text = result.text;
     }
@@ -78,7 +78,7 @@ export function runTextPipeline(input: string, settings: BetterPasteSettings): T
     }
 
     if (settings.aiTextEnabled && settings.aiTextPlainPunctuation) {
-        const result = replacePunctuation(text);
+        const result = replacePunctuation(text, httpUrlRanges(text));
         aiTextCleaned = aiTextCleaned || result.changed;
         text = result.text;
     }

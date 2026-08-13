@@ -19,6 +19,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { PasteService } from '../src/paste/PasteService';
 import type { ImageService } from '../src/paste/ImageService';
+import type { LinkTitleService } from '../src/paste/LinkTitleService';
 import { findImageReferences, replaceImageReferences } from '../src/paste/imageReferences';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import type { BetterPasteSettings } from '../src/settings/types';
@@ -52,14 +53,29 @@ function fakeImages(settings: BetterPasteSettings, failing = false, saved?: Save
             // Name the saved file after the source picture, as the real service does
             const base = source ? (source.split('/').pop() ?? file.name).replace(/\.[a-z0-9]+$/i, '') : file.name;
             return `![[${base}.png${size ? `|${size}` : ''}]]`;
-        }
+        },
+        dispose: () => undefined
     } as unknown as ImageService;
+}
+
+/** Title service double that resolves a standalone web address to a predictable link. */
+function fakeTitles(settings: BetterPasteSettings): LinkTitleService {
+    const hasWork = (text: string): boolean =>
+        settings.fetchLinkTitles &&
+        /^https?:\/\/\S+$/i.test(text) &&
+        !/\.(?:png|jpe?g|gif|webp|svg|avif|bmp|heic|tiff|ico)(?:[?#]|$)/i.test(text);
+
+    return {
+        hasWork,
+        materializeTitle: async (text: string) => (hasWork(text) ? `[Example page](${text})` : null),
+        dispose: () => undefined
+    } as unknown as LinkTitleService;
 }
 
 function build(overrides: Partial<BetterPasteSettings> = {}, failing = false) {
     const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, showNotices: false, ...overrides };
     const saved: SavedClipboardImages[] = [];
-    const service = new PasteService(() => settings, fakeImages(settings, failing, saved));
+    const service = new PasteService(() => settings, fakeImages(settings, failing, saved), fakeTitles(settings));
     return { settings, service, saved };
 }
 
@@ -389,6 +405,79 @@ describe('handleEditorPaste: images in plain text', () => {
         await settle();
         expect(editor.getValue()).toBe('intro\n\n![[image-0.png]]');
     });
+
+    it('replaces the pasted occurrence when the same URL already exists and the user keeps typing', async () => {
+        const { service } = build();
+        const url = 'https://example.com/cat.png';
+        const editor = new FakeEditor(`${url}\n`);
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
+        editor.replaceSelection(' notes');
+        await settle();
+
+        expect(editor.getValue()).toBe(`${url}\n![[image-0.png]] notes`);
+    });
+});
+
+describe('handleEditorPaste: link titles', () => {
+    it('leaves a standalone URL to Obsidian when title fetching is off', () => {
+        const { service } = build({ fetchLinkTitles: false, urlEnabled: false, trimPaste: false });
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO)).toBe(false);
+    });
+
+    it('inserts the URL immediately and replaces it with a titled link', async () => {
+        const { service } = build({ fetchLinkTitles: true, urlEnabled: false });
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe('https://example.com/page');
+        await settle();
+
+        expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
+    });
+
+    it('finds the pasted URL after the user continues typing beside an older copy', async () => {
+        const { service } = build({ fetchLinkTitles: true, urlEnabled: false });
+        const url = 'https://example.com/page';
+        const editor = new FakeEditor(`${url}\n`);
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
+        editor.replaceSelection(' notes');
+        await settle();
+
+        expect(editor.getValue()).toBe(`${url}\n[Example page](${url}) notes`);
+    });
+
+    it('fetches the title for the cleaned address', async () => {
+        const { service } = build({ fetchLinkTitles: true });
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page?utm_source=news' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
+    });
+
+    it('does not fetch a title for prose containing a URL', () => {
+        const { service } = build({ fetchLinkTitles: true, urlEnabled: false, trimPaste: false });
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: 'See https://example.com/page' }), editor.asEditor(), INFO)).toBe(
+            false
+        );
+    });
+
+    it('leaves an image URL to image handling', async () => {
+        const { service } = build({ fetchLinkTitles: true });
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/cat.png' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('![[image-0.png]]');
+    });
 });
 
 describe('handleEditorPaste: rich content', () => {
@@ -621,6 +710,15 @@ describe('leaving a paste alone', () => {
 
         expect(service.handleEditorPaste(fakeClipboardEvent({ plain: TRACKED }), editor.asEditor(), INFO)).toBe(false);
         expect(editor.getValue()).toBe('Notes\n\n```sh\n');
+    });
+
+    it('skips a paste landing inside a code fence in a callout', () => {
+        const { service } = build();
+        const content = '> [!note]\n> ```text\n> ';
+        const editor = new FakeEditor(content);
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: TRACKED }), editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe(content);
     });
 
     it('processes again once the fence has closed', () => {

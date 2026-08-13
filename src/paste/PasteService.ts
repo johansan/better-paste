@@ -25,11 +25,15 @@ import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './ima
 import { extractFrontmatterBlock, isInsideVerbatimContext, isPasteDisabledForNote, resolveImageSize } from './noteOptions';
 import { DISABLE_PROPERTY } from '../settings/constants';
 import type { ImageService } from './ImageService';
+import type { LinkTitleService } from './LinkTitleService';
 import { logError } from '../utils/logger';
 import type { BetterPasteSettings } from '../settings/types';
 
 /** How far before the recorded offset to look when re-finding text the user may have shifted. */
 const REALIGN_WINDOW = 512;
+
+/** Surrounding text kept to distinguish a pasted occurrence from an older identical one. */
+const RANGE_CONTEXT = 64;
 
 /** Summary of everything a single paste changed, used to build the notice. */
 interface PasteSummary {
@@ -38,14 +42,28 @@ interface PasteSummary {
     urlsCleaned: number;
     imagesDownloaded: number;
     imagesFailed: number;
+    linkTitlesFetched: number;
 }
 
-/** Editor state that identifies one inserted range while an image download is pending. */
+/** Editor state that identifies one inserted range while network or vault work is pending. */
 interface AsyncPasteRange {
     startOffset: number;
     inserted: string;
     valueBefore: string;
     valueAfter: string;
+    beforeContext: string;
+    afterContext: string;
+}
+
+function asyncPasteRange(startOffset: number, inserted: string, valueBefore: string, valueAfter: string): AsyncPasteRange {
+    return {
+        startOffset,
+        inserted,
+        valueBefore,
+        valueAfter,
+        beforeContext: valueAfter.slice(Math.max(0, startOffset - RANGE_CONTEXT), startOffset),
+        afterContext: valueAfter.slice(startOffset + inserted.length, startOffset + inserted.length + RANGE_CONTEXT)
+    };
 }
 
 /** True when the clipboard carries exactly one image file. */
@@ -82,17 +100,21 @@ export function isPreformattedHtml(html: string): boolean {
 export class PasteService {
     private readonly getSettings: () => BetterPasteSettings;
     private readonly images: ImageService;
-    /** Set on unload, so an image write that is still in flight stops touching the editor. */
+    private readonly titles: LinkTitleService;
+    /** Set on unload, so awaited work that is still in flight stops touching the editor. */
     private disposed = false;
 
-    constructor(getSettings: () => BetterPasteSettings, images: ImageService) {
+    constructor(getSettings: () => BetterPasteSettings, images: ImageService, titles: LinkTitleService) {
         this.getSettings = getSettings;
         this.images = images;
+        this.titles = titles;
     }
 
     /** Called from the plugin's onunload. */
     dispose(): void {
         this.disposed = true;
+        this.images.dispose();
+        this.titles.dispose();
     }
 
     /**
@@ -143,24 +165,27 @@ export class PasteService {
 
         const result = runTextPipeline(plain, settings);
         const needsImages = this.images.hasWork(result.text);
-        if (!result.changed && !needsImages) return false;
+        const needsTitle = this.titles.hasWork(result.text);
+        if (!result.changed && !needsImages && !needsTitle) return false;
 
         const targetFile = info.file;
         const targetPath = targetFile?.path ?? '';
         const valueBefore = editor.getValue();
         const startOffset = editor.posToOffset(editor.getCursor('from'));
         editor.replaceSelection(result.text);
-        const range: AsyncPasteRange = { startOffset, inserted: result.text, valueBefore, valueAfter: editor.getValue() };
+        const range = asyncPasteRange(startOffset, result.text, valueBefore, editor.getValue());
 
         const summary: PasteSummary = {
             aiTextCleaned: result.aiTextCleaned,
             terminalCleaned: result.terminalCleaned,
             urlsCleaned: result.urlsCleaned,
             imagesDownloaded: 0,
-            imagesFailed: 0
+            imagesFailed: 0,
+            linkTitlesFetched: 0
         };
 
         if (needsImages) void this.runImagePass(editor, info, targetFile, targetPath, range, summary);
+        else if (needsTitle) void this.runTitlePass(editor, info, targetFile, range, summary);
         else this.notify(summary);
 
         return true;
@@ -194,7 +219,8 @@ export class PasteService {
             terminalCleaned: false,
             urlsCleaned: 0,
             imagesDownloaded: 0,
-            imagesFailed: 0
+            imagesFailed: 0,
+            linkTitlesFetched: 0
         };
         let embed: string | null = null;
 
@@ -247,22 +273,28 @@ export class PasteService {
         const result = runTextPipeline(clipboardText, this.getSettings());
         const valueBefore = editor.getValue();
         const startOffset = this.insertAfterClipboardRead(editor, valueAtInvocation, fromOffset, toOffset, result.text);
-        const range: AsyncPasteRange = { startOffset, inserted: result.text, valueBefore, valueAfter: editor.getValue() };
+        const range = asyncPasteRange(startOffset, result.text, valueBefore, editor.getValue());
 
         const summary: PasteSummary = {
             aiTextCleaned: result.aiTextCleaned,
             terminalCleaned: result.terminalCleaned,
             urlsCleaned: result.urlsCleaned,
             imagesDownloaded: 0,
-            imagesFailed: 0
+            imagesFailed: 0,
+            linkTitlesFetched: 0
         };
 
-        if (!this.images.hasWork(result.text)) {
+        if (this.images.hasWork(result.text)) {
+            await this.runImagePass(editor, info, targetFile, targetPath, range, summary);
+            return;
+        }
+
+        if (!this.titles.hasWork(result.text)) {
             this.notify(summary);
             return;
         }
 
-        await this.runImagePass(editor, info, targetFile, targetPath, range, summary);
+        await this.runTitlePass(editor, info, targetFile, range, summary);
     }
 
     /** Command handler: pastes the clipboard's plain text with no transforms applied. */
@@ -296,7 +328,8 @@ export class PasteService {
             terminalCleaned: result.terminalCleaned,
             urlsCleaned: result.urlsCleaned,
             imagesDownloaded: 0,
-            imagesFailed: 0
+            imagesFailed: 0,
+            linkTitlesFetched: 0
         });
     }
 
@@ -322,7 +355,7 @@ export class PasteService {
             if (insertedLength <= 0 || !this.canEdit(info, targetFile)) return;
 
             const inserted = valueAfter.slice(startOffset, startOffset + insertedLength);
-            const range: AsyncPasteRange = { startOffset, inserted, valueBefore, valueAfter };
+            const range = asyncPasteRange(startOffset, inserted, valueBefore, valueAfter);
             void this.processRichRange(editor, info, targetFile, targetPath, range);
         }, 0);
     }
@@ -341,7 +374,8 @@ export class PasteService {
             terminalCleaned: false,
             urlsCleaned: 0,
             imagesDownloaded: 0,
-            imagesFailed: 0
+            imagesFailed: 0,
+            linkTitlesFetched: 0
         };
 
         let text = range.inserted;
@@ -375,7 +409,7 @@ export class PasteService {
         }
 
         if (!this.canEdit(info, targetFile)) return;
-        if (text !== range.inserted) this.replaceRange(editor, range, text);
+        if (text !== range.inserted && !this.replaceRange(editor, range, text)) summary.imagesDownloaded = 0;
         this.notify(summary);
     }
 
@@ -393,7 +427,7 @@ export class PasteService {
             if (!this.canEdit(info, targetFile)) return;
             summary.imagesDownloaded = result.downloaded;
             summary.imagesFailed = result.failed;
-            if (result.text !== range.inserted) this.replaceRange(editor, range, result.text);
+            if (result.text !== range.inserted && !this.replaceRange(editor, range, result.text)) summary.imagesDownloaded = 0;
         } catch (error) {
             logError('Image download failed', error);
         }
@@ -402,27 +436,53 @@ export class PasteService {
         this.notify(summary);
     }
 
-    /**
-     * Replaces the inserted text after an image download. The range is re-located when the
-     * user typed elsewhere, but is abandoned when an identical value predates the paste.
-     */
-    private replaceRange(editor: Editor, range: AsyncPasteRange, next: string): void {
-        const value = editor.getValue();
-        const { startOffset, inserted } = range;
+    /** Fetches the title for one already-inserted web address and turns it into a Markdown link. */
+    private async runTitlePass(
+        editor: Editor,
+        info: MarkdownView | MarkdownFileInfo,
+        targetFile: TFile | null,
+        range: AsyncPasteRange,
+        summary: PasteSummary
+    ): Promise<void> {
+        const link = await this.titles.materializeTitle(range.inserted);
+        if (!this.canEdit(info, targetFile)) return;
 
-        let offset = value === range.valueAfter && value.startsWith(inserted, startOffset) ? startOffset : -1;
-        if (offset < 0 && !range.valueBefore.includes(inserted)) {
-            // A shifted range is only safe to rewrite when it is unique nearby. Otherwise an
-            // identical URL elsewhere in the note could be mistaken for the pasted one.
+        if (link !== null && this.replaceRange(editor, range, link)) summary.linkTitlesFetched = 1;
+        this.notify(summary);
+    }
+
+    /**
+     * Replaces inserted text after awaited work. The recorded offset is used while everything
+     * before it is unchanged. Otherwise nearby context distinguishes it from older copies.
+     */
+    private replaceRange(editor: Editor, range: AsyncPasteRange, next: string): boolean {
+        const value = editor.getValue();
+        const { startOffset, inserted, beforeContext, afterContext } = range;
+
+        const originalPrefix = range.valueAfter.slice(0, startOffset);
+        let offset = value.startsWith(originalPrefix) && value.startsWith(inserted, startOffset) ? startOffset : -1;
+        if (offset < 0) {
             const searchFrom = Math.max(0, startOffset - REALIGN_WINDOW);
             const searchTo = Math.min(value.length, startOffset + REALIGN_WINDOW);
-            const first = value.indexOf(inserted, searchFrom);
-            if (first >= 0 && first <= searchTo) {
-                const second = value.indexOf(inserted, first + inserted.length);
-                if (second < 0 || second > searchTo) offset = first;
+            const candidates: number[] = [];
+
+            for (let candidate = value.indexOf(inserted, searchFrom); candidate >= 0 && candidate <= searchTo;) {
+                candidates.push(candidate);
+                candidate = value.indexOf(inserted, candidate + inserted.length);
             }
+
+            const contextual = candidates.filter(candidate => {
+                const beforeMatches =
+                    beforeContext.length > 0 && value.slice(Math.max(0, candidate - beforeContext.length), candidate) === beforeContext;
+                const afterMatches =
+                    afterContext.length > 0 &&
+                    value.slice(candidate + inserted.length, candidate + inserted.length + afterContext.length) === afterContext;
+                return beforeMatches || afterMatches;
+            });
+            const safe = range.valueBefore.includes(inserted) ? contextual : candidates;
+            if (safe.length === 1) offset = safe[0];
         }
-        if (offset < 0) return;
+        if (offset < 0) return false;
 
         const cursorOffset = editor.posToOffset(editor.getCursor());
         const cursorWasInRange = cursorOffset >= offset && cursorOffset <= offset + inserted.length;
@@ -430,6 +490,7 @@ export class PasteService {
         editor.replaceRange(next, editor.offsetToPos(offset), editor.offsetToPos(offset + inserted.length));
 
         if (cursorWasInRange) editor.setCursor(editor.offsetToPos(offset + next.length));
+        return true;
     }
 
     /** Inserts command text at the invocation range unless the note changed during clipboard access. */
@@ -534,6 +595,7 @@ export class PasteService {
         if (summary.imagesDownloaded > 0) {
             parts.push(`saved ${summary.imagesDownloaded} image${summary.imagesDownloaded === 1 ? '' : 's'}`);
         }
+        if (summary.linkTitlesFetched > 0) parts.push('fetched a link title');
         if (parts.length === 0) return;
         new Notice(`Better Paste: ${parts.join(', ')}`);
     }

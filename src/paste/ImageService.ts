@@ -50,14 +50,21 @@ export class ImageService {
     private readonly getSettings: () => BetterPasteSettings;
     /** Path selection and creation stay together so equal source names cannot claim one file. */
     private saveQueue: Promise<void> = Promise.resolve();
+    private disposed = false;
 
     constructor(app: App, getSettings: () => BetterPasteSettings) {
         this.app = app;
         this.getSettings = getSettings;
     }
 
+    /** Stops awaited work before it can create another vault file. */
+    dispose(): void {
+        this.disposed = true;
+    }
+
     /** True when the text contains at least one image the plugin is configured to download. */
     hasWork(text: string): boolean {
+        if (this.disposed) return false;
         const settings = this.getSettings();
         if (!settings.imagesEnabled) return false;
         return findImageReferences(text, settings).length > 0;
@@ -68,6 +75,7 @@ export class ImageService {
      * References that fail to download are left untouched so nothing is lost.
      */
     async materializeImages(text: string, sourcePath: string, size: string | null = null): Promise<ImageMaterializeResult> {
+        if (this.disposed) return { text, downloaded: 0, failed: 0 };
         const settings = this.getSettings();
         if (!settings.imagesEnabled) return { text, downloaded: 0, failed: 0 };
 
@@ -80,7 +88,7 @@ export class ImageService {
         // A small worker pool keeps a page full of images from opening dozens of sockets
         const queue = [...references];
         const workers = Array.from({ length: Math.min(MAX_CONCURRENT_DOWNLOADS, queue.length) }, async () => {
-            for (let reference = queue.shift(); reference !== undefined; reference = queue.shift()) {
+            for (let reference = queue.shift(); !this.disposed && reference !== undefined; reference = queue.shift()) {
                 const embed = await this.materializeOne(reference, sourcePath, settings, size);
                 if (embed === null) failed += 1;
                 else embeds.set(reference.index, embed);
@@ -99,6 +107,7 @@ export class ImageService {
      * rather than Safari's generic "image.png".
      */
     async saveClipboardImage(file: File, source: string, sourcePath: string, size: string | null = null): Promise<string | null> {
+        if (this.disposed) return null;
         const settings = this.getSettings();
         return this.storeClipboardImage(file, source, sourcePath, settings, size);
     }
@@ -127,6 +136,7 @@ export class ImageService {
             }
 
             const data = await file.arrayBuffer();
+            if (this.disposed) return null;
 
             if (MAX_IMAGE_BYTES > 0 && data.byteLength > MAX_IMAGE_BYTES) {
                 logWarning(`Skipped a pasted image: ${Math.round(data.byteLength / 1024 / 1024)} MB exceeds the size limit`);
@@ -152,7 +162,7 @@ export class ImageService {
     ): Promise<string | null> {
         try {
             const fetched = await this.fetchImage(reference.url);
-            if (!fetched) return null;
+            if (this.disposed || !fetched) return null;
 
             const extension = resolveExtension(fetched.contentType, reference.url, IMAGE_EXTENSIONS);
             if (!extension) {
@@ -233,7 +243,9 @@ export class ImageService {
         const save = this.saveQueue.then(async () => {
             // The availability check and create are one operation from this service's point
             // of view, otherwise two concurrent downloads with the same name can race.
+            if (this.disposed) return null;
             const path = await this.app.fileManager.getAvailablePathForAttachment(fileName, sourcePath);
+            if (this.disposed) return null;
             return this.app.vault.createBinary(path, data);
         });
         this.saveQueue = save.then(

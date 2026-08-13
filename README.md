@@ -1,6 +1,6 @@
 # Better Paste
 
-Better Paste alters clipboard content as it is pasted into Obsidian. It saves linked images into your vault as local attachments, removes tracking parameters from links, rejoins wrapped lines in terminal output, and replaces curly quotes and invisible characters in AI text with their plain equivalents.
+Better Paste alters clipboard content as it is pasted into Obsidian. It saves linked images into your vault as local attachments, removes tracking parameters from links, can fetch page titles for pasted web addresses, rejoins wrapped lines in terminal output, and replaces curly quotes and invisible characters in AI text with their plain equivalents.
 
 If you find Better Paste useful, please consider [☕️ Buying me a coffee](https://buymeacoffee.com/johansan) or [Sponsor on GitHub ❤️](https://github.com/sponsors/johansan).
 
@@ -48,6 +48,8 @@ pastes as:
 https://support.claude.com/en/articles/16266773-how-claude-marks-ai-generated-content
 ```
 
+An optional title rule turns a pasted web address into a Markdown link using the page title. The address is pasted immediately, then replaced when the title arrives. Image addresses are left to image handling, and a failed request leaves the original address in place.
+
 **AI text.** `“The result was fine,” he said.` pastes as `"The result was fine," he said.` Curly quotes become straight, fancy dashes become hyphens, and the invisible characters that came along are gone.
 
 **Images.** Copy a picture in Safari and Obsidian leaves a link to the website. Better Paste saves the picture into your vault instead, so the note still works offline and survives the source site going away.
@@ -88,7 +90,7 @@ Alt text from a downloaded Markdown or HTML image is kept on the local embed. If
 
 ## 5 Settings
 
-Fifteen settings, arranged as a landing page with three sub pages. Anything with only one sensible answer is simply how the plugin behaves, rather than a question you have to answer.
+Sixteen settings, arranged as a landing page with three sub pages. Anything with only one sensible answer is simply how the plugin behaves, rather than a question you have to answer.
 
 ### 5.1 Behavior
 
@@ -109,6 +111,8 @@ Behind **Image handling**:
 ### 5.3 Links
 
 **Which parameters to remove** offers every parameter except where a site rule keeps it, or only the parameters known to be tracking.
+
+**Fetch titles for pasted links** turns a clipboard containing one non-image web address into a Markdown link using the page title. It is off by default because it makes a request to the pasted address. Addresses inside prose and links that already carry their own label are left alone.
 
 Behind **Rules for preserving parameters**, the full rule list and a live tester:
 
@@ -191,9 +195,11 @@ Set custom hotkeys for these in Obsidian's Hotkeys settings. None are bound by d
 
 ## 8 Network disclosure
 
-Better Paste makes network requests in exactly two situations.
+Better Paste makes network requests in exactly three situations.
 
 **Pasting a picture.** When you paste content that references a picture by http(s) address, such as a Safari page selection, a Markdown image link, or a bare link ending in `.png`, the plugin downloads that picture so the note holds a local copy. The address always comes from what you pasted. The plugin never chooses one, and link cleaning deliberately leaves those addresses untouched so a signed link keeps the token it needs. The request uses Obsidian's own `requestUrl`.
+
+**Fetching a link title.** When **Fetch titles for pasted links** is on and the clipboard contains one non-image web address, the plugin fetches that address and reads the HTML page title. A request that fails, takes longer than 10 seconds, returns a non-HTML response, or has no title leaves the pasted address unchanged. This setting is off by default.
 
 **Dialog artwork.** The welcome dialog and the What's new dialog each show a picture, loaded from this repository at `raw.githubusercontent.com` when the dialog opens. The welcome dialog opens automatically on first enable, and the What's new dialog can open automatically after an update. Nothing is sent with the request beyond what fetching any picture involves, and both dialogs simply leave the picture out when it cannot be fetched. The pictures are not bundled because Obsidian installs only `main.js`, `manifest.json` and `styles.css`.
 
@@ -201,13 +207,13 @@ Better Paste makes network requests in exactly two situations.
 
 - No telemetry, no analytics, no crash reporting, no usage counting.
 - No server belonging to this plugin. There is not one.
-- Nothing is fetched silently in the background or on a timer. A request only happens because pasted content referenced a picture or because a welcome or release-notes dialog is being shown.
+- Nothing is fetched silently in the background or on a timer. A request only happens because pasted content referenced a picture, title fetching was enabled for a pasted address, or a welcome or release-notes dialog is being shown.
 - No code is downloaded or executed. Downloaded bytes are only ever written to a file, and only when the response is a recognised image type.
 - Nothing is uploaded. The clipboard is transformed in memory and not retained, and the plugin keeps no history.
 
 **What is stored.** Downloaded pictures go to the attachment location your vault is configured to use. Settings live in `.obsidian/plugins/better-paste/data.json`. Nothing leaves the vault.
 
-**Worth knowing.** Downloading an image, or the artwork in a dialog, reveals your IP address to whoever serves it, exactly as visiting the page would. Turn off **Save pasted images into the vault** if that matters for a given vault. Bitmap-only screenshots are still left to Obsidian's own paste handler.
+**Worth knowing.** Downloading an image, fetching a title, or loading dialog artwork reveals your IP address to whoever serves it, exactly as visiting the page would. Turn off **Save pasted images into the vault** or **Fetch titles for pasted links** if that matters for a given vault. Bitmap-only screenshots are still left to Obsidian's own paste handler.
 
 <br/>
 

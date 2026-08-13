@@ -70,6 +70,7 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
         imageSizeProperty: asString(data.imageSizeProperty, defaults.imageSizeProperty).trim(),
 
         urlEnabled: asBoolean(data.urlEnabled, defaults.urlEnabled),
+        fetchLinkTitles: asBoolean(data.fetchLinkTitles, defaults.fetchLinkTitles),
         urlStripMode: asEnum(data.urlStripMode, URL_STRIP_MODES, defaults.urlStripMode),
         // Only the user's own rules are stored; the shipped list is merged in at read time
         urlDomainRules: asStringArray(data.urlDomainRules),

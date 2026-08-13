@@ -162,6 +162,10 @@ describe('isInsideVerbatimContext', () => {
         expect(atCursor('~~~\n|code\n~~~\n')).toBe(true);
     });
 
+    it('recognises a fenced code block inside a callout', () => {
+        expect(atCursor('> [!note]\n> ```sh\n> |code\n> ```\n')).toBe(true);
+    });
+
     it('requires a closing fence to use the same marker', () => {
         expect(atCursor('```js\n~~~\n|code\n```\n')).toBe(true);
     });

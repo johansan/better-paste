@@ -73,6 +73,8 @@ export interface BetterPasteSettings {
 
     /** Remove tracking from pasted links. */
     urlEnabled: boolean;
+    /** Turn a pasted standalone web address into a Markdown link using the page title. */
+    fetchLinkTitles: boolean;
     /** Whether to drop every parameter or only known tracking ones. */
     urlStripMode: UrlStripMode;
     /**

@@ -369,6 +369,19 @@ export interface ProtectedRange {
     end: number;
 }
 
+/** Ranges occupied by http(s) addresses, excluding punctuation that belongs to prose. */
+export function httpUrlRanges(text: string): ProtectedRange[] {
+    const ranges: ProtectedRange[] = [];
+
+    URL_PATTERN.lastIndex = 0;
+    for (let match = URL_PATTERN.exec(text); match !== null; match = URL_PATTERN.exec(text)) {
+        const url = trimUrlTail(match[0]);
+        ranges.push({ start: match.index, end: match.index + url.length });
+    }
+
+    return ranges;
+}
+
 /**
  * Cleans every http(s) URL found in `text`. Works on plain text and on Markdown, where
  * link targets such as `[label](url)` are matched by the same pattern.

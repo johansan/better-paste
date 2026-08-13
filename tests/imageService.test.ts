@@ -102,4 +102,25 @@ describe('ImageService', () => {
             warning.mockRestore();
         }
     });
+
+    it('does not write a clipboard image after disposal', async () => {
+        const { service, writes } = build();
+        let finishRead: (data: ArrayBuffer) => void = () => undefined;
+        const data = new Promise<ArrayBuffer>(resolve => {
+            finishRead = resolve;
+        });
+        const file = {
+            name: 'waiting.png',
+            type: 'image/png',
+            size: 1,
+            arrayBuffer: () => data
+        } as File;
+
+        const save = service.saveClipboardImage(file, '', 'Notes/Test.md');
+        service.dispose();
+        finishRead(new ArrayBuffer(1));
+
+        expect(await save).toBeNull();
+        expect(writes).toHaveLength(0);
+    });
 });

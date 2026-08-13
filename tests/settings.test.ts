@@ -33,8 +33,14 @@ describe('normalizeSettings', () => {
     });
 
     it('keeps valid stored values', () => {
-        const result = normalizeSettings({ urlStripMode: 'tracking', terminalRejoinMode: 'any', imageFilenameFormat: 'date-time' });
+        const result = normalizeSettings({
+            urlStripMode: 'tracking',
+            fetchLinkTitles: true,
+            terminalRejoinMode: 'any',
+            imageFilenameFormat: 'date-time'
+        });
         expect(result.urlStripMode).toBe('tracking');
+        expect(result.fetchLinkTitles).toBe(true);
         expect(result.terminalRejoinMode).toBe('any');
         expect(result.imageFilenameFormat).toBe('date-time');
     });

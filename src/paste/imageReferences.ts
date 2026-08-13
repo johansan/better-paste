@@ -52,7 +52,7 @@ const MARKDOWN_DEFINITION = /^ {0,3}\[(?:\\.|[^\]\\\n])+\]:[ \t]*<?(?:[^()<\s>]+
 const HTML_IMAGE = /<img\b[^>]*?\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))[^>]*>/gi;
 
 /** Bare http(s) URL, filtered afterwards to those that point at an image file. */
-const BARE_URL = /https?:\/\/[^\s<>"`\\)\]]+/gi;
+const BARE_URL = /https?:\/\/[^\s<>"`\\]+/gi;
 
 /** Tags and autolinks claimed before bare URLs, so an href is never rewritten as an image. */
 const HTML_TAG = /<(?:[^"'<>]|"[^"]*"|'[^']*')+>/g;

@@ -19,6 +19,7 @@
 import { Notice, Plugin } from 'obsidian';
 import type { Editor, MarkdownFileInfo, MarkdownView } from 'obsidian';
 import { ImageService } from './paste/ImageService';
+import { LinkTitleService } from './paste/LinkTitleService';
 import { PasteService } from './paste/PasteService';
 import { WelcomeModal } from './modals/WelcomeModal';
 import { WhatsNewModal } from './modals/WhatsNewModal';
@@ -51,7 +52,8 @@ export default class BetterPastePlugin extends Plugin {
         await this.loadSettings();
 
         const imageService = new ImageService(this.app, () => this.settings);
-        this.pasteService = new PasteService(() => this.settings, imageService);
+        const linkTitleService = new LinkTitleService(() => this.settings);
+        this.pasteService = new PasteService(() => this.settings, imageService, linkTitleService);
 
         this.registerEvent(
             this.app.workspace.on('editor-paste', (event: ClipboardEvent, editor: Editor, info: MarkdownView | MarkdownFileInfo) => {

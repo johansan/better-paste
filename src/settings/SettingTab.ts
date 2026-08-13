@@ -46,10 +46,11 @@ function listKeyOf(controlKey: string): ListSettingKey {
 }
 
 /**
- * Keys whose value is surfaced on a sub-page link. A `displayValue` is only recomputed by
- * `update()`; `refreshDomState` re-evaluates visibility alone and would leave it stale.
+ * Keys whose value is surfaced on a sub-page link and must change while that page stays
+ * visible. A `displayValue` is only recomputed by `update()`; `refreshDomState` only changes
+ * visibility. Textarea values are omitted because rebuilding while typing loses the caret.
  */
-const SUMMARY_KEYS = new Set([`urlDomainRules${LIST_KEY_SUFFIX}`, 'terminalRejoinMode']);
+const SUMMARY_KEYS = new Set(['terminalRejoinMode']);
 
 /**
  * The settings tab.

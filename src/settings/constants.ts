@@ -41,6 +41,9 @@ export const MAX_IMAGE_SIZE_MB = 50;
 /** How long to wait for an image before giving up and keeping the original link. */
 export const IMAGE_TIMEOUT_SECONDS = 30;
 
+/** How long to wait for a page title before leaving the pasted address alone. */
+export const LINK_TITLE_TIMEOUT_SECONDS = 10;
+
 /** Filename templates behind the "File name format" choice. */
 export const FILENAME_TEMPLATES = {
     source: '{{name}}',

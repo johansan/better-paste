@@ -29,7 +29,7 @@ interface FenceDelimiter {
 
 /** Returns the delimiter on a possible fenced code line. */
 function fenceDelimiterOf(line: string): FenceDelimiter | null {
-    const match = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
+    const match = /^(?: {0,3}>[ \t]?)* {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
     if (!match) return null;
 
     const marker: '`' | '~' = match[1].startsWith('`') ? '`' : '~';

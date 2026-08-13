@@ -87,6 +87,21 @@ describe('cleanAiText: punctuation', () => {
         );
     });
 
+    it('leaves punctuation inside a callout code fence alone', () => {
+        const input = ['> [!note]', '> ```text', '> \u201Cquoted\u201D \u2014 text', '> ```'].join('\n');
+        expect(cleanAiText(input, ON).text).toBe(input);
+    });
+
+    it('leaves Unicode punctuation inside URLs alone', () => {
+        const input = '![photo](https://example.com/Foo\u2014Don\u2019t.png)';
+        expect(cleanAiText(input, ON).text).toBe(input);
+    });
+
+    it('leaves targeted invisible characters inside URLs alone', () => {
+        const input = 'https://example.com/foo\u200Bbar';
+        expect(cleanAiText(input, ON).text).toBe(input);
+    });
+
     it('does not create Markdown blocks from line-leading long dashes', () => {
         expect(replacePunctuation('\u2014 A sentence').text).toBe('\\- A sentence');
         expect(replacePunctuation('\u2014\u2014\u2014').text).toBe('\\---');

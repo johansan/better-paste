@@ -18,6 +18,8 @@
 
 import type { BetterPasteSettings } from '../settings/types';
 import { markdownCodeRanges, overlapsRange } from './markdownRanges';
+import { httpUrlRanges } from './urlCleanup';
+import type { ProtectedRange } from './urlCleanup';
 
 /** Subset of settings this rule reads, so tests can build one without a full settings object. */
 export type AiTextOptions = Pick<BetterPasteSettings, 'aiTextPlainPunctuation'>;
@@ -54,30 +56,16 @@ const SINGLE_QUOTES = new RegExp('[\\u2018\\u2019\\u201A\\u201B]', 'g');
  * is a full character wide, so swapping it for an ASCII space changes the layout of a
  * sentence that was set correctly.
  */
-const EXOTIC_SPACES = new RegExp('[\\u00A0\\u1680\\u2000-\\u200A\\u202F\\u205F]', 'g');
+const EXOTIC_SPACE = new RegExp('[\\u00A0\\u1680\\u2000-\\u200A\\u202F\\u205F]');
 
 /**
- * Characters targeted by the cleanup: soft hyphen, zero-width space, and the byte order
- * mark.
- *
- * The zero-width joiner and non-joiner are deliberately NOT here. They look equally
- * invisible but they are load-bearing: the joiner is what holds a multi-part emoji
- * together, and both are ordinary letters-level content in Persian, Arabic and the Indic
- * scripts. Stripping them would corrupt text rather than tidy it.
+ * Every character handled by the invisible-character pass. Bidirectional overrides are
+ * included because they can make text render in an order unrelated to its source. Direction
+ * marks, embeddings and isolates are kept because they carry meaning in mixed-direction text.
+ * The zero-width joiner and non-joiner are also kept because they hold emoji and letters
+ * together in scripts where removing them would corrupt the text.
  */
-const INVISIBLE = new RegExp('[\\u00AD\\u200B\\uFEFF]', 'g');
-
-/**
- * Bidirectional overrides can make text render in an order that has nothing to do with what
- * it says. Embeddings and their terminator are kept because they still carry direction in
- * existing text, even though isolates are preferred for new content.
- *
- * The direction marks U+200E and U+200F and the isolates U+2066-U+2069 are deliberately
- * NOT here, for the same reason as the zero-width joiner above: they are what makes mixed
- * Arabic or Hebrew and Latin text render in the right order. Removing them would corrupt
- * the display of correctly written text.
- */
-const BIDI_CONTROLS = new RegExp('[\\u202D\\u202E]', 'g');
+const NORMALIZED_CHARACTERS = new RegExp('[\\u00A0\\u1680\\u2000-\\u200A\\u202F\\u205F\\u00AD\\u200B\\uFEFF\\u202D\\u202E]', 'g');
 
 export interface AiTextResult {
     text: string;
@@ -92,8 +80,11 @@ export interface AiTextResult {
  * regular expression. Leaving one in place would defeat the terminal rule's blank-line
  * and indentation detection.
  */
-export function normalizeInvisibleCharacters(input: string): AiTextResult {
-    const text = input.replace(EXOTIC_SPACES, ' ').replace(INVISIBLE, '').replace(BIDI_CONTROLS, '');
+export function normalizeInvisibleCharacters(input: string, protect: readonly ProtectedRange[] = []): AiTextResult {
+    const text = input.replace(NORMALIZED_CHARACTERS, (match, offset: number) => {
+        if (overlapsRange(protect, offset, offset + match.length)) return match;
+        return EXOTIC_SPACE.test(match) ? ' ' : '';
+    });
     return { text, changed: text !== input };
 }
 
@@ -106,8 +97,8 @@ export function normalizeInvisibleCharacters(input: string): AiTextResult {
  * it would refuse to rejoin the wrapped paragraph and would render the sentence as a list
  * item. Doing it last means the dash is still a dash while line structure is decided.
  */
-export function replacePunctuation(input: string): AiTextResult {
-    const protectedRanges = markdownCodeRanges(input);
+export function replacePunctuation(input: string, protect: readonly ProtectedRange[] = []): AiTextResult {
+    const protectedRanges = [...markdownCodeRanges(input), ...protect];
     const outsideCode = (match: string, offset: number, replacement: string): string =>
         overlapsRange(protectedRanges, offset, offset + match.length) ? match : replacement;
 
@@ -136,7 +127,9 @@ export function replacePunctuation(input: string): AiTextResult {
  * no line structure left to protect.
  */
 export function cleanAiText(input: string, options: AiTextOptions): AiTextResult {
-    const characters = normalizeInvisibleCharacters(input);
-    const text = options.aiTextPlainPunctuation ? replacePunctuation(characters.text).text : characters.text;
+    const characters = normalizeInvisibleCharacters(input, httpUrlRanges(input));
+    const text = options.aiTextPlainPunctuation
+        ? replacePunctuation(characters.text, httpUrlRanges(characters.text)).text
+        : characters.text;
     return { text, changed: text !== input };
 }

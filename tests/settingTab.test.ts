@@ -163,7 +163,7 @@ describe('settings tree', () => {
 
     it('keeps the landing page short', () => {
         // The point of the sub-pages is that the first screen stays scannable
-        expect(landingRows(tab.getSettingDefinitions()).length).toBeLessThanOrEqual(14);
+        expect(landingRows(tab.getSettingDefinitions()).length).toBeLessThanOrEqual(15);
     });
 
     it('puts the detail on sub-pages, declared so search can still reach it', () => {
@@ -250,6 +250,15 @@ describe('settings values', () => {
     it('round-trips an unedited list to no stored changes', async () => {
         await tab.setControlValue('urlDomainRules.text', String(tab.getControlValue('urlDomainRules.text')));
         expect(plugin.settings.urlDomainRules).toEqual([]);
+    });
+
+    it('does not rebuild the settings page while a site rule is being typed', async () => {
+        const shown = String(tab.getControlValue('urlDomainRules.text'));
+        const before = (tab as unknown as { updateCount: number }).updateCount;
+
+        await tab.setControlValue('urlDomainRules.text', `${shown}\nmine.example | id`);
+
+        expect((tab as unknown as { updateCount: number }).updateCount).toBe(before);
     });
 
     it('rejects a site rule that is not a domain', () => {

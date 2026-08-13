@@ -29,6 +29,7 @@ export const DEFAULT_SETTINGS: BetterPasteSettings = {
     imageSizeProperty: 'image-width',
 
     urlEnabled: true,
+    fetchLinkTitles: false,
     urlStripMode: 'all',
     // Empty means "use the shipped rules unchanged"; entries here are merged over them
     urlDomainRules: [],

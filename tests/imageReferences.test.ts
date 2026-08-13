@@ -87,6 +87,12 @@ describe('findImageReferences', () => {
         expect(found[0].kind).toBe('bare');
     });
 
+    it('finds a bare image URL whose path contains balanced parentheses', () => {
+        const found = findImageReferences('https://example.com/photo_(1).png', options());
+        expect(found).toHaveLength(1);
+        expect(found[0]).toMatchObject({ url: 'https://example.com/photo_(1).png', kind: 'bare' });
+    });
+
     it('ignores a bare URL that is not an image', () => {
         expect(findImageReferences('https://example.com/article', options())).toHaveLength(0);
     });
