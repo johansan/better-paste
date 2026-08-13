@@ -27,6 +27,10 @@ import type { BetterPasteSettings } from '../types';
  */
 export interface SettingsPageContext {
     settings: () => BetterPasteSettings;
+    /** Plugin version, named on the What's new row. */
+    version: string;
+    /** Opens the What's new dialog, and records the version once it is closed. */
+    showWhatsNew: () => void;
 }
 
 /**

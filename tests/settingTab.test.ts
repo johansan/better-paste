@@ -31,12 +31,20 @@ import type BetterPastePlugin from '../src/main';
 import type { BetterPasteSettings } from '../src/settings/types';
 import { SHIPPED_DOMAIN_RULES } from '../src/settings/constants';
 
+/**
+ * Settings the tab deliberately has no row for, because they are state the plugin keeps
+ * rather than a choice the user makes.
+ */
+const STORED_STATE_KEYS = ['lastShownVersion'];
+
 /** Minimal plugin double exposing only what the setting tab touches. */
 function fakePlugin(overrides: Partial<BetterPasteSettings> = {}) {
     const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, ...overrides };
     let saves = 0;
     return {
         settings,
+        manifest: { version: '1.0.0' },
+        showWhatsNew: () => undefined,
         saveSettings: async () => {
             saves += 1;
         },
@@ -120,7 +128,8 @@ describe('settings tree', () => {
                 return key.endsWith('.text') ? key.slice(0, -'.text'.length) : key;
             })
         );
-        expect(Object.keys(DEFAULT_SETTINGS).filter(key => !covered.has(key))).toEqual([]);
+        const uncovered = Object.keys(DEFAULT_SETTINGS).filter(key => !covered.has(key) && !STORED_STATE_KEYS.includes(key));
+        expect(uncovered).toEqual([]);
     });
 
     it('reads the current value back for every control', () => {
@@ -137,6 +146,19 @@ describe('settings tree', () => {
         for (const row of flatten(tab.getSettingDefinitions())) {
             expect(row.name.length).toBeGreaterThan(0);
         }
+    });
+
+    it('puts the release notes and support rows above the rules', () => {
+        const rows = flatten(tab.getSettingDefinitions());
+        expect(rows.slice(0, 2).map(row => row.name)).toEqual(["What's new in Better Paste 1.0.0", 'Support development']);
+    });
+
+    it('groups every rule under a heading, leaving only the start rows loose', () => {
+        const groups = tab
+            .getSettingDefinitions()
+            .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
+
+        expect(groups.map(group => group.heading)).toEqual([undefined, 'Behavior', 'Images', 'Links', 'Terminal text', 'AI cleanup']);
     });
 
     it('keeps the landing page short', () => {

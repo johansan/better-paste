@@ -86,7 +86,7 @@ When a download fails or times out, the original link stays in the note. Nothing
 
 Fifteen settings, arranged as a landing page with three sub pages. Anything with only one sensible answer is simply how the plugin behaves, rather than a question you have to answer.
 
-### 5.1 Pasting
+### 5.1 Behavior
 
 - **Clean up every paste** applies the rules whenever you paste. Turn it off to use the commands only.
 - **Trim space around the paste** drops the blank lines and stray spaces that come with text copied from a web page or a PDF. Only the ends. The middle is left alone.

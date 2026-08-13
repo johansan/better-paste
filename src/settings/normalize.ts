@@ -17,6 +17,7 @@
  */
 
 import { DEFAULT_SETTINGS } from './defaults';
+import { normalizeVersion } from '../releaseNotes';
 import type {
     BetterPasteSettings,
     ImageFilenameFormat,
@@ -78,7 +79,9 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
         terminalBulletMode: asEnum(data.terminalBulletMode, BULLET_MODES, defaults.terminalBulletMode),
 
         aiTextEnabled: asBoolean(data.aiTextEnabled, defaults.aiTextEnabled),
-        aiTextPlainPunctuation: asBoolean(data.aiTextPlainPunctuation, defaults.aiTextPlainPunctuation)
+        aiTextPlainPunctuation: asBoolean(data.aiTextPlainPunctuation, defaults.aiTextPlainPunctuation),
+
+        lastShownVersion: normalizeVersion(data.lastShownVersion)
     };
 }
 

@@ -27,6 +27,7 @@ import { createImageLandingDefinitions } from './pages/imagesPage';
 import { createLinkLandingDefinitions } from './pages/linksPage';
 import { createTerminalLandingDefinitions } from './pages/terminalPage';
 import { createAiTextLandingDefinitions } from './pages/aiTextPage';
+import { createStartDefinitions } from './pages/startPage';
 
 /**
  * Settings stored as a list of lines but edited as one text field. The control key carries
@@ -69,31 +70,42 @@ export class BetterPasteSettingTab extends PluginSettingTab {
 
     /** Shared by every page module. Settings are read live so `visible` predicates stay current. */
     private get context(): SettingsPageContext {
-        return { settings: () => this.plugin.settings };
+        return {
+            settings: () => this.plugin.settings,
+            version: this.plugin.manifest.version,
+            showWhatsNew: () => this.plugin.showWhatsNew()
+        };
     }
 
     getSettingDefinitions(): SettingDefinitionItem[] {
         const context = this.context;
 
         return [
-            toggle(
-                'interceptPaste',
-                'Clean up every paste',
-                'Apply the rules on every paste. Turn this off to use the commands only. A single note can opt out with the "better-paste: false" property.',
-                ['automatic', 'enable', 'disable', 'note', 'exclude', 'property', 'frontmatter', 'opt out']
-            ),
-            toggle('trimPaste', 'Trim space around the paste', 'Removes blank lines and spaces at the start and end of pasted text.', [
-                'whitespace',
-                'blank',
-                'space',
-                'newline',
-                'trim'
-            ]),
-            toggle(
-                'showNotices',
-                'Show a notice when a paste is changed',
-                'A one-line summary of what was cleaned up. Failures are always reported, whatever this is set to.'
-            ),
+            { type: 'group', cls: SETTINGS_CLASS, items: createStartDefinitions(context) },
+            {
+                type: 'group',
+                cls: SETTINGS_CLASS,
+                heading: 'Behavior',
+                items: [
+                    toggle(
+                        'interceptPaste',
+                        'Clean up every paste',
+                        'Apply the rules on every paste. Turn this off to use the commands only. A single note can opt out with the "better-paste: false" property.',
+                        ['automatic', 'enable', 'disable', 'note', 'exclude', 'property', 'frontmatter', 'opt out']
+                    ),
+                    toggle(
+                        'trimPaste',
+                        'Trim space around the paste',
+                        'Removes blank lines and spaces at the start and end of pasted text.',
+                        ['whitespace', 'blank', 'space', 'newline', 'trim']
+                    ),
+                    toggle(
+                        'showNotices',
+                        'Show a notice when a paste is changed',
+                        'A one-line summary of what was cleaned up. Failures are always reported, whatever this is set to.'
+                    )
+                ]
+            },
             { type: 'group', cls: SETTINGS_CLASS, heading: 'Images', items: createImageLandingDefinitions(context) },
             { type: 'group', cls: SETTINGS_CLASS, heading: 'Links', items: createLinkLandingDefinitions(context) },
             { type: 'group', cls: SETTINGS_CLASS, heading: 'Terminal text', items: createTerminalLandingDefinitions(context) },

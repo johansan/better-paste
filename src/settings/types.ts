@@ -96,4 +96,13 @@ export interface BetterPasteSettings {
     aiTextEnabled: boolean;
     /** Replace typographic punctuation with its plain ASCII equivalent. */
     aiTextPlainPunctuation: boolean;
+
+    /* Stored state */
+
+    /**
+     * Version whose release notes have been shown. Not a setting and not editable in the
+     * settings tab: the What's new dialog writes it, and the same value is mirrored into
+     * vault-local storage so a stale synced data.json cannot reopen the dialog.
+     */
+    lastShownVersion: string;
 }

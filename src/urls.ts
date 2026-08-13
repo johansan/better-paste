@@ -16,30 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { BetterPasteSettings } from './types';
+const REPOSITORY = 'johansan/better-paste';
 
-export const DEFAULT_SETTINGS: BetterPasteSettings = {
-    interceptPaste: true,
-    showNotices: true,
-    trimPaste: true,
+/** Shown on the support row in settings and at the foot of the What's new dialog. */
+export const SUPPORT_SPONSOR_URL = 'https://github.com/sponsors/johansan/';
+export const SUPPORT_BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/johansan';
 
-    imagesEnabled: true,
-    imageFilenameFormat: 'source',
-    imageLinkPaste: 'image',
-    imageSizeProperty: 'image-width',
-
-    urlEnabled: true,
-    urlStripMode: 'all',
-    // Empty means "use the shipped rules unchanged"; entries here are merged over them
-    urlDomainRules: [],
-
-    terminalEnabled: true,
-    terminalRejoinMode: 'indented',
-    terminalBulletMode: 'preserve',
-
-    aiTextEnabled: true,
-    aiTextPlainPunctuation: true,
-
-    // Empty means no release notes have been shown in this vault yet
-    lastShownVersion: ''
-};
+/**
+ * Artwork for the welcome dialog. Served from the repository rather than bundled, because
+ * Obsidian installs only main.js, manifest.json and styles.css, so a file next to them
+ * would never reach anyone who installed the plugin from the community list.
+ */
+export const WELCOME_IMAGE_URL = `https://raw.githubusercontent.com/${REPOSITORY}/main/images/welcome.jpg`;

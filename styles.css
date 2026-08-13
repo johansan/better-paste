@@ -82,3 +82,101 @@
 .setting-item.better-paste-tester {
     display: block;
 }
+
+/* ------------------------------------------------------------------ */
+/* Welcome and What's new dialogs                                      */
+/* ------------------------------------------------------------------ */
+
+.modal.better-paste-modal {
+    width: 600px;
+    max-width: calc(100vw - 40px);
+}
+
+.modal.better-paste-modal .modal-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.better-paste-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: var(--size-4-2);
+    margin-top: var(--size-4-4);
+}
+
+.better-paste-modal-divider {
+    border-top: 1px solid var(--background-modifier-border);
+    margin-top: var(--size-4-4);
+}
+
+.better-paste-modal-support {
+    margin-bottom: 0;
+    color: var(--text-muted);
+    font-size: var(--font-ui-small);
+}
+
+/* The release list is the only part that scrolls, so the support line and the
+   buttons stay visible however many versions are being shown at once. */
+.better-paste-release-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: min(60vh, 480px);
+    overflow-y: auto;
+    padding-right: var(--size-4-2);
+}
+
+.better-paste-release + .better-paste-release {
+    margin-top: var(--size-4-4);
+}
+
+.better-paste-release h3 {
+    margin: 0 0 var(--size-4-2);
+    padding: var(--size-4-1) var(--size-4-2);
+    border-radius: var(--radius-s);
+    background-color: var(--background-secondary);
+    font-size: var(--font-ui-medium);
+}
+
+.better-paste-release h4 {
+    margin: var(--size-4-3) 0 var(--size-4-1);
+    font-size: var(--font-ui-small);
+}
+
+.better-paste-release ul {
+    margin: 0;
+    padding-left: var(--size-4-5);
+}
+
+.better-paste-release li {
+    margin-bottom: var(--size-4-1);
+}
+
+.better-paste-release-info {
+    margin: 0 0 var(--size-4-3);
+    color: var(--text-muted);
+}
+
+/* Marks the one point a release note wants read first */
+.better-paste-emphasis {
+    color: var(--text-accent);
+    font-weight: var(--font-bold);
+}
+
+.better-paste-welcome-image {
+    margin-bottom: var(--size-4-4);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-m);
+    overflow: hidden;
+}
+
+.better-paste-welcome-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.better-paste-welcome-body p {
+    margin: 0 0 var(--size-4-3);
+    line-height: 1.5;
+}
