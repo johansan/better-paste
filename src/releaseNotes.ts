@@ -54,7 +54,7 @@ const RELEASE_NOTES: ReleaseNote[] = [
         version: '1.0.0',
         date: '2026-08-13',
         banner: '1.0.0.gif',
-        info: 'The first release of Better Paste.',
+        info: 'This is the first version of Better Paste!',
         new: [
             'Saves pasted images into the vault as attachments. Covers Safari’s `Copy image`, pictures inside copied web content, and bitmaps already on the clipboard.',
             'Removes tracking parameters from pasted links. Thirty-three sites ship with a rule that keeps the parameters they need.',

@@ -170,10 +170,24 @@
     color: var(--text-muted);
 }
 
-/* Marks the one point a release note wants read first */
+/* Inline code in a release note, set the way a theme sets code in a note */
+.better-paste-release-info code,
+.better-paste-release li code {
+    padding: 0.1em 0.35em;
+    border-radius: var(--radius-s);
+    background-color: var(--code-background);
+    color: var(--code-normal);
+    font-size: 0.9em;
+}
+
+/* Marks the one point a release note wants read first, as a highlight rather than
+   coloured text, so it carries at a glance the way a highlight in a note does */
 .better-paste-emphasis {
-    color: var(--text-accent);
-    font-weight: var(--font-bold);
+    padding: 0 var(--size-2-1);
+    border-radius: var(--radius-s);
+    background-color: var(--text-highlight-bg);
+    color: var(--text-normal);
+    font-weight: var(--font-semibold);
 }
 
 .better-paste-welcome-image {
