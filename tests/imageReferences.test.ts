@@ -24,12 +24,6 @@ import {
     isDataImageUri,
     replaceImageReferences
 } from '../src/paste/imageReferences';
-import type { ImageReferenceOptions } from '../src/paste/imageReferences';
-import { DEFAULT_SETTINGS } from '../src/settings/defaults';
-
-function options(overrides: Partial<ImageReferenceOptions> = {}): ImageReferenceOptions {
-    return { ...DEFAULT_SETTINGS, ...overrides };
-}
 
 describe('isDataImageUri', () => {
     it('recognises image data URIs', () => {
@@ -51,43 +45,43 @@ describe('extensionOfUrl', () => {
 
 describe('findImageReferences', () => {
     it('finds a Markdown image and keeps its alt text', () => {
-        const found = findImageReferences('before ![a cat](https://example.com/cat.png) after', options());
+        const found = findImageReferences('before ![a cat](https://example.com/cat.png) after');
         expect(found).toHaveLength(1);
         expect(found[0]).toMatchObject({ url: 'https://example.com/cat.png', alt: 'a cat', kind: 'markdown' });
     });
 
     it('finds a Markdown image whose URL has no extension', () => {
-        const found = findImageReferences('![](https://example.com/render?id=7)', options());
+        const found = findImageReferences('![](https://example.com/render?id=7)');
         expect(found).toHaveLength(1);
         expect(found[0].url).toBe('https://example.com/render?id=7');
     });
 
     it('finds a Markdown image whose URL contains parentheses', () => {
-        const found = findImageReferences('![](https://example.com/photo_(1).png)', options());
+        const found = findImageReferences('![](https://example.com/photo_(1).png)');
         expect(found).toHaveLength(1);
         expect(found[0].url).toBe('https://example.com/photo_(1).png');
         expect(found[0].token).toBe('![](https://example.com/photo_(1).png)');
     });
 
     it('finds a Markdown image with an escaped bracket in its alt text', () => {
-        const found = findImageReferences('![a \\] bracket](https://example.com/photo.png)', options());
+        const found = findImageReferences('![a \\] bracket](https://example.com/photo.png)');
         expect(found).toHaveLength(1);
         expect(found[0]).toMatchObject({ url: 'https://example.com/photo.png', alt: 'a \\] bracket', kind: 'markdown' });
     });
 
     it('returns promptly for an incomplete Markdown link', () => {
-        expect(findImageReferences('[label](https://example.com/abcdefgh', options())).toHaveLength(0);
+        expect(findImageReferences('[label](https://example.com/abcdefgh')).toHaveLength(0);
     });
 
     it('finds an HTML image tag and its alt text', () => {
-        const found = findImageReferences('<img src="https://example.com/a.jpg" alt="hello">', options());
+        const found = findImageReferences('<img src="https://example.com/a.jpg" alt="hello">');
         expect(found).toHaveLength(1);
         expect(found[0]).toMatchObject({ url: 'https://example.com/a.jpg', alt: 'hello', kind: 'html' });
     });
 
     it('keeps greater-than signs inside quoted HTML attributes', () => {
         const text = '<img src="https://example.com/a.jpg" alt="A > B">';
-        const found = findImageReferences(text, options());
+        const found = findImageReferences(text);
 
         expect(found[0]).toMatchObject({ token: text, url: 'https://example.com/a.jpg', alt: 'A > B', kind: 'html' });
         expect(replaceImageReferences(text, found, new Map([[found[0].index, '![[a.jpg]]']]))).toBe('![[a.jpg]]');
@@ -95,69 +89,62 @@ describe('findImageReferences', () => {
 
     it('does not mistake data attributes for src and alt', () => {
         const text = '<img data-src="https://example.com/lazy.jpg" src="https://example.com/actual.jpg" data-alt="Preview" alt="Actual">';
-        const found = findImageReferences(text, options());
+        const found = findImageReferences(text);
 
         expect(found[0]).toMatchObject({ url: 'https://example.com/actual.jpg', alt: 'Actual', kind: 'html' });
         expect(imageSourcesFromHtml(text)).toEqual(['https://example.com/actual.jpg']);
     });
 
     it('finds a data URI image', () => {
-        const found = findImageReferences('![](data:image/png;base64,AAAA)', options());
+        const found = findImageReferences('![](data:image/png;base64,AAAA)');
         expect(found).toHaveLength(1);
         expect(found[0].kind).toBe('markdown');
     });
 
     it('finds a bare image URL', () => {
-        const found = findImageReferences('https://example.com/photo.jpg', options());
+        const found = findImageReferences('https://example.com/photo.jpg');
         expect(found).toHaveLength(1);
         expect(found[0].kind).toBe('bare');
     });
 
     it('finds a bare image URL whose path contains balanced parentheses', () => {
-        const found = findImageReferences('https://example.com/photo_(1).png', options());
+        const found = findImageReferences('https://example.com/photo_(1).png');
         expect(found).toHaveLength(1);
         expect(found[0]).toMatchObject({ url: 'https://example.com/photo_(1).png', kind: 'bare' });
     });
 
     it('ignores a bare URL that is not an image', () => {
-        expect(findImageReferences('https://example.com/article', options())).toHaveLength(0);
+        expect(findImageReferences('https://example.com/article')).toHaveLength(0);
     });
 
     it('does not double-count the URL inside a Markdown image', () => {
-        const found = findImageReferences('![](https://example.com/cat.png)', options());
+        const found = findImageReferences('![](https://example.com/cat.png)');
         expect(found).toHaveLength(1);
         expect(found[0].kind).toBe('markdown');
     });
 
     it('does not treat a normal Markdown link target as a bare image URL', () => {
-        expect(findImageReferences('[photo](https://example.com/cat.png)', options())).toHaveLength(0);
+        expect(findImageReferences('[photo](https://example.com/cat.png)')).toHaveLength(0);
     });
 
     it('does not rewrite an image URL inside a Markdown link definition', () => {
         const text = '![photo][cat]\n\n[cat]: https://example.com/cat.png "A cat"';
-        expect(findImageReferences(text, options())).toHaveLength(0);
+        expect(findImageReferences(text)).toHaveLength(0);
     });
 
     it('does not treat code examples as image references', () => {
         const text = ['`https://example.com/inline.png`', '```md', '![](https://example.com/fenced.png)', '```'].join('\n');
-        expect(findImageReferences(text, options())).toHaveLength(0);
+        expect(findImageReferences(text)).toHaveLength(0);
     });
 
     it('does not treat autolinks or HTML attributes as image references', () => {
-        expect(findImageReferences('<https://example.com/cat.png>', options())).toHaveLength(0);
-        expect(findImageReferences('<a href="https://example.com/cat.png">cat</a>', options())).toHaveLength(0);
-    });
-
-    it('leaves a pasted image link alone when that is the choice', () => {
-        const asLink = options({ imageLinkPaste: 'link' });
-        expect(findImageReferences('https://example.com/a.png', asLink)).toHaveLength(0);
-        // A picture inside copied content is a different question, and still saved
-        expect(findImageReferences('![](https://example.com/a.png)', asLink)).toHaveLength(1);
+        expect(findImageReferences('<https://example.com/cat.png>')).toHaveLength(0);
+        expect(findImageReferences('<a href="https://example.com/cat.png">cat</a>')).toHaveLength(0);
     });
 
     it('returns references sorted by position', () => {
         const text = '![](https://example.com/b.png) and <img src="https://example.com/a.png">';
-        const found = findImageReferences(text, options());
+        const found = findImageReferences(text);
         expect(found.map(reference => reference.index)).toEqual([...found.map(reference => reference.index)].sort((a, b) => a - b));
     });
 });
@@ -165,20 +152,20 @@ describe('findImageReferences', () => {
 describe('replaceImageReferences', () => {
     it('swaps in the resolved embeds', () => {
         const text = 'x ![](https://example.com/a.png) y';
-        const references = findImageReferences(text, options());
+        const references = findImageReferences(text);
         const embeds = new Map([[references[0].index, '![[a.png]]']]);
         expect(replaceImageReferences(text, references, embeds)).toBe('x ![[a.png]] y');
     });
 
     it('leaves references without an embed untouched', () => {
         const text = 'x ![](https://example.com/a.png) y';
-        const references = findImageReferences(text, options());
+        const references = findImageReferences(text);
         expect(replaceImageReferences(text, references, new Map())).toBe(text);
     });
 
     it('handles several references in one pass', () => {
         const text = '![](https://example.com/a.png) ![](https://example.com/b.png)';
-        const references = findImageReferences(text, options());
+        const references = findImageReferences(text);
         const embeds = new Map([
             [references[0].index, '![[a.png]]'],
             [references[1].index, '![[b.png]]']

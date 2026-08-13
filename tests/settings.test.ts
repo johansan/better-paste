@@ -32,17 +32,35 @@ describe('normalizeSettings', () => {
         expect(normalizeSettings({})).toEqual(DEFAULT_SETTINGS);
     });
 
+    it('fetches link titles by default', () => {
+        expect(normalizeSettings({}).fetchLinkTitles).toBe(true);
+    });
+
+    it('converts terminal bullets to Markdown by default', () => {
+        expect(normalizeSettings({}).terminalBulletMode).toBe('markdown');
+    });
+
+    it('leaves comma placement unchanged by default', () => {
+        expect(normalizeSettings({}).textCommaPlacement).toBe('none');
+    });
+
     it('keeps valid stored values', () => {
         const result = normalizeSettings({
             urlStripMode: 'tracking',
-            fetchLinkTitles: true,
+            fetchLinkTitles: false,
             terminalRejoinMode: 'any',
-            imageFilenameFormat: 'date-time'
+            terminalBulletMode: 'preserve',
+            imageFilenameFormat: 'custom',
+            imageFilenameTemplate: '{{name}}-YYYY-MM-DD',
+            textCommaPlacement: 'inside'
         });
         expect(result.urlStripMode).toBe('tracking');
-        expect(result.fetchLinkTitles).toBe(true);
+        expect(result.fetchLinkTitles).toBe(false);
         expect(result.terminalRejoinMode).toBe('any');
-        expect(result.imageFilenameFormat).toBe('date-time');
+        expect(result.terminalBulletMode).toBe('preserve');
+        expect(result.imageFilenameFormat).toBe('custom');
+        expect(result.imageFilenameTemplate).toBe('{{name}}-YYYY-MM-DD');
+        expect(result.textCommaPlacement).toBe('inside');
     });
 
     it('replaces values of the wrong type', () => {
@@ -51,8 +69,17 @@ describe('normalizeSettings', () => {
         expect(result.imageSizeProperty).toBe(DEFAULT_SETTINGS.imageSizeProperty);
     });
 
+    it('uses the default custom image format when the stored format is blank', () => {
+        expect(normalizeSettings({ imageFilenameTemplate: '   ' }).imageFilenameTemplate).toBe('{{name}}');
+    });
+
     it('drops keys that are not settings', () => {
-        const result = normalizeSettings({ terminalStripAnsi: false, imageFolder: 'files', urlTrackingParams: ['x'] });
+        const result = normalizeSettings({
+            terminalStripAnsi: false,
+            imageFolder: 'files',
+            imageLinkPaste: 'link',
+            urlTrackingParams: ['x']
+        });
         expect(result).toEqual(DEFAULT_SETTINGS);
     });
 
@@ -69,6 +96,7 @@ describe('normalizeSettings', () => {
     it('rejects an unknown enum value', () => {
         expect(normalizeSettings({ urlStripMode: 'sometimes' }).urlStripMode).toBe(DEFAULT_SETTINGS.urlStripMode);
         expect(normalizeSettings({ imageFilenameFormat: 'fancy' }).imageFilenameFormat).toBe(DEFAULT_SETTINGS.imageFilenameFormat);
+        expect(normalizeSettings({ textCommaPlacement: 'sometimes' }).textCommaPlacement).toBe(DEFAULT_SETTINGS.textCommaPlacement);
     });
 });
 
@@ -157,7 +185,7 @@ describe('runTextPipeline', () => {
         const result = runTextPipeline(input, DEFAULT_SETTINGS);
 
         expect(result.text).toBe(
-            '• Read the announcement at https://support.claude.com/en/articles/16266773-how-claude-marks-ai and then decide whether the change matters for us.'
+            '- Read the announcement at https://support.claude.com/en/articles/16266773-how-claude-marks-ai and then decide whether the change matters for us.'
         );
         expect(result.terminalCleaned).toBe(true);
         expect(result.urlsCleaned).toBe(1);
@@ -174,6 +202,23 @@ describe('runTextPipeline', () => {
 
     it('reports no change for text that needs none', () => {
         expect(runTextPipeline('Just a sentence.', DEFAULT_SETTINGS).changed).toBe(false);
+    });
+
+    it('leaves comma placement alone by default', () => {
+        expect(runTextPipeline('He called it "finished," then left.', DEFAULT_SETTINGS).text).toBe('He called it "finished," then left.');
+    });
+
+    it('moves commas outside quotation marks when enabled', () => {
+        const settings = { ...DEFAULT_SETTINGS, textCommaPlacement: 'outside' as const };
+        const result = runTextPipeline('He called it "finished," then left.', settings);
+
+        expect(result.text).toBe('He called it "finished", then left.');
+        expect(result.textProcessed).toBe(true);
+    });
+
+    it('moves commas inside quotation marks when selected', () => {
+        const settings = { ...DEFAULT_SETTINGS, textCommaPlacement: 'inside' as const };
+        expect(runTextPipeline('He called it "finished", then left.', settings).text).toBe('He called it "finished," then left.');
     });
 
     it('replaces dashes after the terminal rule, not before it', () => {

@@ -85,8 +85,9 @@ describe('LinkTitleService', () => {
     });
 
     it('does no work while the setting is off', () => {
+        const settings = { ...DEFAULT_SETTINGS, fetchLinkTitles: false };
         const service = new LinkTitleService(
-            () => DEFAULT_SETTINGS,
+            () => settings,
             async () => response(),
             () => 'A page'
         );

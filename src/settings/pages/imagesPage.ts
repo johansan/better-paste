@@ -16,10 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { SettingGroupItem } from 'obsidian';
+import type { Setting, SettingGroupItem } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../defaults';
-import { describeWithExample } from './context';
+import { DEFAULT_IMAGE_FILENAME_TEMPLATE } from '../constants';
+import { applyFileNameTemplate, buildFileNameTokens } from '../../utils/filenames';
 import type { SettingsPageContext } from './context';
+
+const FILENAME_EXAMPLE_URL = 'https://images.example.com/2026/05/skyline-8f21a.jpg';
+const FILENAME_EXAMPLE_DATE = new Date(2026, 7, 13, 14, 5, 6);
 
 /**
  * Shows the rule by example, with the part of the address that is dropped struck through.
@@ -30,7 +34,7 @@ import type { SettingsPageContext } from './context';
  */
 function savingExample(): string | DocumentFragment {
     const lead =
-        'Saves copied images as local files rather than inserting external links. This applies to Safari’s "Copy image", pictures inside copied web content, and images embedded in the clipboard. Images are saved to your vault attachment folder, named after the source:';
+        'Saves pasted pictures as local files rather than leaving external image links. This includes Safari\'s "Copy image", pictures inside copied web content, and standalone image addresses. Images are saved to your vault attachment folder. With "Name from source":';
     const address = 'https://images.example.com/2026/05/';
     const file = 'skyline-8f21a.jpg';
     const query = '?auto=format&w=2400';
@@ -44,6 +48,32 @@ function savingExample(): string | DocumentFragment {
         example.createSpan({ text: file });
         example.createSpan({ cls: 'better-paste-example-removed', text: query });
     });
+}
+
+/** Custom filename format with the same one-line example used by the real save path. */
+function renderCustomFilenameFormat(setting: Setting, context: SettingsPageContext): void {
+    setting.setName('Custom format');
+    setting.settingEl.addClass('better-paste-filename-format');
+    setting.descEl.appendText('Use {{name}} for the source name and Moment date formats such as YYYY-MM-DD.');
+    const example = setting.descEl.createDiv({ cls: 'better-paste-example' });
+
+    const renderExample = (template: string): void => {
+        const tokens = buildFileNameTokens(FILENAME_EXAMPLE_URL);
+        const baseName = applyFileNameTemplate(template, tokens, FILENAME_EXAMPLE_DATE);
+        example.setText(`Example: ${baseName}.jpg`);
+    };
+
+    setting.addText(text => {
+        text.setPlaceholder(DEFAULT_IMAGE_FILENAME_TEMPLATE)
+            .setValue(context.settings().imageFilenameTemplate)
+            .onChange(value => {
+                const template = value.trim() || DEFAULT_IMAGE_FILENAME_TEMPLATE;
+                context.settings().imageFilenameTemplate = template;
+                renderExample(template);
+                return context.saveSettings();
+            });
+    });
+    renderExample(context.settings().imageFilenameTemplate);
 }
 
 /** Rows shown directly under the Images heading on the landing page. */
@@ -60,46 +90,34 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
         {
             type: 'page',
             name: 'Image handling',
-            desc: 'File names, image links, and per-note image width.',
+            desc: 'File names and per-note image width.',
             visible: enabled,
-            items: createImageOptionsDefinitions()
+            items: createImageOptionsDefinitions(context)
         }
     ];
 }
 
 /** The Image options sub-page. */
-function createImageOptionsDefinitions(): SettingGroupItem[] {
+function createImageOptionsDefinitions(context: SettingsPageContext): SettingGroupItem[] {
     return [
         {
             name: 'File names',
-            desc: 'The naming format for saved images.',
+            desc: 'Choose how saved image files are named.',
             control: {
                 type: 'dropdown',
                 key: 'imageFilenameFormat',
                 defaultValue: DEFAULT_SETTINGS.imageFilenameFormat,
                 options: {
-                    source: 'Name from the source',
-                    'source-date': 'Name and date',
-                    'date-time': 'Date and time'
+                    source: 'Name from source',
+                    custom: 'Custom format'
                 }
             }
         },
         {
-            name: 'Pasting an image URL',
-            desc: describeWithExample(
-                'Determines what happens when the clipboard contains only a web address pointing directly to an image. The plugin can either download the picture to your vault, or leave the text as a normal link.',
-                'https://example.com/photo.png'
-            ),
-            aliases: ['bare url', 'link', 'embed', 'preview', 'address'],
-            control: {
-                type: 'dropdown',
-                key: 'imageLinkPaste',
-                defaultValue: DEFAULT_SETTINGS.imageLinkPaste,
-                options: {
-                    image: 'Save the picture and show it',
-                    link: 'Leave the link as it is'
-                }
-            }
+            name: 'Custom format',
+            aliases: ['name', 'filename', 'date', 'moment', 'YYYY', '{{name}}'],
+            visible: () => context.settings().imageFilenameFormat === 'custom',
+            render: setting => renderCustomFilenameFormat(setting, context)
         },
         {
             name: 'Image width property',

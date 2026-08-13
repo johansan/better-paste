@@ -19,7 +19,6 @@
 import { trimUrlTail } from '../transforms/urlCleanup';
 import { markdownCodeRanges } from '../transforms/markdownRanges';
 import { IMAGE_EXTENSIONS } from '../settings/constants';
-import type { BetterPasteSettings } from '../settings/types';
 
 /** Where an image reference came from, which decides how it is rewritten. */
 export type ImageReferenceKind = 'markdown' | 'html' | 'bare';
@@ -35,9 +34,6 @@ export interface ImageReference {
     alt: string;
     kind: ImageReferenceKind;
 }
-
-/** Subset of settings the reference finder reads. */
-export type ImageReferenceOptions = Pick<BetterPasteSettings, 'imageLinkPaste'>;
 
 /** Markdown image: ![alt](url "optional title") */
 const MARKDOWN_IMAGE = /!\[((?:\\.|[^\]\\\n])*)\]\(\s*<?((?:[^()<\s>]|\([^()<\s>]*\))+)>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
@@ -123,7 +119,7 @@ function isSupportedSource(url: string): boolean {
  * resolved by priority: an explicit Markdown or HTML image always wins over a bare URL that
  * happens to sit inside it.
  */
-export function findImageReferences(text: string, options: ImageReferenceOptions): ImageReference[] {
+export function findImageReferences(text: string): ImageReference[] {
     const found: ImageReference[] = [];
     const claimed: { start: number; end: number }[] = markdownCodeRanges(text);
 
@@ -165,22 +161,20 @@ export function findImageReferences(text: string, options: ImageReferenceOptions
         claim(match.index, match.index + match[0].length);
     }
 
-    if (options.imageLinkPaste === 'image') {
-        BARE_URL.lastIndex = 0;
-        for (let match = BARE_URL.exec(text); match !== null; match = BARE_URL.exec(text)) {
-            const url = trimUrlTail(match[0]);
-            if (!looksLikeImageUrl(url)) continue;
-            if (!claim(match.index, match.index + url.length)) continue;
-            found.push({ token: url, index: match.index, url, alt: '', kind: 'bare' });
-        }
+    BARE_URL.lastIndex = 0;
+    for (let match = BARE_URL.exec(text); match !== null; match = BARE_URL.exec(text)) {
+        const url = trimUrlTail(match[0]);
+        if (!looksLikeImageUrl(url)) continue;
+        if (!claim(match.index, match.index + url.length)) continue;
+        found.push({ token: url, index: match.index, url, alt: '', kind: 'bare' });
     }
 
     return found.sort((a, b) => a.index - b.index);
 }
 
 /** The span each image reference occupies, for callers that must leave them alone. */
-export function imageReferenceRanges(text: string, options: ImageReferenceOptions): { start: number; end: number }[] {
-    return findImageReferences(text, options).map(reference => ({
+export function imageReferenceRanges(text: string): { start: number; end: number }[] {
+    return findImageReferences(text).map(reference => ({
         start: reference.index,
         end: reference.index + reference.token.length
     }));

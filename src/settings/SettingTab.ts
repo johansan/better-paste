@@ -26,6 +26,7 @@ import type { SettingsPageContext } from './pages/context';
 import { createImageLandingDefinitions } from './pages/imagesPage';
 import { createLinkLandingDefinitions } from './pages/linksPage';
 import { createTerminalLandingDefinitions } from './pages/terminalPage';
+import { createTextProcessingDefinitions } from './pages/textProcessingPage';
 import { createAiTextLandingDefinitions } from './pages/aiTextPage';
 import { createStartDefinitions } from './pages/startPage';
 
@@ -67,7 +68,8 @@ export class BetterPasteSettingTab extends PluginSettingTab {
         return {
             settings: () => this.plugin.settings,
             version: this.plugin.manifest.version,
-            showWhatsNew: () => this.plugin.showWhatsNew()
+            showWhatsNew: () => this.plugin.showWhatsNew(),
+            saveSettings: () => this.plugin.saveSettings()
         };
     }
 
@@ -88,12 +90,6 @@ export class BetterPasteSettingTab extends PluginSettingTab {
                         ['automatic', 'enable', 'disable', 'note', 'exclude', 'property', 'frontmatter', 'opt out']
                     ),
                     toggle(
-                        'trimPaste',
-                        'Trim space around the paste',
-                        'Removes blank lines and spaces at the start and end of pasted text.',
-                        ['whitespace', 'blank', 'space', 'newline', 'trim']
-                    ),
-                    toggle(
                         'showNotices',
                         'Show a notice when a paste is changed',
                         'A one-line summary of what was cleaned up. Failures are always reported, whatever this is set to.'
@@ -103,6 +99,7 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             { type: 'group', cls: SETTINGS_CLASS, heading: 'Images', items: createImageLandingDefinitions(context) },
             { type: 'group', cls: SETTINGS_CLASS, heading: 'Links', items: createLinkLandingDefinitions(context) },
             { type: 'group', cls: SETTINGS_CLASS, heading: 'Terminal text', items: createTerminalLandingDefinitions(context) },
+            { type: 'group', cls: SETTINGS_CLASS, heading: 'Text processing', items: createTextProcessingDefinitions() },
             { type: 'group', cls: SETTINGS_CLASS, heading: 'AI cleanup', items: createAiTextLandingDefinitions(context) }
         ];
     }

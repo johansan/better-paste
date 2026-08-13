@@ -44,12 +44,8 @@ export const IMAGE_TIMEOUT_SECONDS = 30;
 /** How long to wait for a page title before leaving the pasted address alone. */
 export const LINK_TITLE_TIMEOUT_SECONDS = 10;
 
-/** Filename templates behind the "File name format" choice. */
-export const FILENAME_TEMPLATES = {
-    source: '{{name}}',
-    'source-date': '{{name}}-{{date}}',
-    'date-time': '{{date}}-{{time}}'
-} as const;
+/** Filename format used for source names and as the starting custom format. */
+export const DEFAULT_IMAGE_FILENAME_TEMPLATE = '{{name}}';
 
 /* -------------------------------------------------------------------------- */
 /* URLs                                                                        */

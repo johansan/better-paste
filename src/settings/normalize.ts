@@ -21,9 +21,9 @@ import { normalizeVersion } from '../releaseNotes';
 import type {
     BetterPasteSettings,
     ImageFilenameFormat,
-    ImageLinkPaste,
     TerminalBulletMode,
     TerminalRejoinMode,
+    TextCommaPlacement,
     UrlStripMode
 } from './types';
 
@@ -47,8 +47,8 @@ function asEnum<T extends string>(value: unknown, allowed: readonly T[], fallbac
 const URL_STRIP_MODES: readonly UrlStripMode[] = ['all', 'tracking'];
 const BULLET_MODES: readonly TerminalBulletMode[] = ['preserve', 'markdown'];
 const REJOIN_MODES: readonly TerminalRejoinMode[] = ['indented', 'any', 'never'];
-const FILENAME_FORMATS: readonly ImageFilenameFormat[] = ['source', 'source-date', 'date-time'];
-const IMAGE_LINK_PASTE: readonly ImageLinkPaste[] = ['image', 'link'];
+const FILENAME_FORMATS: readonly ImageFilenameFormat[] = ['source', 'custom'];
+const COMMA_PLACEMENTS: readonly TextCommaPlacement[] = ['none', 'inside', 'outside'];
 
 /**
  * Builds a complete settings object from whatever was stored on disk. Every field is
@@ -62,11 +62,11 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
     return {
         interceptPaste: asBoolean(data.interceptPaste, defaults.interceptPaste),
         showNotices: asBoolean(data.showNotices, defaults.showNotices),
-        trimPaste: asBoolean(data.trimPaste, defaults.trimPaste),
 
         imagesEnabled: asBoolean(data.imagesEnabled, defaults.imagesEnabled),
         imageFilenameFormat: asEnum(data.imageFilenameFormat, FILENAME_FORMATS, defaults.imageFilenameFormat),
-        imageLinkPaste: asEnum(data.imageLinkPaste, IMAGE_LINK_PASTE, defaults.imageLinkPaste),
+        imageFilenameTemplate:
+            asString(data.imageFilenameTemplate, defaults.imageFilenameTemplate).trim() || defaults.imageFilenameTemplate,
         imageSizeProperty: asString(data.imageSizeProperty, defaults.imageSizeProperty).trim(),
 
         urlEnabled: asBoolean(data.urlEnabled, defaults.urlEnabled),
@@ -78,6 +78,9 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
         terminalEnabled: asBoolean(data.terminalEnabled, defaults.terminalEnabled),
         terminalRejoinMode: asEnum(data.terminalRejoinMode, REJOIN_MODES, defaults.terminalRejoinMode),
         terminalBulletMode: asEnum(data.terminalBulletMode, BULLET_MODES, defaults.terminalBulletMode),
+
+        trimPaste: asBoolean(data.trimPaste, defaults.trimPaste),
+        textCommaPlacement: asEnum(data.textCommaPlacement, COMMA_PLACEMENTS, defaults.textCommaPlacement),
 
         aiTextEnabled: asBoolean(data.aiTextEnabled, defaults.aiTextEnabled),
         aiTextPlainPunctuation: asBoolean(data.aiTextPlainPunctuation, defaults.aiTextPlainPunctuation),

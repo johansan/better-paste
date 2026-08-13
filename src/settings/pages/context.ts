@@ -31,19 +31,8 @@ export interface SettingsPageContext {
     version: string;
     /** Opens the What's new dialog, and records the version once it is closed. */
     showWhatsNew: () => void;
-}
-
-/**
- * A description with a worked example underneath it. Falls back to a plain string when
- * there is no Obsidian runtime, because the settings definitions are also read by tests.
- */
-export function describeWithExample(lead: string, example: string): string | DocumentFragment {
-    if (typeof createFragment === 'undefined') return `${lead} ${example}`;
-
-    return createFragment(fragment => {
-        fragment.appendText(lead);
-        fragment.createDiv({ cls: 'better-paste-example', text: example });
-    });
+    /** Persists a value changed by a custom-rendered setting row. */
+    saveSettings: () => Promise<void>;
 }
 
 /** Suffix marking a control key whose stored value is a list but is edited as text. */
@@ -58,7 +47,7 @@ export type BooleanSettingKey = {
 }[keyof BetterPasteSettings];
 
 /** Toggle definition bound to a boolean setting. */
-export function toggle(key: BooleanSettingKey, name: string, desc: string, aliases?: string[]): SettingDefinition {
+export function toggle(key: BooleanSettingKey, name: string, desc: string | DocumentFragment, aliases?: string[]): SettingDefinition {
     return {
         name,
         desc,

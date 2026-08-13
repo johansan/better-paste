@@ -40,9 +40,9 @@ interface SavedClipboardImages {
 /** Image service double that resolves every reference to a predictable embed. */
 function fakeImages(settings: BetterPasteSettings, failing = false, saved?: SavedClipboardImages[]): ImageService {
     return {
-        hasWork: (text: string) => settings.imagesEnabled && findImageReferences(text, settings).length > 0,
+        hasWork: (text: string) => settings.imagesEnabled && findImageReferences(text).length > 0,
         materializeImages: async (text: string, _sourcePath: string, size: string | null = null) => {
-            const references = findImageReferences(text, settings);
+            const references = findImageReferences(text);
             if (failing) return { text, downloaded: 0, failed: references.length };
             const suffix = size ? `|${size}` : '';
             const embeds = new Map(references.map((reference, index) => [reference.index, `![[image-${index}.png${suffix}]]`]));
@@ -115,7 +115,7 @@ describe('handleEditorPaste: plain text', () => {
     });
 
     it('replaces the selection rather than appending', () => {
-        const { service } = build();
+        const { service } = build({ fetchLinkTitles: false });
         const editor = selecting('start OLD end', 'OLD');
         const event = fakeClipboardEvent({ plain: 'https://example.com/a?utm_source=x' });
 
@@ -147,7 +147,7 @@ describe('handleEditorPaste: plain text', () => {
 
         service.handleEditorPaste(fakeClipboardEvent({ plain }), editor.asEditor(), INFO);
         expect(editor.getValue()).toBe(
-            '• A bullet line that is comfortably past the sixty character wrap threshold and continues on the next line.'
+            '- A bullet line that is comfortably past the sixty character wrap threshold and continues on the next line.'
         );
     });
 
@@ -412,6 +412,15 @@ describe('handleEditorPaste: images in plain text', () => {
         expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
         await settle();
         expect(editor.getValue()).toBe('![[image-0.png]]');
+    });
+
+    it('leaves a pasted image URL alone when image saving is off', () => {
+        const { service } = build({ imagesEnabled: false });
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({ plain: 'https://example.com/cat.png' });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe('');
     });
 
     it('keeps the original URL when the download fails', async () => {
@@ -689,6 +698,20 @@ describe('handleEditorPaste: rich content', () => {
         await pasteRich(service, editor, '<p>quoted</p>', '“quoted”');
 
         expect(editor.getValue()).toBe('"quoted"');
+    });
+
+    it('applies text processing to rich content when the other rules are off', async () => {
+        const { service } = build({
+            aiTextEnabled: false,
+            urlEnabled: false,
+            imagesEnabled: false,
+            textCommaPlacement: 'outside'
+        });
+        const editor = new FakeEditor('');
+
+        await pasteRich(service, editor, '<p>quoted</p>', 'He called it "finished," then left.');
+
+        expect(editor.getValue()).toBe('He called it "finished", then left.');
     });
 });
 

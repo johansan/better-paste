@@ -75,8 +75,8 @@ function createTerminalOptionsDefinitions(context: SettingsPageContext): Setting
                 key: 'terminalBulletMode',
                 defaultValue: DEFAULT_SETTINGS.terminalBulletMode,
                 options: {
-                    preserve: 'Leave them as they are',
-                    markdown: 'Convert to Markdown list items'
+                    markdown: 'Convert to Markdown list items',
+                    preserve: 'Leave them as they are'
                 }
             }
         },

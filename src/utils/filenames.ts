@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { moment } from 'obsidian';
+
 /** Characters Obsidian and the major filesystems reject in a file name. */
 const ILLEGAL_CHARACTERS = /[\\/:*?"<>|[\]#^]/g;
 
@@ -27,6 +29,15 @@ const FALLBACK_BASENAME = 'pasted-image';
 
 /** Basenames Windows reserves for devices, even when an extension is added. */
 const WINDOWS_RESERVED_NAME = /^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i;
+
+interface MomentDateFormatter {
+    (date: Date): { format: (pattern: string) => string };
+}
+
+/** Narrows Obsidian's Moment export, whose declaration does not expose its call signature. */
+function isMomentDateFormatter(value: unknown): value is MomentDateFormatter {
+    return typeof value === 'function';
+}
 
 /** Content types mapped to the extension we store them under. */
 const CONTENT_TYPE_EXTENSIONS: Record<string, string> = {
@@ -134,38 +145,17 @@ export function resolveExtension(contentType: string | undefined, url: string, a
 export interface FileNameTokens {
     /** Name taken from the URL, already sanitized. */
     name: string;
-    /** Host the image came from. */
-    host: string;
-    /** Local date as YYYY-MM-DD. */
-    date: string;
-    /** Local time as HHmmss. */
-    time: string;
-    /** Milliseconds since the epoch. */
-    timestamp: string;
 }
 
 /**
  * Builds the token values a filename template can reference. `fallbackName` is used when the
  * URL carries no usable name, which is how a clipboard bitmap contributes its own file name.
  */
-export function buildFileNameTokens(url: string, now: Date, fallbackName?: string): FileNameTokens {
-    const pad = (value: number, width = 2): string => String(value).padStart(width, '0');
-
-    let host = '';
-    try {
-        host = new URL(url).hostname.replace(/^www\./, '');
-    } catch {
-        host = '';
-    }
-
+export function buildFileNameTokens(url: string, fallbackName?: string): FileNameTokens {
     const fallback = fallbackName ? sanitizeFileName(fallbackName.replace(/\.[a-z0-9]+$/i, '')) : FALLBACK_BASENAME;
 
     return {
-        name: baseNameFromUrl(url) ?? fallback,
-        host: sanitizeFileName(host),
-        date: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`,
-        time: `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`,
-        timestamp: String(now.getTime())
+        name: baseNameFromUrl(url) ?? fallback
     };
 }
 
@@ -173,11 +163,12 @@ export function buildFileNameTokens(url: string, now: Date, fallbackName?: strin
  * Expands a filename template. Unknown tokens are left in place so a typo is visible
  * rather than silently producing an empty name.
  */
-export function applyFileNameTemplate(template: string, tokens: FileNameTokens): string {
-    const expanded = template.replace(/\{\{(\w+)\}\}/g, (match, key: string) => {
-        const value = tokens[key as keyof FileNameTokens];
-        return typeof value === 'string' ? value : match;
+export function applyFileNameTemplate(template: string, tokens: FileNameTokens, now: Date): string {
+    const datePattern = template.replace(/\{\{(\w+)\}\}/g, (match, key: string) => {
+        return `[${key === 'name' ? tokens.name : match}]`;
     });
+    if (!isMomentDateFormatter(moment)) throw new Error('Obsidian Moment formatter is unavailable');
+    const expanded = moment(now).format(datePattern);
 
     return sanitizeFileName(expanded);
 }

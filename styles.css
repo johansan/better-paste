@@ -41,6 +41,12 @@
     text-decoration: line-through;
 }
 
+.better-paste-filename-format input {
+    width: 18em;
+    max-width: 100%;
+    font-family: var(--font-monospace);
+}
+
 /* Live preview panes for the URL and terminal rules */
 .better-paste-preview {
     display: flex;

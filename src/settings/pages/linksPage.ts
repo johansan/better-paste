@@ -54,16 +54,16 @@ export function createLinkLandingDefinitions(context: SettingsPageContext): Sett
 
     return [
         {
-            name: 'Clean pasted links',
-            desc: cleaningExample(),
-            aliases: ['url', 'tracking', 'utm', 'parameters', 'query', 'site', 'domain', 'youtube', 'exception'],
-            control: { type: 'toggle', key: 'urlEnabled', defaultValue: DEFAULT_SETTINGS.urlEnabled }
-        },
-        {
             name: 'Fetch titles for pasted links',
             desc: 'When the clipboard contains only a non-image web address, fetch its page title and paste a Markdown link. Other selected text becomes the label without making a request. The original address is kept if the title cannot be fetched.',
             aliases: ['title', 'page', 'website', 'markdown link', 'download'],
             control: { type: 'toggle', key: 'fetchLinkTitles', defaultValue: DEFAULT_SETTINGS.fetchLinkTitles }
+        },
+        {
+            name: 'Clean pasted links',
+            desc: cleaningExample(),
+            aliases: ['url', 'tracking', 'utm', 'parameters', 'query', 'site', 'domain', 'youtube', 'exception'],
+            control: { type: 'toggle', key: 'urlEnabled', defaultValue: DEFAULT_SETTINGS.urlEnabled }
         },
         {
             name: 'Which parameters to remove',

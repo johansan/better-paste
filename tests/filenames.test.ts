@@ -116,21 +116,22 @@ describe('resolveExtension', () => {
 });
 
 describe('applyFileNameTemplate', () => {
-    const tokens = buildFileNameTokens('https://www.example.com/pics/holiday.png', new Date(2026, 7, 12, 9, 5, 3));
+    const now = new Date(2026, 7, 12, 9, 5, 3);
+    const tokens = buildFileNameTokens('https://www.example.com/pics/holiday.png');
 
-    it('builds tokens from the URL and clock', () => {
-        expect(tokens).toMatchObject({ name: 'holiday', host: 'example.com', date: '2026-08-12', time: '090503' });
+    it('builds the source name token from the URL', () => {
+        expect(tokens).toEqual({ name: 'holiday' });
     });
 
-    it('expands known tokens', () => {
-        expect(applyFileNameTemplate('{{date}} {{name}} from {{host}}', tokens)).toBe('2026-08-12 holiday from example.com');
+    it('expands the source name and Moment date syntax', () => {
+        expect(applyFileNameTemplate('{{name}}-YYYY-MM-DD', tokens, now)).toBe('holiday-2026-08-12');
     });
 
     it('leaves unknown tokens in place so a typo is visible', () => {
-        expect(applyFileNameTemplate('{{nope}}', tokens)).toBe('{{nope}}');
+        expect(applyFileNameTemplate('{{nope}}', tokens, now)).toBe('{{nope}}');
     });
 
     it('sanitizes the expanded result', () => {
-        expect(applyFileNameTemplate('a/b {{name}}', tokens)).toBe('ab holiday');
+        expect(applyFileNameTemplate('[copy]/{{name}}', tokens, now)).toBe('copyholiday');
     });
 });

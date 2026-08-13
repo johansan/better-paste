@@ -20,6 +20,27 @@
 // Only the members the tested code paths touch at import time are provided; anything
 // that performs real Obsidian work throws so a test can never silently depend on it.
 
+/** Moment subset used by filename tests. */
+export function moment(date: Date): { format: (pattern: string) => string } {
+    const pad = (value: number): string => String(value).padStart(2, '0');
+    const values: Record<string, string> = {
+        YYYY: String(date.getFullYear()),
+        MM: pad(date.getMonth() + 1),
+        DD: pad(date.getDate()),
+        HH: pad(date.getHours()),
+        mm: pad(date.getMinutes()),
+        ss: pad(date.getSeconds())
+    };
+
+    return {
+        format: (pattern: string): string =>
+            pattern.replace(/\[([^\]]*)\]|YYYY|MM|DD|HH|mm|ss/g, token => {
+                const literal = /^\[([^\]]*)\]$/.exec(token);
+                return literal ? literal[1] : (values[token] ?? token);
+            })
+    };
+}
+
 export class Notice {
     static readonly instances: Notice[] = [];
     hidden = false;

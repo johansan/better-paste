@@ -21,8 +21,9 @@ import { TFile } from 'obsidian';
 import type { App } from 'obsidian';
 import { ImageService } from '../src/paste/ImageService';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
+import type { BetterPasteSettings } from '../src/settings/types';
 
-function build() {
+function build(overrides: Partial<BetterPasteSettings> = {}) {
     const writes: { path: string; data: ArrayBuffer }[] = [];
     const existing = new Set<string>();
     const app = {
@@ -49,7 +50,8 @@ function build() {
         }
     } as unknown as App;
 
-    return { service: new ImageService(app, () => DEFAULT_SETTINGS), writes };
+    const settings = { ...DEFAULT_SETTINGS, ...overrides };
+    return { service: new ImageService(app, () => settings), writes };
 }
 
 describe('ImageService', () => {
@@ -61,6 +63,20 @@ describe('ImageService', () => {
         expect(result).toEqual({ text: '![[Attachments/pasted-image.png|a cat]]', downloaded: 1, failed: 0 });
         expect(writes).toHaveLength(1);
         expect(writes[0].data.byteLength).toBe(1);
+    });
+
+    it('uses the custom source name and Moment date format', async () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date(2026, 7, 13, 14, 5, 6));
+
+        try {
+            const { service, writes } = build({ imageFilenameFormat: 'custom', imageFilenameTemplate: '{{name}}-YYYY-MM-DD' });
+            await service.materializeImages('![](data:image/png;base64,AA==)', 'Notes/Test.md');
+
+            expect(writes[0].path).toBe('Attachments/pasted-image-2026-08-13.png');
+        } finally {
+            vi.useRealTimers();
+        }
     });
 
     it('keeps alt text together with a requested image size', async () => {

@@ -48,7 +48,7 @@ pastes as:
 https://support.claude.com/en/articles/16266773-how-claude-marks-ai-generated-content
 ```
 
-An optional title rule turns a pasted web address into a Markdown link using the page title. The address is pasted immediately, then replaced when the title arrives. Image addresses are left to image handling, and a failed request leaves the original address in place.
+Title fetching turns a pasted web address into a Markdown link using the page title. The address is pasted immediately, then replaced when the title arrives. Image addresses are left to image handling, and a failed request leaves the original address in place.
 
 **AI text.** `“The result was fine,” he said.` pastes as `"The result was fine," he said.` Curly quotes become straight, fancy dashes become hyphens, and the invisible characters that came along are gone.
 
@@ -60,7 +60,7 @@ An optional title rule turns a pasted web address into a Markdown link using the
 
 Better Paste is checked with [TypeScript](https://www.typescriptlang.org/), [ESLint](https://eslint.org/) with the official [Obsidian ESLint plugin](https://github.com/obsidianmd/eslint-plugin), [Stylelint](https://stylelint.io/), [Prettier](https://prettier.io/), [Vitest](https://vitest.dev/) and a dead code check before any change is merged. The build only runs when every check passes, and a warning is treated as an error.
 
-Better Paste runs locally. The one exception is downloading a picture that pasted content linked to. See [section 8](#8-network-disclosure) for the full account.
+Better Paste runs locally apart from requests to download pasted pictures, fetch pasted link titles, and load dialog artwork. See [section 8](#8-network-disclosure) for the full account.
 
 <br/>
 
@@ -90,29 +90,27 @@ Alt text from a downloaded Markdown or HTML image is kept on the local embed. If
 
 ## 5 Settings
 
-Sixteen settings, arranged as a landing page with three sub pages. Anything with only one sensible answer is simply how the plugin behaves, rather than a question you have to answer.
+Seventeen settings, arranged as a landing page with three sub pages. Anything with only one sensible answer is simply how the plugin behaves, rather than a question you have to answer.
 
 ### 5.1 Behavior
 
 - **Clean up every paste** applies the rules whenever you paste. Turn it off to use the commands only.
-- **Trim space around the paste** drops the blank lines and stray spaces that come with text copied from a web page or a PDF. Only the ends. The middle is left alone.
 - **Show a notice when a paste is changed** gives a one line summary. Failures are reported whatever this is set to.
 
 ### 5.2 Images
 
-Saved pictures go wherever the vault files attachments, which is Obsidian's own setting under Files and links. The plugin does not add a second place to answer that.
+**Save pasted images into the vault** saves Safari's "Copy image", pictures inside copied web content, and standalone image addresses as local attachments. Saved pictures go wherever the vault files attachments, which is Obsidian's own setting under Files and links. The plugin does not add a second place to answer that.
 
 Behind **Image handling**:
 
-- **File names** picks a name from the source, a name and date, or a date and time.
-- **Pasting an image URL** decides what happens when the thing you pasted is the picture itself, such as the address from "Copy image address". Either save the picture and show it, or leave the link alone.
+- **File names** uses the source name or a custom format. A custom format can combine `{{name}}` with Moment date syntax, such as `{{name}}-YYYY-MM-DD`. The setting shows the resulting filename below the field.
 - **Image width property** names the note property that sets how wide pasted images are. See [section 6](#6-per-note-control).
 
 ### 5.3 Links
 
 **Which parameters to remove** offers every parameter except where a site rule keeps it, or only the parameters known to be tracking.
 
-**Fetch titles for pasted links** turns a clipboard containing one non-image web address into a Markdown link using the page title. When other text is selected, that text becomes the link label without making a request. It is off by default because fetching a title makes a request to the pasted address. Addresses inside prose and links that already carry their own label are left alone.
+**Fetch titles for pasted links** turns a clipboard containing one non-image web address into a Markdown link using the page title. When other text is selected, that text becomes the link label without making a request. It is on by default. Addresses inside prose and links that already carry their own label are left alone.
 
 Behind **Rules for preserving parameters**, the full rule list and a live tester:
 
@@ -136,14 +134,19 @@ A site rule is a whitelist in **every parameter** mode. In **only tracking** mod
 Behind **Terminal text handling**:
 
 - **When to rejoin a broken line** offers three levels. _Only when the next line is indented_ is what most terminals do and what keeps ordinary multi line text safe. _Whenever the line above looks full_ suits tools that wrap without indenting. _Never rejoin_ leaves every line break alone and only strips escape codes and indentation, which suits column aligned output such as `git log --graph` where the breaks are the layout.
-- **Bullet characters** either leaves `•` alone or converts it to a real Markdown list item that folds and indents.
+- **Bullet characters** converts `•` to a real Markdown list item that folds and indents by default, or can leave the original character alone.
 - A live tester.
 
 The wrap column is worked out from the text itself. A terminal breaks every long line at the same place, so wrapped lines cluster just below it. When several lines sit near the longest, that length is the wrap column. Fenced code is excluded from the measurement, so a long line in a log dump does not stop the prose around it from being rejoined.
 
 The rule leaves text alone entirely unless something identifies it as terminal output, meaning it carried escape codes or a paragraph was actually rejoined. Pasted code keeps its indentation and Markdown's two space line break survives.
 
-### 5.5 AI cleanup
+### 5.5 Text processing
+
+- **Commas and quotes** can leave comma placement unchanged, put commas inside closing quotation marks, or put them outside. It does nothing by default because comma placement is a style preference.
+- **Trim surrounding whitespace** drops blank lines and stray spaces from the start and end of pasted text. The middle is left alone.
+
+### 5.6 AI cleanup
 
 - **Clean up AI text** removes the characters that look ordinary but are not. A no-break space becomes a normal space and selected zero width characters are dropped. The same characters are cleaned up whatever wrote them.
 - **Use plain punctuation** turns long dashes into `-`, and `“ ” ‘ ’` into `"` and `'`. Straight quotes survive code and search better than curly ones. This one is a matter of taste rather than tidiness, so switch it off if you set your punctuation on purpose.
@@ -199,7 +202,7 @@ Better Paste makes network requests in exactly three situations.
 
 **Pasting a picture.** When you paste content that references a picture by http(s) address, such as a Safari page selection, a Markdown image link, or a bare link ending in `.png`, the plugin downloads that picture so the note holds a local copy. The address always comes from what you pasted. The plugin never chooses one, and link cleaning deliberately leaves those addresses untouched so a signed link keeps the token it needs. The request uses Obsidian's own `requestUrl`.
 
-**Fetching a link title.** When **Fetch titles for pasted links** is on and the clipboard contains one non-image web address, the plugin fetches that address and reads the HTML page title. A request that fails, takes longer than 10 seconds, returns a non-HTML response, or has no title leaves the pasted address unchanged. This setting is off by default.
+**Fetching a link title.** When **Fetch titles for pasted links** is on and the clipboard contains one non-image web address, the plugin fetches that address and reads the HTML page title. A request that fails, takes longer than 10 seconds, returns a non-HTML response, or has no title leaves the pasted address unchanged. This setting is on by default.
 
 **Dialog artwork.** The welcome dialog and the What's new dialog each show a picture, loaded from this repository at `raw.githubusercontent.com` when the dialog opens. The welcome dialog opens automatically on first enable, and the What's new dialog can open automatically after an update. Nothing is sent with the request beyond what fetching any picture involves, and both dialogs simply leave the picture out when it cannot be fetched. The pictures are not bundled because Obsidian installs only `main.js`, `manifest.json` and `styles.css`.
 

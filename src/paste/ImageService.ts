@@ -21,7 +21,7 @@ import type { App, TFile } from 'obsidian';
 import { findImageReferences, isDataImageUri, isHttpUrl, replaceImageReferences } from './imageReferences';
 import type { ImageReference } from './imageReferences';
 import { applyFileNameTemplate, buildFileNameTokens, resolveExtension } from '../utils/filenames';
-import { FILENAME_TEMPLATES, IMAGE_EXTENSIONS, IMAGE_TIMEOUT_SECONDS, MAX_IMAGE_SIZE_MB } from '../settings/constants';
+import { DEFAULT_IMAGE_FILENAME_TEMPLATE, IMAGE_EXTENSIONS, IMAGE_TIMEOUT_SECONDS, MAX_IMAGE_SIZE_MB } from '../settings/constants';
 import { logWarning } from '../utils/logger';
 import type { BetterPasteSettings } from '../settings/types';
 
@@ -67,7 +67,7 @@ export class ImageService {
         if (this.disposed) return false;
         const settings = this.getSettings();
         if (!settings.imagesEnabled) return false;
-        return findImageReferences(text, settings).length > 0;
+        return findImageReferences(text).length > 0;
     }
 
     /**
@@ -79,7 +79,7 @@ export class ImageService {
         const settings = this.getSettings();
         if (!settings.imagesEnabled) return { text, downloaded: 0, failed: 0 };
 
-        const references = findImageReferences(text, settings);
+        const references = findImageReferences(text);
         if (references.length === 0) return { text, downloaded: 0, failed: 0 };
 
         const embeds = new Map<number, string>();
@@ -236,8 +236,9 @@ export class ImageService {
         settings: BetterPasteSettings,
         fallbackName?: string
     ): Promise<TFile | null> {
-        const tokens = buildFileNameTokens(url, new Date(), fallbackName);
-        const baseName = applyFileNameTemplate(FILENAME_TEMPLATES[settings.imageFilenameFormat], tokens);
+        const tokens = buildFileNameTokens(url, fallbackName);
+        const template = settings.imageFilenameFormat === 'custom' ? settings.imageFilenameTemplate : DEFAULT_IMAGE_FILENAME_TEMPLATE;
+        const baseName = applyFileNameTemplate(template, tokens, new Date());
         const fileName = `${baseName}.${extension}`;
 
         const save = this.saveQueue.then(async () => {

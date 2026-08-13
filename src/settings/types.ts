@@ -39,14 +39,10 @@ export type TerminalRejoinMode = 'indented' | 'any' | 'never';
 export type TerminalBulletMode = 'preserve' | 'markdown';
 
 /** Naming scheme for saved images. */
-export type ImageFilenameFormat = 'source' | 'source-date' | 'date-time';
+export type ImageFilenameFormat = 'source' | 'custom';
 
-/**
- * What a pasted link that points straight at a picture turns into.
- * - 'image': download the picture and show it
- * - 'link': leave the link alone
- */
-export type ImageLinkPaste = 'image' | 'link';
+/** Placement of a comma next to a closing double quotation mark. */
+export type TextCommaPlacement = 'none' | 'inside' | 'outside';
 
 export interface BetterPasteSettings {
     /* Pasting */
@@ -55,8 +51,6 @@ export interface BetterPasteSettings {
     interceptPaste: boolean;
     /** Show a notice summarising what a paste changed. Failures are always reported. */
     showNotices: boolean;
-    /** Remove blank space from the start and end of whatever was pasted. */
-    trimPaste: boolean;
 
     /* Images */
 
@@ -64,8 +58,8 @@ export interface BetterPasteSettings {
     imagesEnabled: boolean;
     /** Naming scheme for saved images. */
     imageFilenameFormat: ImageFilenameFormat;
-    /** What a pasted link that points straight at a picture turns into. */
-    imageLinkPaste: ImageLinkPaste;
+    /** Custom source-name and Moment date format for saved image filenames. */
+    imageFilenameTemplate: string;
     /** Frontmatter property setting the width of images pasted into a note. Blank disables it. */
     imageSizeProperty: string;
 
@@ -91,6 +85,13 @@ export interface BetterPasteSettings {
     terminalRejoinMode: TerminalRejoinMode;
     /** What happens to bullet characters. */
     terminalBulletMode: TerminalBulletMode;
+
+    /* Text processing */
+
+    /** Remove blank space from the start and end of whatever was pasted. */
+    trimPaste: boolean;
+    /** Placement of a comma next to a closing double quotation mark. */
+    textCommaPlacement: TextCommaPlacement;
 
     /* AI text */
 

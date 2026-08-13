@@ -20,6 +20,7 @@ import { Notice, parseYaml } from 'obsidian';
 import type { Editor, MarkdownFileInfo, MarkdownView, TFile } from 'obsidian';
 import { runTextPipeline } from '../transforms';
 import { cleanAiText } from '../transforms/aiText';
+import { applyCommaPlacement } from '../transforms/textProcessing';
 import { buildUrlCleanupOptions, cleanUrlsInText } from '../transforms/urlCleanup';
 import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './imageReferences';
 import { extractFrontmatterBlock, isInsideVerbatimContext, isPasteDisabledForNote, resolveImageSize } from './noteOptions';
@@ -44,6 +45,7 @@ const TITLE_PROGRESS_INTERVAL_MS = 500;
 interface PasteSummary {
     aiTextCleaned: boolean;
     terminalCleaned: boolean;
+    textProcessed: boolean;
     urlsCleaned: number;
     imagesDownloaded: number;
     imagesFailed: number;
@@ -207,6 +209,7 @@ export class PasteService {
         const summary: PasteSummary = {
             aiTextCleaned: result.aiTextCleaned,
             terminalCleaned: result.terminalCleaned,
+            textProcessed: result.textProcessed,
             urlsCleaned: result.urlsCleaned,
             imagesDownloaded: 0,
             imagesFailed: 0
@@ -245,6 +248,7 @@ export class PasteService {
         const summary: PasteSummary = {
             aiTextCleaned: false,
             terminalCleaned: false,
+            textProcessed: false,
             urlsCleaned: 0,
             imagesDownloaded: 0,
             imagesFailed: 0
@@ -311,6 +315,7 @@ export class PasteService {
         const summary: PasteSummary = {
             aiTextCleaned: result.aiTextCleaned,
             terminalCleaned: result.terminalCleaned,
+            textProcessed: result.textProcessed,
             urlsCleaned: result.urlsCleaned,
             imagesDownloaded: 0,
             imagesFailed: 0
@@ -358,6 +363,7 @@ export class PasteService {
         this.notify({
             aiTextCleaned: result.aiTextCleaned,
             terminalCleaned: result.terminalCleaned,
+            textProcessed: result.textProcessed,
             urlsCleaned: result.urlsCleaned,
             imagesDownloaded: 0,
             imagesFailed: 0
@@ -371,7 +377,7 @@ export class PasteService {
      */
     private scheduleRichPostProcess(editor: Editor, info: MarkdownView | MarkdownFileInfo): void {
         const settings = this.getSettings();
-        if (!settings.aiTextEnabled && !settings.urlEnabled && !settings.imagesEnabled) return;
+        if (!settings.aiTextEnabled && settings.textCommaPlacement === 'none' && !settings.urlEnabled && !settings.imagesEnabled) return;
 
         const targetFile = info.file;
         const targetPath = targetFile?.path ?? '';
@@ -404,6 +410,7 @@ export class PasteService {
         const summary: PasteSummary = {
             aiTextCleaned: false,
             terminalCleaned: false,
+            textProcessed: false,
             urlsCleaned: 0,
             imagesDownloaded: 0,
             imagesFailed: 0
@@ -419,10 +426,16 @@ export class PasteService {
             text = cleaned.text;
         }
 
+        if (settings.textCommaPlacement !== 'none') {
+            const processed = applyCommaPlacement(text, settings.textCommaPlacement);
+            summary.textProcessed = processed.changed;
+            text = processed.text;
+        }
+
         if (settings.urlEnabled) {
             // Same protection as the plain-text pipeline: an image about to be fetched
             // keeps its query, since a signed link needs it
-            const protect = settings.imagesEnabled ? imageReferenceRanges(text, settings) : [];
+            const protect = settings.imagesEnabled ? imageReferenceRanges(text) : [];
             const cleaned = cleanUrlsInText(text, buildUrlCleanupOptions(settings), protect);
             text = cleaned.text;
             summary.urlsCleaned = cleaned.count;
@@ -691,6 +704,7 @@ export class PasteService {
         const parts: string[] = [];
         if (summary.aiTextCleaned) parts.push('tidied AI text');
         if (summary.terminalCleaned) parts.push('cleaned up terminal text');
+        if (summary.textProcessed) parts.push('adjusted text style');
         if (summary.urlsCleaned > 0) parts.push(`cleaned ${summary.urlsCleaned} URL${summary.urlsCleaned === 1 ? '' : 's'}`);
         if (summary.imagesDownloaded > 0) {
             parts.push(`saved ${summary.imagesDownloaded} image${summary.imagesDownloaded === 1 ? '' : 's'}`);

@@ -37,6 +37,9 @@ import { SHIPPED_DOMAIN_RULES } from '../src/settings/constants';
  */
 const STORED_STATE_KEYS = ['lastShownVersion'];
 
+/** Settings owned by a custom-rendered row rather than a declarative control. */
+const CUSTOM_RENDER_SETTING_KEYS = ['imageFilenameTemplate'];
+
 /** Minimal plugin double exposing only what the setting tab touches. */
 function fakePlugin(overrides: Partial<BetterPasteSettings> = {}) {
     const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, ...overrides };
@@ -121,14 +124,16 @@ describe('settings tree', () => {
         }
     });
 
-    it('every setting has a control somewhere in the tree', () => {
+    it('every setting has a control or custom row somewhere in the tree', () => {
         const covered = new Set(
             controlRows(tab).map(row => {
                 const key = row.control.key;
                 return key.endsWith('.text') ? key.slice(0, -'.text'.length) : key;
             })
         );
-        const uncovered = Object.keys(DEFAULT_SETTINGS).filter(key => !covered.has(key) && !STORED_STATE_KEYS.includes(key));
+        const uncovered = Object.keys(DEFAULT_SETTINGS).filter(
+            key => !covered.has(key) && !CUSTOM_RENDER_SETTING_KEYS.includes(key) && !STORED_STATE_KEYS.includes(key)
+        );
         expect(uncovered).toEqual([]);
     });
 
@@ -158,12 +163,61 @@ describe('settings tree', () => {
             .getSettingDefinitions()
             .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
 
-        expect(groups.map(group => group.heading)).toEqual([undefined, 'Behavior', 'Images', 'Links', 'Terminal text', 'AI cleanup']);
+        expect(groups.map(group => group.heading)).toEqual([
+            undefined,
+            'Behavior',
+            'Images',
+            'Links',
+            'Terminal text',
+            'Text processing',
+            'AI cleanup'
+        ]);
+    });
+
+    it('puts surrounding whitespace trimming under Text processing', () => {
+        const groups = tab
+            .getSettingDefinitions()
+            .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
+        const behavior = groups.find(group => group.heading === 'Behavior');
+        const textProcessing = groups.find(group => group.heading === 'Text processing');
+
+        expect(flatten([...(behavior?.items ?? [])]).map(row => row.name)).not.toContain('Trim surrounding whitespace');
+        expect(flatten([...(textProcessing?.items ?? [])]).map(row => row.name)).toContain('Trim surrounding whitespace');
     });
 
     it('keeps the landing page short', () => {
         // The point of the sub-pages is that the first screen stays scannable
-        expect(landingRows(tab.getSettingDefinitions()).length).toBeLessThanOrEqual(15);
+        expect(landingRows(tab.getSettingDefinitions()).length).toBeLessThanOrEqual(16);
+    });
+
+    it('puts title fetching above link cleaning', () => {
+        const names = flatten(tab.getSettingDefinitions()).map(row => row.name);
+        expect(names.indexOf('Fetch titles for pasted links')).toBeLessThan(names.indexOf('Clean pasted links'));
+    });
+
+    it('puts Markdown conversion first in the bullet dropdown', () => {
+        const row = controlRows(tab).find(candidate => candidate.control.key === 'terminalBulletMode');
+        expect(row?.control.type).toBe('dropdown');
+        if (row?.control.type !== 'dropdown') throw new Error('Bullet characters is not a dropdown');
+        expect(Object.keys(row.control.options)[0]).toBe('markdown');
+    });
+
+    it('offers source and custom image filename formats', () => {
+        const row = controlRows(tab).find(candidate => candidate.control.key === 'imageFilenameFormat');
+        expect(row?.control.type).toBe('dropdown');
+        if (row?.control.type !== 'dropdown') throw new Error('File names is not a dropdown');
+        expect(row.control.options).toEqual({ source: 'Name from source', custom: 'Custom format' });
+    });
+
+    it('offers all comma placement choices', () => {
+        const row = controlRows(tab).find(candidate => candidate.control.key === 'textCommaPlacement');
+        expect(row?.control.type).toBe('dropdown');
+        if (row?.control.type !== 'dropdown') throw new Error('Commas and quotes is not a dropdown');
+        expect(row.control.options).toEqual({
+            none: 'Do nothing',
+            inside: 'Comma inside quotes',
+            outside: 'Comma outside quotes'
+        });
     });
 
     it('puts the detail on sub-pages, declared so search can still reach it', () => {
@@ -283,6 +337,14 @@ describe('dependent settings', () => {
     it('hides the image detail when the rule is off', () => {
         expect(isVisible(pageFor('Image handling', { imagesEnabled: false }))).toBe(false);
         expect(isVisible(pageFor('Image handling', { imagesEnabled: true }))).toBe(true);
+    });
+
+    it('shows the custom filename row only for the custom format', () => {
+        const customRow = (settings: Partial<BetterPasteSettings>) =>
+            flatten(makeTab(fakePlugin(settings)).getSettingDefinitions()).find(row => row.name === 'Custom format');
+
+        expect(isVisible(customRow({ imageFilenameFormat: 'source' }))).toBe(false);
+        expect(isVisible(customRow({ imageFilenameFormat: 'custom' }))).toBe(true);
     });
 
     it('hides the link detail when the rule is off', () => {

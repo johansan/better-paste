@@ -97,9 +97,9 @@ describe('cleanTerminalText', () => {
             [
                 'I will remove the extra debate confirmation, then trace the menu main keyboard flows for other small, low-risk friction points. I will keep destructive actions explicit and verify the interaction behavior with the existing tests or a focused harness.',
                 '',
-                '• The extra step is isolated to the list Enter handler, so the core change is straightforward. While tracing adjacent flows, I found two likely friction points worth validating: selection can jump after the 20-second refresh, and pasted Discord items require the uncommon Ctrl-D shortcut to save. I am checking the reference UI and current data behavior before changing either.',
+                '- The extra step is isolated to the list Enter handler, so the core change is straightforward. While tracing adjacent flows, I found two likely friction points worth validating: selection can jump after the 20-second refresh, and pasted Discord items require the uncommon Ctrl-D shortcut to save. I am checking the reference UI and current data behavior before changing either.',
                 '',
-                '• I am making three contained usability changes: Enter will launch a new debate immediately, busy screens will paint before any CLI work begins, and auto-refresh will preserve the selected issue by ID instead of merely preserving its row number. I am leaving confirmations in place only for removing local items, since that action changes stored data.'
+                '- I am making three contained usability changes: Enter will launch a new debate immediately, busy screens will paint before any CLI work begins, and auto-refresh will preserve the selected issue by ID instead of merely preserving its row number. I am leaving confirmations in place only for removing local items, since that action changes stored data.'
             ].join('\n')
         );
         expect(result.changed).toBe(true);
@@ -198,9 +198,14 @@ describe('cleanTerminalText', () => {
         expect(cleanTerminalText('a\n\n\n\nb', options()).text).toBe('a\n\n\n\nb');
     });
 
-    it('converts bullets to Markdown list syntax when asked', () => {
+    it('converts bullets to Markdown list syntax by default', () => {
         const input = '• First item\n• Second item';
-        expect(cleanTerminalText(input, options({ terminalBulletMode: 'markdown' })).text).toBe('- First item\n- Second item');
+        expect(cleanTerminalText(input, options()).text).toBe('- First item\n- Second item');
+    });
+
+    it('preserves bullet characters when asked', () => {
+        const input = '• First item\n• Second item';
+        expect(cleanTerminalText(input, options({ terminalBulletMode: 'preserve' })).text).toBe(input);
     });
 
     it('leaves bullets inside fenced code untouched', () => {

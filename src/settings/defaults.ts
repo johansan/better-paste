@@ -17,26 +17,29 @@
  */
 
 import type { BetterPasteSettings } from './types';
+import { DEFAULT_IMAGE_FILENAME_TEMPLATE } from './constants';
 
 export const DEFAULT_SETTINGS: BetterPasteSettings = {
     interceptPaste: true,
     showNotices: true,
-    trimPaste: true,
 
     imagesEnabled: true,
     imageFilenameFormat: 'source',
-    imageLinkPaste: 'image',
+    imageFilenameTemplate: DEFAULT_IMAGE_FILENAME_TEMPLATE,
     imageSizeProperty: 'image-width',
 
     urlEnabled: true,
-    fetchLinkTitles: false,
+    fetchLinkTitles: true,
     urlStripMode: 'all',
     // Empty means "use the shipped rules unchanged"; entries here are merged over them
     urlDomainRules: [],
 
     terminalEnabled: true,
     terminalRejoinMode: 'indented',
-    terminalBulletMode: 'preserve',
+    terminalBulletMode: 'markdown',
+
+    trimPaste: true,
+    textCommaPlacement: 'none',
 
     aiTextEnabled: true,
     aiTextPlainPunctuation: true,

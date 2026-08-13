@@ -18,6 +18,7 @@
 
 import { normalizeInvisibleCharacters, replacePunctuation } from './aiText';
 import { cleanTerminalText } from './terminalText';
+import { applyCommaPlacement } from './textProcessing';
 import { buildUrlCleanupOptions, cleanUrlsInText, httpUrlRanges } from './urlCleanup';
 import { imageReferenceRanges } from '../paste/imageReferences';
 import type { BetterPasteSettings } from '../settings/types';
@@ -30,6 +31,8 @@ export interface TextPipelineResult {
     aiTextCleaned: boolean;
     /** True when terminal cleanup modified the text. */
     terminalCleaned: boolean;
+    /** True when a Text processing rule modified the text. */
+    textProcessed: boolean;
     /** Number of URLs that were cleaned. */
     urlsCleaned: number;
 }
@@ -50,7 +53,7 @@ function trimPasteEdges(text: string): string {
  * - Invisible characters go first. A no-break space is not whitespace to a regular
  *   expression, so leaving one in would defeat the blank-line and indentation detection
  *   that the terminal rule depends on.
- * - Punctuation goes last. A hyphen is a list marker, so converting a long dash early would
+ * - AI punctuation runs after structural rules. A hyphen is a list marker, so converting a long dash early would
  *   make the terminal rule read that line as a bullet, refuse to rejoin the paragraph, and
  *   leave the sentence rendering as a list item.
  *
@@ -61,6 +64,7 @@ export function runTextPipeline(input: string, settings: BetterPasteSettings): T
     let text = input;
     let aiTextCleaned = false;
     let terminalCleaned = false;
+    let textProcessed = false;
     let urlsCleaned = 0;
 
     if (settings.aiTextEnabled) {
@@ -78,7 +82,7 @@ export function runTextPipeline(input: string, settings: BetterPasteSettings): T
     if (settings.urlEnabled) {
         // Anything that is about to be downloaded as an image is off limits to URL
         // cleaning, which would otherwise strip the token out of a signed link
-        const protect = settings.imagesEnabled ? imageReferenceRanges(text, settings) : [];
+        const protect = settings.imagesEnabled ? imageReferenceRanges(text) : [];
         const result = cleanUrlsInText(text, buildUrlCleanupOptions(settings), protect);
         urlsCleaned = result.count;
         text = result.text;
@@ -90,8 +94,14 @@ export function runTextPipeline(input: string, settings: BetterPasteSettings): T
         text = result.text;
     }
 
+    if (settings.textCommaPlacement !== 'none') {
+        const result = applyCommaPlacement(text, settings.textCommaPlacement);
+        textProcessed = result.changed;
+        text = result.text;
+    }
+
     // Last, so it also clears whatever the rules above left at the edges
     if (settings.trimPaste) text = trimPasteEdges(text);
 
-    return { text, changed: text !== input, aiTextCleaned, terminalCleaned, urlsCleaned };
+    return { text, changed: text !== input, aiTextCleaned, terminalCleaned, textProcessed, urlsCleaned };
 }
