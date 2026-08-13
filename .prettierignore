@@ -1,5 +1,6 @@
 node_modules
 main.js
+release-notes.md
 coverage
 .obsidian
 LICENSE

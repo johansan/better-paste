@@ -176,13 +176,11 @@ describe('settings tree', () => {
         }
     });
 
-    it('shows the state of a sub-page on its link', () => {
+    it('shows the site count on its sub-page link', () => {
         const found = pages(tab.getSettingDefinitions());
         const sites = found.find(page => page.name === 'Rules for preserving parameters');
-        const terminal = found.find(page => page.name === 'Terminal text handling');
 
         expect(typeof sites?.displayValue === 'function' ? sites.displayValue() : sites?.displayValue).toMatch(/^\d+ sites$/);
-        expect(typeof terminal?.displayValue === 'function' ? terminal.displayValue() : terminal?.displayValue).toBe('Indented lines only');
     });
 
     it('gives every master toggle search terms for what it hides', () => {
@@ -242,9 +240,13 @@ describe('settings values', () => {
         await tab.setControlValue('urlDomainRules.text', kept);
 
         const shown = String(tab.getControlValue('urlDomainRules.text'));
+        const sites = pages(tab.getSettingDefinitions()).find(page => page.name === 'Rules for preserving parameters');
+        const status = typeof sites?.status === 'function' ? sites.status() : sites?.status;
+        expect(plugin.settings.urlDomainRules).toEqual(['!google.*']);
         expect(shown.split('\n')).not.toContain('google.* | q, tbm, hl');
         expect(shown).toContain('maps.google.* | q, ll, z');
         expect(shown).toContain('docs.google.*');
+        expect(status).toBeNull();
     });
 
     it('round-trips an unedited list to no stored changes', async () => {
@@ -303,5 +305,12 @@ describe('dependent settings', () => {
         const before = (tab as unknown as { refreshCount: number }).refreshCount;
         await tab.setControlValue('imagesEnabled', false);
         expect((tab as unknown as { refreshCount: number }).refreshCount).toBe(before + 1);
+    });
+
+    it('does not rebuild the terminal tester when its mode changes', async () => {
+        const tab = makeTab(fakePlugin());
+        const before = (tab as unknown as { updateCount: number }).updateCount;
+        await tab.setControlValue('terminalRejoinMode', 'any');
+        expect((tab as unknown as { updateCount: number }).updateCount).toBe(before);
     });
 });

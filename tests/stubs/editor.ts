@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Editor, EditorPosition } from 'obsidian';
+import type { Editor, EditorPosition, EditorSelection } from 'obsidian';
 
 /**
  * A document model implementing the handful of Editor methods PasteService uses.
@@ -47,6 +47,10 @@ export class FakeEditor {
         if (which === 'to') return this.offsetToPos(Math.max(this.anchor, this.head));
         if (which === 'anchor') return this.offsetToPos(this.anchor);
         return this.offsetToPos(this.head);
+    }
+
+    listSelections(): EditorSelection[] {
+        return [{ anchor: this.offsetToPos(this.anchor), head: this.offsetToPos(this.head) }];
     }
 
     setCursor(pos: EditorPosition): void {

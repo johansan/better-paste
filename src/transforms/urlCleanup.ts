@@ -61,7 +61,7 @@ export function buildUrlCleanupOptions(settings: Pick<BetterPasteSettings, 'urlS
 const URL_PATTERN = /https?:\/\/[^\s<>"`\\\u201c\u201d]+/gi;
 
 /** Punctuation that is almost always sentence punctuation rather than part of the URL. */
-const TRAILING_PUNCTUATION = new Set(['.', ',', ';', ':', '!', '?', '"', "'", '`']);
+const TRAILING_PUNCTUATION = new Set(['.', ',', ';', ':', '!', '?', '"', "'", '`', '\u2018', '\u2019', '\u201A', '\u201B']);
 
 /** Closing brackets that only belong to the URL when the URL also contains their opening partner. */
 const CLOSING_BRACKETS: Record<string, string> = {
@@ -241,7 +241,9 @@ export function diffDomainRules(lines: readonly string[]): string[] {
     const shipped = new Map<string, DomainRule>();
     for (const rule of parseDomainRules(SHIPPED_DOMAIN_RULES)) shipped.set(rule.domain, rule);
 
-    const removals = [...shipped.keys()].filter(domain => !shown.has(domain)).map(domain => `!${domain}`);
+    const removals = [...shipped.values()]
+        .filter(rule => !shown.has(rule.domain))
+        .map(rule => `!${rule.anyTld ? `${rule.domain}.*` : rule.domain}`);
 
     const additions = [...shown.values()]
         .filter(rule => {

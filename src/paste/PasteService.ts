@@ -152,6 +152,10 @@ export class PasteService {
         const settings = this.getSettings();
         if (!settings.interceptPaste) return false;
 
+        // Async work tracks one inserted range. Leave multi-selection pastes to Obsidian so
+        // every cursor receives the native paste instead of only one range being rewritten.
+        if (editor.listSelections().length !== 1) return false;
+
         // A note or Markdown code can opt out. Explicit commands deliberately ignore this:
         // if the user asks for the rules by name, they get them.
         if (this.shouldLeaveAlone(editor)) return false;

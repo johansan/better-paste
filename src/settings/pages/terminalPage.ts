@@ -20,14 +20,6 @@ import type { Setting, SettingGroupItem } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../defaults';
 import { runTextPipeline } from '../../transforms';
 import type { SettingsPageContext } from './context';
-import type { TerminalRejoinMode } from '../types';
-
-/** What each rejoin mode is called on the page link. */
-const REJOIN_SUMMARY: Record<TerminalRejoinMode, string> = {
-    indented: 'Indented lines only',
-    any: 'Any wrapped line',
-    never: 'Never'
-};
 
 /** Sample text shown in the tester before the user types their own. */
 const TERMINAL_SAMPLE = [
@@ -51,7 +43,6 @@ export function createTerminalLandingDefinitions(context: SettingsPageContext): 
             name: 'Terminal text handling',
             desc: 'Rejoin conditions and bullet characters.',
             visible: enabled,
-            displayValue: () => REJOIN_SUMMARY[context.settings().terminalRejoinMode],
             items: createTerminalOptionsDefinitions(context)
         }
     ];

@@ -158,6 +158,7 @@ describe('findDomainRule', () => {
 describe('trimUrlTail', () => {
     it('drops sentence punctuation', () => {
         expect(trimUrlTail('https://example.com/a.')).toBe('https://example.com/a');
+        expect(trimUrlTail('https://example.com/a\u2019')).toBe('https://example.com/a');
     });
 
     it('drops an unbalanced closing parenthesis', () => {
@@ -197,6 +198,12 @@ describe('cleanUrl', () => {
 
     it('keeps the Hacker News item id', () => {
         expect(cleanUrl('https://news.ycombinator.com/item?id=123456', options())).toBe('https://news.ycombinator.com/item?id=123456');
+    });
+
+    it('keeps the page title in Wikipedia history links', () => {
+        expect(cleanUrl('https://en.wikipedia.org/w/index.php?title=Obsidian_(software)&action=history', options())).toBe(
+            'https://en.wikipedia.org/w/index.php?title=Obsidian_(software)&action=history'
+        );
     });
 
     it('returns non-http URLs untouched', () => {
@@ -261,6 +268,12 @@ describe('cleanUrlsInText', () => {
     it('cleans a URL embedded in prose without eating the sentence period', () => {
         const result = cleanUrlsInText('See https://example.com/a?utm_source=x. Thanks!', options());
         expect(result.text).toBe('See https://example.com/a. Thanks!');
+        expect(result.count).toBe(1);
+    });
+
+    it('cleans a URL inside curly single quotes without eating the closing quote', () => {
+        const result = cleanUrlsInText('See \u2018https://example.com/a?utm_source=x\u2019 now.', options());
+        expect(result.text).toBe('See \u2018https://example.com/a\u2019 now.');
         expect(result.count).toBe(1);
     });
 

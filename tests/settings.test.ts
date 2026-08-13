@@ -240,6 +240,15 @@ describe('runTextPipeline', () => {
         );
     });
 
+    it('straightens curly single quotes around a URL without losing the closing quote', () => {
+        expect(runTextPipeline('See \u2018https://example.com/page?utm_source=news\u2019 now.', DEFAULT_SETTINGS).text).toBe(
+            "See 'https://example.com/page' now."
+        );
+        expect(runTextPipeline('See \u2018https://example.com/page\u2019 now.', DEFAULT_SETTINGS).text).toBe(
+            "See 'https://example.com/page' now."
+        );
+    });
+
     it('skips a rule that is turned off', () => {
         expect(runTextPipeline('https://example.com/a?utm_source=x', { ...DEFAULT_SETTINGS, urlEnabled: false }).text).toBe(
             'https://example.com/a?utm_source=x'

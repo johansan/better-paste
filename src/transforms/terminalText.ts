@@ -17,6 +17,7 @@
  */
 
 import { stripAnsi } from './ansi';
+import { markdownCodeRanges, overlapsRange } from './markdownRanges';
 import { LIST_MARKERS, MIN_WRAP_WIDTH, WRAP_TOLERANCE } from '../settings/constants';
 import type { BetterPasteSettings } from '../settings/types';
 
@@ -185,6 +186,21 @@ function toMarkdownBullet(line: string): string {
     return `${indent}- ${body}`;
 }
 
+/** Converts terminal bullets without rewriting fenced, inline, or indented Markdown code. */
+function convertMarkdownBullets(text: string): string {
+    const codeRanges = markdownCodeRanges(text);
+    let offset = 0;
+
+    return text
+        .split('\n')
+        .map(line => {
+            const start = offset;
+            offset += line.length + 1;
+            return overlapsRange(codeRanges, start, start + 1) ? line : toMarkdownBullet(line);
+        })
+        .join('\n');
+}
+
 interface Paragraph {
     /** Lines belonging to this paragraph, in order. */
     lines: string[];
@@ -311,10 +327,7 @@ export function cleanTerminalText(input: string, options: TerminalCleanupOptions
         // Converting bullets is a separate, explicit request, so it still applies. The
         // whitespace work does not.
         if (options.terminalBulletMode !== 'markdown') return { text: input, changed: false };
-        const converted = input
-            .split('\n')
-            .map(line => toMarkdownBullet(line))
-            .join('\n');
+        const converted = convertMarkdownBullets(input);
         return { text: converted, changed: converted !== input };
     }
 
@@ -322,12 +335,7 @@ export function cleanTerminalText(input: string, options: TerminalCleanupOptions
 
     let output = rendered.join('\n').replace(/\n{3,}/g, '\n\n');
 
-    if (options.terminalBulletMode === 'markdown') {
-        output = output
-            .split('\n')
-            .map(line => toMarkdownBullet(line))
-            .join('\n');
-    }
+    if (options.terminalBulletMode === 'markdown') output = convertMarkdownBullets(output);
 
     return { text: output, changed: output !== input };
 }

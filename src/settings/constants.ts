@@ -139,7 +139,7 @@ export const SHIPPED_DOMAIN_RULES: readonly string[] = [
     'mail.google.*',
     'bing.com | q',
     'duckduckgo.com | q',
-    'wikipedia.org | search, curid, oldid, diff, action',
+    'wikipedia.org | search, curid, oldid, diff, action, title',
     'stackoverflow.com | tab',
     'stackexchange.com | tab',
     'github.com | tab, q, w',

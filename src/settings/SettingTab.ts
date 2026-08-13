@@ -46,13 +46,6 @@ function listKeyOf(controlKey: string): ListSettingKey {
 }
 
 /**
- * Keys whose value is surfaced on a sub-page link and must change while that page stays
- * visible. A `displayValue` is only recomputed by `update()`; `refreshDomState` only changes
- * visibility. Textarea values are omitted because rebuilding while typing loses the caret.
- */
-const SUMMARY_KEYS = new Set(['terminalRejoinMode']);
-
-/**
  * The settings tab.
  *
  * This class holds no setting rows of its own. It assembles the landing page from the
@@ -129,7 +122,7 @@ export class BetterPasteSettingTab extends PluginSettingTab {
         if (isListControlKey(key)) {
             this.plugin.settings[listKeyOf(key)] = diffDomainRules(parseLines(typeof value === 'string' ? value : ''));
             await this.plugin.saveSettings();
-            this.afterChange(key);
+            this.afterChange();
             return;
         }
 
@@ -141,15 +134,11 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             await super.setControlValue(key, value);
         }
 
-        this.afterChange(key);
+        this.afterChange();
     }
 
-    /**
-     * Re-evaluates whatever the change could have invalidated. Visibility predicates only
-     * need the cheap DOM pass; a summary shown on a page link needs a full rebuild.
-     */
-    private afterChange(key: string): void {
-        if (SUMMARY_KEYS.has(key)) this.update();
-        else this.refreshDomState();
+    /** Re-evaluates visibility without rebuilding controls that hold unsaved tester input. */
+    private afterChange(): void {
+        this.refreshDomState();
     }
 }

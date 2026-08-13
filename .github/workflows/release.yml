@@ -56,9 +56,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="${GITHUB_REF#refs/tags/}"
+
+          # Generate release notes from src/releaseNotes.ts
+          node scripts/mdReleaseNotes.js "$tag" > release-notes.md
+
           # The three files must be individual assets, not a zip, so that Obsidian
           # can fetch them directly
           gh release create "$tag" \
             --title="$tag" \
-            --generate-notes \
+            --notes-file release-notes.md \
             main.js manifest.json styles.css

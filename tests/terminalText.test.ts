@@ -203,6 +203,13 @@ describe('cleanTerminalText', () => {
         expect(cleanTerminalText(input, options({ terminalBulletMode: 'markdown' })).text).toBe('- First item\n- Second item');
     });
 
+    it('leaves bullets inside fenced code untouched', () => {
+        const input = ['```text', '• literal output', '```', '• List item'].join('\n');
+        expect(cleanTerminalText(input, options({ terminalBulletMode: 'markdown' })).text).toBe(
+            ['```text', '• literal output', '```', '- List item'].join('\n')
+        );
+    });
+
     it('reports no change for text that is already clean', () => {
         const input = 'A single tidy line.';
         const result = cleanTerminalText(input, options());

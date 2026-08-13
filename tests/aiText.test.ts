@@ -106,6 +106,10 @@ describe('cleanAiText: punctuation', () => {
         expect(replacePunctuation('\u2014 A sentence').text).toBe('\\- A sentence');
         expect(replacePunctuation('\u2014\u2014\u2014').text).toBe('\\---');
     });
+
+    it('does not create a list item from a blockquoted attribution', () => {
+        expect(replacePunctuation('> \u2014 Author').text).toBe('> \\- Author');
+    });
 });
 
 describe('cleanAiText: invisible characters', () => {

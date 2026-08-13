@@ -113,9 +113,9 @@ export function replacePunctuation(input: string, protect: readonly ProtectedRan
     text = text
         .split('\n')
         .map((line, index) => {
-            if (!/^ {0,3}[\u2013\u2014]/.test(sourceLines[index] ?? '')) return line;
-            if (!/^ {0,3}(?:-(?:[ \t]|$)|-{3,}[ \t]*$)/.test(line)) return line;
-            return line.replace(/^([ ]{0,3})-/, '$1\\-');
+            if (!/^(?: {0,3}>[ \t]?)* {0,3}[\u2013\u2014]/.test(sourceLines[index] ?? '')) return line;
+            if (!/^(?: {0,3}>[ \t]?)* {0,3}(?:-(?:[ \t]|$)|-{3,}[ \t]*$)/.test(line)) return line;
+            return line.replace(/^((?: {0,3}>[ \t]?)* {0,3})-/, '$1\\-');
         })
         .join('\n');
 

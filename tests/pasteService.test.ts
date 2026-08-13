@@ -123,6 +123,20 @@ describe('handleEditorPaste: plain text', () => {
         expect(editor.getValue()).toBe('start https://example.com/a end');
     });
 
+    it('leaves a multi-cursor paste to Obsidian', () => {
+        const { service } = build();
+        const editor = new FakeEditor('first\nsecond');
+        vi.spyOn(editor, 'listSelections').mockReturnValue([
+            { anchor: { line: 0, ch: 0 }, head: { line: 0, ch: 0 } },
+            { anchor: { line: 1, ch: 0 }, head: { line: 1, ch: 0 } }
+        ]);
+
+        const handled = service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/cat.png' }), editor.asEditor(), INFO);
+
+        expect(handled).toBe(false);
+        expect(editor.getValue()).toBe('first\nsecond');
+    });
+
     it('unwraps terminal output on paste', () => {
         const { service } = build();
         const editor = new FakeEditor('');
