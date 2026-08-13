@@ -26,12 +26,18 @@
  * Note text carries a small amount of inline formatting, rendered by WhatsNewModal:
  * **bold**, `code`, ==emphasis==, [label](https://example.com) and a bare link. A single
  * newline becomes a line break. Nothing else is interpreted.
+ *
+ * A release may carry a banner. Put the picture in images/version-banners, name it after
+ * the version, and name the file here. It is fetched from the repository when the dialog
+ * opens, so it has to be pushed to main before that release ships.
  */
 
 export interface ReleaseNote {
     version: string;
     /** ISO date, shown beside the version heading in the reader's own date format. */
     date: string;
+    /** File name inside images/version-banners, extension included, such as '1.0.0.gif'. */
+    banner?: string;
     /** When false, updating to this release does not open the dialog by itself. */
     showOnUpdate?: boolean;
     /** Lead paragraph above the lists. */
@@ -47,6 +53,7 @@ const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.0',
         date: '2026-08-13',
+        banner: '1.0.0.gif',
         info: 'The first release of Better Paste.',
         new: [
             'Saves pasted images into the vault as attachments. Covers Safari’s `Copy image`, pictures inside copied web content, and bitmaps already on the clipboard.',

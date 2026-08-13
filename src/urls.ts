@@ -16,6 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+const REPOSITORY = 'johansan/better-paste';
+const RAW_BASE_URL = `https://raw.githubusercontent.com/${REPOSITORY}/main`;
+
 /** Shown on the support row in settings and at the foot of the What's new dialog. */
 export const SUPPORT_SPONSOR_URL = 'https://github.com/sponsors/johansan/';
 export const SUPPORT_BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/johansan';
+
+/*
+ * Dialog artwork is served from the repository rather than bundled, because Obsidian
+ * installs only main.js, manifest.json and styles.css, so a picture sitting beside them
+ * would never reach anyone who installed from the community list, and inlining it would
+ * carry every past release's artwork in main.js for good. Both dialogs drop the frame
+ * when the fetch fails, so they read the same offline.
+ */
+
+/** Artwork at the top of the welcome dialog. */
+export const WELCOME_IMAGE_URL = `${RAW_BASE_URL}/images/welcome.gif`;
+
+/** Artwork under a version heading in the What's new dialog. `file` names it inside
+ *  images/version-banners, extension included, so a banner can be a gif or a jpg. */
+export function releaseBannerUrl(file: string): string {
+    return `${RAW_BASE_URL}/images/version-banners/${file}`;
+}

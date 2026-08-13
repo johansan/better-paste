@@ -152,6 +152,19 @@
     margin-bottom: var(--size-4-1);
 }
 
+.better-paste-release-banner {
+    margin-bottom: var(--size-4-3);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-m);
+    overflow: hidden;
+}
+
+.better-paste-release-banner img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
 .better-paste-release-info {
     margin: 0 0 var(--size-4-3);
     color: var(--text-muted);

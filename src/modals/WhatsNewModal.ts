@@ -18,7 +18,7 @@
 
 import { Modal, Platform } from 'obsidian';
 import type { App } from 'obsidian';
-import { SUPPORT_BUY_ME_A_COFFEE_URL } from '../urls';
+import { releaseBannerUrl, SUPPORT_BUY_ME_A_COFFEE_URL } from '../urls';
 import type { ReleaseNote } from '../releaseNotes';
 
 /** The lists under a version, in the order they are rendered. */
@@ -148,6 +148,14 @@ export class WhatsNewModal extends Modal {
     private renderRelease(container: HTMLElement, note: ReleaseNote): void {
         const section = container.createDiv({ cls: 'better-paste-release' });
         section.createEl('h3', { text: `Version ${note.version} (${formatReleaseDate(note.date)})` });
+
+        if (note.banner) {
+            const frame = section.createDiv({ cls: 'better-paste-release-banner' });
+            const image = frame.createEl('img', { attr: { alt: '', loading: 'lazy', decoding: 'async' } });
+            // Fetched from the repository, so the notes have to read without it offline
+            image.addEventListener('error', () => frame.remove());
+            image.src = releaseBannerUrl(note.banner);
+        }
 
         if (note.info) renderNoteText(section.createEl('p', { cls: 'better-paste-release-info' }), note.info);
 

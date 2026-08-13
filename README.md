@@ -191,21 +191,23 @@ Set custom hotkeys for these in Obsidian's Hotkeys settings. None are bound by d
 
 ## 8 Network disclosure
 
-Better Paste makes network requests in exactly one situation.
+Better Paste makes network requests in exactly two situations.
 
-**What it does.** When you paste content that references a picture by http(s) address, such as a Safari page selection, a Markdown image link, or a bare link ending in `.png`, the plugin downloads that picture so the note holds a local copy. The address always comes from what you pasted. The plugin never chooses one, and link cleaning deliberately leaves those addresses untouched so a signed link keeps the token it needs. The request uses Obsidian's own `requestUrl`.
+**Pasting a picture.** When you paste content that references a picture by http(s) address, such as a Safari page selection, a Markdown image link, or a bare link ending in `.png`, the plugin downloads that picture so the note holds a local copy. The address always comes from what you pasted. The plugin never chooses one, and link cleaning deliberately leaves those addresses untouched so a signed link keeps the token it needs. The request uses Obsidian's own `requestUrl`.
+
+**Dialog artwork.** The welcome dialog and the What's new dialog each show a picture, loaded from this repository at `raw.githubusercontent.com` when the dialog opens. Nothing is sent with the request beyond what fetching any picture involves, and both dialogs simply leave the picture out when it cannot be fetched. The pictures are not bundled because Obsidian installs only `main.js`, `manifest.json` and `styles.css`.
 
 **What it never does.**
 
 - No telemetry, no analytics, no crash reporting, no usage counting.
 - No server belonging to this plugin. There is not one.
-- Nothing is fetched at startup, in the background, or on a timer. A request only ever happens as the direct result of a paste you made.
+- Nothing is fetched at startup, in the background, or on a timer. A request only ever happens as the direct result of a paste you made, or of a dialog you opened.
 - No code is downloaded or executed. Downloaded bytes are only ever written to a file, and only when the response is a recognised image type.
 - Nothing is uploaded. The clipboard is transformed in memory and not retained, and the plugin keeps no history.
 
 **What is stored.** Downloaded pictures go to the attachment location your vault is configured to use. Settings live in `.obsidian/plugins/better-paste/data.json`. Nothing leaves the vault.
 
-**Worth knowing.** Downloading an image reveals your IP address to whoever serves it, exactly as visiting the page would. Turn off **Save pasted images into the vault** if that matters for a given vault. Bitmap-only screenshots are still left to Obsidian's own paste handler.
+**Worth knowing.** Downloading an image, or the artwork in a dialog, reveals your IP address to whoever serves it, exactly as visiting the page would. Turn off **Save pasted images into the vault** if that matters for a given vault. Bitmap-only screenshots are still left to Obsidian's own paste handler.
 
 <br/>
 
