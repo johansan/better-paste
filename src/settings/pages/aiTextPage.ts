@@ -26,7 +26,7 @@ export function createAiTextLandingDefinitions(context: SettingsPageContext): Se
     return [
         {
             name: 'Clean up AI text',
-            desc: 'Assistants produce characters that look ordinary but are not, and they survive a copy and paste. This swaps them for their plain equivalents: a no-break space becomes a normal space, and zero-width characters are dropped. The same characters get cleaned up whatever wrote them. Emoji and non-Latin scripts are left alone.',
+            desc: 'Replaces hidden or special characters with their plain equivalents. A no-break space becomes a normal space, and zero-width characters are dropped. Emoji and non-Latin scripts are untouched.',
             aliases: [
                 'ai',
                 'chatgpt',
@@ -49,7 +49,7 @@ export function createAiTextLandingDefinitions(context: SettingsPageContext): Se
             ...toggle(
                 'aiTextPlainPunctuation',
                 'Use plain punctuation',
-                'Turn the em dash — and en dash – into a hyphen, and the curly quotes “ ” ‘ ’ into straight " and \'. Assistants and web pages both produce these; straight quotes also survive code and search better. This one is a matter of taste rather than tidiness, so switch it off if you set your punctuation on purpose. Guillemets « » are left alone, being ordinary quotation marks in several languages.',
+                'Converts long dashes into a hyphen, and curly quotes into straight quotes. Guillemets are preserved.',
                 [
                     'em dash',
                     'en dash',

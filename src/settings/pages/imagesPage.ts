@@ -28,13 +28,13 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
     return [
         {
             name: 'Save pasted images into the vault',
-            desc: 'Keep a local copy of pictures you paste, instead of a link to somebody else’s server. Covers Safari’s "Copy image", pictures inside copied web content, and images embedded in the clipboard. They are filed wherever the vault puts attachments, which is set under Files and links.',
+            desc: 'Saves copied images as local files rather than inserting external links. This applies to Safari’s "Copy image", pictures inside copied web content, and images embedded in the clipboard. Images are saved to your vault attachment folder.',
             aliases: ['download', 'attachment', 'safari', 'screenshot', 'picture', 'folder', 'file name', 'filename', 'width', 'size'],
             control: { type: 'toggle', key: 'imagesEnabled', defaultValue: DEFAULT_SETTINGS.imagesEnabled }
         },
         {
             type: 'page',
-            name: 'More about images',
+            name: 'Image handling',
             desc: 'File names, image links, and per-note image width.',
             visible: enabled,
             items: createImageOptionsDefinitions()
@@ -47,7 +47,7 @@ function createImageOptionsDefinitions(): SettingGroupItem[] {
     return [
         {
             name: 'File names',
-            desc: 'How saved pictures are named. A name taken from the source is the most recognizable, but some sites serve pictures under a meaningless name.',
+            desc: 'The naming format for saved images.',
             control: {
                 type: 'dropdown',
                 key: 'imageFilenameFormat',
@@ -60,9 +60,9 @@ function createImageOptionsDefinitions(): SettingGroupItem[] {
             }
         },
         {
-            name: 'Pasting a link to an image',
+            name: 'Pasting an image URL',
             desc: describeWithExample(
-                'Sometimes what you paste is not a page but the picture itself: the address you get from "Copy image address" in a browser, ending in .png or .jpg. This decides what lands in the note.',
+                'Determines what happens when the clipboard contains only a web address pointing directly to an image. The plugin can either download the picture to your vault, or leave the text as a normal link.',
                 'https://example.com/photo.png'
             ),
             aliases: ['bare url', 'link', 'embed', 'preview', 'address'],
@@ -78,7 +78,7 @@ function createImageOptionsDefinitions(): SettingGroupItem[] {
         },
         {
             name: 'Image width property',
-            desc: 'The note property that sets how wide pasted images are. With the default, writing "image-width: 400" in a note’s properties embeds every image pasted there at 400 pixels. A note using it also takes screenshot pastes over from Obsidian, since only this plugin can apply the width. Leave blank to switch off.',
+            desc: 'The frontmatter property that defines the width of images pasted into a note. A note using this property takes screenshot pastes over from Obsidian. Leave blank to disable.',
             aliases: ['size', 'frontmatter', 'property', 'resize'],
             control: {
                 type: 'text',

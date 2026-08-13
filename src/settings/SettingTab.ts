@@ -82,12 +82,13 @@ export class BetterPasteSettingTab extends PluginSettingTab {
                 'Apply the rules on every paste. Turn this off to use the commands only. A single note can opt out with the "better-paste: false" property.',
                 ['automatic', 'enable', 'disable', 'note', 'exclude', 'property', 'frontmatter', 'opt out']
             ),
-            toggle(
-                'trimPaste',
-                'Trim space around the paste',
-                'Drop the blank lines and stray spaces that come with text copied from a web page or a PDF, at the start and end of what you pasted. What is in the middle is left alone.',
-                ['whitespace', 'blank', 'space', 'newline', 'trim']
-            ),
+            toggle('trimPaste', 'Trim space around the paste', 'Removes blank lines and spaces at the start and end of pasted text.', [
+                'whitespace',
+                'blank',
+                'space',
+                'newline',
+                'trim'
+            ]),
             toggle(
                 'showNotices',
                 'Show a notice when a paste is changed',

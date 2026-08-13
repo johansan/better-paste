@@ -42,14 +42,14 @@ export function createTerminalLandingDefinitions(context: SettingsPageContext): 
     return [
         {
             name: 'Clean up terminal output',
-            desc: 'Put back together the paragraphs your terminal broke apart at the edge of its window, and drop the indentation it added. Color codes are removed; code fences, tables and list items are left exactly as they are.',
+            desc: 'Rejoins wrapped lines in terminal output and removes indentation. Color codes are stripped. Code fences, tables, and list items are untouched.',
             aliases: ['wrap', 'unwrap', 'rejoin', 'ansi', 'console', 'shell', 'indent', 'bullet', 'list', 'markdown'],
             control: { type: 'toggle', key: 'terminalEnabled', defaultValue: DEFAULT_SETTINGS.terminalEnabled }
         },
         {
             type: 'page',
-            name: 'More about terminal text',
-            desc: 'How cautiously lines are rejoined, and what happens to bullets.',
+            name: 'Terminal text handling',
+            desc: 'The condition required to treat a line as a continuation of the previous line, and what happens to bullets.',
             visible: enabled,
             displayValue: () => REJOIN_SUMMARY[context.settings().terminalRejoinMode],
             items: createTerminalOptionsDefinitions(context)
@@ -62,7 +62,7 @@ function createTerminalOptionsDefinitions(context: SettingsPageContext): Setting
     return [
         {
             name: 'When to rejoin a broken line',
-            desc: 'Most terminals indent the continuation of a wrapped line, and requiring that indent is what keeps ordinary multi-line text safe. Loosen it for tools that wrap without indenting; switch it off entirely for column-aligned output such as git log --graph, where the line breaks are the layout.',
+            desc: 'The condition required to treat a line as a continuation of the previous line.',
             aliases: ['indent', 'wrap', 'aggressive', 'safe', 'git log'],
             control: {
                 type: 'dropdown',
@@ -77,7 +77,7 @@ function createTerminalOptionsDefinitions(context: SettingsPageContext): Setting
         },
         {
             name: 'Bullet characters',
-            desc: 'Terminal output uses characters like • that Obsidian treats as ordinary text. Converting them to Markdown list items makes them fold, indent and render as real lists.',
+            desc: 'Determines whether bullet characters (like •) in terminal output are preserved or converted to Markdown list items.',
             aliases: ['list', 'markdown', 'dash'],
             control: {
                 type: 'dropdown',

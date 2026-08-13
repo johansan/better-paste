@@ -31,7 +31,7 @@ import type { SettingsPageContext } from './context';
  * outside a browser by the tests.
  */
 function cleaningExample(): string | DocumentFragment {
-    const lead = 'Removes the tracking a link picks up on its way to you. The struck-through part goes:';
+    const lead = 'Removes tracking parameters from pasted links. The struck-through part is removed:';
     const kept = 'https://example.com/article';
     const removed = '?utm_source=newsletter&fbclid=9c2a41';
 
@@ -61,7 +61,7 @@ export function createLinkLandingDefinitions(context: SettingsPageContext): Sett
         },
         {
             name: 'Which parameters to remove',
-            desc: 'Removing everything is thorough, and leans on the site rules to keep the parameters that matter. Removing only known tracking is cautious and leaves unfamiliar parameters alone.',
+            desc: 'Choose whether to remove all query parameters unless explicitly kept by a site rule, or to remove only known tracking parameters.',
             visible: enabled,
             aliases: ['utm', 'tracking', 'query', 'parameters'],
             control: {
@@ -76,8 +76,8 @@ export function createLinkLandingDefinitions(context: SettingsPageContext): Sett
         },
         {
             type: 'page',
-            name: 'Sites where parameters matter',
-            desc: 'Sites where the part after the ? carries meaning: a video timestamp, a meeting password, a document ID.',
+            name: 'Rules for preserving parameters',
+            desc: 'Site rules for keeping specific query parameters.',
             visible: enabled,
             displayValue: () => {
                 const count = mergeDomainRules(context.settings().urlDomainRules).length;
@@ -101,7 +101,7 @@ function createSitesPageDefinitions(context: SettingsPageContext): SettingDefini
             items: [
                 {
                     name: 'Your site rules',
-                    desc: `${SHIPPED_DOMAIN_RULES.length} common sites are already handled and stay up to date with the plugin. Add your own here, one per line. "example.com" keeps every parameter on that site, "example.com: a, b" keeps only those two, and "!example.com" drops a rule that ships with the plugin. Subdomains are matched automatically.`,
+                    desc: `${SHIPPED_DOMAIN_RULES.length} common sites are already handled and stay up to date with the plugin. Add your own site rules here, one per line. "example.com" keeps every parameter on that site, "example.com: a, b" keeps only those two, and "!example.com" drops a rule that ships with the plugin. Subdomains are matched automatically.`,
                     aliases: ['domain', 'exception', 'whitelist', 'youtube'],
                     control: {
                         type: 'textarea',

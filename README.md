@@ -1,12 +1,8 @@
 # Better Paste
 
-Clean up whatever you paste into a note. Save pasted pictures into the vault instead of linking to somebody else's server, strip tracking out of links, put terminal output back together, and replace the punctuation that AI assistants produce.
+Better Paste alters clipboard content as it is pasted into Obsidian. It saves linked images into your vault as local attachments, removes tracking parameters from links, rejoins wrapped lines in terminal output, and replaces curly quotes and invisible characters in AI text with their plain equivalents.
 
 If you find Better Paste useful, please consider [☕️ Buying me a coffee](https://buymeacoffee.com/johansan) or [Sponsor on GitHub ❤️](https://github.com/sponsors/johansan).
-
-<br/>
-
-![Obsidian Compatibility](https://img.shields.io/badge/Obsidian-v1.13.1+-483699?logo=obsidian&style=flat-square) [![Quality checks](https://github.com/johansan/better-paste/actions/workflows/ci.yml/badge.svg)](https://github.com/johansan/better-paste/actions/workflows/ci.yml)
 
 <br/>
 
@@ -100,17 +96,17 @@ Fifteen settings, arranged as a landing page with three sub pages. Anything with
 
 Saved pictures go wherever the vault files attachments, which is Obsidian's own setting under Files and links. The plugin does not add a second place to answer that.
 
-Behind **More about images**:
+Behind **Image handling**:
 
 - **File names** picks a name from the source, a name and date, or a date and time.
-- **Pasting a link to an image** decides what happens when the thing you pasted is the picture itself, such as the address from "Copy image address". Either save the picture and show it, or leave the link alone.
+- **Pasting an image URL** decides what happens when the thing you pasted is the picture itself, such as the address from "Copy image address". Either save the picture and show it, or leave the link alone.
 - **Image width property** names the note property that sets how wide pasted images are. See [section 6](#6-per-note-control).
 
 ### 5.3 Links
 
 **Which parameters to remove** offers every parameter except where a site rule keeps it, or only the parameters known to be tracking.
 
-Behind **Sites where parameters matter**, the full rule list and a live tester:
+Behind **Rules for preserving parameters**, the full rule list and a live tester:
 
 ```
 youtube.com | v, t, list, index, start     keep only these parameters
@@ -129,7 +125,7 @@ A site rule is a whitelist in **every parameter** mode. In **only tracking** mod
 
 ### 5.4 Terminal text
 
-Behind **More about terminal text**:
+Behind **Terminal text handling**:
 
 - **When to rejoin a broken line** offers three levels. _Only when the next line is indented_ is what most terminals do and what keeps ordinary multi line text safe. _Whenever the line above looks full_ suits tools that wrap without indenting. _Never rejoin_ leaves every line break alone and only strips escape codes and indentation, which suits column aligned output such as `git log --graph` where the breaks are the layout.
 - **Bullet characters** either leaves `•` alone or converts it to a real Markdown list item that folds and indents.
