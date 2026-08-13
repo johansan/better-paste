@@ -28,6 +28,7 @@ import type { ImageService } from './ImageService';
 import { escapeLinkTitle } from './LinkTitleService';
 import type { LinkTitleService } from './LinkTitleService';
 import { logError } from '../utils/logger';
+import { showNotice } from '../utils/notices';
 import type { BetterPasteSettings } from '../settings/types';
 
 /** How far before the recorded offset to look when re-finding text the user may have shifted. */
@@ -36,6 +37,9 @@ const REALIGN_WINDOW = 512;
 /** Surrounding text kept to distinguish a pasted occurrence from an older identical one. */
 const RANGE_CONTEXT = 64;
 
+/** Delay between progress message updates while a page title is being fetched. */
+const TITLE_PROGRESS_INTERVAL_MS = 500;
+
 /** Summary of everything a single paste changed, used to build the notice. */
 interface PasteSummary {
     aiTextCleaned: boolean;
@@ -43,7 +47,6 @@ interface PasteSummary {
     urlsCleaned: number;
     imagesDownloaded: number;
     imagesFailed: number;
-    linkTitlesFetched: number;
 }
 
 /** Editor state that identifies one inserted range while network or vault work is pending. */
@@ -54,6 +57,12 @@ interface AsyncPasteRange {
     valueAfter: string;
     beforeContext: string;
     afterContext: string;
+}
+
+/** One visible title-fetch notice and its next scheduled animation step. */
+interface TitleProgressNotice {
+    notice: Notice;
+    timer: number;
 }
 
 function asyncPasteRange(startOffset: number, inserted: string, valueBefore: string, valueAfter: string): AsyncPasteRange {
@@ -113,6 +122,8 @@ export class PasteService {
     private disposed = false;
     /** Ranges still awaiting work, kept aligned when another pending paste is rewritten. */
     private readonly pendingRanges = new Set<AsyncPasteRange>();
+    /** Title progress notices still visible, kept so unload can dismiss them immediately. */
+    private readonly titleProgressNotices = new Set<TitleProgressNotice>();
 
     constructor(getSettings: () => BetterPasteSettings, images: ImageService, titles: LinkTitleService) {
         this.getSettings = getSettings;
@@ -124,6 +135,7 @@ export class PasteService {
     dispose(): void {
         this.disposed = true;
         this.pendingRanges.clear();
+        for (const progress of this.titleProgressNotices) this.hideTitleProgress(progress);
         this.images.dispose();
         this.titles.dispose();
     }
@@ -193,8 +205,7 @@ export class PasteService {
             terminalCleaned: result.terminalCleaned,
             urlsCleaned: result.urlsCleaned,
             imagesDownloaded: 0,
-            imagesFailed: 0,
-            linkTitlesFetched: 0
+            imagesFailed: 0
         };
 
         if (needsImages) void this.runImagePass(editor, info, targetFile, targetPath, range, summary);
@@ -232,8 +243,7 @@ export class PasteService {
             terminalCleaned: false,
             urlsCleaned: 0,
             imagesDownloaded: 0,
-            imagesFailed: 0,
-            linkTitlesFetched: 0
+            imagesFailed: 0
         };
         let embed: string | null = null;
 
@@ -299,8 +309,7 @@ export class PasteService {
             terminalCleaned: result.terminalCleaned,
             urlsCleaned: result.urlsCleaned,
             imagesDownloaded: 0,
-            imagesFailed: 0,
-            linkTitlesFetched: 0
+            imagesFailed: 0
         };
 
         if (needsImages) {
@@ -347,8 +356,7 @@ export class PasteService {
             terminalCleaned: result.terminalCleaned,
             urlsCleaned: result.urlsCleaned,
             imagesDownloaded: 0,
-            imagesFailed: 0,
-            linkTitlesFetched: 0
+            imagesFailed: 0
         });
     }
 
@@ -394,8 +402,7 @@ export class PasteService {
             terminalCleaned: false,
             urlsCleaned: 0,
             imagesDownloaded: 0,
-            imagesFailed: 0,
-            linkTitlesFetched: 0
+            imagesFailed: 0
         };
 
         let text = range.inserted;
@@ -474,15 +481,52 @@ export class PasteService {
         summary: PasteSummary
     ): Promise<void> {
         this.pendingRanges.add(range);
+        const progress = this.showTitleProgress();
         try {
             const link = await this.titles.materializeTitle(range.inserted);
             if (!this.canEdit(info, targetFile)) return;
 
-            if (link !== null && this.replaceRange(editor, range, link)) summary.linkTitlesFetched = 1;
+            if (link === null) {
+                this.hideTitleProgress(progress);
+                showNotice('Better Paste: could not fetch the title.', { variant: 'warning' });
+            } else this.replaceRange(editor, range, link);
+            this.hideTitleProgress(progress);
             this.notify(summary);
         } finally {
+            this.hideTitleProgress(progress);
             this.pendingRanges.delete(range);
         }
+    }
+
+    /** Shows an animated notice for title work when ordinary paste notices are enabled. */
+    private showTitleProgress(): TitleProgressNotice | null {
+        if (!this.getSettings().showNotices) return null;
+
+        const progress: TitleProgressNotice = {
+            notice: showNotice('Better Paste: fetching title.', { timeout: 0, variant: 'loading' }),
+            timer: 0
+        };
+        let dots = 1;
+
+        const animate = (): void => {
+            progress.timer = window.setTimeout(() => {
+                if (!this.titleProgressNotices.has(progress)) return;
+                dots = (dots % 3) + 1;
+                progress.notice.setMessage(`Better Paste: fetching title${'.'.repeat(dots)}`);
+                animate();
+            }, TITLE_PROGRESS_INTERVAL_MS);
+        };
+
+        this.titleProgressNotices.add(progress);
+        animate();
+        return progress;
+    }
+
+    /** Stops and dismisses a title-fetch progress notice. */
+    private hideTitleProgress(progress: TitleProgressNotice | null): void {
+        if (progress === null || !this.titleProgressNotices.delete(progress)) return;
+        window.clearTimeout(progress.timer);
+        progress.notice.hide();
     }
 
     /**
@@ -647,7 +691,6 @@ export class PasteService {
         if (summary.imagesDownloaded > 0) {
             parts.push(`saved ${summary.imagesDownloaded} image${summary.imagesDownloaded === 1 ? '' : 's'}`);
         }
-        if (summary.linkTitlesFetched > 0) parts.push('fetched a link title');
         if (parts.length === 0) return;
         new Notice(`Better Paste: ${parts.join(', ')}`);
     }

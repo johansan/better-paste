@@ -21,7 +21,24 @@
 // that performs real Obsidian work throws so a test can never silently depend on it.
 
 export class Notice {
-    constructor(public message: string) {}
+    static readonly instances: Notice[] = [];
+    hidden = false;
+
+    constructor(
+        public message: string,
+        public duration?: number
+    ) {
+        Notice.instances.push(this);
+    }
+
+    setMessage(message: string): this {
+        this.message = message;
+        return this;
+    }
+
+    hide(): void {
+        this.hidden = true;
+    }
 }
 
 export class TFolder {

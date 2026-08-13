@@ -61,6 +61,18 @@ describe('LinkTitleService', () => {
         expect(await service.materializeTitle('https://example.com/page')).toBe('[A page](https://example.com/page)');
     });
 
+    it('rejects a site name as the title of a specific page', async () => {
+        const settings = { ...DEFAULT_SETTINGS, fetchLinkTitles: true };
+        const service = new LinkTitleService(
+            () => settings,
+            async () => response({ text: '<title>Reddit</title>' }),
+            () => 'Reddit'
+        );
+
+        expect(await service.materializeTitle('https://www.reddit.com/r/ObsidianMD/comments/example')).toBeNull();
+        expect(await service.materializeTitle('https://www.reddit.com/')).toBe('[Reddit](https://www.reddit.com/)');
+    });
+
     it('leaves non-HTML responses alone', async () => {
         const settings = { ...DEFAULT_SETTINGS, fetchLinkTitles: true };
         const service = new LinkTitleService(

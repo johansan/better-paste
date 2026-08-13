@@ -57,6 +57,15 @@ export function escapeLinkTitle(title: string): string {
     return title.replace(/[\\`*_[\]<>~|]/g, '\\$&');
 }
 
+/** True when a page-specific URL returned only a brand name found in its hostname. */
+function isGenericSiteTitle(title: string, url: URL): boolean {
+    if (url.pathname === '/' && !url.search && !url.hash) return false;
+
+    const normalise = (value: string): string => value.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const normalisedTitle = normalise(title);
+    return normalisedTitle.length > 0 && url.hostname.split('.').some(label => normalise(label) === normalisedTitle);
+}
+
 /** Fetches page titles for standalone links and formats the resulting Markdown link. */
 export class LinkTitleService {
     private readonly getSettings: () => BetterPasteSettings;
@@ -105,7 +114,7 @@ export class LinkTitleService {
             if (contentType && !/^(?:text\/html|application\/xhtml\+xml)\b/i.test(contentType.trim())) return null;
 
             const title = this.parseTitle(response.text);
-            return title ? `[${escapeLinkTitle(title)}](${url})` : null;
+            return title && !isGenericSiteTitle(title, new URL(url)) ? `[${escapeLinkTitle(title)}](${url})` : null;
         } catch (error) {
             logWarning(`Failed to fetch the title for ${url}`, error);
             return null;
