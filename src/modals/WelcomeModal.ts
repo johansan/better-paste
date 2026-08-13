@@ -21,7 +21,8 @@ import { WELCOME_IMAGE_URL } from '../urls';
 
 const INTRODUCTION = [
     'Better Paste alters clipboard content as it is pasted into a note.',
-    'Images are saved into the vault as attachments, tracking parameters are removed from links, wrapped terminal output is rejoined, and curly quotes and invisible characters are replaced with their plain equivalents.',
+    'AI chatbots write curly quotes, long dashes and invisible characters that look like ordinary text but are not, and they survive a copy and paste. Better Paste replaces them with their plain equivalents. The same characters are cleaned up whatever wrote them.',
+    'Images are saved into the vault as attachments, tracking parameters are removed from links, and the lines a terminal wrapped are put back together.',
     'Each rule can be turned off on its own, and a single note can opt out of all of them with the "better-paste: false" property. Everything is under Settings, Better Paste.'
 ];
 
