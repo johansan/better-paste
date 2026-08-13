@@ -161,6 +161,14 @@ describe('isInsideVerbatimContext', () => {
         expect(atCursor('~~~\n|code\n~~~\n')).toBe(true);
     });
 
+    it('requires a closing fence to use the same marker', () => {
+        expect(atCursor('```js\n~~~\n|code\n```\n')).toBe(true);
+    });
+
+    it('requires a closing fence to be at least as long as the opening fence', () => {
+        expect(atCursor('````js\n```\n|code\n````\n')).toBe(true);
+    });
+
     it('is true inside frontmatter the note actually closes', () => {
         expect(atCursor('---\ntitle: |\n---\n\nBody')).toBe(true);
     });

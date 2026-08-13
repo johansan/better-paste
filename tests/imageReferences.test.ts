@@ -84,6 +84,10 @@ describe('findImageReferences', () => {
         expect(found[0].kind).toBe('markdown');
     });
 
+    it('does not treat a normal Markdown link target as a bare image URL', () => {
+        expect(findImageReferences('[photo](https://example.com/cat.png)', options())).toHaveLength(0);
+    });
+
     it('leaves a pasted image link alone when that is the choice', () => {
         const asLink = options({ imageLinkPaste: 'link' });
         expect(findImageReferences('https://example.com/a.png', asLink)).toHaveLength(0);

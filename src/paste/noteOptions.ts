@@ -49,17 +49,32 @@ function frontmatterEndLine(lines: readonly string[]): number {
     return -1;
 }
 
-/**
- * True when a line opens or closes a fenced code block.
- *
- * Bounded to three leading spaces, because four makes it an indented code block rather than
- * a fence. A backtick fence's info string may not itself contain a backtick, which is what
- * separates an opening fence from an inline code span sitting at the start of a line.
- */
-function isFenceLine(line: string): boolean {
+interface FenceDelimiter {
+    marker: '`' | '~';
+    length: number;
+    rest: string;
+}
+
+/** Returns the delimiter on a possible fence line. */
+function fenceDelimiterOf(line: string): FenceDelimiter | null {
     const match = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
-    if (!match) return false;
-    return !(match[1].startsWith('`') && match[2].includes('`'));
+    if (!match) return null;
+
+    const marker: '`' | '~' = match[1].startsWith('`') ? '`' : '~';
+    const rest = match[2];
+    if (marker === '`' && rest.includes('`')) return null;
+    return { marker, length: match[1].length, rest };
+}
+
+/** A closing fence must use the opening marker, be at least as long, and have no info string. */
+function closesFence(line: string, opening: FenceDelimiter): boolean {
+    const candidate = fenceDelimiterOf(line);
+    return (
+        candidate !== null &&
+        candidate.marker === opening.marker &&
+        candidate.length >= opening.length &&
+        candidate.rest.trim().length === 0
+    );
 }
 
 /** Extracts the YAML text of a note's frontmatter block, or null when there is none. */
@@ -138,19 +153,22 @@ export function isInsideVerbatimContext(content: string, cursorOffset: number): 
     const frontmatterEnd = frontmatterEndLine(lines);
 
     let offset = 0;
-    let insideFence = false;
+    let fence: FenceDelimiter | null = null;
 
     for (let index = 0; index < lines.length; index++) {
         const lineEnd = offset + lines[index].length;
         const inFrontmatter = frontmatterEnd >= 0 && index <= frontmatterEnd;
 
-        if (cursorOffset <= lineEnd) return inFrontmatter || insideFence;
+        if (cursorOffset <= lineEnd) return inFrontmatter || fence !== null;
 
-        // The toggle happens after the cursor check, so a cursor on the opening fence line
-        // is not yet inside the block
-        if (!inFrontmatter && isFenceLine(lines[index])) insideFence = !insideFence;
+        // Fence state changes after the cursor check, so a cursor on the opening line is not
+        // yet inside the block while one on the closing line still is.
+        if (!inFrontmatter) {
+            if (fence === null) fence = fenceDelimiterOf(lines[index]);
+            else if (closesFence(lines[index], fence)) fence = null;
+        }
         offset = lineEnd + 1;
     }
 
-    return insideFence;
+    return fence !== null;
 }

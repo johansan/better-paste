@@ -17,7 +17,7 @@
  */
 
 import { Modal } from 'obsidian';
-import { WELCOME_IMAGE_URL } from '../urls';
+import welcomeImage from '../../images/welcome.jpg';
 
 const INTRODUCTION = [
     'Better Paste alters clipboard content as it is pasted into a note.',
@@ -36,10 +36,7 @@ export class WelcomeModal extends Modal {
 
         const frame = this.contentEl.createDiv({ cls: 'better-paste-welcome-image' });
         const image = frame.createEl('img', { attr: { alt: '', loading: 'lazy', decoding: 'async' } });
-        // The artwork is fetched from the repository, so the dialog has to read without it
-        // when the vault is offline
-        image.addEventListener('error', () => frame.remove());
-        image.src = WELCOME_IMAGE_URL;
+        image.src = welcomeImage;
 
         const body = this.contentEl.createDiv({ cls: 'better-paste-welcome-body' });
         for (const paragraph of INTRODUCTION) body.createEl('p', { text: paragraph });

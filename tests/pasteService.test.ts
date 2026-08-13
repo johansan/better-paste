@@ -29,8 +29,8 @@ const INFO = { file: { path: 'Notes/Test.md' } } as unknown as MarkdownView | Ma
 
 /** Records what the paste handler asked the image service to save. */
 interface SavedClipboardImages {
-    files: readonly File[];
-    sources: readonly string[];
+    file: File;
+    source: string;
     sourcePath: string;
     size: string | null;
 }
@@ -46,16 +46,12 @@ function fakeImages(settings: BetterPasteSettings, failing = false, saved?: Save
             const embeds = new Map(references.map((reference, index) => [reference.index, `![[image-${index}.png${suffix}]]`]));
             return { text: replaceImageReferences(text, references, embeds), downloaded: embeds.size, failed: 0 };
         },
-        saveClipboardImages: async (files: readonly File[], sources: readonly string[], sourcePath: string, size: string | null = null) => {
-            saved?.push({ files, sources, sourcePath, size });
-            if (failing) return { embeds: [], failed: files.length };
+        saveClipboardImage: async (file: File, source: string, sourcePath: string, size: string | null = null) => {
+            saved?.push({ file, source, sourcePath, size });
+            if (failing) return null;
             // Name the saved file after the source picture, as the real service does
-            const embeds = files.map((file, index) => {
-                const source = sources[index] ?? '';
-                const base = source ? (source.split('/').pop() ?? file.name).replace(/\.[a-z0-9]+$/i, '') : file.name;
-                return `![[${base}.png${size ? `|${size}` : ''}]]`;
-            });
-            return { embeds, failed: 0 };
+            const base = source ? (source.split('/').pop() ?? file.name).replace(/\.[a-z0-9]+$/i, '') : file.name;
+            return `![[${base}.png${size ? `|${size}` : ''}]]`;
         }
     } as unknown as ImageService;
 }
@@ -183,8 +179,8 @@ describe('handleEditorPaste: Safari copy image', () => {
         await settle();
 
         expect(saved).toHaveLength(1);
-        expect(saved[0].files[0].type).toBe('image/png');
-        expect(saved[0].sources).toEqual(['https://www.tokentek.ai/_astro/gaia-2026-talk.J2oaR4rx_sdIoa.webp']);
+        expect(saved[0].file.type).toBe('image/png');
+        expect(saved[0].source).toBe('https://www.tokentek.ai/_astro/gaia-2026-talk.J2oaR4rx_sdIoa.webp');
         expect(saved[0].sourcePath).toBe('Notes/Test.md');
     });
 
@@ -192,7 +188,7 @@ describe('handleEditorPaste: Safari copy image', () => {
         const { service, saved } = build();
         service.handleEditorPaste(safariEvent(), new FakeEditor('').asEditor(), INFO);
         await settle();
-        expect(saved[0].sources).toHaveLength(1);
+        expect(saved[0].source).toBe('https://www.tokentek.ai/_astro/gaia-2026-talk.J2oaR4rx_sdIoa.webp');
     });
 
     it('replaces the selection the paste was aimed at', async () => {
@@ -238,7 +234,7 @@ describe('handleEditorPaste: Safari copy image', () => {
         expect(editor.getValue()).toBe('');
     });
 
-    it('handles several bitmaps in one paste', async () => {
+    it('leaves a multi-file paste to Obsidian', () => {
         const { service } = build();
         const editor = new FakeEditor('');
         const event = fakeClipboardEvent({
@@ -246,9 +242,8 @@ describe('handleEditorPaste: Safari copy image', () => {
             files: [fakeFile('image.png', 'image/png'), fakeFile('image2.png', 'image/png')]
         });
 
-        service.handleEditorPaste(event, editor.asEditor(), INFO);
-        await settle();
-        expect(editor.getValue()).toBe('![[one.png]]\n![[two.png]]');
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe('');
     });
 });
 
@@ -458,6 +453,15 @@ describe('handleEditorPaste: rich content', () => {
 
         expect(editor.getValue()).toBe('[link](https://example.com/b?utm_source=x)');
     });
+
+    it('still cleans AI typography when the other rich-content rules are off', async () => {
+        const { service } = build({ urlEnabled: false, imagesEnabled: false });
+        const editor = new FakeEditor('');
+
+        await pasteRich(service, editor, '<p>quoted</p>', '“quoted”');
+
+        expect(editor.getValue()).toBe('"quoted"');
+    });
 });
 
 describe('surviving an edit during the image write', () => {
@@ -477,6 +481,18 @@ describe('surviving an edit during the image write', () => {
         expect(editor.getValue()).toContain('photo.png');
     });
 
+    it('does not trust stale offsets after an equal-length edit', async () => {
+        const { service } = build();
+        const editor = selecting('OLD', 'OLD');
+        const event = fakeClipboardEvent({ html: SAFARI_HTML, files: [fakeFile('image.png', 'image/png')] });
+
+        service.handleEditorPaste(event, editor.asEditor(), INFO);
+        editor.replaceRange('NEW', { line: 0, ch: 0 }, { line: 0, ch: 3 });
+        await settle();
+
+        expect(editor.getValue()).toBe('NEW![[photo.png]]');
+    });
+
     it('stops touching the editor once the plugin is unloaded', async () => {
         const { service } = build();
         const editor = new FakeEditor('');
@@ -487,6 +503,17 @@ describe('surviving an edit during the image write', () => {
         await settle();
 
         expect(editor.getValue()).toBe('');
+    });
+
+    it('does not finish a URL replacement once the plugin is unloaded', async () => {
+        const { service } = build();
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/cat.png' }), editor.asEditor(), INFO);
+        service.dispose();
+        await settle();
+
+        expect(editor.getValue()).toBe('https://example.com/cat.png');
     });
 });
 

@@ -48,7 +48,7 @@ pastes as:
 https://support.claude.com/en/articles/16266773-how-claude-marks-ai-generated-content
 ```
 
-**AI text.** `“The result — which nobody expected — was fine,” he said.` pastes as `"The result - which nobody expected - was fine," he said.` Curly quotes become straight, fancy dashes become hyphens, and the invisible characters that came along are gone.
+**AI text.** `“The result was fine,” he said.` pastes as `"The result was fine," he said.` Curly quotes become straight, fancy dashes become hyphens, and the invisible characters that came along are gone.
 
 **Images.** Copy a picture in Safari and Obsidian leaves a link to the website. Better Paste saves the picture into your vault instead, so the note still works offline and survives the source site going away.
 
@@ -66,19 +66,23 @@ Better Paste runs locally. The one exception is downloading a picture that paste
 
 Better Paste looks at what the clipboard actually holds.
 
-| Clipboard holds                                                | What happens                                                                                                                |
-| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Bitmap data **and** an `<img>` tag, from Safari's "Copy image" | Better Paste saves the bitmap it already has. Obsidian on its own prefers the HTML and leaves an external link              |
-| Bitmap data alone, such as a screenshot                        | Left to Obsidian, which already saves it using your attachment settings                                                     |
-| Rich content (HTML)                                            | Obsidian converts it to Markdown as usual, then Better Paste cleans the links and downloads the images in what was inserted |
-| A styled terminal dump                                         | Treated as plain text, so the terminal rule applies                                                                         |
-| Plain text                                                     | Better Paste transforms it and inserts the result itself                                                                    |
+| Clipboard holds                                               | What happens                                                                                                                |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| One bitmap **and** an `<img>` tag, from Safari's "Copy image" | Better Paste saves the bitmap it already has. Obsidian on its own prefers the HTML and leaves an external link              |
+| Bitmap data alone, such as a screenshot                       | Left to Obsidian, which already saves it using your attachment settings                                                     |
+| Rich content (HTML)                                           | Obsidian converts it to Markdown as usual, then Better Paste cleans the links and downloads the images in what was inserted |
+| A styled terminal dump                                        | Treated as plain text, so the terminal rule applies                                                                         |
+| Plain text                                                    | Better Paste transforms it and inserts the result itself                                                                    |
 
 Safari's "Copy image" is the case worth calling out. It puts _both_ the decoded bitmap and an `<img>` tag on the clipboard, and Obsidian picks the HTML, so the note ends up pointing at the website instead of holding the picture. Better Paste uses the bytes that are already there, so nothing is downloaded at all. The file is still named after the original picture rather than Safari's generic `image.png`, and the extension comes from the actual bitmap.
+
+A paste containing more than one file is left to Obsidian. Better Paste only takes over a single clipboard bitmap.
 
 Rich content is deliberately left to Obsidian's own HTML to Markdown conversion rather than reimplemented. Better Paste only post-processes the result.
 
 When a download fails or times out, the original link stays in the note. Nothing is lost, and a notice says what happened.
+
+Alt text from a downloaded Markdown or HTML image is kept on the local embed. If the note also sets an image width, the embed carries both.
 
 <br/>
 
@@ -138,7 +142,7 @@ The rule leaves text alone entirely unless something identifies it as terminal o
 ### 5.5 AI cleanup
 
 - **Clean up AI text** removes the characters that look ordinary but are not. A no-break space becomes a normal space and zero width characters are dropped. The same characters are cleaned up whatever wrote them.
-- **Use plain punctuation** turns `—` and `–` into `-`, and `“ ” ‘ ’` into `"` and `'`. Straight quotes survive code and search better than curly ones. This one is a matter of taste rather than tidiness, so switch it off if you set your punctuation on purpose.
+- **Use plain punctuation** turns long dashes into `-`, and `“ ” ‘ ’` into `"` and `'`. Straight quotes survive code and search better than curly ones. This one is a matter of taste rather than tidiness, so switch it off if you set your punctuation on purpose.
 
 Several invisible characters are deliberately kept, because they are load bearing rather than junk. The zero width joiner holds a multi part emoji together, the joiner and non-joiner are ordinary content in Persian, Arabic and the Indic scripts, the direction marks make mixed Arabic or Hebrew and Latin text render in the right order, and the ideographic space is the normal word space in CJK. Guillemets `«` `»` are left alone for the same reason, being real quotation marks in several languages.
 
@@ -201,7 +205,7 @@ Better Paste makes network requests in exactly one situation.
 
 **What is stored.** Downloaded pictures go to the attachment location your vault is configured to use. Settings live in `.obsidian/plugins/better-paste/data.json`. Nothing leaves the vault.
 
-**Worth knowing.** Downloading an image reveals your IP address to whoever serves it, exactly as visiting the page would. Turn off **Save pasted images into the vault** if that matters for a given vault. Pictures already on the clipboard are still saved, since saving those touches no network at all.
+**Worth knowing.** Downloading an image reveals your IP address to whoever serves it, exactly as visiting the page would. Turn off **Save pasted images into the vault** if that matters for a given vault. Bitmap-only screenshots are still left to Obsidian's own paste handler.
 
 <br/>
 

@@ -122,6 +122,10 @@ describe('wildcards', () => {
         expect(cleanUrl('https://google.a.b.c.example/search?q=hi', options())).toBe('https://google.a.b.c.example/search');
     });
 
+    it('does not mistake an ordinary two-label suffix for a country domain', () => {
+        expect(cleanUrl('https://google.example.com/search?q=hi', options())).toBe('https://google.example.com/search');
+    });
+
     it('still does not match a domain that merely ends with the same letters', () => {
         expect(cleanUrl('https://notexample.com/p?id=7', options('all', ['example.com | id']))).toBe('https://notexample.com/p');
     });
@@ -269,5 +273,12 @@ describe('cleanUrlsInText', () => {
         const result = cleanUrlsInText('no links here', options());
         expect(result.count).toBe(0);
         expect(result.text).toBe('no links here');
+    });
+
+    it('does not move URL-safe query characters onto the cleaned path', () => {
+        for (const suffix of ['_', '~', '*']) {
+            const input = `https://example.com/a?utm_source=value${suffix}`;
+            expect(cleanUrlsInText(input, options('tracking')).text).toBe('https://example.com/a');
+        }
     });
 });

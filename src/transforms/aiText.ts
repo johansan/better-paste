@@ -88,7 +88,7 @@ export interface AiTextResult {
  * spaces, zero-width and direction-control characters are dropped.
  *
  * Runs before the other text rules, because a no-break space is not whitespace to a
- * regular expression — leaving one in place would defeat the terminal rule's blank-line
+ * regular expression. Leaving one in place would defeat the terminal rule's blank-line
  * and indentation detection.
  */
 export function normalizeInvisibleCharacters(input: string): AiTextResult {
@@ -101,7 +101,7 @@ export function normalizeInvisibleCharacters(input: string): AiTextResult {
  * hyphens, curly quotes become straight ones.
  *
  * Runs after the terminal rule, not before it. A hyphen is a list marker, so converting
- * "— he said" to "- he said" first would make the terminal rule read that line as a bullet:
+ * a leading long dash to a hyphen first would make the terminal rule read that line as a bullet:
  * it would refuse to rejoin the wrapped paragraph and would render the sentence as a list
  * item. Doing it last means the dash is still a dash while line structure is decided.
  */

@@ -43,7 +43,7 @@ export interface TextPipelineResult {
  * - Invisible characters go first. A no-break space is not whitespace to a regular
  *   expression, so leaving one in would defeat the blank-line and indentation detection
  *   that the terminal rule depends on.
- * - Punctuation goes last. A hyphen is a list marker, so converting "— he said" early would
+ * - Punctuation goes last. A hyphen is a list marker, so converting a long dash early would
  *   make the terminal rule read that line as a bullet, refuse to rejoin the paragraph, and
  *   leave the sentence rendering as a list item.
  *

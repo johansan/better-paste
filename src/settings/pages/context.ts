@@ -23,7 +23,7 @@ import type { BetterPasteSettings } from '../types';
 /**
  * What every page builder receives. Settings are read through a function so that
  * `visible` predicates always see current values rather than a snapshot taken at build
- * time — Obsidian re-evaluates them on each render.
+ * time because Obsidian re-evaluates them on each render.
  */
 export interface SettingsPageContext {
     settings: () => BetterPasteSettings;

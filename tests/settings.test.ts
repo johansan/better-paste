@@ -20,7 +20,7 @@ import { describe, expect, it } from 'vitest';
 import { findInvalidDomainRules, normalizeSettings, parseLines } from '../src/settings/normalize';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { SHIPPED_DOMAIN_RULES } from '../src/settings/constants';
-import { isPreformattedHtml, onlyImageFiles } from '../src/paste/PasteService';
+import { isPreformattedHtml, isSingleImageFile } from '../src/paste/PasteService';
 import { runTextPipeline } from '../src/transforms';
 import { mergeDomainRules } from '../src/transforms/urlCleanup';
 import { fakeFile } from './stubs/editor';
@@ -107,21 +107,25 @@ describe('isPreformattedHtml', () => {
     });
 });
 
-describe('onlyImageFiles', () => {
-    it('is true when every file is an image', () => {
-        expect(onlyImageFiles([fakeFile('a.png', 'image/png'), fakeFile('b.jpg', 'image/jpeg')])).toBe(true);
+describe('isSingleImageFile', () => {
+    it('is true for one image', () => {
+        expect(isSingleImageFile([fakeFile('a.png', 'image/png')])).toBe(true);
     });
 
-    it('is false for a mixed paste, so nothing is dropped', () => {
-        expect(onlyImageFiles([fakeFile('a.png', 'image/png'), fakeFile('notes.pdf', 'application/pdf')])).toBe(false);
+    it('is false for several images, which are left to Obsidian', () => {
+        expect(isSingleImageFile([fakeFile('a.png', 'image/png'), fakeFile('b.jpg', 'image/jpeg')])).toBe(false);
+    });
+
+    it('is false for a non-image file', () => {
+        expect(isSingleImageFile([fakeFile('notes.pdf', 'application/pdf')])).toBe(false);
     });
 
     it('is false when there are no files', () => {
-        expect(onlyImageFiles([])).toBe(false);
+        expect(isSingleImageFile([])).toBe(false);
     });
 
     it('is false when the type is unknown', () => {
-        expect(onlyImageFiles([fakeFile('mystery', '')])).toBe(false);
+        expect(isSingleImageFile([fakeFile('mystery', '')])).toBe(false);
     });
 });
 
@@ -145,7 +149,7 @@ describe('runTextPipeline', () => {
     it('normalises AI typography before the other rules see it', () => {
         // A no-break space is not whitespace to a regular expression, so if the AI rule did
         // not run first the terminal rule would treat this line as non-blank
-        const result = runTextPipeline('a — b', DEFAULT_SETTINGS);
+        const result = runTextPipeline('a\u00a0\u2014\u00a0b', DEFAULT_SETTINGS);
         expect(result.text).toBe('a - b');
         expect(result.aiTextCleaned).toBe(true);
     });
@@ -205,6 +209,6 @@ describe('runTextPipeline', () => {
         expect(runTextPipeline('https://example.com/a?utm_source=x', { ...DEFAULT_SETTINGS, urlEnabled: false }).text).toBe(
             'https://example.com/a?utm_source=x'
         );
-        expect(runTextPipeline('a — b', { ...DEFAULT_SETTINGS, aiTextEnabled: false }).text).toBe('a — b');
+        expect(runTextPipeline('a \u2014 b', { ...DEFAULT_SETTINGS, aiTextEnabled: false }).text).toBe('a \u2014 b');
     });
 });

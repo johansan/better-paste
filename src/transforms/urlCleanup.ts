@@ -23,6 +23,9 @@ import type { BetterPasteSettings, UrlStripMode } from '../settings/types';
 /** How many labels a wildcard top-level domain may stand for, covering ".com" and ".co.uk". */
 const MAX_TLD_LABELS = 2;
 
+/** Common second-level labels used before a two-letter country suffix. */
+const COUNTRY_SECOND_LEVEL_LABELS = new Set(['ac', 'co', 'com', 'edu', 'gov', 'net', 'org']);
+
 /** A parsed line from the site rules. */
 export interface DomainRule {
     /** Hostname the rule applies to, matched against the host itself and any subdomain. */
@@ -57,7 +60,7 @@ export function buildUrlCleanupOptions(settings: Pick<BetterPasteSettings, 'urlS
 const URL_PATTERN = /https?:\/\/[^\s<>"'`\\]+/gi;
 
 /** Punctuation that is almost always sentence punctuation rather than part of the URL. */
-const TRAILING_PUNCTUATION = new Set(['.', ',', ';', ':', '!', '?', '"', "'", '`', '*', '_', '~']);
+const TRAILING_PUNCTUATION = new Set(['.', ',', ';', ':', '!', '?', '"', "'", '`']);
 
 /** Closing brackets that only belong to the URL when the URL also contains their opening partner. */
 const CLOSING_BRACKETS: Record<string, string> = {
@@ -108,7 +111,7 @@ export function trimUrlTail(url: string): string {
  * Normalises a domain for matching.
  *
  * A leading "*." is accepted and dropped, because a rule already covers every subdomain:
- * "example.com" and "*.example.com" mean the same thing. A trailing ".*" is different — it
+ * "example.com" and "*.example.com" mean the same thing. A trailing ".*" is different because it
  * means the site on any top-level domain, which is how one rule covers google.com,
  * google.se and google.co.uk together.
  */
@@ -128,9 +131,15 @@ function hostMatchesRule(host: string, rule: DomainRule): boolean {
     for (let start = 0; start + wanted.length < labels.length; start++) {
         if (!wanted.every((label, offset) => labels[start + offset] === label)) continue;
 
-        // Whatever follows has to be short enough to be a top-level domain
+        // One label covers .com and .se. Two labels must look like .co.uk or .com.au,
+        // otherwise a host such as google.example.com would match google.*.
         const remaining = labels.length - (start + wanted.length);
-        if (remaining >= 1 && remaining <= MAX_TLD_LABELS) return true;
+        if (remaining === 1) return true;
+        if (remaining === MAX_TLD_LABELS) {
+            const secondLevel = labels[start + wanted.length];
+            const country = labels[start + wanted.length + 1];
+            if (COUNTRY_SECOND_LEVEL_LABELS.has(secondLevel) && country.length === 2) return true;
+        }
     }
 
     return false;

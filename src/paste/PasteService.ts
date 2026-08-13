@@ -40,10 +40,10 @@ interface PasteSummary {
     imagesFailed: number;
 }
 
-/** True when the clipboard carries at least one file and every file is an image. */
-export function onlyImageFiles(files: FileList | readonly File[]): boolean {
+/** True when the clipboard carries exactly one image file. */
+export function isSingleImageFile(files: FileList | readonly File[]): boolean {
     const list = Array.from(files);
-    return list.length > 0 && list.every(file => file.type.toLowerCase().startsWith('image/'));
+    return list.length === 1 && list[0].type.toLowerCase().startsWith('image/');
 }
 
 /**
@@ -97,8 +97,9 @@ export class PasteService {
         const html = clipboard.getData('text/html');
 
         if (clipboard.files.length > 0) {
-            // Mixed pastes are left alone so a non-image attachment is never dropped
-            if (!settings.imagesEnabled || !onlyImageFiles(clipboard.files)) return false;
+            // Obsidian owns multi-file pastes. This path only handles one bitmap, either to
+            // avoid the HTML flavour or apply a note-specific width.
+            if (!settings.imagesEnabled || !isSingleImageFile(clipboard.files)) return false;
 
             // Two reasons to take over a bitmap paste. Safari's "Copy image" puts the bitmap
             // AND an <img> tag on the clipboard, and Obsidian prefers the HTML there, which
@@ -108,7 +109,7 @@ export class PasteService {
             const size = this.imageSizeFor(editor);
             if (!htmlHasImages(html) && size === null) return false;
 
-            void this.pasteClipboardImages(clipboard, editor, info, html, size);
+            void this.pasteClipboardImage(clipboard, editor, info, html, size);
             return true;
         }
 
@@ -142,11 +143,11 @@ export class PasteService {
     }
 
     /**
-     * Saves clipboard bitmaps into the vault and inserts embeds for them. The range to fill
+     * Saves a clipboard bitmap into the vault and inserts its embed. The range to fill
      * is measured before the first await so the insert lands where the paste was aimed, even
      * though the vault write is asynchronous.
      */
-    private async pasteClipboardImages(
+    private async pasteClipboardImage(
         clipboard: DataTransfer,
         editor: Editor,
         info: MarkdownView | MarkdownFileInfo,
@@ -156,10 +157,10 @@ export class PasteService {
         const fromOffset = editor.posToOffset(editor.getCursor('from'));
         const toOffset = editor.posToOffset(editor.getCursor('to'));
         // The document is untouched at this point, because the default paste was
-        // suppressed. If its length changes while the vault write runs, the user typed,
-        // and the offsets above no longer mean what they meant.
-        const lengthBefore = editor.getValue().length;
-        const files = Array.from(clipboard.files);
+        // suppressed. The complete value is kept so an equal-length edit cannot make stale
+        // offsets look safe after the vault write finishes.
+        const valueBefore = editor.getValue();
+        const file = clipboard.files[0];
         const sources = imageSourcesFromHtml(html);
 
         const summary: PasteSummary = {
@@ -169,26 +170,21 @@ export class PasteService {
             imagesDownloaded: 0,
             imagesFailed: 0
         };
-        let embeds: string[] = [];
+        let embed: string | null = null;
 
         try {
-            const result = await this.images.saveClipboardImages(files, sources, this.sourcePathOf(info), size);
-            embeds = result.embeds;
-            summary.imagesDownloaded = result.embeds.length;
-            summary.imagesFailed = result.failed;
+            embed = await this.images.saveClipboardImage(file, sources[0] ?? '', this.sourcePathOf(info), size);
+            if (embed) summary.imagesDownloaded = 1;
+            else summary.imagesFailed = 1;
         } catch (error) {
+            summary.imagesFailed = 1;
             logError('Could not save a pasted image', error);
         }
 
-        // Nothing was saved, so fall back to linking the original pictures rather than
+        // Nothing was saved, so fall back to linking the original picture rather than
         // swallowing the paste entirely.
-        const text =
-            embeds.length > 0
-                ? embeds.join('\n')
-                : sources
-                      .filter(Boolean)
-                      .map(source => `![${size ?? ''}](${source})`)
-                      .join('\n');
+        const source = sources[0] ?? '';
+        const text = embed ?? (source ? `![${size ?? ''}](${source})` : '');
 
         if (this.disposed) return;
 
@@ -199,13 +195,14 @@ export class PasteService {
             return;
         }
 
-        if (editor.getValue().length === lengthBefore) {
+        if (editor.getValue() === valueBefore) {
             editor.replaceRange(text, editor.offsetToPos(fromOffset), editor.offsetToPos(toOffset));
             editor.setCursor(editor.offsetToPos(fromOffset + text.length));
         } else {
-            // Somebody typed while the image was being written. Inserting at the recorded
-            // offsets would overwrite whatever they wrote, so go in at the cursor instead.
-            editor.replaceSelection(text);
+            // The document changed while the image was being written, so the recorded range
+            // is stale. Insert at the head without deleting the user's current selection.
+            const cursor = editor.getCursor();
+            editor.replaceRange(text, cursor, cursor);
         }
 
         this.notify(summary);
@@ -274,7 +271,7 @@ export class PasteService {
      */
     private scheduleRichPostProcess(editor: Editor, info: MarkdownView | MarkdownFileInfo): void {
         const settings = this.getSettings();
-        if (!settings.urlEnabled && !settings.imagesEnabled) return;
+        if (!settings.aiTextEnabled && !settings.urlEnabled && !settings.imagesEnabled) return;
 
         const startOffset = editor.posToOffset(editor.getCursor('from'));
         const lengthBefore = editor.getValue().length;
@@ -352,6 +349,7 @@ export class PasteService {
     ): Promise<void> {
         try {
             const result = await this.images.materializeImages(inserted, this.sourcePathOf(info), this.imageSizeFor(editor));
+            if (this.disposed) return;
             summary.imagesDownloaded = result.downloaded;
             summary.imagesFailed = result.failed;
             if (result.text !== inserted) this.replaceRange(editor, startOffset, inserted, result.text);
@@ -373,10 +371,15 @@ export class PasteService {
 
         let offset = value.startsWith(expected, startOffset) ? startOffset : -1;
         if (offset < 0) {
-            // Bounded on both sides: the same URL can appear elsewhere in the note, and
-            // an unbounded search would happily rewrite that one instead
-            const found = value.indexOf(expected, Math.max(0, startOffset - REALIGN_WINDOW));
-            offset = found >= 0 && found <= startOffset + REALIGN_WINDOW ? found : -1;
+            // A shifted range is only safe to rewrite when it is unique nearby. Otherwise an
+            // identical URL elsewhere in the note could be mistaken for the pasted one.
+            const searchFrom = Math.max(0, startOffset - REALIGN_WINDOW);
+            const searchTo = Math.min(value.length, startOffset + REALIGN_WINDOW);
+            const first = value.indexOf(expected, searchFrom);
+            if (first >= 0 && first <= searchTo) {
+                const second = value.indexOf(expected, first + expected.length);
+                if (second < 0 || second > searchTo) offset = first;
+            }
         }
         if (offset < 0) return;
 

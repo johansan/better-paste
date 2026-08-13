@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** Shown on the support row in settings and at the foot of the What's new dialog. */
-export const SUPPORT_SPONSOR_URL = 'https://github.com/sponsors/johansan/';
-export const SUPPORT_BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/johansan';
+declare module '*.jpg' {
+    const dataUrl: string;
+    export default dataUrl;
+}

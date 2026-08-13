@@ -26,10 +26,10 @@ jobs:
           node-version: '24.x'
           cache: npm
 
-      - name: Build plugin
+      - name: Check and build plugin
         run: |
           npm ci
-          npm run build
+          CI=1 ./scripts/build.sh
 
       # A mismatch here means the tag and the manifest disagree, which Obsidian's
       # release checks reject

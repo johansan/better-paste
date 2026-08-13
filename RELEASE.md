@@ -16,10 +16,10 @@ Submission is a form at [community.obsidian.md](https://community.obsidian.md), 
 ### Already done
 
 - `manifest.json` uses only the nine allowed keys, and `id`, `name` and `description` are free of the words "obsidian" and "plugin".
-- The description satisfies the validator's charset, which permits only `A-Za-z0-9 .,!?'"-`. A colon or an em dash would be rejected, and no local lint catches it — the rule only fires on a filename that no ESLint config block matches.
+- The description satisfies the validator's charset, which permits only `A-Za-z0-9 .,!?'"-`. A colon or an em dash would be rejected. No local lint catches it because the rule only fires on a filename that no ESLint config block matches.
 - `LICENSE` is verbatim GPL-3.0 so GitHub detects it. Anything prepended makes GitHub report `NOASSERTION`, which the scanner flags.
 - The README discloses network use, which policy requires for any plugin that makes requests.
-- `versions.json` maps `1.0.0` to `minAppVersion` 1.13.0.
+- `versions.json` maps `1.0.0` to `minAppVersion` 1.13.1.
 - `id` `better-paste` and name "Better Paste" were both free as of 2026-08-12, across 6,602 published plugins.
 
 ## Cutting a release

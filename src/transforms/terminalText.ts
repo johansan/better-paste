@@ -27,13 +27,40 @@ export type TerminalCleanupOptions = Pick<BetterPasteSettings, 'terminalRejoinMo
 const NUMBERED_LIST = /^\s*\d{1,9}[.)]\s/;
 const HEADING = /^\s{0,3}#{1,6}(\s|$)/;
 const BLOCKQUOTE = /^\s{0,3}>/;
-const FENCE = /^\s*(?:```|~~~)/;
 const TABLE_ROW = /^\s*\|/;
 const THEMATIC_BREAK = /^\s{0,3}(?:-{3,}|\*{3,}|_{3,})\s*$/;
 const FRONTMATTER_DELIMITER = /^---\s*$/;
 
 /** Markdown treats four or more leading spaces as an indented code block. */
 const INDENTED_CODE_WIDTH = 4;
+
+interface FenceDelimiter {
+    marker: '`' | '~';
+    length: number;
+    rest: string;
+}
+
+/** Returns the delimiter on a possible fence line. */
+function fenceDelimiterOf(line: string): FenceDelimiter | null {
+    const match = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
+    if (!match) return null;
+
+    const marker: '`' | '~' = match[1].startsWith('`') ? '`' : '~';
+    const rest = match[2];
+    if (marker === '`' && rest.includes('`')) return null;
+    return { marker, length: match[1].length, rest };
+}
+
+/** A closing fence must use the opening marker, be at least as long, and have no info string. */
+function closesFence(line: string, opening: FenceDelimiter): boolean {
+    const candidate = fenceDelimiterOf(line);
+    return (
+        candidate !== null &&
+        candidate.marker === opening.marker &&
+        candidate.length >= opening.length &&
+        candidate.rest.trim().length === 0
+    );
+}
 
 /** Returns the literal leading whitespace of a line. */
 function leadingWhitespace(line: string): string {
@@ -60,7 +87,7 @@ function isBlank(line: string): boolean {
  * A terminal breaks every long line at the same column, so wrapped lines cluster just
  * below it. When at least two lines sit near the longest one, that length is taken as the
  * wrap column. A single long line is an outlier rather than evidence, so the conservative
- * floor is used instead — which also covers text that was never wrapped at all.
+ * floor is used instead, which also covers text that was never wrapped at all.
  *
  * This replaces asking the user for a threshold they cannot know: the answer depends on
  * how wide their terminal window happened to be when they copied.
@@ -69,13 +96,18 @@ export function inferWrapWidth(lines: readonly string[]): number {
     // Fenced content is copied verbatim, so a long JSON line inside a log dump must not
     // drag the threshold above the prose the user actually wants rejoined
     const prose: string[] = [];
-    let insideFence = false;
+    let fence: FenceDelimiter | null = null;
     for (const line of lines) {
-        if (FENCE.test(line)) {
-            insideFence = !insideFence;
+        if (fence === null) {
+            const opening = fenceDelimiterOf(line);
+            if (opening) {
+                fence = opening;
+                continue;
+            }
+            if (!isBlank(line)) prose.push(line);
             continue;
         }
-        if (!insideFence && !isBlank(line)) prose.push(line);
+        if (closesFence(line, fence)) fence = null;
     }
 
     const lengths = prose.map(line => line.trimEnd().length);
@@ -107,7 +139,7 @@ function startsNewBlock(line: string): boolean {
     if (NUMBERED_LIST.test(line)) return true;
     if (HEADING.test(line)) return true;
     if (BLOCKQUOTE.test(line)) return true;
-    if (FENCE.test(line)) return true;
+    if (fenceDelimiterOf(line) !== null) return true;
     if (TABLE_ROW.test(line)) return true;
     if (THEMATIC_BREAK.test(line)) return true;
     if (FRONTMATTER_DELIMITER.test(line)) return true;
@@ -165,27 +197,26 @@ function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptio
     const requireIndent = rejoin === 'indented';
     const paragraphs: Paragraph[] = [];
     let current: Paragraph | null = null;
-    let insideFence = false;
+    let fence: FenceDelimiter | null = null;
 
     for (const line of lines) {
-        const fenceToggle = FENCE.test(line);
-
-        if (isBlank(line) && !insideFence) {
+        if (isBlank(line) && fence === null) {
             current = null;
             paragraphs.push({ lines: [line], verbatim: true });
             continue;
         }
 
-        if (insideFence) {
+        if (fence !== null) {
             // Everything between fences is copied verbatim, including the closing fence
             paragraphs.push({ lines: [line], verbatim: true });
-            if (fenceToggle) insideFence = false;
+            if (closesFence(line, fence)) fence = null;
             continue;
         }
 
-        if (fenceToggle) {
+        const opening = fenceDelimiterOf(line);
+        if (opening) {
             current = null;
-            insideFence = true;
+            fence = opening;
             paragraphs.push({ lines: [line], verbatim: true });
             continue;
         }

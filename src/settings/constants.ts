@@ -162,7 +162,7 @@ export const SHIPPED_DOMAIN_RULES: readonly string[] = [
 
 /**
  * Characters that begin a list item. Deliberately excludes the en and em dash: a line
- * opening with "– " is far more often prose than a bullet, and treating it as a list item
+ * opening with a long dash is far more often prose than a bullet, and treating it as a list item
  * both blocks a legitimate rejoin and corrupts the text when bullets are converted.
  */
 export const LIST_MARKERS: readonly string[] = ['•', '‣', '▪', '▫', '▸', '◦', '·', '-', '*', '+'];

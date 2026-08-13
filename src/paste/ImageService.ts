@@ -33,13 +33,6 @@ interface FetchedImage {
     contentType?: string;
 }
 
-export interface ClipboardImageResult {
-    /** Embeds for the bitmaps that were saved, in clipboard order. */
-    embeds: string[];
-    /** Bitmaps that could not be saved. */
-    failed: number;
-}
-
 export interface ImageMaterializeResult {
     text: string;
     /** Images that were saved into the vault. */
@@ -95,32 +88,18 @@ export class ImageService {
     }
 
     /**
-     * Stores bitmaps that are already on the clipboard, which is what Safari provides
-     * alongside its HTML when you copy an image. `sources` supplies the original image URL
-     * for each file where one is known, so the saved file can be named after the picture
+     * Stores a bitmap that is already on the clipboard, which is what Safari provides
+     * alongside its HTML when you copy an image. `source` supplies the original image URL
+     * when one is known, so the saved file can be named after the picture
      * rather than Safari's generic "image.png".
      */
-    async saveClipboardImages(
-        files: readonly File[],
-        sources: readonly string[],
-        sourcePath: string,
-        size: string | null = null
-    ): Promise<ClipboardImageResult> {
+    async saveClipboardImage(file: File, source: string, sourcePath: string, size: string | null = null): Promise<string | null> {
         const settings = this.getSettings();
-        const embeds: string[] = [];
-        let failed = 0;
-
-        for (const [index, file] of files.entries()) {
-            const embed = await this.saveClipboardImage(file, sources[index] ?? '', sourcePath, settings, size);
-            if (embed === null) failed += 1;
-            else embeds.push(embed);
-        }
-
-        return { embeds, failed };
+        return this.storeClipboardImage(file, source, sourcePath, settings, size);
     }
 
     /** Stores one clipboard bitmap and returns its embed, or null when it cannot be saved. */
-    private async saveClipboardImage(
+    private async storeClipboardImage(
         file: File,
         source: string,
         sourcePath: string,
@@ -181,7 +160,7 @@ export class ImageService {
             const file = await this.saveImage(reference.url, fetched.data, extension, sourcePath, settings);
             if (!file) return null;
 
-            return this.embedFor(file, sourcePath, size);
+            return this.embedFor(file, sourcePath, size, reference.alt);
         } catch (error) {
             logWarning(`Failed to download ${reference.url}`, error);
             return null;
@@ -192,8 +171,9 @@ export class ImageService {
      * Builds the embed for a saved image. Obsidian reads the size out of the link's alias
      * slot in both link styles: `![[picture.png|400]]` and `![400](picture.png)`.
      */
-    private embedFor(file: TFile, sourcePath: string, size: string | null): string {
-        return `!${this.app.fileManager.generateMarkdownLink(file, sourcePath, undefined, size ?? undefined)}`;
+    private embedFor(file: TFile, sourcePath: string, size: string | null, alt = ''): string {
+        const label = size ? (alt ? `${alt}|${size}` : size) : alt || undefined;
+        return `!${this.app.fileManager.generateMarkdownLink(file, sourcePath, undefined, label)}`;
     }
 
     /** Retrieves image bytes from an http(s) URL or decodes them from a data: URI. */

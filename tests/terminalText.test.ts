@@ -147,6 +147,11 @@ describe('cleanTerminalText', () => {
         expect(cleanTerminalText(input, options()).text).toBe(input);
     });
 
+    it('does not close a fence with another marker or a shorter delimiter', () => {
+        const input = ['````js', '~~~', '```', '  const value = 1;', '````'].join('\n');
+        expect(cleanTerminalText(input, options({ terminalRejoinMode: 'never' })).text).toBe(input);
+    });
+
     it('requires an indent for continuation lines by default', () => {
         const input = [
             'A line that is comfortably longer than the sixty character wrap threshold',
