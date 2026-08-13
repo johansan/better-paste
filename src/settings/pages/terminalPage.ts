@@ -49,7 +49,7 @@ export function createTerminalLandingDefinitions(context: SettingsPageContext): 
         {
             type: 'page',
             name: 'Terminal text handling',
-            desc: 'The condition required to treat a line as a continuation of the previous line, and what happens to bullets.',
+            desc: 'Rejoin conditions and bullet characters.',
             visible: enabled,
             displayValue: () => REJOIN_SUMMARY[context.settings().terminalRejoinMode],
             items: createTerminalOptionsDefinitions(context)
