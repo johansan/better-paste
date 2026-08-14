@@ -14,105 +14,187 @@ If you find Better Paste useful, please consider [☕️ Buying me a coffee](htt
 
 <br/>
 
-## 2 What it does
+## 2 How it works
 
-Four rules. Each one can be turned off on its own.
+Copy, paste, and this is what reaches the note. Every rule can be turned off on its own, and [section 3](#3-settings-in-detail) covers each one in full.
 
-**Terminal output.** Copying from a terminal gives you the terminal's line breaks, not yours:
+### 2.1 Images from Safari
 
-```
- The deployment finished, but three of the health checks did not report back before the
-  timeout, so the rollout has been paused pending a manual review.
-
-• Two of the three recovered on their own within a minute, which suggests the checks are
-  racing the container's startup probe rather than failing outright.
-```
-
-pastes as:
+Safari's "Copy image" puts the picture and its web address on the clipboard. Pasted into Obsidian on its own, the address wins and the note points at the website:
 
 ```
-The deployment finished, but three of the health checks did not report back before the timeout, so the rollout has been paused pending a manual review.
-
-• Two of the three recovered on their own within a minute, which suggests the checks are racing the container's startup probe rather than failing outright.
+![](https://images.example.com/2026/05/skyline-8f21a.jpg?auto=format&w=2400)
 ```
 
-**Links.** A link out of a newsletter:
+Pasted with Better Paste, which saves the bytes that were already on the clipboard:
 
 ```
-https://support.claude.com/en/articles/16266773-how-claude-marks-ai-generated-content?utm_source=www.therundown.ai&utm_medium=newsletter&utm_campaign=anthropic-slips-an-invisible-signature-into-claude&_bhlid=5860aad7a9737cf115b5ac231b92ca3147d16877
+![[skyline-8f21a.jpg]]
 ```
 
-pastes as:
+### 2.2 Tracking parameters
+
+Copied out of a newsletter:
 
 ```
-https://support.claude.com/en/articles/16266773-how-claude-marks-ai-generated-content
+https://www.theverge.com/2026/1/9/story?utm_source=newsletter&utm_medium=email&fbclid=IwAR2x9
 ```
 
-Title fetching turns a pasted web address into a Markdown link using the page title. The address is pasted immediately, then replaced when the title arrives. Image addresses are left to image handling, and a failed request leaves the original address in place.
+Pasted:
 
-**AI text.** `“The result was fine,” he said.` pastes as `"The result was fine," he said.` Curly quotes become straight, fancy dashes become hyphens, and the invisible characters that came along are gone.
+```
+https://www.theverge.com/2026/1/9/story
+```
 
-**Images.** Copy a picture in Safari and Obsidian leaves a link to the website. Better Paste saves the picture into your vault instead, so the note still works offline and survives the source site going away.
+### 2.3 Link titles
+
+Copied from the address bar:
+
+```
+https://obsidian.md
+```
+
+Pasted, after the title arrives:
+
+```
+[Obsidian - Sharpen your thinking](https://obsidian.md)
+```
+
+### 2.4 Terminal output
+
+Copied from a terminal, which broke the line at its window width:
+
+```
+npm warn deprecated inflight@1.0.6: This module is not supported and leaks memory. Do
+  not use it. Check out lru-cache instead.
+```
+
+Pasted:
+
+```
+npm warn deprecated inflight@1.0.6: This module is not supported and leaks memory. Do not use it. Check out lru-cache instead.
+```
+
+### 2.5 AI text
+
+Copied from a chatbot:
+
+```
+“It works,” she said — finally.
+```
+
+Pasted:
+
+```
+"It works," she said - finally.
+```
+
+The invisible characters that travel with chatbot text go at the same time, which [section 3.5](#35-text-processing) shows in full.
+
+### 2.6 Commas and quotes
+
+Copied from anywhere that puts the comma inside the quotation mark:
+
+```
+She called it "finished," then left.
+```
+
+Pasted, with **Commas and quotes** set to outside:
+
+```
+She called it "finished", then left.
+```
 
 <br/>
 
-## 3 Security and quality
-
-Better Paste is checked with [TypeScript](https://www.typescriptlang.org/), [ESLint](https://eslint.org/) with the official [Obsidian ESLint plugin](https://github.com/obsidianmd/eslint-plugin), [Stylelint](https://stylelint.io/), [Prettier](https://prettier.io/), [Vitest](https://vitest.dev/) and a dead code check before any change is merged. The build only runs when every check passes, and a warning is treated as an error.
-
-Better Paste runs locally apart from requests to download pasted pictures, fetch pasted link titles, and load dialog artwork. See [section 9](#9-network-disclosure) for the full account.
-
-<br/>
-
-## 4 How it decides what to do
-
-Better Paste looks at what the clipboard actually holds.
-
-| Clipboard holds                                               | What happens                                                                                                                |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| One bitmap **and** an `<img>` tag, from Safari's "Copy image" | Better Paste saves the bitmap it already has. Obsidian on its own prefers the HTML and leaves an external link              |
-| Bitmap data alone, such as a screenshot                       | Left to Obsidian, which already saves it using your attachment settings                                                     |
-| Rich content (HTML)                                           | Obsidian converts it to Markdown as usual, then Better Paste cleans the links and downloads the images in what was inserted |
-| A styled terminal dump                                        | Treated as plain text, so the terminal rule applies                                                                         |
-| Plain text                                                    | Better Paste transforms it and inserts the result itself                                                                    |
-
-Safari's "Copy image" is the case worth calling out. It puts _both_ the decoded bitmap and an `<img>` tag on the clipboard, and Obsidian picks the HTML, so the note ends up pointing at the website instead of holding the picture. Better Paste uses the bytes that are already there, so nothing is downloaded at all. The file is still named after the original picture rather than Safari's generic `image.png`, and the extension comes from the actual bitmap.
-
-A paste containing more than one file is left to Obsidian. Better Paste only takes over a single clipboard bitmap.
-
-Rich content is deliberately left to Obsidian's own HTML to Markdown conversion rather than reimplemented. Better Paste only post-processes the result.
-
-When a download fails or times out, the original link stays in the note. Nothing is lost, and a notice says what happened.
-
-Alt text from a downloaded Markdown or HTML image is kept on the local embed. If the note also sets an image width, the embed carries both.
-
-<br/>
-
-## 5 Settings
+## 3 Settings in detail
 
 Seventeen settings, arranged as a landing page with three sub pages. Anything with only one sensible answer is simply how the plugin behaves, rather than a question you have to answer.
 
-### 5.1 Behavior
+### 3.1 Behavior
 
 - **Clean up every paste** applies the rules whenever you paste. Turn it off to use the commands only.
 - **Show a notice when a paste is changed** gives a one line summary. Failures are reported whatever this is set to.
 
-### 5.2 Images
+### 3.2 Images
 
-**Save pasted images into the vault** saves Safari's "Copy image", pictures inside copied web content, and standalone image addresses as local attachments. Saved pictures go wherever the vault files attachments, which is Obsidian's own setting under Files and links. The plugin does not add a second place to answer that.
+**Save pasted images into the vault** covers Safari's "Copy image", pictures inside copied web content, and standalone image addresses. Saved pictures go wherever the vault files attachments, which is Obsidian's own setting under Files and links. The plugin does not add a second place to answer that.
+
+The address decides the file name, including the address in the `<img>` tag that comes with Safari's "Copy image", so a picture saved from Safari is not called `image.png`. Everything before the last slash and everything after the question mark is dropped:
+
+```
+https://images.example.com/2026/05/skyline-8f21a.jpg?auto=format&w=2400
+```
+
+is saved as `skyline-8f21a.jpg` and embedded as `![[skyline-8f21a.jpg]]`.
 
 Behind **Image handling**:
 
-- **File names** uses the source name or a custom format. A custom format can combine `{{name}}` with Moment date syntax, such as `{{name}}-YYYY-MM-DD`. The setting shows the resulting filename below the field.
-- **Image width property** names the note property that sets how wide pasted images are. See [section 6](#6-per-note-control).
+- **File names** uses the source name or a custom format. A custom format can combine `{{name}}` with Moment date syntax, so `{{name}}-YYYY-MM-DD` saves the picture above as `skyline-8f21a-2026-08-13.jpg`. The setting shows the resulting filename below the field.
+- **Image width property** names the note property that sets how wide pasted images are. See [section 4](#4-per-note-control).
 
-### 5.3 Links
+Alt text survives the download. A copied web page that contained
 
-**Which parameters to remove** offers every parameter except where a site rule keeps it, or only the parameters known to be tracking.
+```
+![Harbour at dusk](https://images.example.com/2026/05/skyline-8f21a.jpg)
+```
 
-**Fetch titles for pasted links** turns a clipboard containing one non-image web address into a Markdown link using the page title. When other text is selected, that text becomes the link label without making a request. It is on by default. Addresses inside prose and links that already carry their own label are left alone.
+becomes
 
-Behind **Rules for preserving parameters**, the full rule list and a live tester:
+```
+![[skyline-8f21a.jpg|Harbour at dusk]]
+```
+
+and if the note also sets a width, the embed carries both as `![[skyline-8f21a.jpg|Harbour at dusk|400]]`.
+
+When a download fails or times out, the original link stays in the note. Nothing is lost, and a notice says what happened.
+
+### 3.3 Links
+
+**Fetch titles for pasted links** turns a clipboard containing one non-image web address into a Markdown link using the page title. The address is pasted immediately and replaced when the title arrives, so nothing blocks while the request runs. When other text is selected, that text becomes the link label without making a request. It is on by default. Addresses inside prose and links that already carry their own label are left alone.
+
+A title that is only the site's own brand name is rejected, because it says nothing the address did not already say. A story on `reddit.com` whose page title comes back as "Reddit" is left as the plain address rather than becoming a link labelled with the site name.
+
+**Clean pasted links** removes the parameters. **Which parameters to remove** chooses between every parameter except where a site rule keeps it, and only the parameters known to be tracking.
+
+Six links, pasted as one block, in the default **every parameter** mode:
+
+```
+https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLxAbC123&si=8f2a1c&utm_source=share&t=42
+https://www.amazon.com/dp/B0CHX1W1XY/ref=sr_1_3?crid=2ABCDE&keywords=usb+hub&qid=1735689600&sr=8-3
+https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT?si=8a1b2c3d4e5f
+https://www.google.co.uk/search?q=obsidian+plugins&client=safari&sca_esv=9f1&sourceid=chrome
+https://news.ycombinator.com/item?id=42315901&utm_medium=email
+https://en.wikipedia.org/wiki/Obsidian#Formation:~:text=Obsidian%20is%20produced
+```
+
+come out as
+
+```
+https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLxAbC123&t=42
+https://www.amazon.com/dp/B0CHX1W1XY/ref=sr_1_3
+https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT
+https://www.google.co.uk/search?q=obsidian+plugins
+https://news.ycombinator.com/item?id=42315901
+https://en.wikipedia.org/wiki/Obsidian#Formation
+```
+
+The video ID, the playlist, the timestamp, the search term and the Hacker News item ID survive because site rules keep them. The scroll to text fragment at the end of the Wikipedia link is dropped while the real `#Formation` anchor is kept. `google.co.uk` is covered by the same rule as `google.com`.
+
+The same six links in **only tracking** mode:
+
+```
+https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLxAbC123&si=8f2a1c&t=42
+https://www.amazon.com/dp/B0CHX1W1XY/ref=sr_1_3?crid=2ABCDE&keywords=usb+hub&qid=1735689600&sr=8-3
+https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT?si=8a1b2c3d4e5f
+https://www.google.co.uk/search?q=obsidian+plugins&client=safari&sca_esv=9f1&sourceid=chrome
+https://news.ycombinator.com/item?id=42315901
+https://en.wikipedia.org/wiki/Obsidian#Formation
+```
+
+Only `utm_medium` was a known tracking name, so only it and the text fragment went. Everything unfamiliar survives, which is the point of the cautious mode.
+
+Behind **Site rules**, the full rule list and a live tester:
 
 ```
 youtube.com | v, t, list, index, start     keep only these parameters
@@ -129,30 +211,113 @@ Only your changes are saved rather than the whole list, so a site added in a lat
 
 A site rule is a whitelist in **every parameter** mode. In **only tracking** mode it can only ever rescue a parameter, never remove one, so an unfamiliar parameter survives if you chose the cautious mode.
 
-### 5.4 Terminal text
+### 3.4 Terminal text
+
+**Clean up terminal output** strips escape sequences, removes the shared indentation, and rejoins the paragraphs a terminal broke at its window width. Here is a whole `npm install` tail, copied as it appeared on screen:
+
+```
+npm warn deprecated inflight@1.0.6: This module is not supported and leaks memory. Do
+  not use it. Check out lru-cache if you want a tested way to coalesce async requests.
+
+
+added 412 packages, and audited 413 packages in 6s
+
+• 52 packages are looking for funding
+• 3 moderate severity vulnerabilities were found in the dependency tree, and two of
+  them are fixed by running npm audit fix.
+```
+
+pasted:
+
+```
+npm warn deprecated inflight@1.0.6: This module is not supported and leaks memory. Do not use it. Check out lru-cache if you want a tested way to coalesce async requests.
+
+added 412 packages, and audited 413 packages in 6s
+
+- 52 packages are looking for funding
+- 3 moderate severity vulnerabilities were found in the dependency tree, and two of them are fixed by running npm audit fix.
+```
+
+Both wrapped paragraphs are back on one line, the run of blank lines collapsed to one, the trailing blank line went, and the `•` bullets became Markdown list items that fold and indent like any other list. The `added 412 packages` line was never wrapped, so it was left exactly as it was.
 
 Behind **Terminal text handling**:
 
-- **When to rejoin a broken line** offers three levels. _Only when the next line is indented_ is what most terminals do and what keeps ordinary multi line text safe. _Whenever the line above looks full_ suits tools that wrap without indenting. _Never rejoin_ leaves every line break alone and only strips escape codes and indentation, which suits column aligned output such as `git log --graph` where the breaks are the layout.
-- **Bullet characters** converts `•` to a real Markdown list item that folds and indents by default, or can leave the original character alone.
+- **When to rejoin a broken line** offers three levels.
+- **Bullet characters** converts `•` to a real Markdown list item, or leaves the original character alone.
 - A live tester.
+
+_Only when the line is indented_ is the default. It is what most terminals do, and it keeps ordinary multi line text safe. _Whether or not the line is indented_ suits tools that wrap without indenting, which the default deliberately leaves alone:
+
+```
+The certificate for api.example.com expired on 12 March, so every request from the
+worker pool has been failing since then.
+```
+
+The default leaves that unchanged, because nothing distinguishes the second line from a line the writer meant to break. The second level rejoins it:
+
+```
+The certificate for api.example.com expired on 12 March, so every request from the worker pool has been failing since then.
+```
+
+_Never rejoin_ leaves every line break alone and only strips escape codes and indentation. It suits column aligned output such as `git log --graph`, where the breaks are the layout and the colour codes are the only thing you want gone.
 
 The wrap column is worked out from the text itself. A terminal breaks every long line at the same place, so wrapped lines cluster just below it. When several lines sit near the longest, that length is the wrap column. Fenced code is excluded from the measurement, so a long line in a log dump does not stop the prose around it from being rejoined.
 
 The rule leaves text alone entirely unless something identifies it as terminal output, meaning it carried escape codes or a paragraph was actually rejoined. Pasted code keeps its indentation and Markdown's two space line break survives.
 
-### 5.5 Text processing
+### 3.5 Text processing
 
 - **Trim surrounding whitespace** drops blank lines and stray spaces from the start and end of pasted text. The middle is left alone.
 - **Commas and quotes** can leave comma placement unchanged, put commas inside closing quotation marks, or put them outside. **No change** is the default because comma placement is a style preference.
-- **AI cleanup: invisible characters** removes zero-width spaces and turns non-breaking spaces into normal spaces. For example, `The[U+00A0]result[U+200B] was fine.` becomes `The result was fine.`
-- **AI cleanup: dashes and quotes** turns long dashes into `-`, and `“ ” ‘ ’` into `"` and `'`. For example, `“The result [long dash] against all odds [long dash] was perfect.”` becomes `"The result - against all odds - was perfect."`
+- **AI cleanup: invisible characters** removes zero-width spaces and turns non-breaking spaces into normal spaces.
+- **AI cleanup: dashes and quotes** turns long dashes into `-`, and `“ ” ‘ ’` into `"` and `'`.
 
-Several invisible characters are deliberately kept, because they carry meaning rather than being junk. The zero width joiner holds a multi part emoji together, the joiner and non-joiner are ordinary content in Persian, Arabic and the Indic scripts, the word joiner prevents a line break, direction marks and embeddings make mixed Arabic or Hebrew and Latin text render in the right order, and the ideographic space is the normal word space in CJK.
+Two lines out of a chatbot, with the invisible characters drawn as their Unicode code points:
+
+```
+“The rollout is fine,” she said — the checks just need more time.
+Runtime dropped from 3–4 minutes to 40 seconds, and it doesn’t block[U+00A0]the release[U+200B].
+```
+
+pasted:
+
+```
+"The rollout is fine," she said - the checks just need more time.
+Runtime dropped from 3-4 minutes to 40 seconds, and it doesn't block the release.
+```
+
+Curly double and single quotes became straight, the em dash and the en dash became hyphens, the non-breaking space became an ordinary space, and the zero-width space at the end is gone.
+
+**Trim surrounding whitespace** works on the edges only. Text copied out of a web page or a chat window usually arrives padded, and the marks below stand for the blank lines and spaces that came with it:
+
+```
+[blank]
+[blank]
+···Meeting notes from the review.···
+[blank]
+```
+
+pasted:
+
+```
+Meeting notes from the review.
+```
+
+A blank line in the middle of the same paste is content, so it stays.
+
+**Commas and quotes** works in both directions, and only on a comma next to a closing double quotation mark:
+
+| Setting              | `She called it "finished," then left.` | `She called it "finished", then left.` |
+| -------------------- | -------------------------------------- | -------------------------------------- |
+| No change (default)  | unchanged                              | unchanged                              |
+| Comma inside quotes  | unchanged                              | `"finished," then left.`               |
+| Comma outside quotes | `"finished", then left.`               | unchanged                              |
+
+Several invisible characters are deliberately kept, because they carry meaning rather than being junk. The zero width joiner holds a multi part emoji together, the joiner and non-joiner are ordinary content in Persian, Arabic and the Indic scripts, the word joiner prevents a line break, direction marks and embeddings make mixed Arabic or Hebrew and Latin text render in the right order, and the ideographic space is the normal word space in CJK. `👨‍👩‍👧` and `東京　です` come through untouched.
 
 <br/>
 
-## 6 Per note control
+## 4 Per note control
 
 Two frontmatter properties change what happens in a single note.
 
@@ -182,7 +347,7 @@ One consequence worth knowing. A note with `image-width` also takes screenshot p
 
 <br/>
 
-## 7 Commands
+## 5 Commands
 
 Set custom hotkeys for these in Obsidian's Hotkeys settings. None are bound by default.
 
@@ -193,7 +358,27 @@ Set custom hotkeys for these in Obsidian's Hotkeys settings. None are bound by d
 
 <br/>
 
-## 8 Languages
+## 6 How it decides what to do
+
+Better Paste looks at what the clipboard actually holds.
+
+| Clipboard holds                                               | What happens                                                                                                                |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| One bitmap **and** an `<img>` tag, from Safari's "Copy image" | Better Paste saves the bitmap it already has. Obsidian on its own prefers the HTML and leaves an external link              |
+| Bitmap data alone, such as a screenshot                       | Left to Obsidian, which already saves it using your attachment settings                                                     |
+| Rich content (HTML)                                           | Obsidian converts it to Markdown as usual, then Better Paste cleans the links and downloads the images in what was inserted |
+| A styled terminal dump                                        | Treated as plain text, so the terminal rule applies                                                                         |
+| Plain text                                                    | Better Paste transforms it and inserts the result itself                                                                    |
+
+Safari's "Copy image" is the case worth calling out. It puts _both_ the decoded bitmap and an `<img>` tag on the clipboard, and Obsidian picks the HTML, so the note ends up pointing at the website instead of holding the picture. Better Paste uses the bytes that are already there, so nothing is downloaded at all. The file is still named after the original picture rather than Safari's generic `image.png`, and the extension comes from the actual bitmap.
+
+A paste containing more than one file is left to Obsidian. Better Paste only takes over a single clipboard bitmap.
+
+Rich content is deliberately left to Obsidian's own HTML to Markdown conversion rather than reimplemented. Better Paste only post-processes the result.
+
+<br/>
+
+## 7 Languages
 
 Commands, settings, notices and dialogs follow the language Obsidian is set to. Twenty one languages are translated, and any other language falls back to English.
 
@@ -205,11 +390,19 @@ Obsidian applies the interface language at startup, so switching language takes 
 
 <br/>
 
+## 8 Security and quality
+
+Better Paste is checked with [TypeScript](https://www.typescriptlang.org/), [ESLint](https://eslint.org/) with the official [Obsidian ESLint plugin](https://github.com/obsidianmd/eslint-plugin), [Stylelint](https://stylelint.io/), [Prettier](https://prettier.io/), [Vitest](https://vitest.dev/) and a dead code check before any change is merged. The build only runs when every check passes, and a warning is treated as an error.
+
+Better Paste runs locally apart from requests to download pasted pictures, fetch pasted link titles, and load dialog artwork. See [section 9](#9-network-disclosure) for the full account.
+
+<br/>
+
 ## 9 Network disclosure
 
 Better Paste makes network requests in exactly three situations.
 
-**Pasting a picture.** When you paste content that references a picture by http(s) address, such as a Safari page selection, a Markdown image link, or a bare link ending in `.png`, the plugin downloads that picture so the note holds a local copy. The address always comes from what you pasted. The plugin never chooses one, and link cleaning deliberately leaves those addresses untouched so a signed link keeps the token it needs. The request uses Obsidian's own `requestUrl`.
+**Pasting a picture.** When you paste content that references a picture by http(s) address, such as a Safari page selection, a Markdown image link, or a bare link ending in `.png`, the plugin downloads that picture so the note holds a local copy. Safari's "Copy image" is the case that makes no request, because the bitmap is already on the clipboard. The address always comes from what you pasted. The plugin never chooses one, and link cleaning deliberately leaves those addresses untouched so a signed link keeps the token it needs. The request uses Obsidian's own `requestUrl`.
 
 **Fetching a link title.** When **Fetch titles for pasted links** is on and the clipboard contains one non-image web address, the plugin fetches that address and reads the HTML page title. A request that fails, takes longer than 10 seconds, returns a non-HTML response, or has no title leaves the pasted address unchanged. This setting is on by default.
 
@@ -231,7 +424,7 @@ Better Paste makes network requests in exactly three situations.
 
 ## 10 What is not a setting
 
-A paste is left alone when the cursor sits inside inline code, an indented or fenced code block, or the frontmatter block. Pasting into code is an act of preservation, so applying text rules there would destroy the thing you were protecting.
+A paste is left alone when the cursor sits inside inline code, an indented or fenced code block, or the frontmatter block. Pasting into code is an act of preservation, so applying text rules there would destroy the thing you were protecting. The same holds inside the text: a fenced block in the middle of what you pasted comes through byte for byte, tracking parameters and curly quotes included.
 
 These behaviours have one sensible value and are simply how the plugin works. Escape sequences and stray control characters are stripped from terminal output, the shared indentation is removed, runs of blank lines collapse, trailing spaces go, fenced code is never rejoined, images embedded in the clipboard as `data:` URIs are always saved, images over 50 MB or slower than 30 seconds are left as links, and scroll to text `#:~:text=` fragments are dropped from links while real anchors are kept.
 
