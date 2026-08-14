@@ -146,7 +146,7 @@ The rule leaves text alone entirely unless something identifies it as terminal o
 - **Trim surrounding whitespace** drops blank lines and stray spaces from the start and end of pasted text. The middle is left alone.
 - **Commas and quotes** can leave comma placement unchanged, put commas inside closing quotation marks, or put them outside. **No change** is the default because comma placement is a style preference.
 - **AI cleanup: invisible characters** removes zero-width spaces and turns non-breaking spaces into normal spaces. For example, `The[U+00A0]result[U+200B] was fine.` becomes `The result was fine.`
-- **AI cleanup: dashes and quotes** turns long dashes into `-`, and `“ ” ‘ ’` into `"` and `'`. For example, `“This approach [long dash] while simple [long dash] can significantly improve your workflow.”` becomes `"This approach - while simple - can significantly improve your workflow."`
+- **AI cleanup: dashes and quotes** turns long dashes into `-`, and `“ ” ‘ ’` into `"` and `'`. For example, `“The result [long dash] against all odds [long dash] was perfect.”` becomes `"The result - against all odds - was perfect."`
 
 Several invisible characters are deliberately kept, because they carry meaning rather than being junk. The zero width joiner holds a multi part emoji together, the joiner and non-joiner are ordinary content in Persian, Arabic and the Indic scripts, the word joiner prevents a line break, direction marks and embeddings make mixed Arabic or Hebrew and Latin text render in the right order, and the ideographic space is the normal word space in CJK.
 
