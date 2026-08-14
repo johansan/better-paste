@@ -53,7 +53,10 @@ const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.1',
         date: '2026-08-13',
-        new: ['Fetch titles for pasted links. A standalone web address can now become a Markdown link using the page title.']
+        new: [
+            'Fetch titles for pasted links. A standalone web address can now become a Markdown link using the page title.',
+            'Translated into 21 languages, following the language Obsidian is set to.'
+        ]
     },
     {
         version: '1.0.0',

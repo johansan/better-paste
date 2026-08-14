@@ -60,7 +60,7 @@ Title fetching turns a pasted web address into a Markdown link using the page ti
 
 Better Paste is checked with [TypeScript](https://www.typescriptlang.org/), [ESLint](https://eslint.org/) with the official [Obsidian ESLint plugin](https://github.com/obsidianmd/eslint-plugin), [Stylelint](https://stylelint.io/), [Prettier](https://prettier.io/), [Vitest](https://vitest.dev/) and a dead code check before any change is merged. The build only runs when every check passes, and a warning is treated as an error.
 
-Better Paste runs locally apart from requests to download pasted pictures, fetch pasted link titles, and load dialog artwork. See [section 8](#8-network-disclosure) for the full account.
+Better Paste runs locally apart from requests to download pasted pictures, fetch pasted link titles, and load dialog artwork. See [section 9](#9-network-disclosure) for the full account.
 
 <br/>
 
@@ -193,7 +193,19 @@ Set custom hotkeys for these in Obsidian's Hotkeys settings. None are bound by d
 
 <br/>
 
-## 8 Network disclosure
+## 8 Languages
+
+Commands, settings, notices and dialogs follow the language Obsidian is set to. Twenty one languages are translated, and any other language falls back to English.
+
+Arabic, Chinese (Simplified), Chinese (Traditional), Dutch, English, French, German, Indonesian, Italian, Japanese, Korean, Persian, Polish, Portuguese, Portuguese (Brazil), Russian, Spanish, Thai, Turkish, Ukrainian, Vietnamese.
+
+A count picks the grammatical number the language requires, so Russian, Polish, Ukrainian and Arabic are not limited to one plural form. Every setting carries search terms in both the interface language and English, so searching either finds the row. The setting names and descriptions themselves are only in the interface language.
+
+Obsidian applies the interface language at startup, so switching language takes effect after a restart. Release notes are written in English.
+
+<br/>
+
+## 9 Network disclosure
 
 Better Paste makes network requests in exactly three situations.
 
@@ -217,7 +229,7 @@ Better Paste makes network requests in exactly three situations.
 
 <br/>
 
-## 9 What is not a setting
+## 10 What is not a setting
 
 A paste is left alone when the cursor sits inside inline code, an indented or fenced code block, or the frontmatter block. Pasting into code is an act of preservation, so applying text rules there would destroy the thing you were protecting.
 
@@ -225,7 +237,7 @@ These behaviours have one sensible value and are simply how the plugin works. Es
 
 <br/>
 
-## 10 Contact
+## 11 Contact
 
 Better Paste is built and maintained by [Johan Sanneblad](https://www.linkedin.com/in/johansan/). Johan has a PhD in Software Development and has worked with innovation development for companies such as Apple, Electronic Arts, Google, Microsoft, Lego, SKF, Volvo Cars, Volvo Group and Yamaha.
 
@@ -233,7 +245,7 @@ Feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/johansan/
 
 <br/>
 
-## 11 Questions or issues?
+## 12 Questions or issues?
 
 Open an issue on the [GitHub repository](https://github.com/johansan/better-paste/issues).
 
@@ -243,6 +255,6 @@ The most useful thing you can include in a bug report is what was on the clipboa
 
 <br/>
 
-## 12 License
+## 13 License
 
 This project is licensed under the GNU General Public License v3.0. See the [LICENSE](https://github.com/johansan/better-paste/blob/main/LICENSE) file for details.

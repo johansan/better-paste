@@ -17,14 +17,8 @@
  */
 
 import { Modal } from 'obsidian';
+import { strings } from '../i18n';
 import { WELCOME_IMAGE_URL } from '../urls';
-
-const INTRODUCTION = [
-    'Better Paste alters clipboard content as it is pasted into a note.',
-    'It saves linked images into the vault as attachments, removes tracking parameters from links, rejoins wrapped lines in terminal output, and replaces curly quotes and invisible characters with plain equivalents.',
-    'Every rule can be turned off on its own.',
-    'A single note can opt out entirely with the "better-paste: false" property. Settings are under Settings, Better Paste.'
-];
 
 /** Shown once, the first time the plugin runs in a vault. */
 export class WelcomeModal extends Modal {
@@ -32,7 +26,7 @@ export class WelcomeModal extends Modal {
 
     onOpen(): void {
         this.modalEl.addClass('better-paste-modal');
-        this.titleEl.setText('Welcome to Better Paste');
+        this.titleEl.setText(strings.welcome.title);
 
         const frame = this.contentEl.createDiv({ cls: 'better-paste-welcome-image' });
         const image = frame.createEl('img', { attr: { alt: '', loading: 'lazy', decoding: 'async' } });
@@ -42,10 +36,10 @@ export class WelcomeModal extends Modal {
         image.src = WELCOME_IMAGE_URL;
 
         const body = this.contentEl.createDiv({ cls: 'better-paste-welcome-body' });
-        for (const paragraph of INTRODUCTION) body.createEl('p', { text: paragraph });
+        for (const paragraph of strings.welcome.intro) body.createEl('p', { text: paragraph });
 
         const buttons = this.contentEl.createDiv({ cls: 'better-paste-modal-buttons' });
-        this.startButton = buttons.createEl('button', { cls: 'mod-cta', text: 'Get started', attr: { type: 'button' } });
+        this.startButton = buttons.createEl('button', { cls: 'mod-cta', text: strings.welcome.startButton, attr: { type: 'button' } });
         this.startButton.addEventListener('click', () => {
             this.close();
         });

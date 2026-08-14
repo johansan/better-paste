@@ -24,6 +24,7 @@ import { PasteService } from './paste/PasteService';
 import { WelcomeModal } from './modals/WelcomeModal';
 import { WhatsNewModal } from './modals/WhatsNewModal';
 import { BetterPasteSettingTab } from './settings/SettingTab';
+import { format, strings } from './i18n';
 import { DEFAULT_SETTINGS } from './settings/defaults';
 import { normalizeSettings } from './settings/normalize';
 import {
@@ -66,7 +67,7 @@ export default class BetterPastePlugin extends Plugin {
 
         this.addCommand({
             id: 'paste',
-            name: 'Paste',
+            name: strings.commands.paste,
             editorCallback: (editor: Editor, info: MarkdownView | MarkdownFileInfo) => {
                 void this.pasteService.pasteProcessed(editor, info);
             }
@@ -74,7 +75,7 @@ export default class BetterPastePlugin extends Plugin {
 
         this.addCommand({
             id: 'paste-raw',
-            name: 'Paste without processing',
+            name: strings.commands.pasteRaw,
             editorCallback: (editor: Editor, info: MarkdownView | MarkdownFileInfo) => {
                 void this.pasteService.pasteRaw(editor, info);
             }
@@ -82,7 +83,7 @@ export default class BetterPastePlugin extends Plugin {
 
         this.addCommand({
             id: 'clean',
-            name: 'Clean up selection',
+            name: strings.commands.cleanSelection,
             editorCallback: (editor: Editor) => {
                 this.pasteService.cleanSelection(editor);
             }
@@ -90,7 +91,7 @@ export default class BetterPastePlugin extends Plugin {
 
         this.addCommand({
             id: 'toggle-cleanup',
-            name: 'Toggle automatic cleanup',
+            name: strings.commands.toggleCleanup,
             callback: () => {
                 void this.toggleAutomaticProcessing();
             }
@@ -122,7 +123,8 @@ export default class BetterPastePlugin extends Plugin {
     private async toggleAutomaticProcessing(): Promise<void> {
         this.settings.autoClean = !this.settings.autoClean;
         await this.saveSettings();
-        new Notice(`Better Paste: automatic processing ${this.settings.autoClean ? 'on' : 'off'}`);
+        const message = this.settings.autoClean ? strings.notices.cleanupOn : strings.notices.cleanupOff;
+        new Notice(format(strings.notices.prefix, { message }));
     }
 
     /** Opens the release notes on demand, from the button in settings. */

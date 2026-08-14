@@ -1,0 +1,225 @@
+/*
+ * Better Paste - Plugin for Obsidian
+ * Copyright (c) 2026 Johan Sanneblad
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+import type { TranslationStrings } from '../types';
+
+/** Korean. Keys and comments live in src/i18n/locales/en.ts. */
+export const STRINGS_KO: TranslationStrings = {
+    commands: {
+        paste: '붙여넣기',
+        pasteRaw: '처리 없이 붙여넣기',
+        cleanSelection: '선택 영역 정리',
+        toggleCleanup: '자동 정리 전환'
+    },
+
+    notices: {
+        prefix: 'Better Paste: {message}',
+        separator: ', ',
+        cleanupOn: '자동 처리 켜짐',
+        cleanupOff: '자동 처리 꺼짐',
+        selectTextFirst: '먼저 텍스트를 선택하세요',
+        nothingToClean: '정리할 것이 없습니다',
+        clipboardFailed: '클립보드를 읽지 못했습니다',
+        titleFailed: '제목을 가져오지 못했습니다.',
+        fetchingTitle: '제목 가져오는 중{dots}',
+        imagesFailed: { other: '이미지 {count}개를 저장하지 못했습니다' },
+        imagesFailedLinkKept: '{images}. 원래 링크를 유지했습니다',
+        imagesFailedNothingPasted: '{images}. 그래서 아무것도 붙여넣지 않았습니다. 내용은 클립보드에 그대로 있습니다.',
+        aiTextCleaned: 'AI 텍스트 정돈',
+        terminalCleaned: '터미널 출력 정리',
+        textProcessed: '텍스트 스타일 조정',
+        urlsCleaned: { other: 'URL {count}개 정리' },
+        imagesSaved: { other: '이미지 {count}개 저장' }
+    },
+
+    settings: {
+        exampleFallback: '{description} 예: {example}',
+        plainFallback: '{description} {example}',
+
+        start: {
+            whatsNewName: 'Better Paste {version}의 새로운 기능',
+            whatsNewDesc: '최근 릴리스에서 달라진 점입니다.',
+            whatsNewAliases: ['릴리스 노트', '변경 사항', '변경 기록', '버전', '업데이트', '기록'],
+            whatsNewButton: '최근 업데이트 보기',
+            supportName: '개발 후원하기',
+            supportDesc: 'Better Paste가 도움이 되었다면 계속된 개발을 후원해 주세요.',
+            supportAliases: ['후원', '기부', '커피', 'github'],
+            sponsorButton: '❤️ 후원',
+            coffeeButton: '☕️ 커피 한 잔 사주기'
+        },
+
+        behavior: {
+            heading: '동작',
+            autoCleanName: '붙여넣을 때마다 정리',
+            autoCleanDesc:
+                '붙여넣을 때마다 규칙을 적용합니다. 명령만 사용하려면 끄세요. 개별 노트는 "better-paste: false" 속성으로 제외할 수 있습니다.',
+            autoCleanAliases: ['자동', '켜기', '끄기', '노트', '제외', '속성', '프론트매터', 'frontmatter'],
+            showNoticesName: '붙여넣기가 변경되면 알림 표시',
+            showNoticesDesc: '무엇을 정리했는지 한 줄로 요약합니다. 실패는 이 설정과 관계없이 항상 알립니다.',
+            showNoticesAliases: ['알림', '요약', '메시지', '조용히']
+        },
+
+        images: {
+            heading: '이미지',
+            savingName: '붙여넣은 이미지를 보관함에 저장',
+            savingDesc:
+                '외부 이미지 링크를 남기지 않고 붙여넣은 이미지를 로컬 파일로 저장합니다. Safari의 "이미지 복사", 복사한 웹 콘텐츠 속 이미지, 단독 이미지 주소가 여기에 해당합니다. 이미지는 보관함의 첨부 파일 폴더에 저장됩니다. "원본 이름 사용"을 선택한 경우:',
+            savingAliases: ['다운로드', '첨부 파일', 'safari', '스크린샷', '이미지', '폴더', '파일 이름', '너비', '크기'],
+            pageName: '이미지 처리',
+            pageDesc: '파일 이름과 노트별 이미지 너비.',
+            nameFormatName: '파일 이름',
+            nameFormatDesc: '저장한 이미지 파일의 이름을 정하는 방식을 선택합니다.',
+            nameFormatSource: '원본 이름 사용',
+            nameFormatCustom: '사용자 형식',
+            customName: '사용자 형식',
+            customDesc: '원본 이름에는 {{name}}을, 날짜에는 YYYY-MM-DD 같은 Moment 형식을 사용하세요.',
+            customMomentLink: 'Moment 형식',
+            customExample: '예: {value}',
+            customAliases: ['이름', '파일 이름', '날짜', 'moment', 'YYYY', '{{name}}'],
+            sizePropertyName: '이미지 너비 속성',
+            sizePropertyDesc:
+                '노트에 붙여넣는 이미지의 너비를 정하는 프론트매터 속성입니다. 이 속성을 쓰는 노트에서는 스크린샷 붙여넣기를 Obsidian 대신 이 플러그인이 처리합니다. 비워 두면 사용하지 않습니다.',
+            sizePropertyAliases: ['크기', '프론트매터', 'frontmatter', '속성', '크기 조정']
+        },
+
+        links: {
+            heading: '링크',
+            titlesName: '붙여넣은 링크의 제목 가져오기',
+            titlesDesc:
+                '클립보드에 이미지가 아닌 웹 주소만 있으면 페이지 제목을 가져와 Markdown 링크를 붙여넣습니다. 다른 텍스트를 선택해 두었다면 요청 없이 그 텍스트가 링크 이름이 됩니다. 제목을 가져오지 못하면 원래 주소를 그대로 둡니다.',
+            titlesAliases: ['제목', '페이지', '웹사이트', 'markdown 링크', '다운로드'],
+            cleaningName: '붙여넣은 링크 정리',
+            cleaningDesc: '붙여넣은 링크에서 추적 매개변수를 제거합니다. 취소선이 그어진 부분이 제거됩니다:',
+            cleaningAliases: ['url', '추적', 'utm', '매개변수', '쿼리', '사이트', '도메인', 'youtube', '예외'],
+            stripName: '어떤 매개변수를 제거할지',
+            stripDesc:
+                '모든 쿼리 매개변수를 제거할지, 알려진 추적 매개변수만 제거할지 선택합니다. 사이트 규칙은 두 방식 모두에서 매개변수를 남길 수 있습니다.',
+            stripAliases: ['utm', '추적', '쿼리', '매개변수'],
+            stripAll: '사이트 규칙이 남기는 경우를 빼고 모든 매개변수',
+            stripTracking: '알려진 추적 매개변수만',
+            rulesName: '매개변수를 남기는 규칙',
+            rulesDesc: '두 제거 방식 모두에서 특정 쿼리 매개변수를 남기기 위한 사이트 규칙입니다.',
+            rulesCount: { other: '{count}개 사이트' },
+            listName: '내 사이트 규칙',
+            listDesc:
+                '{sites}은 이미 처리되어 있으며 플러그인과 함께 최신 상태로 유지됩니다. 여기에 직접 만든 사이트 규칙을 한 줄에 하나씩 추가하세요. "example.com"은 그 사이트의 모든 매개변수를 남기고, "example.com: a, b"는 그 둘만 남기며, "!example.com"은 플러그인에 포함된 규칙을 취소합니다. "알려진 추적 매개변수만" 방식에서는 나머지 매개변수가 이미 남아 있기 때문에 규칙은 해당하는 추적 매개변수만 남깁니다. 하위 도메인은 자동으로 일치합니다.',
+            listShippedCount: { other: '주요 사이트 {count}곳' },
+            listAliases: ['도메인', '예외', '허용 목록', 'youtube'],
+            listInvalid: '사이트 이름이 아닙니다: {values}',
+            testerName: '시험해 보기',
+            testerDesc: '링크를 붙여넣어 이 규칙이 무엇을 남기는지 확인하세요.',
+            testerLabel: '정리할 링크',
+            testerEmpty: '정리된 링크가 여기에 표시됩니다.'
+        },
+
+        terminal: {
+            heading: '터미널 텍스트',
+            cleanupName: '터미널 출력 정리',
+            cleanupDesc:
+                '터미널 출력에서 줄바꿈된 행을 다시 잇고 들여쓰기를 없앱니다. 색상 코드는 제거됩니다. 코드 블록, 표, 목록 항목은 그대로 둡니다.',
+            cleanupAliases: ['줄바꿈', '잇기', 'ansi', '콘솔', '셸', '들여쓰기', '글머리 기호', '목록', 'markdown'],
+            pageName: '터미널 텍스트 처리',
+            pageDesc: '다시 잇는 조건과 글머리 기호 문자.',
+            rejoinName: '끊어진 줄을 다시 잇는 시점',
+            rejoinDesc: '어떤 줄을 앞 줄의 연속으로 볼지 판단하는 조건입니다.',
+            rejoinAliases: ['들여쓰기', '줄바꿈', '적극적', '안전', 'git log'],
+            rejoinIndented: '다음 줄이 들여쓰기된 경우에만',
+            rejoinAny: '윗줄이 가득 차 보일 때마다',
+            rejoinNever: '절대 잇지 않고 코드와 들여쓰기만 제거',
+            bulletsName: '글머리 기호 문자',
+            bulletsDesc: '터미널 출력의 글머리 기호(• 등)를 그대로 둘지 Markdown 목록 항목으로 바꿀지 정합니다.',
+            bulletsAliases: ['목록', 'markdown', '대시'],
+            bulletsMarkdown: 'Markdown 목록 항목으로 변환',
+            bulletsPreserve: '그대로 두기',
+            testerName: '시험해 보기',
+            testerDesc: '터미널 출력을 붙여넣어 어떻게 정리되는지 확인하세요.',
+            testerLabel: '정리할 터미널 텍스트',
+            testerEmpty: '정리된 텍스트가 여기에 표시됩니다.',
+            testerSample: [
+                '• 추가 단계는 목록의 Enter 처리기에만 한정되므로 핵심 변경은 간단합니다. 인접한 흐름을 따라가다가 찾은 것은',
+                '  확인해 볼 만한 마찰 지점 두 곳으로, 새로 고침 뒤 선택이 튈 수 있습니다.'
+            ]
+        },
+
+        text: {
+            heading: '텍스트 처리',
+            trimName: '앞뒤 공백 제거',
+            trimDesc: '붙여넣은 텍스트의 처음과 끝에서 빈 줄과 공백을 제거합니다.',
+            trimAliases: ['공백', '빈 줄', '스페이스', '줄바꿈', '다듬기'],
+            commasName: '쉼표와 따옴표',
+            commasDesc: '닫는 큰따옴표 옆에 쉼표를 둘 위치를 선택합니다.',
+            commasAliases: ['쉼표', '따옴표', '인용', '문장 부호', '스타일'],
+            commasNone: '변경 없음',
+            commasInside: '쉼표를 따옴표 안쪽에',
+            commasOutside: '쉼표를 따옴표 바깥쪽에',
+            commasExampleSource: '상태는 "완료," 다음은 "대기"였다.',
+            commasExampleOutside: '상태는 "완료", 다음은 "대기"였다.',
+            invisibleName: 'AI 정리: 보이지 않는 문자',
+            invisibleDesc: '너비가 0인 공백을 제거하고 줄바꿈 없는 공백을 일반 공백으로 바꿉니다.',
+            invisibleAliases: [
+                'ai',
+                'chatgpt',
+                'claude',
+                'llm',
+                '대시',
+                '엠 대시',
+                '엔 대시',
+                '하이픈',
+                '유니코드',
+                '보이지 않는',
+                'nbsp',
+                '타이포그래피',
+                '문장 부호',
+                '공백'
+            ],
+            invisibleExampleStart: '그',
+            invisibleExampleMiddle: '결과',
+            invisibleExampleEnd: '는 좋았다.',
+            invisibleExampleAfter: '그 결과는 좋았다.',
+            punctuationName: 'AI 정리: 대시와 따옴표',
+            punctuationDesc: '긴 대시를 하이픈으로, 둥근 따옴표를 곧은 따옴표로 바꿉니다.',
+            punctuationAliases: ['엠 대시', '엔 대시', '하이픈', '따옴표', '스마트 따옴표', '아포스트로피', '문장 부호', '타이포그래피'],
+            punctuationExampleBefore: '“그 결과는 — 모든 예상을 깨고 — 완벽했다.”',
+            punctuationExampleAfter: '"그 결과는 - 모든 예상을 깨고 - 완벽했다."'
+        }
+    },
+
+    welcome: {
+        title: 'Better Paste에 오신 것을 환영합니다',
+        intro: [
+            'Better Paste는 클립보드 내용을 노트에 붙여넣는 순간에 바꿔 줍니다.',
+            '링크된 이미지를 보관함 첨부 파일로 저장하고, 링크에서 추적 매개변수를 제거하며, 터미널 출력에서 줄바꿈된 행을 다시 잇고, 둥근 따옴표와 보이지 않는 문자를 단순한 문자로 바꿉니다.',
+            '규칙은 각각 따로 끌 수 있습니다.',
+            '개별 노트는 "better-paste: false" 속성으로 전부 제외할 수 있습니다. 설정은 설정, Better Paste에 있습니다.'
+        ],
+        startButton: '시작하기'
+    },
+
+    whatsNew: {
+        title: 'Better Paste의 새로운 기능',
+        scrollLabel: '릴리스 노트',
+        releaseHeading: '버전 {version} ({date})',
+        categoryNew: '새 기능',
+        categoryImproved: '개선',
+        categoryChanged: '변경',
+        categoryFixed: '수정',
+        support: 'Better Paste가 도움이 되었다면 개발을 후원해 주세요.',
+        coffeeButton: '☕️ 커피 한 잔 사주기',
+        thanksButton: '고마워요!'
+    }
+};

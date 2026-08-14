@@ -18,13 +18,18 @@
 
 import type { SettingGroupItem } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../defaults';
+import { aliases, format, strings } from '../../i18n';
 import { toggle } from './context';
 import type { SettingsPageContext } from './context';
+
+/** The Unicode code points the example draws in place of the characters they stand for. */
+const NO_BREAK_SPACE_CODE = '[U+00A0]';
+const ZERO_WIDTH_SPACE_CODE = '[U+200B]';
 
 /** Adds a compact before and after example below a setting description. */
 function withExample(description: string, before: string, after: string): string | DocumentFragment {
     const example = `${before} \u2192 ${after}`;
-    if (typeof createFragment === 'undefined') return `${description} Example: ${example}`;
+    if (typeof createFragment === 'undefined') return format(strings.settings.exampleFallback, { description, example });
 
     return createFragment(fragment => {
         fragment.appendText(description);
@@ -34,73 +39,41 @@ function withExample(description: string, before: string, after: string): string
 
 /** Shows the two invisible source characters as visible, removed Unicode codes. */
 function invisibleCharactersDescription(): string | DocumentFragment {
-    const description = 'Removes zero-width spaces and turns non-breaking spaces into normal spaces.';
-    const start = 'The';
-    const noBreakSpace = '[U+00A0]';
-    const middle = 'result';
-    const zeroWidthSpace = '[U+200B]';
-    const end = ' was fine.';
-    const after = 'The result was fine.';
-    const example = `${start}${noBreakSpace}${middle}${zeroWidthSpace}${end} \u2192 ${after}`;
+    const text = strings.settings.text;
+    const description = text.invisibleDesc;
+    const tail = `${text.invisibleExampleEnd} \u2192 ${text.invisibleExampleAfter}`;
+    const example = `${text.invisibleExampleStart}${NO_BREAK_SPACE_CODE}${text.invisibleExampleMiddle}${ZERO_WIDTH_SPACE_CODE}${tail}`;
 
-    if (typeof createFragment === 'undefined') return `${description} Example: ${example}`;
+    if (typeof createFragment === 'undefined') return format(strings.settings.exampleFallback, { description, example });
 
     return createFragment(fragment => {
         fragment.appendText(description);
         const row = fragment.createDiv({ cls: 'better-paste-example' });
-        row.appendText(start);
-        row.createSpan({ cls: 'better-paste-example-removed', text: noBreakSpace });
-        row.appendText(middle);
-        row.createSpan({ cls: 'better-paste-example-removed', text: zeroWidthSpace });
-        row.appendText(`${end} \u2192 ${after}`);
+        row.appendText(text.invisibleExampleStart);
+        row.createSpan({ cls: 'better-paste-example-removed', text: NO_BREAK_SPACE_CODE });
+        row.appendText(text.invisibleExampleMiddle);
+        row.createSpan({ cls: 'better-paste-example-removed', text: ZERO_WIDTH_SPACE_CODE });
+        row.appendText(tail);
     });
 }
 
 /** AI cleanup rows shown under Text processing on the landing page. */
 export function createAiTextLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
+    const text = strings.settings.text;
+
     return [
         {
-            name: 'AI cleanup: invisible characters',
+            name: text.invisibleName,
             desc: invisibleCharactersDescription(),
-            aliases: [
-                'ai',
-                'chatgpt',
-                'claude',
-                'llm',
-                'dash',
-                'em dash',
-                'en dash',
-                'hyphen',
-                'unicode',
-                'invisible',
-                'nbsp',
-                'typography',
-                'punctuation',
-                'whitespace'
-            ],
+            aliases: aliases(source => source.settings.text.invisibleAliases),
             control: { type: 'toggle', key: 'textInvisible', defaultValue: DEFAULT_SETTINGS.textInvisible }
         },
         {
             ...toggle(
                 'textPunctuation',
-                'AI cleanup: dashes and quotes',
-                withExample(
-                    'Converts long dashes into hyphens and curly quotes into straight quotes.',
-                    '\u201cThe result \u2014 against all odds \u2014 was perfect.\u201d',
-                    '"The result - against all odds - was perfect."'
-                ),
-                [
-                    'em dash',
-                    'en dash',
-                    'hyphen',
-                    'quote',
-                    'quotes',
-                    'smart quotes',
-                    'curly quotes',
-                    'apostrophe',
-                    'punctuation',
-                    'typography'
-                ]
+                text.punctuationName,
+                withExample(text.punctuationDesc, text.punctuationExampleBefore, text.punctuationExampleAfter),
+                aliases(source => source.settings.text.punctuationAliases)
             ),
             visible: () => context.settings().textInvisible
         }

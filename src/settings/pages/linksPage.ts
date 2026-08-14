@@ -21,8 +21,13 @@ import { DEFAULT_SETTINGS } from '../defaults';
 import { SHIPPED_DOMAIN_RULES } from '../constants';
 import { findInvalidDomainRules } from '../normalize';
 import { buildUrlCleanupOptions, cleanUrl, mergeDomainRules } from '../../transforms/urlCleanup';
+import { aliases, format, plural, strings } from '../../i18n';
 import { LIST_KEY_SUFFIX, SETTINGS_CLASS } from './context';
 import type { SettingsPageContext } from './context';
+
+/** The two halves of the example address, which read the same in every language. */
+const CLEANING_EXAMPLE_KEPT = 'https://example.com/article';
+const CLEANING_EXAMPLE_REMOVED = '?utm_source=newsletter&fbclid=9c2a41';
 
 /**
  * Shows the rule by example, with the part that gets removed struck through.
@@ -31,64 +36,72 @@ import type { SettingsPageContext } from './context';
  * outside a browser by the tests.
  */
 function cleaningExample(): string | DocumentFragment {
-    const lead = 'Removes tracking parameters from pasted links. The struck-through part is removed:';
-    const kept = 'https://example.com/article';
-    const removed = '?utm_source=newsletter&fbclid=9c2a41';
+    const lead = strings.settings.links.cleaningDesc;
 
-    if (typeof createFragment === 'undefined') return `${lead} ${kept}${removed}`;
+    if (typeof createFragment === 'undefined') {
+        return format(strings.settings.plainFallback, {
+            description: lead,
+            example: `${CLEANING_EXAMPLE_KEPT}${CLEANING_EXAMPLE_REMOVED}`
+        });
+    }
 
     return createFragment(fragment => {
         fragment.appendText(lead);
         const example = fragment.createDiv({ cls: 'better-paste-example' });
-        example.createSpan({ text: kept });
-        example.createSpan({ cls: 'better-paste-example-removed', text: removed });
+        example.createSpan({ text: CLEANING_EXAMPLE_KEPT });
+        example.createSpan({ cls: 'better-paste-example-removed', text: CLEANING_EXAMPLE_REMOVED });
     });
 }
 
 /** Sample URL shown in the tester before the user types their own. */
 const URL_SAMPLE = 'https://support.claude.com/en/articles/16266773-how-claude-marks-ai-generated-content?utm_source=news&_bhlid=abc123';
 
+/** Placeholder for the rule list, which is a rule rather than a sentence. */
+const RULE_PLACEHOLDER = 'example.com: id, page';
+
+/** How many invalid rules the validation message names before it stops listing them. */
+const INVALID_RULES_SHOWN = 3;
+
 /** Rows shown directly under the Links heading on the landing page. */
 export function createLinkLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
     const enabled = (): boolean => context.settings().linkEnabled;
 
+    const text = strings.settings.links;
+
     return [
         {
-            name: 'Fetch titles for pasted links',
-            desc: 'When the clipboard contains only a non-image web address, fetch its page title and paste a Markdown link. Other selected text becomes the label without making a request. The original address is kept if the title cannot be fetched.',
-            aliases: ['title', 'page', 'website', 'markdown link', 'download'],
+            name: text.titlesName,
+            desc: text.titlesDesc,
+            aliases: aliases(source => source.settings.links.titlesAliases),
             control: { type: 'toggle', key: 'linkTitles', defaultValue: DEFAULT_SETTINGS.linkTitles }
         },
         {
-            name: 'Clean pasted links',
+            name: text.cleaningName,
             desc: cleaningExample(),
-            aliases: ['url', 'tracking', 'utm', 'parameters', 'query', 'site', 'domain', 'youtube', 'exception'],
+            aliases: aliases(source => source.settings.links.cleaningAliases),
             control: { type: 'toggle', key: 'linkEnabled', defaultValue: DEFAULT_SETTINGS.linkEnabled }
         },
         {
-            name: 'Which parameters to remove',
-            desc: 'Choose whether to remove every query parameter or only known tracking parameters. Site rules can preserve parameters in either mode.',
+            name: text.stripName,
+            desc: text.stripDesc,
             visible: enabled,
-            aliases: ['utm', 'tracking', 'query', 'parameters'],
+            aliases: aliases(source => source.settings.links.stripAliases),
             control: {
                 type: 'dropdown',
                 key: 'linkStrip',
                 defaultValue: DEFAULT_SETTINGS.linkStrip,
                 options: {
-                    all: 'Every parameter, except where a site rule keeps it',
-                    tracking: 'Only parameters known to be tracking'
+                    all: text.stripAll,
+                    tracking: text.stripTracking
                 }
             }
         },
         {
             type: 'page',
-            name: 'Rules for preserving parameters',
-            desc: 'Site rules for keeping specific query parameters in either removal mode.',
+            name: text.rulesName,
+            desc: text.rulesDesc,
             visible: enabled,
-            displayValue: () => {
-                const count = mergeDomainRules(context.settings().linkRules).length;
-                return count === 1 ? '1 site' : `${count} sites`;
-            },
+            displayValue: () => plural(text.rulesCount, mergeDomainRules(context.settings().linkRules).length),
             // A rule that will not parse is only reported on the page that holds it, so the
             // link has to carry the warning back to the landing page
             status: () => (findInvalidDomainRules(context.settings().linkRules.join('\n')).length > 0 ? 'warning' : null),
@@ -106,25 +119,29 @@ function createSitesPageDefinitions(context: SettingsPageContext): SettingDefini
             cls: SETTINGS_CLASS,
             items: [
                 {
-                    name: 'Your site rules',
-                    desc: `${SHIPPED_DOMAIN_RULES.length} common sites are already handled and stay up to date with the plugin. Add your own site rules here, one per line. "example.com" keeps every parameter on that site, "example.com: a, b" keeps only those two, and "!example.com" drops a rule that ships with the plugin. In "Only parameters known to be tracking" mode, a rule only rescues matching tracking parameters because other parameters are already kept. Subdomains are matched automatically.`,
-                    aliases: ['domain', 'exception', 'whitelist', 'youtube'],
+                    name: strings.settings.links.listName,
+                    desc: format(strings.settings.links.listDesc, {
+                        sites: plural(strings.settings.links.listShippedCount, SHIPPED_DOMAIN_RULES.length)
+                    }),
+                    aliases: aliases(source => source.settings.links.listAliases),
                     control: {
                         type: 'textarea',
                         key: `linkRules${LIST_KEY_SUFFIX}`,
                         rows: 6,
-                        placeholder: 'example.com: id, page',
+                        placeholder: RULE_PLACEHOLDER,
                         defaultValue: '',
                         validate: value => {
                             const invalid = findInvalidDomainRules(typeof value === 'string' ? value : '');
                             if (invalid.length === 0) return;
-                            return `Not a site name: ${invalid.slice(0, 3).join(', ')}`;
+                            return format(strings.settings.links.listInvalid, {
+                                values: invalid.slice(0, INVALID_RULES_SHOWN).join(', ')
+                            });
                         }
                     }
                 },
                 {
-                    name: 'Try it',
-                    desc: 'Paste a link to see what these rules would keep.',
+                    name: strings.settings.links.testerName,
+                    desc: strings.settings.links.testerDesc,
                     searchable: false,
                     render: setting => renderUrlTester(setting, context)
                 }
@@ -141,7 +158,7 @@ function renderUrlTester(setting: Setting, context: SettingsPageContext): void {
     const container = setting.settingEl.createDiv({ cls: 'better-paste-preview' });
     const input = container.createEl('input', {
         type: 'text',
-        attr: { placeholder: URL_SAMPLE, 'aria-label': 'Link to clean' }
+        attr: { placeholder: URL_SAMPLE, 'aria-label': strings.settings.links.testerLabel }
     });
     const output = container.createDiv({ cls: 'better-paste-preview-output' });
     output.setAttrs({ role: 'status', 'aria-live': 'polite' });
@@ -149,7 +166,7 @@ function renderUrlTester(setting: Setting, context: SettingsPageContext): void {
     const render = (): void => {
         const source = input.value.trim();
         if (!source) {
-            output.setText('The cleaned link appears here.');
+            output.setText(strings.settings.links.testerEmpty);
             output.addClass('better-paste-preview-empty');
             return;
         }

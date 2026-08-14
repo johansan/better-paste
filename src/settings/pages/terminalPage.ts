@@ -19,29 +19,28 @@
 import type { Setting, SettingGroupItem } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../defaults';
 import { runTextPipeline } from '../../transforms';
+import { aliases, strings } from '../../i18n';
 import type { SettingsPageContext } from './context';
 
 /** Sample text shown in the tester before the user types their own. */
-const TERMINAL_SAMPLE = [
-    '• The extra step is isolated to the list Enter handler, so the core change is straightforward. While tracing adjacent flows, I found',
-    '  two likely friction points worth validating: selection can jump after the refresh.'
-].join('\n');
+const TERMINAL_SAMPLE = strings.settings.terminal.testerSample.join('\n');
 
 /** Rows shown directly under the Terminal text heading on the landing page. */
 export function createTerminalLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
     const enabled = (): boolean => context.settings().terminalEnabled;
+    const text = strings.settings.terminal;
 
     return [
         {
-            name: 'Clean up terminal output',
-            desc: 'Rejoins wrapped lines in terminal output and removes indentation. Color codes are stripped. Code fences, tables, and list items are untouched.',
-            aliases: ['wrap', 'unwrap', 'rejoin', 'ansi', 'console', 'shell', 'indent', 'bullet', 'list', 'markdown'],
+            name: text.cleanupName,
+            desc: text.cleanupDesc,
+            aliases: aliases(source => source.settings.terminal.cleanupAliases),
             control: { type: 'toggle', key: 'terminalEnabled', defaultValue: DEFAULT_SETTINGS.terminalEnabled }
         },
         {
             type: 'page',
-            name: 'Terminal text handling',
-            desc: 'Rejoin conditions and bullet characters.',
+            name: text.pageName,
+            desc: text.pageDesc,
             visible: enabled,
             items: createTerminalOptionsDefinitions(context)
         }
@@ -50,39 +49,41 @@ export function createTerminalLandingDefinitions(context: SettingsPageContext): 
 
 /** The Terminal options sub-page. */
 function createTerminalOptionsDefinitions(context: SettingsPageContext): SettingGroupItem[] {
+    const text = strings.settings.terminal;
+
     return [
         {
-            name: 'When to rejoin a broken line',
-            desc: 'The condition required to treat a line as a continuation of the previous line.',
-            aliases: ['indent', 'wrap', 'aggressive', 'safe', 'git log'],
+            name: text.rejoinName,
+            desc: text.rejoinDesc,
+            aliases: aliases(source => source.settings.terminal.rejoinAliases),
             control: {
                 type: 'dropdown',
                 key: 'terminalRejoin',
                 defaultValue: DEFAULT_SETTINGS.terminalRejoin,
                 options: {
-                    indented: 'Only when the next line is indented',
-                    any: 'Whenever the line above looks full',
-                    never: 'Never rejoin, only strip codes and indentation'
+                    indented: text.rejoinIndented,
+                    any: text.rejoinAny,
+                    never: text.rejoinNever
                 }
             }
         },
         {
-            name: 'Bullet characters',
-            desc: 'Determines whether bullet characters (like •) in terminal output are preserved or converted to Markdown list items.',
-            aliases: ['list', 'markdown', 'dash'],
+            name: text.bulletsName,
+            desc: text.bulletsDesc,
+            aliases: aliases(source => source.settings.terminal.bulletsAliases),
             control: {
                 type: 'dropdown',
                 key: 'terminalBullets',
                 defaultValue: DEFAULT_SETTINGS.terminalBullets,
                 options: {
-                    markdown: 'Convert to Markdown list items',
-                    preserve: 'Leave them as they are'
+                    markdown: text.bulletsMarkdown,
+                    preserve: text.bulletsPreserve
                 }
             }
         },
         {
-            name: 'Try it',
-            desc: 'Paste terminal output to see how it would be cleaned up.',
+            name: text.testerName,
+            desc: text.testerDesc,
             searchable: false,
             render: setting => renderTerminalTester(setting, context)
         }
@@ -96,7 +97,7 @@ function renderTerminalTester(setting: Setting, context: SettingsPageContext): v
     setting.settingEl.addClass('better-paste-tester');
     const container = setting.settingEl.createDiv({ cls: 'better-paste-preview' });
     const input = container.createEl('textarea', {
-        attr: { placeholder: TERMINAL_SAMPLE, rows: '5', 'aria-label': 'Terminal text to clean' }
+        attr: { placeholder: TERMINAL_SAMPLE, rows: '5', 'aria-label': strings.settings.terminal.testerLabel }
     });
     const output = container.createDiv({ cls: 'better-paste-preview-output' });
     output.setAttrs({ role: 'status', 'aria-live': 'polite' });
@@ -104,7 +105,7 @@ function renderTerminalTester(setting: Setting, context: SettingsPageContext): v
     const render = (): void => {
         const source = input.value;
         if (!source.trim()) {
-            output.setText('The cleaned text appears here.');
+            output.setText(strings.settings.terminal.testerEmpty);
             output.addClass('better-paste-preview-empty');
             return;
         }

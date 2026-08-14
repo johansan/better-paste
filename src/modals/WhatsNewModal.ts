@@ -18,15 +18,16 @@
 
 import { Modal, Platform } from 'obsidian';
 import type { App } from 'obsidian';
+import { format, localeTag, strings } from '../i18n';
 import { releaseBannerUrl, SUPPORT_BUY_ME_A_COFFEE_URL } from '../urls';
 import type { ReleaseNote } from '../releaseNotes';
 
 /** The lists under a version, in the order they are rendered. */
 const CATEGORIES = [
-    { key: 'new', label: 'New' },
-    { key: 'improved', label: 'Improved' },
-    { key: 'changed', label: 'Changed' },
-    { key: 'fixed', label: 'Fixed' }
+    { key: 'new', label: strings.whatsNew.categoryNew },
+    { key: 'improved', label: strings.whatsNew.categoryImproved },
+    { key: 'changed', label: strings.whatsNew.categoryChanged },
+    { key: 'fixed', label: strings.whatsNew.categoryFixed }
 ] as const;
 
 /** Opens a link in the browser rather than inside Obsidian. */
@@ -87,7 +88,7 @@ function formatReleaseDate(date: string): string {
     const parsed = new Date(`${date}T00:00:00`);
     if (Number.isNaN(parsed.getTime())) return date;
 
-    return parsed.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    return parsed.toLocaleDateString(localeTag, { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 /** The What's new dialog. `onDismiss` runs once it is closed, however it was closed. */
@@ -104,26 +105,26 @@ export class WhatsNewModal extends Modal {
 
     onOpen(): void {
         this.modalEl.addClass('better-paste-modal');
-        this.titleEl.setText("What's new in Better Paste");
+        this.titleEl.setText(strings.whatsNew.title);
 
         const scroll = this.contentEl.createDiv({ cls: 'better-paste-release-scroll' });
-        scroll.setAttrs({ tabindex: '0', role: 'region', 'aria-label': 'Release notes' });
+        scroll.setAttrs({ tabindex: '0', role: 'region', 'aria-label': strings.whatsNew.scrollLabel });
         for (const note of this.releaseNotes) this.renderRelease(scroll, note);
 
         this.contentEl.createDiv({ cls: 'better-paste-modal-divider' });
         this.contentEl.createEl('p', {
             cls: 'better-paste-modal-support',
-            text: 'If you find Better Paste useful, please consider supporting its development.'
+            text: strings.whatsNew.support
         });
 
         const buttons = this.contentEl.createDiv({ cls: 'better-paste-modal-buttons' });
 
-        const coffeeButton = buttons.createEl('button', { text: '☕️ Buy me a coffee', attr: { type: 'button' } });
+        const coffeeButton = buttons.createEl('button', { text: strings.whatsNew.coffeeButton, attr: { type: 'button' } });
         coffeeButton.addEventListener('click', () => {
             window.open(SUPPORT_BUY_ME_A_COFFEE_URL);
         });
 
-        this.thanksButton = buttons.createEl('button', { cls: 'mod-cta', text: 'Thanks!', attr: { type: 'button' } });
+        this.thanksButton = buttons.createEl('button', { cls: 'mod-cta', text: strings.whatsNew.thanksButton, attr: { type: 'button' } });
         this.thanksButton.addEventListener('click', () => {
             this.close();
         });
@@ -148,7 +149,9 @@ export class WhatsNewModal extends Modal {
 
     private renderRelease(container: HTMLElement, note: ReleaseNote): void {
         const section = container.createDiv({ cls: 'better-paste-release' });
-        section.createEl('h3', { text: `Version ${note.version} (${formatReleaseDate(note.date)})` });
+        section.createEl('h3', {
+            text: format(strings.whatsNew.releaseHeading, { version: note.version, date: formatReleaseDate(note.date) })
+        });
 
         if (note.banner) {
             const frame = section.createDiv({ cls: 'better-paste-release-banner' });

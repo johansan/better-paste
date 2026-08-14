@@ -17,36 +17,39 @@
  */
 
 import type { SettingGroupItem } from 'obsidian';
+import { aliases, format, strings } from '../../i18n';
 import { SUPPORT_BUY_ME_A_COFFEE_URL, SUPPORT_SPONSOR_URL } from '../../urls';
 import type { SettingsPageContext } from './context';
 
 /** Release notes and support links, shown above the rules. */
 export function createStartDefinitions(context: SettingsPageContext): SettingGroupItem[] {
+    const text = strings.settings.start;
+
     return [
         {
-            name: `What's new in Better Paste ${context.version}`,
-            desc: 'What changed in the most recent releases.',
-            aliases: ['release notes', 'changelog', 'version', 'update', 'history'],
+            name: format(text.whatsNewName, { version: context.version }),
+            desc: text.whatsNewDesc,
+            aliases: aliases(source => source.settings.start.whatsNewAliases),
             render: setting => {
                 setting.addButton(button =>
-                    button.setButtonText('View recent updates').onClick(() => {
+                    button.setButtonText(text.whatsNewButton).onClick(() => {
                         context.showWhatsNew();
                     })
                 );
             }
         },
         {
-            name: 'Support development',
-            desc: 'If you find Better Paste useful, please consider supporting its continued development.',
-            aliases: ['sponsor', 'donate', 'coffee', 'github'],
+            name: text.supportName,
+            desc: text.supportDesc,
+            aliases: aliases(source => source.settings.start.supportAliases),
             render: setting => {
                 setting.addButton(button =>
-                    button.setButtonText('❤️ Sponsor').onClick(() => {
+                    button.setButtonText(text.sponsorButton).onClick(() => {
                         window.open(SUPPORT_SPONSOR_URL);
                     })
                 );
                 setting.addButton(button =>
-                    button.setButtonText('☕️ Buy me a coffee').onClick(() => {
+                    button.setButtonText(text.coffeeButton).onClick(() => {
                         window.open(SUPPORT_BUY_ME_A_COFFEE_URL);
                     })
                 );

@@ -20,11 +20,17 @@ import type { Setting, SettingGroupItem } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../defaults';
 import { DEFAULT_IMAGE_NAME_TEMPLATE } from '../constants';
 import { applyFileNameTemplate, buildFileNameTokens } from '../../utils/filenames';
+import { aliases, format, strings } from '../../i18n';
 import { MOMENT_FORMAT_DOCS_URL } from '../../urls';
 import type { SettingsPageContext } from './context';
 
 const FILENAME_EXAMPLE_URL = 'https://images.example.com/2026/05/skyline-8f21a.jpg';
 const FILENAME_EXAMPLE_DATE = new Date(2026, 7, 13, 14, 5, 6);
+
+/** The three parts of the example address, which read the same in every language. */
+const SAVING_EXAMPLE_ADDRESS = 'https://images.example.com/2026/05/';
+const SAVING_EXAMPLE_FILE = 'skyline-8f21a.jpg';
+const SAVING_EXAMPLE_QUERY = '?auto=format&w=2400';
 
 /**
  * Shows the rule by example, with the part of the address that is dropped struck through.
@@ -34,30 +40,33 @@ const FILENAME_EXAMPLE_DATE = new Date(2026, 7, 13, 14, 5, 6);
  * outside a browser by the tests.
  */
 function savingExample(): string | DocumentFragment {
-    const lead =
-        'Saves pasted pictures as local files rather than leaving external image links. This includes Safari\'s "Copy image", pictures inside copied web content, and standalone image addresses. Images are saved to your vault attachment folder. With "Name from source":';
-    const address = 'https://images.example.com/2026/05/';
-    const file = 'skyline-8f21a.jpg';
-    const query = '?auto=format&w=2400';
+    const lead = strings.settings.images.savingDesc;
 
-    if (typeof createFragment === 'undefined') return `${lead} ${address}${file}${query}`;
+    if (typeof createFragment === 'undefined') {
+        return format(strings.settings.plainFallback, {
+            description: lead,
+            example: `${SAVING_EXAMPLE_ADDRESS}${SAVING_EXAMPLE_FILE}${SAVING_EXAMPLE_QUERY}`
+        });
+    }
 
     return createFragment(fragment => {
         fragment.appendText(lead);
         const example = fragment.createDiv({ cls: 'better-paste-example' });
-        example.createSpan({ cls: 'better-paste-example-removed', text: address });
-        example.createSpan({ text: file });
-        example.createSpan({ cls: 'better-paste-example-removed', text: query });
+        example.createSpan({ cls: 'better-paste-example-removed', text: SAVING_EXAMPLE_ADDRESS });
+        example.createSpan({ text: SAVING_EXAMPLE_FILE });
+        example.createSpan({ cls: 'better-paste-example-removed', text: SAVING_EXAMPLE_QUERY });
     });
 }
 
 /** Custom filename format with the same one-line example used by the real save path. */
 function renderCustomFilenameFormat(setting: Setting, context: SettingsPageContext): void {
-    setting.setName('Custom format');
+    const text = strings.settings.images;
+
+    setting.setName(text.customName);
     setting.settingEl.addClass('better-paste-filename-format');
-    setting.descEl.appendText('Use {{name}} for the source name and Moment date formats such as YYYY-MM-DD.');
+    setting.descEl.appendText(text.customDesc);
     setting.descEl.createEl('br');
-    const momentLink = setting.descEl.createEl('a', { text: 'Moment format', href: MOMENT_FORMAT_DOCS_URL });
+    const momentLink = setting.descEl.createEl('a', { text: text.customMomentLink, href: MOMENT_FORMAT_DOCS_URL });
     momentLink.setAttr('rel', 'noopener noreferrer');
     momentLink.setAttr('target', '_blank');
     const example = setting.descEl.createDiv({ cls: 'better-paste-example' });
@@ -65,7 +74,7 @@ function renderCustomFilenameFormat(setting: Setting, context: SettingsPageConte
     const renderExample = (template: string): void => {
         const tokens = buildFileNameTokens(FILENAME_EXAMPLE_URL);
         const baseName = applyFileNameTemplate(template, tokens, FILENAME_EXAMPLE_DATE);
-        example.setText(`Example: ${baseName}.jpg`);
+        example.setText(format(text.customExample, { value: `${baseName}.jpg` }));
     };
 
     setting.addText(text => {
@@ -85,17 +94,19 @@ function renderCustomFilenameFormat(setting: Setting, context: SettingsPageConte
 export function createImageLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
     const enabled = (): boolean => context.settings().imageEnabled;
 
+    const text = strings.settings.images;
+
     return [
         {
-            name: 'Save pasted images into the vault',
+            name: text.savingName,
             desc: savingExample(),
-            aliases: ['download', 'attachment', 'safari', 'screenshot', 'picture', 'folder', 'file name', 'filename', 'width', 'size'],
+            aliases: aliases(source => source.settings.images.savingAliases),
             control: { type: 'toggle', key: 'imageEnabled', defaultValue: DEFAULT_SETTINGS.imageEnabled }
         },
         {
             type: 'page',
-            name: 'Image handling',
-            desc: 'File names and per-note image width.',
+            name: text.pageName,
+            desc: text.pageDesc,
             visible: enabled,
             items: createImageOptionsDefinitions(context)
         }
@@ -104,30 +115,32 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
 
 /** The Image options sub-page. */
 function createImageOptionsDefinitions(context: SettingsPageContext): SettingGroupItem[] {
+    const text = strings.settings.images;
+
     return [
         {
-            name: 'File names',
-            desc: 'Choose how saved image files are named.',
+            name: text.nameFormatName,
+            desc: text.nameFormatDesc,
             control: {
                 type: 'dropdown',
                 key: 'imageNameFormat',
                 defaultValue: DEFAULT_SETTINGS.imageNameFormat,
                 options: {
-                    source: 'Name from source',
-                    custom: 'Custom format'
+                    source: text.nameFormatSource,
+                    custom: text.nameFormatCustom
                 }
             }
         },
         {
-            name: 'Custom format',
-            aliases: ['name', 'filename', 'date', 'moment', 'YYYY', '{{name}}'],
+            name: text.customName,
+            aliases: aliases(source => source.settings.images.customAliases),
             visible: () => context.settings().imageNameFormat === 'custom',
             render: setting => renderCustomFilenameFormat(setting, context)
         },
         {
-            name: 'Image width property',
-            desc: 'The frontmatter property that defines the width of images pasted into a note. A note using this property takes screenshot pastes over from Obsidian. Leave blank to disable.',
-            aliases: ['size', 'frontmatter', 'property', 'resize'],
+            name: text.sizePropertyName,
+            desc: text.sizePropertyDesc,
+            aliases: aliases(source => source.settings.images.sizePropertyAliases),
             control: {
                 type: 'text',
                 key: 'imageSizeProperty',

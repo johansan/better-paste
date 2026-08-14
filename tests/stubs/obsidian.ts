@@ -20,6 +20,14 @@
 // Only the members the tested code paths touch at import time are provided; anything
 // that performs real Obsidian work throws so a test can never silently depend on it.
 
+/**
+ * Obsidian's interface language. Tests run against English, which is also what the real
+ * call returns when the user has not chosen another language.
+ */
+export function getLanguage(): string {
+    return 'en';
+}
+
 /** Moment subset used by filename tests. */
 export function moment(date: Date): { format: (pattern: string) => string } {
     const pad = (value: number): string => String(value).padStart(2, '0');

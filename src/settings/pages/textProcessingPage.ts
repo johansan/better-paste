@@ -18,28 +18,29 @@
 
 import type { SettingGroupItem } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../defaults';
+import { aliases, format, strings } from '../../i18n';
 import { toggle } from './context';
 import type { SettingsPageContext } from './context';
 import type { TextCommaPlacement } from '../types';
 
-const COMMA_EXAMPLE_SOURCE = 'He called it "finished," then left.';
+/** The source already has the comma inside the quotation mark, so only "outside" moves it. */
 const COMMA_EXAMPLE_RESULTS: Record<TextCommaPlacement, string> = {
-    none: COMMA_EXAMPLE_SOURCE,
-    inside: COMMA_EXAMPLE_SOURCE,
-    outside: 'He called it "finished", then left.'
+    none: strings.settings.text.commasExampleSource,
+    inside: strings.settings.text.commasExampleSource,
+    outside: strings.settings.text.commasExampleOutside
 };
 
 /** Comma example text, also used to update the rendered row after a dropdown change. */
 export function commaPlacementExample(placement: TextCommaPlacement): string {
-    return `${COMMA_EXAMPLE_SOURCE} \u2192 ${COMMA_EXAMPLE_RESULTS[placement]}`;
+    return `${strings.settings.text.commasExampleSource} \u2192 ${COMMA_EXAMPLE_RESULTS[placement]}`;
 }
 
 /** Shows the selected comma placement with the same compact example used by other rules. */
 function commasDescription(placement: TextCommaPlacement): string | DocumentFragment {
-    const description = 'Choose where to place a comma next to a closing double quotation mark.';
+    const description = strings.settings.text.commasDesc;
     const example = commaPlacementExample(placement);
 
-    if (typeof createFragment === 'undefined') return `${description} Example: ${example}`;
+    if (typeof createFragment === 'undefined') return format(strings.settings.exampleFallback, { description, example });
 
     return createFragment(fragment => {
         fragment.appendText(description);
@@ -49,26 +50,27 @@ function commasDescription(placement: TextCommaPlacement): string | DocumentFrag
 
 /** Rows shown directly under the Text processing heading. */
 export function createTextProcessingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
+    const text = strings.settings.text;
+
     return [
-        toggle('textTrim', 'Trim surrounding whitespace', 'Removes blank lines and spaces from the start and end of pasted text.', [
-            'whitespace',
-            'blank',
-            'space',
-            'newline',
-            'trim'
-        ]),
+        toggle(
+            'textTrim',
+            text.trimName,
+            text.trimDesc,
+            aliases(source => source.settings.text.trimAliases)
+        ),
         {
-            name: 'Commas and quotes',
+            name: text.commasName,
             desc: commasDescription(context.settings().textComma),
-            aliases: ['comma', 'quote', 'quotation', 'punctuation', 'style'],
+            aliases: aliases(source => source.settings.text.commasAliases),
             control: {
                 type: 'dropdown',
                 key: 'textComma',
                 defaultValue: DEFAULT_SETTINGS.textComma,
                 options: {
-                    none: 'No change',
-                    inside: 'Comma inside quotes',
-                    outside: 'Comma outside quotes'
+                    none: text.commasNone,
+                    inside: text.commasInside,
+                    outside: text.commasOutside
                 }
             }
         }

@@ -25,6 +25,7 @@ import { buildUrlCleanupOptions, cleanUrlsInText } from '../transforms/urlCleanu
 import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './imageReferences';
 import { extractFrontmatterBlock, isInsideVerbatimContext, isPasteDisabledForNote, resolveImageSize } from './noteOptions';
 import { DISABLE_PROPERTY } from '../settings/constants';
+import { format, plural, strings } from '../i18n';
 import type { ImageService } from './ImageService';
 import { escapeLinkTitle } from './LinkTitleService';
 import type { LinkTitleService } from './LinkTitleService';
@@ -349,13 +350,13 @@ export class PasteService {
     cleanSelection(editor: Editor): void {
         const selection = editor.getSelection();
         if (!selection) {
-            new Notice('Better Paste: select some text first');
+            new Notice(format(strings.notices.prefix, { message: strings.notices.selectTextFirst }));
             return;
         }
 
         const result = runTextPipeline(selection, this.getSettings());
         if (!result.changed) {
-            new Notice('Better Paste: nothing to clean up');
+            new Notice(format(strings.notices.prefix, { message: strings.notices.nothingToClean }));
             return;
         }
 
@@ -505,7 +506,7 @@ export class PasteService {
 
             if (link === null) {
                 this.hideTitleProgress(progress);
-                showNotice('Better Paste: could not fetch the title.', { variant: 'warning' });
+                showNotice(format(strings.notices.prefix, { message: strings.notices.titleFailed }), { variant: 'warning' });
             } else this.replaceRange(editor, range, link);
             this.hideTitleProgress(progress);
             this.notify(summary);
@@ -519,8 +520,11 @@ export class PasteService {
     private showTitleProgress(): TitleProgressNotice | null {
         if (!this.getSettings().showNotices) return null;
 
+        const fetchingTitle = (dots: number): string =>
+            format(strings.notices.prefix, { message: format(strings.notices.fetchingTitle, { dots: '.'.repeat(dots) }) });
+
         const progress: TitleProgressNotice = {
-            notice: showNotice('Better Paste: fetching title.', { timeout: 0, variant: 'loading' }),
+            notice: showNotice(fetchingTitle(1), { timeout: 0, variant: 'loading' }),
             timer: 0
         };
         let dots = 1;
@@ -529,7 +533,7 @@ export class PasteService {
             progress.timer = window.setTimeout(() => {
                 if (!this.titleProgressNotices.has(progress)) return;
                 dots = (dots % 3) + 1;
-                progress.notice.setMessage(`Better Paste: fetching title${'.'.repeat(dots)}`);
+                progress.notice.setMessage(fetchingTitle(dots));
                 animate();
             }, TITLE_PROGRESS_INTERVAL_MS);
         };
@@ -635,7 +639,7 @@ export class PasteService {
             return text.length > 0 ? text : null;
         } catch (error) {
             logError('Could not read the clipboard', error);
-            new Notice('Better Paste: could not read the clipboard');
+            new Notice(format(strings.notices.prefix, { message: strings.notices.clipboardFailed }));
             return null;
         }
     }
@@ -689,27 +693,24 @@ export class PasteService {
         // A failure is reported whether or not the user asked for notices: it is the one
         // case where silence would leave them with a note they think is complete.
         if (summary.imagesFailed > 0) {
-            const count = summary.imagesFailed;
-            const what = `${count} image${count === 1 ? '' : 's'} could not be saved`;
+            const images = plural(strings.notices.imagesFailed, summary.imagesFailed);
             // A screenshot has no link to fall back to, so say what actually happened
-            new Notice(
-                options.insertedNothing
-                    ? `Better Paste: ${what}, so nothing was pasted. The clipboard still has it.`
-                    : `Better Paste: ${what}, the original link was kept`
+            const message = format(
+                options.insertedNothing ? strings.notices.imagesFailedNothingPasted : strings.notices.imagesFailedLinkKept,
+                { images }
             );
+            new Notice(format(strings.notices.prefix, { message }));
         }
 
         if (!this.getSettings().showNotices) return;
 
         const parts: string[] = [];
-        if (summary.aiTextCleaned) parts.push('tidied AI text');
-        if (summary.terminalCleaned) parts.push('cleaned up terminal text');
-        if (summary.textProcessed) parts.push('adjusted text style');
-        if (summary.urlsCleaned > 0) parts.push(`cleaned ${summary.urlsCleaned} URL${summary.urlsCleaned === 1 ? '' : 's'}`);
-        if (summary.imagesDownloaded > 0) {
-            parts.push(`saved ${summary.imagesDownloaded} image${summary.imagesDownloaded === 1 ? '' : 's'}`);
-        }
+        if (summary.aiTextCleaned) parts.push(strings.notices.aiTextCleaned);
+        if (summary.terminalCleaned) parts.push(strings.notices.terminalCleaned);
+        if (summary.textProcessed) parts.push(strings.notices.textProcessed);
+        if (summary.urlsCleaned > 0) parts.push(plural(strings.notices.urlsCleaned, summary.urlsCleaned));
+        if (summary.imagesDownloaded > 0) parts.push(plural(strings.notices.imagesSaved, summary.imagesDownloaded));
         if (parts.length === 0) return;
-        new Notice(`Better Paste: ${parts.join(', ')}`);
+        new Notice(format(strings.notices.prefix, { message: parts.join(strings.notices.separator) }));
     }
 }

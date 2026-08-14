@@ -20,6 +20,7 @@ import { PluginSettingTab } from 'obsidian';
 import type { App, SettingDefinitionItem } from 'obsidian';
 import type BetterPastePlugin from '../main';
 import { parseLines } from './normalize';
+import { aliases, strings } from '../i18n';
 import { diffDomainRules, renderDomainRules } from '../transforms/urlCleanup';
 import { LIST_KEY_SUFFIX, SETTINGS_CLASS, toggle } from './pages/context';
 import type { SettingsPageContext } from './pages/context';
@@ -81,28 +82,34 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             {
                 type: 'group',
                 cls: SETTINGS_CLASS,
-                heading: 'Behavior',
+                heading: strings.settings.behavior.heading,
                 items: [
                     toggle(
                         'autoClean',
-                        'Clean up every paste',
-                        'Apply the rules on every paste. Turn this off to use the commands only. A single note can opt out with the "better-paste: false" property.',
-                        ['automatic', 'enable', 'disable', 'note', 'exclude', 'property', 'frontmatter', 'opt out']
+                        strings.settings.behavior.autoCleanName,
+                        strings.settings.behavior.autoCleanDesc,
+                        aliases(source => source.settings.behavior.autoCleanAliases)
                     ),
                     toggle(
                         'showNotices',
-                        'Show a notice when a paste is changed',
-                        'A one-line summary of what was cleaned up. Failures are always reported, whatever this is set to.'
+                        strings.settings.behavior.showNoticesName,
+                        strings.settings.behavior.showNoticesDesc,
+                        aliases(source => source.settings.behavior.showNoticesAliases)
                     )
                 ]
             },
-            { type: 'group', cls: SETTINGS_CLASS, heading: 'Images', items: createImageLandingDefinitions(context) },
-            { type: 'group', cls: SETTINGS_CLASS, heading: 'Links', items: createLinkLandingDefinitions(context) },
-            { type: 'group', cls: SETTINGS_CLASS, heading: 'Terminal text', items: createTerminalLandingDefinitions(context) },
+            { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.images.heading, items: createImageLandingDefinitions(context) },
+            { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.links.heading, items: createLinkLandingDefinitions(context) },
             {
                 type: 'group',
                 cls: SETTINGS_CLASS,
-                heading: 'Text processing',
+                heading: strings.settings.terminal.heading,
+                items: createTerminalLandingDefinitions(context)
+            },
+            {
+                type: 'group',
+                cls: SETTINGS_CLASS,
+                heading: strings.settings.text.heading,
                 items: [...createTextProcessingDefinitions(context), ...createAiTextLandingDefinitions(context)]
             }
         ];
