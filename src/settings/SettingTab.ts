@@ -34,7 +34,7 @@ import { createStartDefinitions } from './pages/startPage';
  * Settings stored as a list of lines but edited as one text field. The control key carries
  * a suffix so the tab knows to convert between the two forms.
  */
-const LIST_KEYS = ['urlDomainRules'] as const;
+const LIST_KEYS = ['linkRules'] as const;
 type ListSettingKey = (typeof LIST_KEYS)[number];
 
 function isListControlKey(key: string): boolean {
@@ -84,7 +84,7 @@ export class BetterPasteSettingTab extends PluginSettingTab {
                 heading: 'Behavior',
                 items: [
                     toggle(
-                        'interceptPaste',
+                        'autoClean',
                         'Clean up every paste',
                         'Apply the rules on every paste. Turn this off to use the commands only. A single note can opt out with the "better-paste: false" property.',
                         ['automatic', 'enable', 'disable', 'note', 'exclude', 'property', 'frontmatter', 'opt out']
@@ -135,7 +135,7 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             await super.setControlValue(key, value);
         }
 
-        if (key === 'textCommaPlacement') this.updateCommaExample(value);
+        if (key === 'textComma') this.updateCommaExample(value);
 
         this.afterChange();
     }

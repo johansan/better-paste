@@ -21,7 +21,7 @@ import type { App, TFile } from 'obsidian';
 import { findImageReferences, isDataImageUri, isHttpUrl, replaceImageReferences } from './imageReferences';
 import type { ImageReference } from './imageReferences';
 import { applyFileNameTemplate, buildFileNameTokens, resolveExtension } from '../utils/filenames';
-import { DEFAULT_IMAGE_FILENAME_TEMPLATE, IMAGE_EXTENSIONS, IMAGE_TIMEOUT_SECONDS, MAX_IMAGE_SIZE_MB } from '../settings/constants';
+import { DEFAULT_IMAGE_NAME_TEMPLATE, IMAGE_EXTENSIONS, IMAGE_TIMEOUT_SECONDS, MAX_IMAGE_SIZE_MB } from '../settings/constants';
 import { logWarning } from '../utils/logger';
 import type { BetterPasteSettings } from '../settings/types';
 
@@ -66,7 +66,7 @@ export class ImageService {
     hasWork(text: string): boolean {
         if (this.disposed) return false;
         const settings = this.getSettings();
-        if (!settings.imagesEnabled) return false;
+        if (!settings.imageEnabled) return false;
         return findImageReferences(text).length > 0;
     }
 
@@ -77,7 +77,7 @@ export class ImageService {
     async materializeImages(text: string, sourcePath: string, size: string | null = null): Promise<ImageMaterializeResult> {
         if (this.disposed) return { text, downloaded: 0, failed: 0 };
         const settings = this.getSettings();
-        if (!settings.imagesEnabled) return { text, downloaded: 0, failed: 0 };
+        if (!settings.imageEnabled) return { text, downloaded: 0, failed: 0 };
 
         const references = findImageReferences(text);
         if (references.length === 0) return { text, downloaded: 0, failed: 0 };
@@ -237,7 +237,7 @@ export class ImageService {
         fallbackName?: string
     ): Promise<TFile | null> {
         const tokens = buildFileNameTokens(url, fallbackName);
-        const template = settings.imageFilenameFormat === 'custom' ? settings.imageFilenameTemplate : DEFAULT_IMAGE_FILENAME_TEMPLATE;
+        const template = settings.imageNameFormat === 'custom' ? settings.imageNameTemplate : DEFAULT_IMAGE_NAME_TEMPLATE;
         const baseName = applyFileNameTemplate(template, tokens, new Date());
         const fileName = `${baseName}.${extension}`;
 

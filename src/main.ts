@@ -120,9 +120,9 @@ export default class BetterPastePlugin extends Plugin {
 
     /** Flips the master paste switch and reports the new state, for use from a hotkey. */
     private async toggleAutomaticProcessing(): Promise<void> {
-        this.settings.interceptPaste = !this.settings.interceptPaste;
+        this.settings.autoClean = !this.settings.autoClean;
         await this.saveSettings();
-        new Notice(`Better Paste: automatic processing ${this.settings.interceptPaste ? 'on' : 'off'}`);
+        new Notice(`Better Paste: automatic processing ${this.settings.autoClean ? 'on' : 'off'}`);
     }
 
     /** Opens the release notes on demand, from the button in settings. */

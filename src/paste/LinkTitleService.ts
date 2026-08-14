@@ -85,7 +85,7 @@ export class LinkTitleService {
 
     /** True when this paste is exactly one non-image web address and title fetching is on. */
     hasWork(text: string): boolean {
-        if (this.disposed || !this.getSettings().fetchLinkTitles) return false;
+        if (this.disposed || !this.getSettings().linkTitles) return false;
         const url = standaloneWebUrl(text);
         return url !== null && !isObviousImageUrl(url);
     }

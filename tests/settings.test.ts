@@ -33,44 +33,44 @@ describe('normalizeSettings', () => {
     });
 
     it('fetches link titles by default', () => {
-        expect(normalizeSettings({}).fetchLinkTitles).toBe(true);
+        expect(normalizeSettings({}).linkTitles).toBe(true);
     });
 
     it('converts terminal bullets to Markdown by default', () => {
-        expect(normalizeSettings({}).terminalBulletMode).toBe('markdown');
+        expect(normalizeSettings({}).terminalBullets).toBe('markdown');
     });
 
     it('leaves comma placement unchanged by default', () => {
-        expect(normalizeSettings({}).textCommaPlacement).toBe('none');
+        expect(normalizeSettings({}).textComma).toBe('none');
     });
 
     it('keeps valid stored values', () => {
         const result = normalizeSettings({
-            urlStripMode: 'tracking',
-            fetchLinkTitles: false,
-            terminalRejoinMode: 'any',
-            terminalBulletMode: 'preserve',
-            imageFilenameFormat: 'custom',
-            imageFilenameTemplate: '{{name}}-YYYY-MM-DD',
-            textCommaPlacement: 'inside'
+            linkStrip: 'tracking',
+            linkTitles: false,
+            terminalRejoin: 'any',
+            terminalBullets: 'preserve',
+            imageNameFormat: 'custom',
+            imageNameTemplate: '{{name}}-YYYY-MM-DD',
+            textComma: 'inside'
         });
-        expect(result.urlStripMode).toBe('tracking');
-        expect(result.fetchLinkTitles).toBe(false);
-        expect(result.terminalRejoinMode).toBe('any');
-        expect(result.terminalBulletMode).toBe('preserve');
-        expect(result.imageFilenameFormat).toBe('custom');
-        expect(result.imageFilenameTemplate).toBe('{{name}}-YYYY-MM-DD');
-        expect(result.textCommaPlacement).toBe('inside');
+        expect(result.linkStrip).toBe('tracking');
+        expect(result.linkTitles).toBe(false);
+        expect(result.terminalRejoin).toBe('any');
+        expect(result.terminalBullets).toBe('preserve');
+        expect(result.imageNameFormat).toBe('custom');
+        expect(result.imageNameTemplate).toBe('{{name}}-YYYY-MM-DD');
+        expect(result.textComma).toBe('inside');
     });
 
     it('replaces values of the wrong type', () => {
-        const result = normalizeSettings({ interceptPaste: 'yes', imageSizeProperty: 7 });
-        expect(result.interceptPaste).toBe(DEFAULT_SETTINGS.interceptPaste);
+        const result = normalizeSettings({ autoClean: 'yes', imageSizeProperty: 7 });
+        expect(result.autoClean).toBe(DEFAULT_SETTINGS.autoClean);
         expect(result.imageSizeProperty).toBe(DEFAULT_SETTINGS.imageSizeProperty);
     });
 
     it('uses the default custom image format when the stored format is blank', () => {
-        expect(normalizeSettings({ imageFilenameTemplate: '   ' }).imageFilenameTemplate).toBe('{{name}}');
+        expect(normalizeSettings({ imageNameTemplate: '   ' }).imageNameTemplate).toBe('{{name}}');
     });
 
     it('drops keys that are not settings', () => {
@@ -84,19 +84,19 @@ describe('normalizeSettings', () => {
     });
 
     it("stores only the user's own site rules, leaving the shipped list in code", () => {
-        expect(normalizeSettings({ urlDomainRules: ['mine.example: id'] }).urlDomainRules).toEqual(['mine.example: id']);
+        expect(normalizeSettings({ linkRules: ['mine.example: id'] }).linkRules).toEqual(['mine.example: id']);
         expect(mergeDomainRules([])).toHaveLength(SHIPPED_DOMAIN_RULES.length);
     });
 
     it('round-trips its own output unchanged', () => {
-        const once = normalizeSettings({ urlStripMode: 'tracking', urlDomainRules: ['mine.example: id'] });
+        const once = normalizeSettings({ linkStrip: 'tracking', linkRules: ['mine.example: id'] });
         expect(normalizeSettings(once)).toEqual(once);
     });
 
     it('rejects an unknown enum value', () => {
-        expect(normalizeSettings({ urlStripMode: 'sometimes' }).urlStripMode).toBe(DEFAULT_SETTINGS.urlStripMode);
-        expect(normalizeSettings({ imageFilenameFormat: 'fancy' }).imageFilenameFormat).toBe(DEFAULT_SETTINGS.imageFilenameFormat);
-        expect(normalizeSettings({ textCommaPlacement: 'sometimes' }).textCommaPlacement).toBe(DEFAULT_SETTINGS.textCommaPlacement);
+        expect(normalizeSettings({ linkStrip: 'sometimes' }).linkStrip).toBe(DEFAULT_SETTINGS.linkStrip);
+        expect(normalizeSettings({ imageNameFormat: 'fancy' }).imageNameFormat).toBe(DEFAULT_SETTINGS.imageNameFormat);
+        expect(normalizeSettings({ textComma: 'sometimes' }).textComma).toBe(DEFAULT_SETTINGS.textComma);
     });
 });
 
@@ -209,7 +209,7 @@ describe('runTextPipeline', () => {
     });
 
     it('moves commas outside quotation marks when enabled', () => {
-        const settings = { ...DEFAULT_SETTINGS, textCommaPlacement: 'outside' as const };
+        const settings = { ...DEFAULT_SETTINGS, textComma: 'outside' as const };
         const result = runTextPipeline('He called it "finished," then left.', settings);
 
         expect(result.text).toBe('He called it "finished", then left.');
@@ -217,7 +217,7 @@ describe('runTextPipeline', () => {
     });
 
     it('moves commas inside quotation marks when selected', () => {
-        const settings = { ...DEFAULT_SETTINGS, textCommaPlacement: 'inside' as const };
+        const settings = { ...DEFAULT_SETTINGS, textComma: 'inside' as const };
         expect(runTextPipeline('He called it "finished", then left.', settings).text).toBe('He called it "finished," then left.');
     });
 
@@ -271,7 +271,7 @@ describe('runTextPipeline', () => {
 
     it('leaves the ends alone when trimming is off', () => {
         // The terminal rule dedents on its own, so it has to be off to isolate the trim
-        const settings = { ...DEFAULT_SETTINGS, trimPaste: false, terminalEnabled: false };
+        const settings = { ...DEFAULT_SETTINGS, textTrim: false, terminalEnabled: false };
         expect(runTextPipeline('  spaced  ', settings).text).toBe('  spaced  ');
     });
 
@@ -295,9 +295,9 @@ describe('runTextPipeline', () => {
     });
 
     it('skips a rule that is turned off', () => {
-        expect(runTextPipeline('https://example.com/a?utm_source=x', { ...DEFAULT_SETTINGS, urlEnabled: false }).text).toBe(
+        expect(runTextPipeline('https://example.com/a?utm_source=x', { ...DEFAULT_SETTINGS, linkEnabled: false }).text).toBe(
             'https://example.com/a?utm_source=x'
         );
-        expect(runTextPipeline('a \u2014 b', { ...DEFAULT_SETTINGS, aiTextEnabled: false }).text).toBe('a \u2014 b');
+        expect(runTextPipeline('a \u2014 b', { ...DEFAULT_SETTINGS, textInvisible: false }).text).toBe('a \u2014 b');
     });
 });

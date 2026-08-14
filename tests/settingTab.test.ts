@@ -38,7 +38,7 @@ import { SHIPPED_DOMAIN_RULES } from '../src/settings/constants';
 const STORED_STATE_KEYS = ['lastShownVersion'];
 
 /** Settings owned by a custom-rendered row rather than a declarative control. */
-const CUSTOM_RENDER_SETTING_KEYS = ['imageFilenameTemplate'];
+const CUSTOM_RENDER_SETTING_KEYS = ['imageNameTemplate'];
 
 /** Minimal plugin double exposing only what the setting tab touches. */
 function fakePlugin(overrides: Partial<BetterPasteSettings> = {}) {
@@ -192,14 +192,14 @@ describe('settings tree', () => {
     });
 
     it('puts Markdown conversion first in the bullet dropdown', () => {
-        const row = controlRows(tab).find(candidate => candidate.control.key === 'terminalBulletMode');
+        const row = controlRows(tab).find(candidate => candidate.control.key === 'terminalBullets');
         expect(row?.control.type).toBe('dropdown');
         if (row?.control.type !== 'dropdown') throw new Error('Bullet characters is not a dropdown');
         expect(Object.keys(row.control.options)[0]).toBe('markdown');
     });
 
     it('offers source and custom image filename formats', () => {
-        const row = controlRows(tab).find(candidate => candidate.control.key === 'imageFilenameFormat');
+        const row = controlRows(tab).find(candidate => candidate.control.key === 'imageNameFormat');
         expect(row?.control.type).toBe('dropdown');
         if (row?.control.type !== 'dropdown') throw new Error('File names is not a dropdown');
         expect(row.control.options).toEqual({ source: 'Name from source', custom: 'Custom format' });
@@ -216,7 +216,7 @@ describe('settings tree', () => {
     });
 
     it('offers all comma placement choices', () => {
-        const row = controlRows(tab).find(candidate => candidate.control.key === 'textCommaPlacement');
+        const row = controlRows(tab).find(candidate => candidate.control.key === 'textComma');
         expect(row?.control.type).toBe('dropdown');
         if (row?.control.type !== 'dropdown') throw new Error('Commas and quotes is not a dropdown');
         expect(row.control.options).toEqual({
@@ -227,8 +227,8 @@ describe('settings tree', () => {
     });
 
     it('updates the comma example for the selected placement', () => {
-        const descriptionFor = (placement: BetterPasteSettings['textCommaPlacement']): string => {
-            const row = flatten(makeTab(fakePlugin({ textCommaPlacement: placement })).getSettingDefinitions()).find(
+        const descriptionFor = (placement: BetterPasteSettings['textComma']): string => {
+            const row = flatten(makeTab(fakePlugin({ textComma: placement })).getSettingDefinitions()).find(
                 candidate => candidate.name === 'Commas and quotes'
             );
             if (typeof row?.desc !== 'string') throw new Error('Commas and quotes has no text fallback');
@@ -275,7 +275,7 @@ describe('settings tree', () => {
 
     it('gives every master toggle search terms for what it hides', () => {
         // A rule that is off hides its own settings, and a hidden row is dropped from search
-        const masters = ['imagesEnabled', 'urlEnabled', 'terminalEnabled', 'aiTextEnabled'];
+        const masters = ['imageEnabled', 'linkEnabled', 'terminalEnabled', 'textInvisible'];
         for (const key of masters) {
             const row = controlRows(tab).find(candidate => candidate.control.key === key);
             expect(row?.aliases?.length, `"${key}" has no aliases`).toBeGreaterThan(0);
@@ -293,46 +293,46 @@ describe('settings values', () => {
     });
 
     it('writes a plain setting through and persists it', async () => {
-        await tab.setControlValue('terminalRejoinMode', 'any');
-        expect(plugin.settings.terminalRejoinMode).toBe('any');
+        await tab.setControlValue('terminalRejoin', 'any');
+        expect(plugin.settings.terminalRejoin).toBe('any');
         expect(plugin.saveCount()).toBe(1);
     });
 
     it('shows every site rule, shipped ones included, so they can be edited', () => {
-        const shown = String(tab.getControlValue('urlDomainRules.text')).split('\n');
+        const shown = String(tab.getControlValue('linkRules.text')).split('\n');
         expect(shown).toHaveLength(SHIPPED_DOMAIN_RULES.length);
         expect(shown).toContain('youtube.com | v, t, list, index, start');
     });
 
     it('stores only what the user changed, so later releases can still add rules', async () => {
-        const shown = String(tab.getControlValue('urlDomainRules.text'));
-        await tab.setControlValue('urlDomainRules.text', `${shown}\nmine.example | id`);
-        expect(plugin.settings.urlDomainRules).toEqual(['mine.example | id']);
+        const shown = String(tab.getControlValue('linkRules.text'));
+        await tab.setControlValue('linkRules.text', `${shown}\nmine.example | id`);
+        expect(plugin.settings.linkRules).toEqual(['mine.example | id']);
     });
 
     it('remembers a rule the user deleted from the field', async () => {
-        const kept = String(tab.getControlValue('urlDomainRules.text'))
+        const kept = String(tab.getControlValue('linkRules.text'))
             .split('\n')
             .filter(line => !line.startsWith('youtube.com'))
             .join('\n');
 
-        await tab.setControlValue('urlDomainRules.text', kept);
-        expect(plugin.settings.urlDomainRules).toEqual(['!youtube.com']);
-        expect(String(tab.getControlValue('urlDomainRules.text'))).not.toContain('youtube.com |');
+        await tab.setControlValue('linkRules.text', kept);
+        expect(plugin.settings.linkRules).toEqual(['!youtube.com']);
+        expect(String(tab.getControlValue('linkRules.text'))).not.toContain('youtube.com |');
     });
 
     it('keeps specific Google rules when only the generic rule is deleted', async () => {
-        const kept = String(tab.getControlValue('urlDomainRules.text'))
+        const kept = String(tab.getControlValue('linkRules.text'))
             .split('\n')
             .filter(line => !line.startsWith('google.*'))
             .join('\n');
 
-        await tab.setControlValue('urlDomainRules.text', kept);
+        await tab.setControlValue('linkRules.text', kept);
 
-        const shown = String(tab.getControlValue('urlDomainRules.text'));
+        const shown = String(tab.getControlValue('linkRules.text'));
         const sites = pages(tab.getSettingDefinitions()).find(page => page.name === 'Rules for preserving parameters');
         const status = typeof sites?.status === 'function' ? sites.status() : sites?.status;
-        expect(plugin.settings.urlDomainRules).toEqual(['!google.*']);
+        expect(plugin.settings.linkRules).toEqual(['!google.*']);
         expect(shown.split('\n')).not.toContain('google.* | q, tbm, hl');
         expect(shown).toContain('maps.google.* | q, ll, z');
         expect(shown).toContain('docs.google.*');
@@ -340,21 +340,21 @@ describe('settings values', () => {
     });
 
     it('round-trips an unedited list to no stored changes', async () => {
-        await tab.setControlValue('urlDomainRules.text', String(tab.getControlValue('urlDomainRules.text')));
-        expect(plugin.settings.urlDomainRules).toEqual([]);
+        await tab.setControlValue('linkRules.text', String(tab.getControlValue('linkRules.text')));
+        expect(plugin.settings.linkRules).toEqual([]);
     });
 
     it('does not rebuild the settings page while a site rule is being typed', async () => {
-        const shown = String(tab.getControlValue('urlDomainRules.text'));
+        const shown = String(tab.getControlValue('linkRules.text'));
         const before = (tab as unknown as { updateCount: number }).updateCount;
 
-        await tab.setControlValue('urlDomainRules.text', `${shown}\nmine.example | id`);
+        await tab.setControlValue('linkRules.text', `${shown}\nmine.example | id`);
 
         expect((tab as unknown as { updateCount: number }).updateCount).toBe(before);
     });
 
     it('rejects a site rule that is not a domain', () => {
-        const row = controlRows(tab).find(candidate => candidate.control.key === 'urlDomainRules.text');
+        const row = controlRows(tab).find(candidate => candidate.control.key === 'linkRules.text');
         const validate = row?.control.validate as ((value: string) => string | void) | undefined;
         expect(validate?.('example.com: id')).toBeUndefined();
         expect(validate?.('youtube,com: v')).toContain('youtube,com');
@@ -371,21 +371,21 @@ describe('dependent settings', () => {
     }
 
     it('hides the image detail when the rule is off', () => {
-        expect(isVisible(pageFor('Image handling', { imagesEnabled: false }))).toBe(false);
-        expect(isVisible(pageFor('Image handling', { imagesEnabled: true }))).toBe(true);
+        expect(isVisible(pageFor('Image handling', { imageEnabled: false }))).toBe(false);
+        expect(isVisible(pageFor('Image handling', { imageEnabled: true }))).toBe(true);
     });
 
     it('shows the custom filename row only for the custom format', () => {
         const customRow = (settings: Partial<BetterPasteSettings>) =>
             flatten(makeTab(fakePlugin(settings)).getSettingDefinitions()).find(row => row.name === 'Custom format');
 
-        expect(isVisible(customRow({ imageFilenameFormat: 'source' }))).toBe(false);
-        expect(isVisible(customRow({ imageFilenameFormat: 'custom' }))).toBe(true);
+        expect(isVisible(customRow({ imageNameFormat: 'source' }))).toBe(false);
+        expect(isVisible(customRow({ imageNameFormat: 'custom' }))).toBe(true);
     });
 
     it('hides the link detail when the rule is off', () => {
-        expect(isVisible(rowFor('urlStripMode', { urlEnabled: false }))).toBe(false);
-        expect(isVisible(pageFor('Rules for preserving parameters', { urlEnabled: false }))).toBe(false);
+        expect(isVisible(rowFor('linkStrip', { linkEnabled: false }))).toBe(false);
+        expect(isVisible(pageFor('Rules for preserving parameters', { linkEnabled: false }))).toBe(false);
     });
 
     it('hides the terminal page when the rule is off', () => {
@@ -394,14 +394,14 @@ describe('dependent settings', () => {
     });
 
     it('hides the punctuation choice when AI cleanup is off', () => {
-        expect(isVisible(rowFor('aiTextPlainPunctuation', { aiTextEnabled: false }))).toBe(false);
-        expect(isVisible(rowFor('aiTextPlainPunctuation', { aiTextEnabled: true }))).toBe(true);
+        expect(isVisible(rowFor('textPunctuation', { textInvisible: false }))).toBe(false);
+        expect(isVisible(rowFor('textPunctuation', { textInvisible: true }))).toBe(true);
     });
 
     it('re-evaluates dependent settings after a change', async () => {
         const tab = makeTab(fakePlugin());
         const before = (tab as unknown as { refreshCount: number }).refreshCount;
-        await tab.setControlValue('imagesEnabled', false);
+        await tab.setControlValue('imageEnabled', false);
         expect((tab as unknown as { refreshCount: number }).refreshCount).toBe(before + 1);
     });
 
@@ -414,14 +414,14 @@ describe('dependent settings', () => {
             }
         });
 
-        await tab.setControlValue('textCommaPlacement', 'outside');
+        await tab.setControlValue('textComma', 'outside');
         expect(rendered).toEqual(['He called it "finished," then left. \u2192 He called it "finished", then left.']);
     });
 
     it('does not rebuild the terminal tester when its mode changes', async () => {
         const tab = makeTab(fakePlugin());
         const before = (tab as unknown as { updateCount: number }).updateCount;
-        await tab.setControlValue('terminalRejoinMode', 'any');
+        await tab.setControlValue('terminalRejoin', 'any');
         expect((tab as unknown as { updateCount: number }).updateCount).toBe(before);
     });
 });

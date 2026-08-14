@@ -67,7 +67,7 @@ export function runTextPipeline(input: string, settings: BetterPasteSettings): T
     let textProcessed = false;
     let urlsCleaned = 0;
 
-    if (settings.aiTextEnabled) {
+    if (settings.textInvisible) {
         const result = normalizeInvisibleCharacters(text, httpUrlRanges(text));
         aiTextCleaned = result.changed;
         text = result.text;
@@ -79,29 +79,29 @@ export function runTextPipeline(input: string, settings: BetterPasteSettings): T
         text = result.text;
     }
 
-    if (settings.urlEnabled) {
+    if (settings.linkEnabled) {
         // Anything that is about to be downloaded as an image is off limits to URL
         // cleaning, which would otherwise strip the token out of a signed link
-        const protect = settings.imagesEnabled ? imageReferenceRanges(text) : [];
+        const protect = settings.imageEnabled ? imageReferenceRanges(text) : [];
         const result = cleanUrlsInText(text, buildUrlCleanupOptions(settings), protect);
         urlsCleaned = result.count;
         text = result.text;
     }
 
-    if (settings.aiTextEnabled && settings.aiTextPlainPunctuation) {
+    if (settings.textInvisible && settings.textPunctuation) {
         const result = replacePunctuation(text, httpUrlRanges(text));
         aiTextCleaned = aiTextCleaned || result.changed;
         text = result.text;
     }
 
-    if (settings.textCommaPlacement !== 'none') {
-        const result = applyCommaPlacement(text, settings.textCommaPlacement);
+    if (settings.textComma !== 'none') {
+        const result = applyCommaPlacement(text, settings.textComma);
         textProcessed = result.changed;
         text = result.text;
     }
 
     // Last, so it also clears whatever the rules above left at the edges
-    if (settings.trimPaste) text = trimPasteEdges(text);
+    if (settings.textTrim) text = trimPasteEdges(text);
 
     return { text, changed: text !== input, aiTextCleaned, terminalCleaned, textProcessed, urlsCleaned };
 }

@@ -70,7 +70,7 @@ describe('ImageService', () => {
         vi.setSystemTime(new Date(2026, 7, 13, 14, 5, 6));
 
         try {
-            const { service, writes } = build({ imageFilenameFormat: 'custom', imageFilenameTemplate: '{{name}}-YYYY-MM-DD' });
+            const { service, writes } = build({ imageNameFormat: 'custom', imageNameTemplate: '{{name}}-YYYY-MM-DD' });
             await service.materializeImages('![](data:image/png;base64,AA==)', 'Notes/Test.md');
 
             expect(writes[0].path).toBe('Attachments/pasted-image-2026-08-13.png');

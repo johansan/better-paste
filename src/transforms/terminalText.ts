@@ -22,7 +22,7 @@ import { LIST_MARKERS, MIN_WRAP_WIDTH, WRAP_TOLERANCE } from '../settings/consta
 import type { BetterPasteSettings } from '../settings/types';
 
 /** Subset of settings this rule reads, so tests can build one without a full settings object. */
-export type TerminalCleanupOptions = Pick<BetterPasteSettings, 'terminalRejoinMode' | 'terminalBulletMode'>;
+export type TerminalCleanupOptions = Pick<BetterPasteSettings, 'terminalRejoin' | 'terminalBullets'>;
 
 /** Markdown constructs that always begin their own block and never continue the previous paragraph. */
 const NUMBERED_LIST = /^\s*\d{1,9}[.)]\s/;
@@ -214,7 +214,7 @@ interface Paragraph {
  * and followed by a line that does not open a new Markdown block.
  */
 function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptions, wrapWidth: number): Paragraph[] {
-    const rejoin = options.terminalRejoinMode;
+    const rejoin = options.terminalRejoin;
     const requireIndent = rejoin === 'indented';
     const paragraphs: Paragraph[] = [];
     let current: Paragraph | null = null;
@@ -312,7 +312,7 @@ export function cleanTerminalText(input: string, options: TerminalCleanupOptions
     const lines = dedent(text.split('\n'));
     const wrapWidth = inferWrapWidth(lines);
 
-    const preserveIndent = options.terminalRejoinMode === 'never';
+    const preserveIndent = options.terminalRejoin === 'never';
     const paragraphs = groupParagraphs(lines, options, wrapWidth);
 
     // Dedenting, trimming and collapsing blank lines are only wanted on text that came
@@ -326,7 +326,7 @@ export function cleanTerminalText(input: string, options: TerminalCleanupOptions
     if (!preserveIndent && !hadEscapes && !rejoined) {
         // Converting bullets is a separate, explicit request, so it still applies. The
         // whitespace work does not.
-        if (options.terminalBulletMode !== 'markdown') return { text: input, changed: false };
+        if (options.terminalBullets !== 'markdown') return { text: input, changed: false };
         const converted = convertMarkdownBullets(input);
         return { text: converted, changed: converted !== input };
     }
@@ -335,7 +335,7 @@ export function cleanTerminalText(input: string, options: TerminalCleanupOptions
 
     let output = rendered.join('\n').replace(/\n{3,}/g, '\n\n');
 
-    if (options.terminalBulletMode === 'markdown') output = convertMarkdownBullets(output);
+    if (options.terminalBullets === 'markdown') output = convertMarkdownBullets(output);
 
     return { text: output, changed: output !== input };
 }

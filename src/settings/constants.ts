@@ -45,7 +45,7 @@ export const IMAGE_TIMEOUT_SECONDS = 30;
 export const LINK_TITLE_TIMEOUT_SECONDS = 10;
 
 /** Filename format used for source names and as the starting custom format. */
-export const DEFAULT_IMAGE_FILENAME_TEMPLATE = '{{name}}';
+export const DEFAULT_IMAGE_NAME_TEMPLATE = '{{name}}';
 
 /* -------------------------------------------------------------------------- */
 /* URLs                                                                        */

@@ -51,7 +51,7 @@ describe('link title candidates', () => {
 
 describe('LinkTitleService', () => {
     it('fetches an HTML title and returns a Markdown link', async () => {
-        const settings = { ...DEFAULT_SETTINGS, fetchLinkTitles: true };
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
         const service = new LinkTitleService(
             () => settings,
             async () => response({ text: '<title>A page</title>' }),
@@ -62,7 +62,7 @@ describe('LinkTitleService', () => {
     });
 
     it('rejects a site name as the title of a specific page', async () => {
-        const settings = { ...DEFAULT_SETTINGS, fetchLinkTitles: true };
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
         const service = new LinkTitleService(
             () => settings,
             async () => response({ text: '<title>Reddit</title>' }),
@@ -74,7 +74,7 @@ describe('LinkTitleService', () => {
     });
 
     it('leaves non-HTML responses alone', async () => {
-        const settings = { ...DEFAULT_SETTINGS, fetchLinkTitles: true };
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
         const service = new LinkTitleService(
             () => settings,
             async () => response({ headers: { 'Content-Type': 'application/pdf' } }),
@@ -85,7 +85,7 @@ describe('LinkTitleService', () => {
     });
 
     it('does no work while the setting is off', () => {
-        const settings = { ...DEFAULT_SETTINGS, fetchLinkTitles: false };
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: false };
         const service = new LinkTitleService(
             () => settings,
             async () => response(),
@@ -95,7 +95,7 @@ describe('LinkTitleService', () => {
     });
 
     it('discards a response that arrives after disposal', async () => {
-        const settings = { ...DEFAULT_SETTINGS, fetchLinkTitles: true };
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
         let finishRequest: (value: RequestUrlResponse) => void = () => undefined;
         const pending = new Promise<RequestUrlResponse>(resolve => {
             finishRequest = resolve;

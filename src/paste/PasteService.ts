@@ -152,7 +152,7 @@ export class PasteService {
      */
     handleEditorPaste(event: ClipboardEvent, editor: Editor, info: MarkdownView | MarkdownFileInfo): boolean {
         const settings = this.getSettings();
-        if (!settings.interceptPaste) return false;
+        if (!settings.autoClean) return false;
 
         // Async work tracks one inserted range. Leave multi-selection pastes to Obsidian so
         // every cursor receives the native paste instead of only one range being rewritten.
@@ -170,7 +170,7 @@ export class PasteService {
         if (clipboard.files.length > 0) {
             // Obsidian owns multi-file pastes. This path only handles one bitmap, either to
             // avoid the HTML flavour or apply a note-specific width.
-            if (!settings.imagesEnabled || !isSingleImageFile(clipboard.files)) return false;
+            if (!settings.imageEnabled || !isSingleImageFile(clipboard.files)) return false;
 
             // Two reasons to take over a bitmap paste. Safari's "Copy image" puts the bitmap
             // AND an <img> tag on the clipboard, and Obsidian prefers the HTML there, which
@@ -377,7 +377,7 @@ export class PasteService {
      */
     private scheduleRichPostProcess(editor: Editor, info: MarkdownView | MarkdownFileInfo): void {
         const settings = this.getSettings();
-        if (!settings.aiTextEnabled && settings.textCommaPlacement === 'none' && !settings.urlEnabled && !settings.imagesEnabled) return;
+        if (!settings.textInvisible && settings.textComma === 'none' && !settings.linkEnabled && !settings.imageEnabled) return;
 
         const targetFile = info.file;
         const targetPath = targetFile?.path ?? '';
@@ -420,22 +420,22 @@ export class PasteService {
 
         // Content copied out of a browser arrives as HTML, which is how most people paste
         // an assistant's answer. Without this the character rule would never see it.
-        if (settings.aiTextEnabled) {
+        if (settings.textInvisible) {
             const cleaned = cleanAiText(text, settings);
             summary.aiTextCleaned = cleaned.changed;
             text = cleaned.text;
         }
 
-        if (settings.textCommaPlacement !== 'none') {
-            const processed = applyCommaPlacement(text, settings.textCommaPlacement);
+        if (settings.textComma !== 'none') {
+            const processed = applyCommaPlacement(text, settings.textComma);
             summary.textProcessed = processed.changed;
             text = processed.text;
         }
 
-        if (settings.urlEnabled) {
+        if (settings.linkEnabled) {
             // Same protection as the plain-text pipeline: an image about to be fetched
             // keeps its query, since a signed link needs it
-            const protect = settings.imagesEnabled ? imageReferenceRanges(text) : [];
+            const protect = settings.imageEnabled ? imageReferenceRanges(text) : [];
             const cleaned = cleanUrlsInText(text, buildUrlCleanupOptions(settings), protect);
             text = cleaned.text;
             summary.urlsCleaned = cleaned.count;

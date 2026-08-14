@@ -57,8 +57,8 @@ function createTerminalOptionsDefinitions(context: SettingsPageContext): Setting
             aliases: ['indent', 'wrap', 'aggressive', 'safe', 'git log'],
             control: {
                 type: 'dropdown',
-                key: 'terminalRejoinMode',
-                defaultValue: DEFAULT_SETTINGS.terminalRejoinMode,
+                key: 'terminalRejoin',
+                defaultValue: DEFAULT_SETTINGS.terminalRejoin,
                 options: {
                     indented: 'Only when the next line is indented',
                     any: 'Whenever the line above looks full',
@@ -72,8 +72,8 @@ function createTerminalOptionsDefinitions(context: SettingsPageContext): Setting
             aliases: ['list', 'markdown', 'dash'],
             control: {
                 type: 'dropdown',
-                key: 'terminalBulletMode',
-                defaultValue: DEFAULT_SETTINGS.terminalBulletMode,
+                key: 'terminalBullets',
+                defaultValue: DEFAULT_SETTINGS.terminalBullets,
                 options: {
                     markdown: 'Convert to Markdown list items',
                     preserve: 'Leave them as they are'

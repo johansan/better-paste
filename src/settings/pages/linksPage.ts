@@ -50,20 +50,20 @@ const URL_SAMPLE = 'https://support.claude.com/en/articles/16266773-how-claude-m
 
 /** Rows shown directly under the Links heading on the landing page. */
 export function createLinkLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
-    const enabled = (): boolean => context.settings().urlEnabled;
+    const enabled = (): boolean => context.settings().linkEnabled;
 
     return [
         {
             name: 'Fetch titles for pasted links',
             desc: 'When the clipboard contains only a non-image web address, fetch its page title and paste a Markdown link. Other selected text becomes the label without making a request. The original address is kept if the title cannot be fetched.',
             aliases: ['title', 'page', 'website', 'markdown link', 'download'],
-            control: { type: 'toggle', key: 'fetchLinkTitles', defaultValue: DEFAULT_SETTINGS.fetchLinkTitles }
+            control: { type: 'toggle', key: 'linkTitles', defaultValue: DEFAULT_SETTINGS.linkTitles }
         },
         {
             name: 'Clean pasted links',
             desc: cleaningExample(),
             aliases: ['url', 'tracking', 'utm', 'parameters', 'query', 'site', 'domain', 'youtube', 'exception'],
-            control: { type: 'toggle', key: 'urlEnabled', defaultValue: DEFAULT_SETTINGS.urlEnabled }
+            control: { type: 'toggle', key: 'linkEnabled', defaultValue: DEFAULT_SETTINGS.linkEnabled }
         },
         {
             name: 'Which parameters to remove',
@@ -72,8 +72,8 @@ export function createLinkLandingDefinitions(context: SettingsPageContext): Sett
             aliases: ['utm', 'tracking', 'query', 'parameters'],
             control: {
                 type: 'dropdown',
-                key: 'urlStripMode',
-                defaultValue: DEFAULT_SETTINGS.urlStripMode,
+                key: 'linkStrip',
+                defaultValue: DEFAULT_SETTINGS.linkStrip,
                 options: {
                     all: 'Every parameter, except where a site rule keeps it',
                     tracking: 'Only parameters known to be tracking'
@@ -86,12 +86,12 @@ export function createLinkLandingDefinitions(context: SettingsPageContext): Sett
             desc: 'Site rules for keeping specific query parameters in either removal mode.',
             visible: enabled,
             displayValue: () => {
-                const count = mergeDomainRules(context.settings().urlDomainRules).length;
+                const count = mergeDomainRules(context.settings().linkRules).length;
                 return count === 1 ? '1 site' : `${count} sites`;
             },
             // A rule that will not parse is only reported on the page that holds it, so the
             // link has to carry the warning back to the landing page
-            status: () => (findInvalidDomainRules(context.settings().urlDomainRules.join('\n')).length > 0 ? 'warning' : null),
+            status: () => (findInvalidDomainRules(context.settings().linkRules.join('\n')).length > 0 ? 'warning' : null),
             items: createSitesPageDefinitions(context)
         }
     ];
@@ -111,7 +111,7 @@ function createSitesPageDefinitions(context: SettingsPageContext): SettingDefini
                     aliases: ['domain', 'exception', 'whitelist', 'youtube'],
                     control: {
                         type: 'textarea',
-                        key: `urlDomainRules${LIST_KEY_SUFFIX}`,
+                        key: `linkRules${LIST_KEY_SUFFIX}`,
                         rows: 6,
                         placeholder: 'example.com: id, page',
                         defaultValue: '',

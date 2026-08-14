@@ -78,11 +78,11 @@ export function createAiTextLandingDefinitions(context: SettingsPageContext): Se
                 'punctuation',
                 'whitespace'
             ],
-            control: { type: 'toggle', key: 'aiTextEnabled', defaultValue: DEFAULT_SETTINGS.aiTextEnabled }
+            control: { type: 'toggle', key: 'textInvisible', defaultValue: DEFAULT_SETTINGS.textInvisible }
         },
         {
             ...toggle(
-                'aiTextPlainPunctuation',
+                'textPunctuation',
                 'AI cleanup: dashes and quotes',
                 withExample(
                     'Converts long dashes into hyphens and curly quotes into straight quotes.',
@@ -102,7 +102,7 @@ export function createAiTextLandingDefinitions(context: SettingsPageContext): Se
                     'typography'
                 ]
             ),
-            visible: () => context.settings().aiTextEnabled
+            visible: () => context.settings().textInvisible
         }
     ];
 }

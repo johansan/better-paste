@@ -29,10 +29,10 @@ import {
 } from '../src/transforms/urlCleanup';
 import type { UrlCleanupOptions } from '../src/transforms/urlCleanup';
 import { SHIPPED_DOMAIN_RULES } from '../src/settings/constants';
-import type { UrlStripMode } from '../src/settings/types';
+import type { LinkStripMode } from '../src/settings/types';
 
-function options(urlStripMode: UrlStripMode = 'all', urlDomainRules: string[] = []): UrlCleanupOptions {
-    return buildUrlCleanupOptions({ urlStripMode, urlDomainRules });
+function options(linkStrip: LinkStripMode = 'all', linkRules: string[] = []): UrlCleanupOptions {
+    return buildUrlCleanupOptions({ linkStrip, linkRules });
 }
 
 describe('parseDomainRules', () => {

@@ -19,8 +19,8 @@
 import { describe, expect, it } from 'vitest';
 import { cleanAiText, normalizeInvisibleCharacters, replacePunctuation } from '../src/transforms/aiText';
 
-const ON = { aiTextPlainPunctuation: true };
-const PLAIN_OFF = { aiTextPlainPunctuation: false };
+const ON = { textPunctuation: true };
+const PLAIN_OFF = { textPunctuation: false };
 
 // Written as escapes so this file stays plain ASCII
 const NBSP = '\u00A0';

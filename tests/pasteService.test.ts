@@ -40,7 +40,7 @@ interface SavedClipboardImages {
 /** Image service double that resolves every reference to a predictable embed. */
 function fakeImages(settings: BetterPasteSettings, failing = false, saved?: SavedClipboardImages[]): ImageService {
     return {
-        hasWork: (text: string) => settings.imagesEnabled && findImageReferences(text).length > 0,
+        hasWork: (text: string) => settings.imageEnabled && findImageReferences(text).length > 0,
         materializeImages: async (text: string, _sourcePath: string, size: string | null = null) => {
             const references = findImageReferences(text);
             if (failing) return { text, downloaded: 0, failed: references.length };
@@ -62,7 +62,7 @@ function fakeImages(settings: BetterPasteSettings, failing = false, saved?: Save
 /** Title service double that resolves a standalone web address to a predictable link. */
 function fakeTitles(settings: BetterPasteSettings, fetched: string[]): LinkTitleService {
     const hasWork = (text: string): boolean =>
-        settings.fetchLinkTitles &&
+        settings.linkTitles &&
         /^https?:\/\/\S+$/i.test(text) &&
         !/\.(?:png|jpe?g|gif|webp|svg|avif|bmp|heic|tiff|ico)(?:[?#]|$)/i.test(text);
 
@@ -115,7 +115,7 @@ describe('handleEditorPaste: plain text', () => {
     });
 
     it('replaces the selection rather than appending', () => {
-        const { service } = build({ fetchLinkTitles: false });
+        const { service } = build({ linkTitles: false });
         const editor = selecting('start OLD end', 'OLD');
         const event = fakeClipboardEvent({ plain: 'https://example.com/a?utm_source=x' });
 
@@ -152,7 +152,7 @@ describe('handleEditorPaste: plain text', () => {
     });
 
     it('does nothing when automatic processing is off', () => {
-        const { service } = build({ interceptPaste: false });
+        const { service } = build({ autoClean: false });
         const editor = new FakeEditor('');
         const event = fakeClipboardEvent({ plain: 'https://example.com/a?utm_source=x' });
 
@@ -271,7 +271,7 @@ describe('handleEditorPaste: Safari copy image', () => {
     });
 
     it('leaves the paste alone when image handling is off', () => {
-        const { service } = build({ imagesEnabled: false });
+        const { service } = build({ imageEnabled: false });
         const editor = new FakeEditor('');
 
         expect(service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO)).toBe(false);
@@ -415,7 +415,7 @@ describe('handleEditorPaste: images in plain text', () => {
     });
 
     it('leaves a pasted image URL alone when image saving is off', () => {
-        const { service } = build({ imagesEnabled: false });
+        const { service } = build({ imageEnabled: false });
         const editor = new FakeEditor('');
         const event = fakeClipboardEvent({ plain: 'https://example.com/cat.png' });
 
@@ -471,14 +471,14 @@ describe('handleEditorPaste: images in plain text', () => {
 
 describe('handleEditorPaste: link titles', () => {
     it('leaves a standalone URL to Obsidian when title fetching is off', () => {
-        const { service } = build({ fetchLinkTitles: false, urlEnabled: false, trimPaste: false });
+        const { service } = build({ linkTitles: false, linkEnabled: false, textTrim: false });
         const editor = new FakeEditor('');
 
         expect(service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO)).toBe(false);
     });
 
     it('inserts the URL immediately and replaces it with a titled link', async () => {
-        const { service } = build({ fetchLinkTitles: true, urlEnabled: false });
+        const { service } = build({ linkTitles: true, linkEnabled: false });
         const editor = new FakeEditor('');
 
         expect(service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO)).toBe(true);
@@ -493,8 +493,8 @@ describe('handleEditorPaste: link titles', () => {
         const settings: BetterPasteSettings = {
             ...DEFAULT_SETTINGS,
             showNotices: true,
-            fetchLinkTitles: true,
-            urlEnabled: false
+            linkTitles: true,
+            linkEnabled: false
         };
         let finishTitleFetch: (result: string | null) => void = () => undefined;
         const titleResult = new Promise<string | null>(resolve => {
@@ -541,8 +541,8 @@ describe('handleEditorPaste: link titles', () => {
         const settings: BetterPasteSettings = {
             ...DEFAULT_SETTINGS,
             showNotices: false,
-            fetchLinkTitles: true,
-            urlEnabled: false
+            linkTitles: true,
+            linkEnabled: false
         };
         const titles = {
             hasWork: (text: string) => /^https?:\/\/\S+$/i.test(text),
@@ -563,7 +563,7 @@ describe('handleEditorPaste: link titles', () => {
     });
 
     it('uses selected text as the link label without fetching a title', async () => {
-        const { service, fetchedTitles } = build({ fetchLinkTitles: true, urlEnabled: false });
+        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false });
         const editor = selecting('Read the documentation next', 'documentation');
         const url = 'https://example.com/page';
 
@@ -575,7 +575,7 @@ describe('handleEditorPaste: link titles', () => {
     });
 
     it('fetches a title when the selection is the pasted URL itself', async () => {
-        const { service, fetchedTitles } = build({ fetchLinkTitles: true, urlEnabled: false });
+        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false });
         const url = 'https://example.com/page';
         const editor = selecting(url, url);
 
@@ -587,7 +587,7 @@ describe('handleEditorPaste: link titles', () => {
     });
 
     it('finds the pasted URL after the user continues typing beside an older copy', async () => {
-        const { service } = build({ fetchLinkTitles: true, urlEnabled: false });
+        const { service } = build({ linkTitles: true, linkEnabled: false });
         const url = 'https://example.com/page';
         const editor = new FakeEditor(`${url}\n`);
 
@@ -599,7 +599,7 @@ describe('handleEditorPaste: link titles', () => {
     });
 
     it('fetches the title for the cleaned address', async () => {
-        const { service } = build({ fetchLinkTitles: true });
+        const { service } = build({ linkTitles: true });
         const editor = new FakeEditor('');
 
         service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page?utm_source=news' }), editor.asEditor(), INFO);
@@ -609,7 +609,7 @@ describe('handleEditorPaste: link titles', () => {
     });
 
     it('does not fetch a title for prose containing a URL', () => {
-        const { service } = build({ fetchLinkTitles: true, urlEnabled: false, trimPaste: false });
+        const { service } = build({ linkTitles: true, linkEnabled: false, textTrim: false });
         const editor = new FakeEditor('');
 
         expect(service.handleEditorPaste(fakeClipboardEvent({ plain: 'See https://example.com/page' }), editor.asEditor(), INFO)).toBe(
@@ -618,7 +618,7 @@ describe('handleEditorPaste: link titles', () => {
     });
 
     it('leaves an image URL to image handling', async () => {
-        const { service } = build({ fetchLinkTitles: true });
+        const { service } = build({ linkTitles: true });
         const editor = new FakeEditor('');
 
         service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/cat.png' }), editor.asEditor(), INFO);
@@ -683,7 +683,7 @@ describe('handleEditorPaste: rich content', () => {
     });
 
     it('does no work when both rich-content rules are off', async () => {
-        const { service } = build({ urlEnabled: false, imagesEnabled: false });
+        const { service } = build({ linkEnabled: false, imageEnabled: false });
         const editor = new FakeEditor('');
 
         await pasteRich(service, editor, RICH_HTML, '[link](https://example.com/b?utm_source=x)');
@@ -692,7 +692,7 @@ describe('handleEditorPaste: rich content', () => {
     });
 
     it('still cleans AI typography when the other rich-content rules are off', async () => {
-        const { service } = build({ urlEnabled: false, imagesEnabled: false });
+        const { service } = build({ linkEnabled: false, imageEnabled: false });
         const editor = new FakeEditor('');
 
         await pasteRich(service, editor, '<p>quoted</p>', '“quoted”');
@@ -702,10 +702,10 @@ describe('handleEditorPaste: rich content', () => {
 
     it('applies text processing to rich content when the other rules are off', async () => {
         const { service } = build({
-            aiTextEnabled: false,
-            urlEnabled: false,
-            imagesEnabled: false,
-            textCommaPlacement: 'outside'
+            textInvisible: false,
+            linkEnabled: false,
+            imageEnabled: false,
+            textComma: 'outside'
         });
         const editor = new FakeEditor('');
 
@@ -805,7 +805,7 @@ describe('surviving an edit during the image write', () => {
 
 describe('explicit paste commands', () => {
     it('uses the invocation selection as a URL label without fetching a title', async () => {
-        const { service, fetchedTitles } = build({ fetchLinkTitles: true, urlEnabled: false });
+        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false });
         const editor = selecting('Read the documentation next', 'documentation');
         const url = 'https://example.com/page';
         vi.stubGlobal('navigator', { clipboard: { readText: async () => url } });
@@ -899,7 +899,7 @@ describe('leaving a paste alone', () => {
     });
 
     it('skips a URL paste inside inline code', async () => {
-        const { service, fetchedTitles } = build({ fetchLinkTitles: true, urlEnabled: false, trimPaste: false });
+        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false, textTrim: false });
         const url = 'https://example.com/page';
         const editor = new FakeEditor('Use ``', 'Use `'.length);
 
@@ -913,7 +913,7 @@ describe('leaving a paste alone', () => {
     });
 
     it('skips a URL paste on an indented code line', async () => {
-        const { service, fetchedTitles } = build({ fetchLinkTitles: true, urlEnabled: false, trimPaste: false });
+        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false, textTrim: false });
         const url = 'https://example.com/page';
         const editor = new FakeEditor('    ');
 

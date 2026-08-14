@@ -50,7 +50,7 @@ function commasDescription(placement: TextCommaPlacement): string | DocumentFrag
 /** Rows shown directly under the Text processing heading. */
 export function createTextProcessingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
     return [
-        toggle('trimPaste', 'Trim surrounding whitespace', 'Removes blank lines and spaces from the start and end of pasted text.', [
+        toggle('textTrim', 'Trim surrounding whitespace', 'Removes blank lines and spaces from the start and end of pasted text.', [
             'whitespace',
             'blank',
             'space',
@@ -59,12 +59,12 @@ export function createTextProcessingDefinitions(context: SettingsPageContext): S
         ]),
         {
             name: 'Commas and quotes',
-            desc: commasDescription(context.settings().textCommaPlacement),
+            desc: commasDescription(context.settings().textComma),
             aliases: ['comma', 'quote', 'quotation', 'punctuation', 'style'],
             control: {
                 type: 'dropdown',
-                key: 'textCommaPlacement',
-                defaultValue: DEFAULT_SETTINGS.textCommaPlacement,
+                key: 'textComma',
+                defaultValue: DEFAULT_SETTINGS.textComma,
                 options: {
                     none: 'No change',
                     inside: 'Comma inside quotes',

@@ -20,11 +20,11 @@ import { DEFAULT_SETTINGS } from './defaults';
 import { normalizeVersion } from '../releaseNotes';
 import type {
     BetterPasteSettings,
-    ImageFilenameFormat,
+    ImageNameFormat,
     TerminalBulletMode,
     TerminalRejoinMode,
     TextCommaPlacement,
-    UrlStripMode
+    LinkStripMode
 } from './types';
 
 function asBoolean(value: unknown, fallback: boolean): boolean {
@@ -44,10 +44,10 @@ function asEnum<T extends string>(value: unknown, allowed: readonly T[], fallbac
     return typeof value === 'string' && (allowed as readonly string[]).includes(value) ? (value as T) : fallback;
 }
 
-const URL_STRIP_MODES: readonly UrlStripMode[] = ['all', 'tracking'];
+const STRIP_MODES: readonly LinkStripMode[] = ['all', 'tracking'];
 const BULLET_MODES: readonly TerminalBulletMode[] = ['preserve', 'markdown'];
 const REJOIN_MODES: readonly TerminalRejoinMode[] = ['indented', 'any', 'never'];
-const FILENAME_FORMATS: readonly ImageFilenameFormat[] = ['source', 'custom'];
+const NAME_FORMATS: readonly ImageNameFormat[] = ['source', 'custom'];
 const COMMA_PLACEMENTS: readonly TextCommaPlacement[] = ['none', 'inside', 'outside'];
 
 /**
@@ -60,30 +60,28 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
     const defaults = DEFAULT_SETTINGS;
 
     return {
-        interceptPaste: asBoolean(data.interceptPaste, defaults.interceptPaste),
+        autoClean: asBoolean(data.autoClean, defaults.autoClean),
         showNotices: asBoolean(data.showNotices, defaults.showNotices),
 
-        imagesEnabled: asBoolean(data.imagesEnabled, defaults.imagesEnabled),
-        imageFilenameFormat: asEnum(data.imageFilenameFormat, FILENAME_FORMATS, defaults.imageFilenameFormat),
-        imageFilenameTemplate:
-            asString(data.imageFilenameTemplate, defaults.imageFilenameTemplate).trim() || defaults.imageFilenameTemplate,
+        imageEnabled: asBoolean(data.imageEnabled, defaults.imageEnabled),
+        imageNameFormat: asEnum(data.imageNameFormat, NAME_FORMATS, defaults.imageNameFormat),
+        imageNameTemplate: asString(data.imageNameTemplate, defaults.imageNameTemplate).trim() || defaults.imageNameTemplate,
         imageSizeProperty: asString(data.imageSizeProperty, defaults.imageSizeProperty).trim(),
 
-        urlEnabled: asBoolean(data.urlEnabled, defaults.urlEnabled),
-        fetchLinkTitles: asBoolean(data.fetchLinkTitles, defaults.fetchLinkTitles),
-        urlStripMode: asEnum(data.urlStripMode, URL_STRIP_MODES, defaults.urlStripMode),
+        linkEnabled: asBoolean(data.linkEnabled, defaults.linkEnabled),
+        linkTitles: asBoolean(data.linkTitles, defaults.linkTitles),
+        linkStrip: asEnum(data.linkStrip, STRIP_MODES, defaults.linkStrip),
         // Only the user's own rules are stored; the shipped list is merged in at read time
-        urlDomainRules: asStringArray(data.urlDomainRules),
+        linkRules: asStringArray(data.linkRules),
 
         terminalEnabled: asBoolean(data.terminalEnabled, defaults.terminalEnabled),
-        terminalRejoinMode: asEnum(data.terminalRejoinMode, REJOIN_MODES, defaults.terminalRejoinMode),
-        terminalBulletMode: asEnum(data.terminalBulletMode, BULLET_MODES, defaults.terminalBulletMode),
+        terminalRejoin: asEnum(data.terminalRejoin, REJOIN_MODES, defaults.terminalRejoin),
+        terminalBullets: asEnum(data.terminalBullets, BULLET_MODES, defaults.terminalBullets),
 
-        trimPaste: asBoolean(data.trimPaste, defaults.trimPaste),
-        textCommaPlacement: asEnum(data.textCommaPlacement, COMMA_PLACEMENTS, defaults.textCommaPlacement),
-
-        aiTextEnabled: asBoolean(data.aiTextEnabled, defaults.aiTextEnabled),
-        aiTextPlainPunctuation: asBoolean(data.aiTextPlainPunctuation, defaults.aiTextPlainPunctuation),
+        textTrim: asBoolean(data.textTrim, defaults.textTrim),
+        textComma: asEnum(data.textComma, COMMA_PLACEMENTS, defaults.textComma),
+        textInvisible: asBoolean(data.textInvisible, defaults.textInvisible),
+        textPunctuation: asBoolean(data.textPunctuation, defaults.textPunctuation),
 
         lastShownVersion: normalizeVersion(data.lastShownVersion)
     };

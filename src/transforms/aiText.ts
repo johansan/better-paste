@@ -22,7 +22,7 @@ import { httpUrlRanges } from './urlCleanup';
 import type { ProtectedRange } from './urlCleanup';
 
 /** Subset of settings this rule reads, so tests can build one without a full settings object. */
-export type AiTextOptions = Pick<BetterPasteSettings, 'aiTextPlainPunctuation'>;
+export type AiTextOptions = Pick<BetterPasteSettings, 'textPunctuation'>;
 
 /*
  * Every pattern is built from escape strings rather than literal characters, because the
@@ -128,8 +128,6 @@ export function replacePunctuation(input: string, protect: readonly ProtectedRan
  */
 export function cleanAiText(input: string, options: AiTextOptions): AiTextResult {
     const characters = normalizeInvisibleCharacters(input, httpUrlRanges(input));
-    const text = options.aiTextPlainPunctuation
-        ? replacePunctuation(characters.text, httpUrlRanges(characters.text)).text
-        : characters.text;
+    const text = options.textPunctuation ? replacePunctuation(characters.text, httpUrlRanges(characters.text)).text : characters.text;
     return { text, changed: text !== input };
 }

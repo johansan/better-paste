@@ -157,7 +157,7 @@ describe('cleanTerminalText', () => {
 
     it('does not close a fence with another marker or a shorter delimiter', () => {
         const input = ['````js', '~~~', '```', '  const value = 1;', '````'].join('\n');
-        expect(cleanTerminalText(input, options({ terminalRejoinMode: 'never' })).text).toBe(input);
+        expect(cleanTerminalText(input, options({ terminalRejoin: 'never' })).text).toBe(input);
     });
 
     it('requires an indent for continuation lines by default', () => {
@@ -166,7 +166,7 @@ describe('cleanTerminalText', () => {
             'Not indented so not a continuation'
         ].join('\n');
         expect(cleanTerminalText(input, options()).text).toBe(input);
-        expect(cleanTerminalText(input, options({ terminalRejoinMode: 'any' })).text).toBe(
+        expect(cleanTerminalText(input, options({ terminalRejoin: 'any' })).text).toBe(
             'A line that is comfortably longer than the sixty character wrap threshold Not indented so not a continuation'
         );
     });
@@ -177,7 +177,7 @@ describe('cleanTerminalText', () => {
             '      continued here.\u001B[0m'
         ].join('\n');
 
-        expect(cleanTerminalText(input, options({ terminalRejoinMode: 'never' })).text).toBe(
+        expect(cleanTerminalText(input, options({ terminalRejoin: 'never' })).text).toBe(
             ['A line that is comfortably longer than any plausible wrap column for this test', '  continued here.'].join('\n')
         );
     });
@@ -205,12 +205,12 @@ describe('cleanTerminalText', () => {
 
     it('preserves bullet characters when asked', () => {
         const input = '• First item\n• Second item';
-        expect(cleanTerminalText(input, options({ terminalBulletMode: 'preserve' })).text).toBe(input);
+        expect(cleanTerminalText(input, options({ terminalBullets: 'preserve' })).text).toBe(input);
     });
 
     it('leaves bullets inside fenced code untouched', () => {
         const input = ['```text', '• literal output', '```', '• List item'].join('\n');
-        expect(cleanTerminalText(input, options({ terminalBulletMode: 'markdown' })).text).toBe(
+        expect(cleanTerminalText(input, options({ terminalBullets: 'markdown' })).text).toBe(
             ['```text', '• literal output', '```', '- List item'].join('\n')
         );
     });

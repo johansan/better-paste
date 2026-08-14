@@ -18,7 +18,7 @@
 
 import type { Setting, SettingGroupItem } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../defaults';
-import { DEFAULT_IMAGE_FILENAME_TEMPLATE } from '../constants';
+import { DEFAULT_IMAGE_NAME_TEMPLATE } from '../constants';
 import { applyFileNameTemplate, buildFileNameTokens } from '../../utils/filenames';
 import { MOMENT_FORMAT_DOCS_URL } from '../../urls';
 import type { SettingsPageContext } from './context';
@@ -69,28 +69,28 @@ function renderCustomFilenameFormat(setting: Setting, context: SettingsPageConte
     };
 
     setting.addText(text => {
-        text.setPlaceholder(DEFAULT_IMAGE_FILENAME_TEMPLATE)
-            .setValue(context.settings().imageFilenameTemplate)
+        text.setPlaceholder(DEFAULT_IMAGE_NAME_TEMPLATE)
+            .setValue(context.settings().imageNameTemplate)
             .onChange(value => {
-                const template = value.trim() || DEFAULT_IMAGE_FILENAME_TEMPLATE;
-                context.settings().imageFilenameTemplate = template;
+                const template = value.trim() || DEFAULT_IMAGE_NAME_TEMPLATE;
+                context.settings().imageNameTemplate = template;
                 renderExample(template);
                 return context.saveSettings();
             });
     });
-    renderExample(context.settings().imageFilenameTemplate);
+    renderExample(context.settings().imageNameTemplate);
 }
 
 /** Rows shown directly under the Images heading on the landing page. */
 export function createImageLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
-    const enabled = (): boolean => context.settings().imagesEnabled;
+    const enabled = (): boolean => context.settings().imageEnabled;
 
     return [
         {
             name: 'Save pasted images into the vault',
             desc: savingExample(),
             aliases: ['download', 'attachment', 'safari', 'screenshot', 'picture', 'folder', 'file name', 'filename', 'width', 'size'],
-            control: { type: 'toggle', key: 'imagesEnabled', defaultValue: DEFAULT_SETTINGS.imagesEnabled }
+            control: { type: 'toggle', key: 'imageEnabled', defaultValue: DEFAULT_SETTINGS.imageEnabled }
         },
         {
             type: 'page',
@@ -110,8 +110,8 @@ function createImageOptionsDefinitions(context: SettingsPageContext): SettingGro
             desc: 'Choose how saved image files are named.',
             control: {
                 type: 'dropdown',
-                key: 'imageFilenameFormat',
-                defaultValue: DEFAULT_SETTINGS.imageFilenameFormat,
+                key: 'imageNameFormat',
+                defaultValue: DEFAULT_SETTINGS.imageNameFormat,
                 options: {
                     source: 'Name from source',
                     custom: 'Custom format'
@@ -121,7 +121,7 @@ function createImageOptionsDefinitions(context: SettingsPageContext): SettingGro
         {
             name: 'Custom format',
             aliases: ['name', 'filename', 'date', 'moment', 'YYYY', '{{name}}'],
-            visible: () => context.settings().imageFilenameFormat === 'custom',
+            visible: () => context.settings().imageNameFormat === 'custom',
             render: setting => renderCustomFilenameFormat(setting, context)
         },
         {

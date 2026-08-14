@@ -17,32 +17,31 @@
  */
 
 import type { BetterPasteSettings } from './types';
-import { DEFAULT_IMAGE_FILENAME_TEMPLATE } from './constants';
+import { DEFAULT_IMAGE_NAME_TEMPLATE } from './constants';
 
 export const DEFAULT_SETTINGS: BetterPasteSettings = {
-    interceptPaste: true,
+    autoClean: true,
     showNotices: true,
 
-    imagesEnabled: true,
-    imageFilenameFormat: 'source',
-    imageFilenameTemplate: DEFAULT_IMAGE_FILENAME_TEMPLATE,
+    imageEnabled: true,
+    imageNameFormat: 'source',
+    imageNameTemplate: DEFAULT_IMAGE_NAME_TEMPLATE,
     imageSizeProperty: 'image-width',
 
-    urlEnabled: true,
-    fetchLinkTitles: true,
-    urlStripMode: 'all',
+    linkEnabled: true,
+    linkTitles: true,
+    linkStrip: 'all',
     // Empty means "use the shipped rules unchanged"; entries here are merged over them
-    urlDomainRules: [],
+    linkRules: [],
 
     terminalEnabled: true,
-    terminalRejoinMode: 'indented',
-    terminalBulletMode: 'markdown',
+    terminalRejoin: 'indented',
+    terminalBullets: 'markdown',
 
-    trimPaste: true,
-    textCommaPlacement: 'none',
-
-    aiTextEnabled: true,
-    aiTextPlainPunctuation: true,
+    textTrim: true,
+    textComma: 'none',
+    textInvisible: true,
+    textPunctuation: true,
 
     // Empty means no release notes have been shown in this vault yet
     lastShownVersion: ''

@@ -21,7 +21,7 @@
  * - 'all': drop every query parameter unless a site rule keeps it
  * - 'tracking': drop only parameters known to be tracking
  */
-export type UrlStripMode = 'all' | 'tracking';
+export type LinkStripMode = 'all' | 'tracking';
 
 /**
  * How readily a line is treated as the continuation of the one above it.
@@ -39,7 +39,7 @@ export type TerminalRejoinMode = 'indented' | 'any' | 'never';
 export type TerminalBulletMode = 'preserve' | 'markdown';
 
 /** Naming scheme for saved images. */
-export type ImageFilenameFormat = 'source' | 'custom';
+export type ImageNameFormat = 'source' | 'custom';
 
 /** Placement of a comma next to a closing double quotation mark. */
 export type TextCommaPlacement = 'none' | 'inside' | 'outside';
@@ -48,57 +48,57 @@ export interface BetterPasteSettings {
     /* Pasting */
 
     /** Run the rules automatically on paste. When off, only the commands apply them. */
-    interceptPaste: boolean;
+    autoClean: boolean;
     /** Show a notice summarising what a paste changed. Failures are always reported. */
     showNotices: boolean;
 
     /* Images */
 
     /** Save pasted pictures into the vault instead of leaving them as links. */
-    imagesEnabled: boolean;
+    imageEnabled: boolean;
     /** Naming scheme for saved images. */
-    imageFilenameFormat: ImageFilenameFormat;
+    imageNameFormat: ImageNameFormat;
     /** Custom source-name and Moment date format for saved image filenames. */
-    imageFilenameTemplate: string;
+    imageNameTemplate: string;
     /** Frontmatter property setting the width of images pasted into a note. Blank disables it. */
     imageSizeProperty: string;
 
     /* Links */
 
     /** Remove tracking from pasted links. */
-    urlEnabled: boolean;
+    linkEnabled: boolean;
     /** Turn a pasted standalone web address into a Markdown link using the page title. */
-    fetchLinkTitles: boolean;
+    linkTitles: boolean;
     /** Whether to drop every parameter or only known tracking ones. */
-    urlStripMode: UrlStripMode;
+    linkStrip: LinkStripMode;
     /**
      * The user's own site rules, merged over the shipped list at read time so that
      * updates to the shipped rules keep reaching people who have added their own.
      */
-    urlDomainRules: string[];
+    linkRules: string[];
 
     /* Terminal text */
 
     /** Rejoin paragraphs a terminal broke across lines. */
     terminalEnabled: boolean;
     /** How readily a line is treated as a continuation. */
-    terminalRejoinMode: TerminalRejoinMode;
+    terminalRejoin: TerminalRejoinMode;
     /** What happens to bullet characters. */
-    terminalBulletMode: TerminalBulletMode;
+    terminalBullets: TerminalBulletMode;
 
     /* Text processing */
 
     /** Remove blank space from the start and end of whatever was pasted. */
-    trimPaste: boolean;
+    textTrim: boolean;
     /** Placement of a comma next to a closing double quotation mark. */
-    textCommaPlacement: TextCommaPlacement;
-
-    /* AI text */
-
-    /** Normalise the typography that AI assistants produce. */
-    aiTextEnabled: boolean;
-    /** Replace typographic punctuation with its plain ASCII equivalent. */
-    aiTextPlainPunctuation: boolean;
+    textComma: TextCommaPlacement;
+    /** Remove zero-width characters and turn no-break spaces into ordinary ones. */
+    textInvisible: boolean;
+    /**
+     * Replace typographic punctuation with its plain ASCII equivalent. Only applies when
+     * `textInvisible` is on, because both halves clean up the same pasted text.
+     */
+    textPunctuation: boolean;
 
     /* Stored state */
 

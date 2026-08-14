@@ -19,7 +19,7 @@
 import { matchesAnyGlob } from '../utils/glob';
 import { SHIPPED_DOMAIN_RULES, TRACKING_PARAMS } from '../settings/constants';
 import { markdownCodeRanges, overlapsRange } from './markdownRanges';
-import type { BetterPasteSettings, UrlStripMode } from '../settings/types';
+import type { BetterPasteSettings, LinkStripMode } from '../settings/types';
 
 /** How many labels a wildcard top-level domain may stand for, covering ".com" and ".co.uk". */
 const MAX_TLD_LABELS = 2;
@@ -44,13 +44,13 @@ export interface DomainRule {
  * rather than once per URL, which matters for a document full of links.
  */
 export interface UrlCleanupOptions {
-    urlStripMode: UrlStripMode;
+    strip: LinkStripMode;
     rules: readonly DomainRule[];
 }
 
 /** Builds the cleaning options for a paste from the stored settings. */
-export function buildUrlCleanupOptions(settings: Pick<BetterPasteSettings, 'urlStripMode' | 'urlDomainRules'>): UrlCleanupOptions {
-    return { urlStripMode: settings.urlStripMode, rules: mergeDomainRules(settings.urlDomainRules) };
+export function buildUrlCleanupOptions(settings: Pick<BetterPasteSettings, 'linkStrip' | 'linkRules'>): UrlCleanupOptions {
+    return { strip: settings.linkStrip, rules: mergeDomainRules(settings.linkRules) };
 }
 
 /**
@@ -302,7 +302,7 @@ function ruleKeeps(rule: DomainRule | null, name: string): boolean {
  * rule act as a whitelist there would silently strip ordinary parameters from a user who
  * chose the conservative mode precisely to avoid that.
  */
-function shouldKeepParam(name: string, rule: DomainRule | null, mode: UrlStripMode): boolean {
+function shouldKeepParam(name: string, rule: DomainRule | null, mode: LinkStripMode): boolean {
     if (mode === 'tracking') {
         if (!matchesAnyGlob(name, TRACKING_PARAMS)) return true;
         return ruleKeeps(rule, name);
@@ -351,7 +351,7 @@ export function cleanUrl(raw: string, options: UrlCleanupOptions): string {
     const query = queryIndex >= 0 ? withoutFragment.slice(queryIndex + 1) : '';
 
     const rule = findDomainRule(parsed.hostname, options.rules);
-    const kept = splitQuery(query).filter(pair => shouldKeepParam(pair.name, rule, options.urlStripMode));
+    const kept = splitQuery(query).filter(pair => shouldKeepParam(pair.name, rule, options.strip));
 
     const nextQuery = kept.map(pair => pair.raw).join('&');
     const rebuilt = `${base}${nextQuery ? `?${nextQuery}` : ''}${cleanFragment(fragment)}`;
