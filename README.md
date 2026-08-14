@@ -1,4 +1,4 @@
-# Better Paste
+# ![Better Paste](https://raw.githubusercontent.com/johansan/better-paste/main/images/welcome.gif)
 
 Stop fixing formatting manually after every paste. Better Paste resolves common clipboard issues before they reach your Obsidian vault. It finally lets you copy images from Safari directly into your vault, strips tracking parameters from URLs, fetches page titles, rejoins broken lines in terminal output, and removes invisible characters and curly quotes from AI text. Just paste, and the plugin handles the rest.
 
