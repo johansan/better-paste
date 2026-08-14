@@ -34,8 +34,7 @@ function withExample(description: string, before: string, after: string): string
 
 /** Shows the two invisible source characters as visible, removed Unicode codes. */
 function invisibleCharactersDescription(): string | DocumentFragment {
-    const description =
-        'Turns unusual spaces into normal spaces and removes selected invisible formatting characters. Emoji and meaningful language characters are left unchanged.';
+    const description = 'Removes zero-width spaces and turns non-breaking spaces into normal spaces.';
     const start = 'The';
     const noBreakSpace = '[U+00A0]';
     const middle = 'result';
