@@ -1,6 +1,6 @@
 # Better Paste
 
-Better Paste alters clipboard content as it is pasted into Obsidian. It saves linked images into your vault as local attachments, removes tracking parameters from links, can fetch page titles for pasted web addresses, rejoins wrapped lines in terminal output, and replaces curly quotes and invisible characters in AI text with their plain equivalents.
+Stop fixing formatting manually after every paste. Better Paste resolves common clipboard issues before they reach your Obsidian vault. It finally lets you copy images from Safari directly into your vault, strips tracking parameters from URLs, fetches page titles, rejoins broken lines in terminal output, and removes invisible characters and curly quotes from AI text. Just paste, and the plugin handles the rest.
 
 If you find Better Paste useful, please consider [☕️ Buying me a coffee](https://buymeacoffee.com/johansan) or [Sponsor on GitHub ❤️](https://github.com/sponsors/johansan).
 
@@ -143,15 +143,12 @@ The rule leaves text alone entirely unless something identifies it as terminal o
 
 ### 5.5 Text processing
 
-- **Commas and quotes** can leave comma placement unchanged, put commas inside closing quotation marks, or put them outside. It does nothing by default because comma placement is a style preference.
+- **Commas and quotes** can leave comma placement unchanged, put commas inside closing quotation marks, or put them outside. **No change** is the default because comma placement is a style preference.
 - **Trim surrounding whitespace** drops blank lines and stray spaces from the start and end of pasted text. The middle is left alone.
+- **AI cleanup: invisible characters** removes characters that look ordinary but are not. A no-break space becomes a normal space and selected zero width characters are dropped. For example, `The result[zero-width space] was fine.` becomes `The result was fine.`
+- **AI cleanup: plain punctuation** turns long dashes into `-`, and `“ ” ‘ ’` into `"` and `'`. For example, `“The result [long dash] was fine.”` becomes `"The result - was fine."` Straight quotes survive code and search better than curly ones. This one is a matter of taste rather than tidiness, so switch it off if you set your punctuation on purpose.
 
-### 5.6 AI cleanup
-
-- **Clean up AI text** removes the characters that look ordinary but are not. A no-break space becomes a normal space and selected zero width characters are dropped. The same characters are cleaned up whatever wrote them.
-- **Use plain punctuation** turns long dashes into `-`, and `“ ” ‘ ’` into `"` and `'`. Straight quotes survive code and search better than curly ones. This one is a matter of taste rather than tidiness, so switch it off if you set your punctuation on purpose.
-
-Several invisible characters are deliberately kept, because they carry meaning rather than being junk. The zero width joiner holds a multi part emoji together, the joiner and non-joiner are ordinary content in Persian, Arabic and the Indic scripts, the word joiner prevents a line break, direction marks and embeddings make mixed Arabic or Hebrew and Latin text render in the right order, and the ideographic space is the normal word space in CJK. Guillemets `«` `»` are left alone for the same reason, being real quotation marks in several languages.
+Several invisible characters are deliberately kept, because they carry meaning rather than being junk. The zero width joiner holds a multi part emoji together, the joiner and non-joiner are ordinary content in Persian, Arabic and the Indic scripts, the word joiner prevents a line break, direction marks and embeddings make mixed Arabic or Hebrew and Latin text render in the right order, and the ideographic space is the normal word space in CJK. Angle quotes `«` `»` are left alone for the same reason, because they are standard quotation marks in several languages.
 
 <br/>
 
