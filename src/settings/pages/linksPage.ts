@@ -67,7 +67,7 @@ export function createLinkLandingDefinitions(context: SettingsPageContext): Sett
         },
         {
             name: 'Which parameters to remove',
-            desc: 'Choose whether to remove all query parameters unless explicitly kept by a site rule, or to remove only known tracking parameters.',
+            desc: 'Choose whether to remove every query parameter or only known tracking parameters. Site rules can preserve parameters in either mode.',
             visible: enabled,
             aliases: ['utm', 'tracking', 'query', 'parameters'],
             control: {
@@ -83,7 +83,7 @@ export function createLinkLandingDefinitions(context: SettingsPageContext): Sett
         {
             type: 'page',
             name: 'Rules for preserving parameters',
-            desc: 'Site rules for keeping specific query parameters.',
+            desc: 'Site rules for keeping specific query parameters in either removal mode.',
             visible: enabled,
             displayValue: () => {
                 const count = mergeDomainRules(context.settings().urlDomainRules).length;
@@ -107,7 +107,7 @@ function createSitesPageDefinitions(context: SettingsPageContext): SettingDefini
             items: [
                 {
                     name: 'Your site rules',
-                    desc: `${SHIPPED_DOMAIN_RULES.length} common sites are already handled and stay up to date with the plugin. Add your own site rules here, one per line. "example.com" keeps every parameter on that site, "example.com: a, b" keeps only those two, and "!example.com" drops a rule that ships with the plugin. Subdomains are matched automatically.`,
+                    desc: `${SHIPPED_DOMAIN_RULES.length} common sites are already handled and stay up to date with the plugin. Add your own site rules here, one per line. "example.com" keeps every parameter on that site, "example.com: a, b" keeps only those two, and "!example.com" drops a rule that ships with the plugin. In "Only parameters known to be tracking" mode, a rule only rescues matching tracking parameters because other parameters are already kept. Subdomains are matched automatically.`,
                     aliases: ['domain', 'exception', 'whitelist', 'youtube'],
                     control: {
                         type: 'textarea',

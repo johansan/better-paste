@@ -23,6 +23,9 @@ const RAW_BASE_URL = `https://raw.githubusercontent.com/${REPOSITORY}/main`;
 export const SUPPORT_SPONSOR_URL = 'https://github.com/sponsors/johansan/';
 export const SUPPORT_BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/johansan';
 
+/** Moment tokens supported by custom image filename formats. */
+export const MOMENT_FORMAT_DOCS_URL = 'https://momentjs.com/docs/#/displaying/format/';
+
 /*
  * Dialog artwork is served from the repository rather than bundled, because Obsidian
  * installs only main.js, manifest.json and styles.css, so a picture sitting beside them

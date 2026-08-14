@@ -205,6 +205,16 @@ describe('settings tree', () => {
         expect(row.control.options).toEqual({ source: 'Name from source', custom: 'Custom format' });
     });
 
+    it('explains how site rules behave in tracking mode', () => {
+        const mode = flatten(tab.getSettingDefinitions()).find(row => row.name === 'Which parameters to remove');
+        const sites = pages(tab.getSettingDefinitions()).find(page => page.name === 'Rules for preserving parameters');
+        const rules = flatten([...(sites?.items ?? [])]).find(row => row.name === 'Your site rules');
+
+        expect(mode?.desc).toContain('Site rules can preserve parameters in either mode.');
+        expect(sites?.desc).toContain('either removal mode');
+        expect(rules?.desc).toContain('a rule only rescues matching tracking parameters because other parameters are already kept');
+    });
+
     it('offers all comma placement choices', () => {
         const row = controlRows(tab).find(candidate => candidate.control.key === 'textCommaPlacement');
         expect(row?.control.type).toBe('dropdown');

@@ -20,6 +20,7 @@ import type { Setting, SettingGroupItem } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../defaults';
 import { DEFAULT_IMAGE_FILENAME_TEMPLATE } from '../constants';
 import { applyFileNameTemplate, buildFileNameTokens } from '../../utils/filenames';
+import { MOMENT_FORMAT_DOCS_URL } from '../../urls';
 import type { SettingsPageContext } from './context';
 
 const FILENAME_EXAMPLE_URL = 'https://images.example.com/2026/05/skyline-8f21a.jpg';
@@ -55,6 +56,10 @@ function renderCustomFilenameFormat(setting: Setting, context: SettingsPageConte
     setting.setName('Custom format');
     setting.settingEl.addClass('better-paste-filename-format');
     setting.descEl.appendText('Use {{name}} for the source name and Moment date formats such as YYYY-MM-DD.');
+    setting.descEl.createEl('br');
+    const momentLink = setting.descEl.createEl('a', { text: 'Moment format', href: MOMENT_FORMAT_DOCS_URL });
+    momentLink.setAttr('rel', 'noopener noreferrer');
+    momentLink.setAttr('target', '_blank');
     const example = setting.descEl.createDiv({ cls: 'better-paste-example' });
 
     const renderExample = (template: string): void => {
