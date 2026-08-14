@@ -32,7 +32,7 @@ export function createTextProcessingDefinitions(): SettingGroupItem[] {
                 key: 'textCommaPlacement',
                 defaultValue: DEFAULT_SETTINGS.textCommaPlacement,
                 options: {
-                    none: 'Do nothing',
+                    none: 'No change',
                     inside: 'Comma inside quotes',
                     outside: 'Comma outside quotes'
                 }

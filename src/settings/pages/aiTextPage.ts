@@ -21,12 +21,27 @@ import { DEFAULT_SETTINGS } from '../defaults';
 import { toggle } from './context';
 import type { SettingsPageContext } from './context';
 
-/** Rows shown directly under the AI text heading on the landing page. */
+/** Adds a compact before and after example below a setting description. */
+function withExample(description: string, before: string, after: string): string | DocumentFragment {
+    const example = `${before} \u2192 ${after}`;
+    if (typeof createFragment === 'undefined') return `${description} Example: ${example}`;
+
+    return createFragment(fragment => {
+        fragment.appendText(description);
+        fragment.createDiv({ cls: 'better-paste-example', text: example });
+    });
+}
+
+/** AI cleanup rows shown under Text processing on the landing page. */
 export function createAiTextLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
     return [
         {
-            name: 'Clean up AI text',
-            desc: 'Replaces hidden or special characters with their plain equivalents. A no-break space becomes a normal space, and selected zero-width characters are dropped. Emoji, joiners and direction marks are untouched.',
+            name: 'AI cleanup: invisible characters',
+            desc: withExample(
+                'Turns unusual spaces into normal spaces and removes selected invisible formatting characters. Emoji and meaningful language characters are left unchanged.',
+                'The result[zero-width space] was fine.',
+                'The result was fine.'
+            ),
             aliases: [
                 'ai',
                 'chatgpt',
@@ -48,8 +63,12 @@ export function createAiTextLandingDefinitions(context: SettingsPageContext): Se
         {
             ...toggle(
                 'aiTextPlainPunctuation',
-                'Use plain punctuation',
-                'Converts long dashes into a hyphen, and curly quotes into straight quotes. Guillemets are preserved.',
+                'AI cleanup: plain punctuation',
+                withExample(
+                    'Converts long dashes into hyphens and curly quotes into straight quotes. Angle quotes such as \u00ab \u00bb are left unchanged.',
+                    '\u201cThe result \u2014 was fine.\u201d',
+                    '"The result - was fine."'
+                ),
                 [
                     'em dash',
                     'en dash',

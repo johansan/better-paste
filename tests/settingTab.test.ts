@@ -163,26 +163,21 @@ describe('settings tree', () => {
             .getSettingDefinitions()
             .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
 
-        expect(groups.map(group => group.heading)).toEqual([
-            undefined,
-            'Behavior',
-            'Images',
-            'Links',
-            'Terminal text',
-            'Text processing',
-            'AI cleanup'
-        ]);
+        expect(groups.map(group => group.heading)).toEqual([undefined, 'Behavior', 'Images', 'Links', 'Terminal text', 'Text processing']);
     });
 
-    it('puts surrounding whitespace trimming under Text processing', () => {
+    it('puts text preferences and AI cleanup under Text processing', () => {
         const groups = tab
             .getSettingDefinitions()
             .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
         const behavior = groups.find(group => group.heading === 'Behavior');
         const textProcessing = groups.find(group => group.heading === 'Text processing');
+        const names = flatten([...(textProcessing?.items ?? [])]).map(row => row.name);
 
         expect(flatten([...(behavior?.items ?? [])]).map(row => row.name)).not.toContain('Trim surrounding whitespace');
-        expect(flatten([...(textProcessing?.items ?? [])]).map(row => row.name)).toContain('Trim surrounding whitespace');
+        expect(names).toContain('Trim surrounding whitespace');
+        expect(names).toContain('AI cleanup: invisible characters');
+        expect(names).toContain('AI cleanup: plain punctuation');
     });
 
     it('keeps the landing page short', () => {
@@ -214,10 +209,21 @@ describe('settings tree', () => {
         expect(row?.control.type).toBe('dropdown');
         if (row?.control.type !== 'dropdown') throw new Error('Commas and quotes is not a dropdown');
         expect(row.control.options).toEqual({
-            none: 'Do nothing',
+            none: 'No change',
             inside: 'Comma inside quotes',
             outside: 'Comma outside quotes'
         });
+    });
+
+    it('shows an example for each AI cleanup setting', () => {
+        const rows = flatten(tab.getSettingDefinitions()).filter(row => row.name.startsWith('AI cleanup:'));
+
+        expect(rows).toHaveLength(2);
+        for (const row of rows) {
+            expect(typeof row.desc).toBe('string');
+            if (typeof row.desc !== 'string') throw new Error(`${row.name} has no text fallback`);
+            expect(row.desc).toContain('\u2192');
+        }
     });
 
     it('puts the detail on sub-pages, declared so search can still reach it', () => {

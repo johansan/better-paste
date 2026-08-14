@@ -99,8 +99,12 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             { type: 'group', cls: SETTINGS_CLASS, heading: 'Images', items: createImageLandingDefinitions(context) },
             { type: 'group', cls: SETTINGS_CLASS, heading: 'Links', items: createLinkLandingDefinitions(context) },
             { type: 'group', cls: SETTINGS_CLASS, heading: 'Terminal text', items: createTerminalLandingDefinitions(context) },
-            { type: 'group', cls: SETTINGS_CLASS, heading: 'Text processing', items: createTextProcessingDefinitions() },
-            { type: 'group', cls: SETTINGS_CLASS, heading: 'AI cleanup', items: createAiTextLandingDefinitions(context) }
+            {
+                type: 'group',
+                cls: SETTINGS_CLASS,
+                heading: 'Text processing',
+                items: [...createTextProcessingDefinitions(), ...createAiTextLandingDefinitions(context)]
+            }
         ];
     }
 
