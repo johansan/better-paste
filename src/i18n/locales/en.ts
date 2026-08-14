@@ -78,7 +78,11 @@ export const STRINGS_EN = {
             supportDesc: 'If you find Better Paste useful, please consider supporting its development.',
             supportAliases: ['sponsor', 'donate', 'coffee', 'github'],
             sponsorButton: '❤️ Sponsor',
-            coffeeButton: '☕️ Buy me a coffee'
+            coffeeButton: '☕️ Buy me a coffee',
+            pluginsName: 'Check out my other plugins',
+            pluginsAliases: ['plugins', 'notebook navigator', 'pixel perfect image', 'author', 'more'],
+            notebookNavigatorDesc: 'A better file browser and calendar',
+            pixelPerfectImageDesc: 'Exact image resizing and much more'
         },
 
         behavior: {

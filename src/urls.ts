@@ -26,6 +26,11 @@ export const SUPPORT_BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/johansan';
 /** Moment tokens supported by custom image filename formats. */
 export const MOMENT_FORMAT_DOCS_URL = 'https://momentjs.com/docs/#/displaying/format/';
 
+/** A plugin's page in Obsidian's community plugin browser, opened by the cards in settings. */
+export function communityPluginUrl(id: string): string {
+    return `obsidian://show-plugin?id=${id}`;
+}
+
 /*
  * Dialog artwork is served from the repository rather than bundled, because Obsidian
  * installs only main.js, manifest.json and styles.css, so a picture sitting beside them

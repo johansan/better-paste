@@ -63,7 +63,11 @@ export const STRINGS_PT: TranslationStrings = {
             supportDesc: 'Se o Better Paste lhe é útil, considere apoiar o seu desenvolvimento.',
             supportAliases: ['patrocinar', 'donativo', 'café', 'github'],
             sponsorButton: '❤️ Patrocinar',
-            coffeeButton: '☕️ Ofereça-me um café'
+            coffeeButton: '☕️ Ofereça-me um café',
+            pluginsName: 'Veja os meus outros plugins',
+            pluginsAliases: ['plugins', 'extensões', 'notebook navigator', 'pixel perfect image', 'autor'],
+            notebookNavigatorDesc: 'Um explorador de ficheiros e calendário melhores',
+            pixelPerfectImageDesc: 'Redimensionamento exato de imagens e muito mais'
         },
 
         behavior: {

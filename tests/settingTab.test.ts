@@ -183,7 +183,7 @@ describe('settings tree', () => {
 
     it('keeps the landing page short', () => {
         // The point of the sub-pages is that the first screen stays scannable
-        expect(landingRows(tab.getSettingDefinitions()).length).toBeLessThanOrEqual(16);
+        expect(landingRows(tab.getSettingDefinitions()).length).toBeLessThanOrEqual(17);
     });
 
     it('puts title fetching above link cleaning', () => {

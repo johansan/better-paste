@@ -63,7 +63,11 @@ export const STRINGS_NL: TranslationStrings = {
             supportDesc: 'Als Better Paste je van pas komt, overweeg dan de ontwikkeling te steunen.',
             supportAliases: ['sponsor', 'doneren', 'koffie', 'github'],
             sponsorButton: '❤️ Sponsor',
-            coffeeButton: '☕️ Trakteer me op koffie'
+            coffeeButton: '☕️ Trakteer me op koffie',
+            pluginsName: 'Bekijk mijn andere plugins',
+            pluginsAliases: ['plugins', 'notebook navigator', 'pixel perfect image', 'auteur', 'meer'],
+            notebookNavigatorDesc: 'Een betere bestandsverkenner en agenda',
+            pixelPerfectImageDesc: 'Exact afbeeldingen schalen en veel meer'
         },
 
         behavior: {

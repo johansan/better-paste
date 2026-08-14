@@ -84,9 +84,103 @@
     font-style: italic;
 }
 
-/* The tester rows lay their preview out below the label rather than beside it */
-.setting-item.better-paste-tester {
+/* The tester and plugin rows lay their content out below the label rather than beside it */
+.setting-item.better-paste-tester,
+.setting-item.better-paste-plugins {
     display: block;
+}
+
+/* ------------------------------------------------------------------ */
+/* Cards for the author's other plugins                                */
+/* ------------------------------------------------------------------ */
+
+/* One column when the settings pane is narrow, because the description needs the width */
+.better-paste-plugin-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16em, 1fr));
+    gap: var(--size-4-2);
+    margin-top: var(--size-4-2);
+}
+
+/* A button so the whole card can be reached from the keyboard. The declarations before
+   the layout undo the button styling a theme applies. */
+.better-paste-plugin-card {
+    height: auto;
+    padding: var(--size-4-3);
+    background-color: var(--background-secondary);
+    box-shadow: none;
+    text-align: start;
+    white-space: normal;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--size-4-3);
+    width: 100%;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-m);
+    cursor: pointer;
+}
+
+.better-paste-plugin-card:hover {
+    border-color: var(--background-modifier-border-hover);
+    background-color: var(--background-modifier-hover);
+}
+
+.better-paste-plugin-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: var(--size-4-8);
+    height: var(--size-4-8);
+    border-radius: var(--radius-m);
+    background-color: var(--background-primary);
+    color: var(--text-accent);
+}
+
+/* min-width lets a long word wrap instead of stretching the card past its column */
+.better-paste-plugin-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-2-1);
+    min-width: 0;
+}
+
+.better-paste-plugin-name {
+    color: var(--text-normal);
+    font-size: var(--font-ui-small);
+    font-weight: var(--font-semibold);
+    line-height: 1.3;
+}
+
+/* One line whatever the language, cut with an ellipsis, so every card is the same height
+   and the row costs the same as the rows above it */
+.better-paste-plugin-description {
+    color: var(--text-muted);
+    font-size: var(--font-ui-smaller);
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Sits at the far edge, the way Obsidian marks a row that opens somewhere else. It keeps
+   to the middle of the card while the icon and the name line up at the top. */
+.better-paste-plugin-arrow {
+    display: flex;
+    align-items: center;
+    align-self: center;
+    flex: 0 0 auto;
+    margin-inline-start: auto;
+    color: var(--text-faint);
+}
+
+.better-paste-plugin-arrow .svg-icon {
+    width: var(--icon-s);
+    height: var(--icon-s);
+}
+
+.better-paste-plugin-card:hover .better-paste-plugin-arrow {
+    color: var(--text-muted);
 }
 
 /* ------------------------------------------------------------------ */

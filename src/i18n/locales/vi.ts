@@ -60,7 +60,11 @@ export const STRINGS_VI: TranslationStrings = {
             supportDesc: 'Nếu Better Paste hữu ích với bạn, hãy cân nhắc ủng hộ việc phát triển.',
             supportAliases: ['tài trợ', 'quyên góp', 'cà phê', 'github'],
             sponsorButton: '❤️ Tài trợ',
-            coffeeButton: '☕️ Mời tôi ly cà phê'
+            coffeeButton: '☕️ Mời tôi ly cà phê',
+            pluginsName: 'Xem các plugin khác của tôi',
+            pluginsAliases: ['plugin', 'tiện ích', 'notebook navigator', 'pixel perfect image', 'tác giả'],
+            notebookNavigatorDesc: 'Trình duyệt tệp và lịch tốt hơn',
+            pixelPerfectImageDesc: 'Đổi kích thước ảnh chính xác và nhiều hơn nữa'
         },
 
         behavior: {

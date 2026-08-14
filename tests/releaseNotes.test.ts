@@ -78,11 +78,8 @@ describe('release notes', () => {
     it('lists link title fetching and translations as new in 1.0.1', () => {
         expect(getLatestReleaseNotes(1)[0]).toMatchObject({
             version: '1.0.1',
-            date: '2026-08-13',
-            new: [
-                'Fetch titles for pasted links. A standalone web address can now become a Markdown link using the page title.',
-                'Translated into 21 languages, following the language Obsidian is set to.'
-            ]
+            date: '2026-08-14',
+            new: ['Better Paste will now fetch titles for pasted links.', 'Translated into 21 languages.']
         });
     });
 

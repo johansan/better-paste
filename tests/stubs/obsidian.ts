@@ -135,6 +135,17 @@ export function requestUrl(): never {
 }
 
 /**
+ * The settings page registers its plugin icons when it is imported, so this has to succeed.
+ * Obsidian keeps the drawing for later; nothing under test reads it back.
+ */
+export function addIcon(): void {}
+
+/** Icons come from Obsidian's own set, so drawing one only happens in the running app. */
+export function setIcon(): never {
+    throw new Error('setIcon is not available in tests');
+}
+
+/**
  * Parses the "key: value" subset of YAML that frontmatter properties use. The real parser
  * is Obsidian's; the plugin's own frontmatter logic is tested directly against plain
  * objects, so this only needs to cover the shapes the integration tests paste in.

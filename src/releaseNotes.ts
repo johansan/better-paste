@@ -52,25 +52,14 @@ export interface ReleaseNote {
 const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.1',
-        date: '2026-08-13',
-        new: [
-            'Fetch titles for pasted links. A standalone web address can now become a Markdown link using the page title.',
-            'Translated into 21 languages, following the language Obsidian is set to.'
-        ]
+        date: '2026-08-14',
+        new: ['Better Paste will now fetch titles for pasted links.', 'Translated into 21 languages.']
     },
     {
         version: '1.0.0',
         date: '2026-08-13',
         banner: '1.0.0.gif',
-        info: 'This is the first version of Better Paste!',
-        new: [
-            'Saves pasted images into the vault as attachments. Covers Safari’s `Copy image`, pictures inside copied web content, and bitmaps already on the clipboard.',
-            'Removes tracking parameters from pasted links. Thirty-three sites ship with a rule that keeps the parameters they need.',
-            'Rejoins wrapped lines in terminal output, and removes color codes and indentation. Fenced code, tables and list items are left alone.',
-            'Replaces curly quotes, long dashes and invisible characters with plain equivalents.',
-            'Four commands: `Paste`, `Paste without processing`, `Clean up selection` and `Toggle automatic cleanup`.',
-            'A note can opt out with the `better-paste: false` property, or set the width of pasted images with `image-width`.'
-        ]
+        info: 'First version of Better Paste!'
     }
 ];
 

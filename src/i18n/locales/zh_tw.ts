@@ -60,7 +60,11 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             supportDesc: '如果 Better Paste 對你有幫助，歡迎支持它的開發。',
             supportAliases: ['贊助', '捐款', '咖啡', 'github'],
             sponsorButton: '❤️ 贊助',
-            coffeeButton: '☕️ 請我喝杯咖啡'
+            coffeeButton: '☕️ 請我喝杯咖啡',
+            pluginsName: '看看我的其他外掛',
+            pluginsAliases: ['外掛', '插件', 'notebook navigator', 'pixel perfect image', '作者'],
+            notebookNavigatorDesc: '更好用的檔案瀏覽器和行事曆',
+            pixelPerfectImageDesc: '精確的圖片縮放等'
         },
 
         behavior: {

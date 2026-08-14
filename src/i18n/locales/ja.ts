@@ -60,7 +60,11 @@ export const STRINGS_JA: TranslationStrings = {
             supportDesc: 'Better Paste が役に立ったら、開発の支援をご検討ください。',
             supportAliases: ['スポンサー', '寄付', 'コーヒー', 'github'],
             sponsorButton: '❤️ スポンサー',
-            coffeeButton: '☕️ コーヒーをおごる'
+            coffeeButton: '☕️ コーヒーをおごる',
+            pluginsName: 'ほかのプラグインも見る',
+            pluginsAliases: ['プラグイン', 'notebook navigator', 'pixel perfect image', '作者', 'その他'],
+            notebookNavigatorDesc: 'より使いやすいファイルブラウザとカレンダー',
+            pixelPerfectImageDesc: '正確な画像リサイズなど'
         },
 
         behavior: {

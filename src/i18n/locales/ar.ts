@@ -81,7 +81,11 @@ export const STRINGS_AR: TranslationStrings = {
             supportDesc: 'إذا كان Better Paste مفيدًا لك، ففكّر في دعم تطويره.',
             supportAliases: ['رعاية', 'تبرع', 'قهوة', 'github'],
             sponsorButton: '❤️ رعاية',
-            coffeeButton: '☕️ اشترِ لي قهوة'
+            coffeeButton: '☕️ اشترِ لي قهوة',
+            pluginsName: 'اطّلع على إضافاتي الأخرى',
+            pluginsAliases: ['إضافات', 'notebook navigator', 'pixel perfect image', 'المطوّر', 'المزيد'],
+            notebookNavigatorDesc: 'متصفّح ملفات وتقويم أفضل',
+            pixelPerfectImageDesc: 'تغيير حجم الصور بدقة والمزيد'
         },
 
         behavior: {

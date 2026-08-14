@@ -63,7 +63,11 @@ export const STRINGS_FA: TranslationStrings = {
             supportDesc: 'اگر Better Paste برایتان مفید است، از توسعه آن پشتیبانی کنید.',
             supportAliases: ['حمایت', 'کمک مالی', 'قهوه', 'github'],
             sponsorButton: '❤️ حمایت',
-            coffeeButton: '☕️ یک قهوه مهمانم کن'
+            coffeeButton: '☕️ یک قهوه مهمانم کن',
+            pluginsName: 'افزونه‌های دیگرم را ببینید',
+            pluginsAliases: ['افزونه‌ها', 'notebook navigator', 'pixel perfect image', 'سازنده', 'بیشتر'],
+            notebookNavigatorDesc: 'مرورگر فایل و تقویم بهتر',
+            pixelPerfectImageDesc: 'تغییر اندازه دقیق تصویر و بیشتر'
         },
 
         behavior: {

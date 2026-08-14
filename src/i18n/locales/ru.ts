@@ -75,7 +75,11 @@ export const STRINGS_RU: TranslationStrings = {
             supportDesc: 'Если Better Paste вам полезен, поддержите его разработку.',
             supportAliases: ['спонсор', 'пожертвование', 'кофе', 'github'],
             sponsorButton: '❤️ Спонсировать',
-            coffeeButton: '☕️ Купить мне кофе'
+            coffeeButton: '☕️ Купить мне кофе',
+            pluginsName: 'Посмотрите мои другие плагины',
+            pluginsAliases: ['плагины', 'notebook navigator', 'pixel perfect image', 'автор', 'ещё'],
+            notebookNavigatorDesc: 'Улучшенный файловый браузер и календарь',
+            pixelPerfectImageDesc: 'Точное изменение размера изображений и многое другое'
         },
 
         behavior: {

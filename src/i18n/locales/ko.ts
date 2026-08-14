@@ -60,7 +60,11 @@ export const STRINGS_KO: TranslationStrings = {
             supportDesc: 'Better Paste가 도움이 되었다면 개발을 후원해 주세요.',
             supportAliases: ['후원', '기부', '커피', 'github'],
             sponsorButton: '❤️ 후원',
-            coffeeButton: '☕️ 커피 한 잔 사주기'
+            coffeeButton: '☕️ 커피 한 잔 사주기',
+            pluginsName: '제가 만든 다른 플러그인 보기',
+            pluginsAliases: ['플러그인', 'notebook navigator', 'pixel perfect image', '제작자', '더 보기'],
+            notebookNavigatorDesc: '더 나은 파일 브라우저와 캘린더',
+            pixelPerfectImageDesc: '정확한 이미지 크기 조정 등'
         },
 
         behavior: {
