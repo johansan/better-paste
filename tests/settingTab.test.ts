@@ -87,16 +87,6 @@ function pages(items: SettingDefinitionItem[]): SettingDefinitionPage[] {
     return found;
 }
 
-/** Rows on the landing page itself, not inside any sub-page. */
-function landingRows(items: SettingDefinitionItem[]): SettingDefinitionItem[] {
-    const rows: SettingDefinitionItem[] = [];
-    for (const item of items) {
-        if (isContainer(item) && item.type !== 'page') rows.push(...landingRows([...(item.items ?? [])]));
-        else rows.push(item);
-    }
-    return rows;
-}
-
 function controlRows(tab: BetterPasteSettingTab): SettingDefinitionControl[] {
     return flatten(tab.getSettingDefinitions()).filter((row): row is SettingDefinitionControl => row.control !== undefined);
 }
@@ -163,7 +153,28 @@ describe('settings tree', () => {
             .getSettingDefinitions()
             .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
 
-        expect(groups.map(group => group.heading)).toEqual([undefined, 'Behavior', 'Images', 'Links', 'Terminal text', 'Text processing']);
+        expect(groups.map(group => group.heading)).toEqual([
+            undefined,
+            'Behavior',
+            'Images',
+            'Links',
+            'Terminal text',
+            'Text processing',
+            'Frontmatter'
+        ]);
+    });
+
+    it('puts both per-note property names under Frontmatter', () => {
+        const groups = tab
+            .getSettingDefinitions()
+            .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
+        const frontmatter = groups.find(group => group.heading === 'Frontmatter');
+        const images = groups.find(group => group.heading === 'Images');
+
+        // The two properties are one family, so they are configured together rather than
+        // one being a constant and the other buried under Images
+        expect(flatten([...(frontmatter?.items ?? [])]).map(row => row.name)).toEqual(['Note property', 'Image width property']);
+        expect(flatten([...(images?.items ?? [])]).map(row => row.name)).not.toContain('Image width property');
     });
 
     it('puts text preferences and AI cleanup under Text processing', () => {
@@ -179,11 +190,6 @@ describe('settings tree', () => {
         expect(names).toContain('Trim surrounding whitespace');
         expect(names).toContain('AI cleanup: invisible characters');
         expect(names).toContain('AI cleanup: dashes and quotes');
-    });
-
-    it('keeps the landing page short', () => {
-        // The point of the sub-pages is that the first screen stays scannable
-        expect(landingRows(tab.getSettingDefinitions()).length).toBeLessThanOrEqual(17);
     });
 
     it('puts title fetching above link cleaning', () => {

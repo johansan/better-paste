@@ -94,7 +94,15 @@ export const STRINGS_KO: TranslationStrings = {
             customDesc: '원본 이름에는 {{name}}을, 날짜에는 YYYY-MM-DD 같은 Moment 형식을 사용하세요.',
             customMomentLink: 'Moment 형식',
             customExample: '예: {value}',
-            customAliases: ['이름', '파일 이름', '날짜', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['이름', '파일 이름', '날짜', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: '프론트매터',
+            notePropertyName: '노트 속성',
+            notePropertyDesc:
+                '개별 노트에서 Better Paste를 켜거나 끄는 속성입니다. "bp: false"이면 노트를 그대로 두고, "bp: true"면 "붙여넣을 때마다 정리"가 꺼져 있어도 정리합니다. 비워 두면 이 속성을 무시합니다.',
+            notePropertyAliases: ['노트', '속성', '프론트매터', 'frontmatter', '제외', '끄기', '켜기', 'bp'],
             sizePropertyName: '이미지 너비 속성',
             sizePropertyDesc:
                 '노트에 붙여넣는 이미지의 너비를 정하는 프론트매터 속성입니다. 노트에 "bp-image-width: 400"이 있으면 붙여넣은 이미지가 ![[photo.png|400]]이 됩니다. 비워 두면 너비를 넣지 않습니다.',

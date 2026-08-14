@@ -30,6 +30,7 @@ import { createTerminalLandingDefinitions } from './pages/terminalPage';
 import { commaPlacementExample, createTextProcessingDefinitions } from './pages/textProcessingPage';
 import { createAiTextLandingDefinitions } from './pages/aiTextPage';
 import { createStartDefinitions } from './pages/startPage';
+import { createFrontmatterDefinitions } from './pages/frontmatterPage';
 
 /**
  * Settings stored as a list of lines but edited as one text field. The control key carries
@@ -111,7 +112,9 @@ export class BetterPasteSettingTab extends PluginSettingTab {
                 cls: SETTINGS_CLASS,
                 heading: strings.settings.text.heading,
                 items: [...createTextProcessingDefinitions(context), ...createAiTextLandingDefinitions(context)]
-            }
+            },
+            // Last, because these name the per-note properties rather than changing a rule
+            { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.frontmatter.heading, items: createFrontmatterDefinitions() }
         ];
     }
 
@@ -136,7 +139,7 @@ export class BetterPasteSettingTab extends PluginSettingTab {
 
         // Trim here as well as on load, so the field does not show a value that the next
         // restart will silently change
-        if (key === 'imageSizeProperty' && typeof value === 'string') {
+        if ((key === 'imageSizeProperty' || key === 'noteProperty') && typeof value === 'string') {
             await super.setControlValue(key, value.trim());
         } else {
             await super.setControlValue(key, value);

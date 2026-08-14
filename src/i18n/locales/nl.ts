@@ -74,7 +74,7 @@ export const STRINGS_NL: TranslationStrings = {
             heading: 'Gedrag',
             autoCleanName: 'Elke plakactie opschonen',
             autoCleanDesc:
-                'Past de regels toe bij elke plakactie. Staat dit uit, dan werken de regels alleen via de Better Paste-opdrachten. Een losse notitie kan zichzelf uitsluiten met de eigenschap "bp: false" of insluiten met "bp: true".',
+                'Past de regels toe bij elke plakactie. Staat dit uit, dan werken de regels alleen via de Better Paste-opdrachten. Een losse notitie kan zichzelf uitsluiten met de eigenschap "bp: false" of zich altijd laten opschonen met "bp: true".',
             autoCleanAliases: ['automatisch', 'inschakelen', 'uitschakelen', 'notitie', 'uitsluiten', 'eigenschap', 'frontmatter'],
             showNoticesName: 'Melding tonen wanneer een plakactie is aangepast',
             showNoticesDesc: 'Een samenvatting van één regel van wat er is veranderd. Fouten worden altijd gemeld.',
@@ -107,7 +107,15 @@ export const STRINGS_NL: TranslationStrings = {
             customDesc: 'Gebruik {{name}} voor de bronnaam en Moment-datumnotaties zoals YYYY-MM-DD.',
             customMomentLink: 'Moment-notatie',
             customExample: 'Voorbeeld: {value}',
-            customAliases: ['naam', 'bestandsnaam', 'datum', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['naam', 'bestandsnaam', 'datum', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'Frontmatter',
+            notePropertyName: 'Notitie-eigenschap',
+            notePropertyDesc:
+                'Eigenschap die Better Paste voor één notitie in- of uitschakelt. Met "bp: false" blijft de notitie ongewijzigd, en met "bp: true" wordt ze opgeschoond, zelfs als "Elke plakactie opschonen" uit staat. Laat leeg om de eigenschap te negeren.',
+            notePropertyAliases: ['notitie', 'eigenschap', 'frontmatter', 'uitsluiten', 'uitschakelen', 'inschakelen', 'bp'],
             sizePropertyName: 'Eigenschap voor afbeeldingsbreedte',
             sizePropertyDesc:
                 'Frontmatter-eigenschap die de breedte bepaalt van afbeeldingen die in een notitie worden geplakt. Met "bp-image-width: 400" in de notitie wordt een geplakte afbeelding ![[photo.png|400]]. Laat leeg om geen breedte toe te voegen.',

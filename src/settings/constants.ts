@@ -25,15 +25,6 @@
  * reach anyone who had already run the plugin.
  */
 
-/**
- * Frontmatter property that switches the plugin off for a single note.
- *
- * Namespaced so it reads as a plugin directive rather than a property of the note, and
- * so it sorts next to the other bp properties in Obsidian's properties panel. Nesting
- * them under one key was rejected because the properties UI cannot edit a nested map.
- */
-export const DISABLE_PROPERTY = 'bp';
-
 /* -------------------------------------------------------------------------- */
 /* Images                                                                      */
 /* -------------------------------------------------------------------------- */

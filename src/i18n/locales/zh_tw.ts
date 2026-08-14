@@ -71,7 +71,7 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             heading: '行為',
             autoCleanName: '每次貼上都整理',
             autoCleanDesc:
-                '每次貼上都會套用規則。關閉後規則只在 Better Paste 指令中生效。單篇筆記可以用 "bp: false" 屬性排除自己，也可以用 "bp: true" 屬性加入。',
+                '每次貼上都會套用規則。關閉後規則只在 Better Paste 指令中生效。單篇筆記可以用 "bp: false" 屬性排除自己，也可以用 "bp: true" 屬性單獨啟用。',
             autoCleanAliases: ['自動', '啟用', '停用', '筆記', '排除', '屬性', 'frontmatter'],
             showNoticesName: '貼上內容被修改時顯示通知',
             showNoticesDesc: '用一行說明改動了什麼。失敗一律會通知。',
@@ -94,7 +94,15 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             customDesc: '用 {{name}} 代表來源名稱，日期可用 YYYY-MM-DD 這類 Moment 格式。',
             customMomentLink: 'Moment 格式',
             customExample: '範例：{value}',
-            customAliases: ['名稱', '檔案名稱', '日期', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['名稱', '檔案名稱', '日期', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'Frontmatter',
+            notePropertyName: '筆記屬性',
+            notePropertyDesc:
+                '為單篇筆記開啟或關閉 Better Paste 的屬性。寫成 "bp: false" 時該筆記不會被更動，寫成 "bp: true" 時即使「每次貼上都整理」已關閉也會整理。留空則忽略該屬性。',
+            notePropertyAliases: ['筆記', '屬性', 'frontmatter', '排除', '停用', '啟用', 'bp'],
             sizePropertyName: '圖片寬度屬性',
             sizePropertyDesc:
                 '決定貼進筆記的圖片寬度的 frontmatter 屬性。筆記中寫有 "bp-image-width: 400" 時，貼上的圖片會變成 ![[photo.png|400]]。留空則不加上寬度。',

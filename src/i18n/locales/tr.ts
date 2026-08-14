@@ -74,7 +74,7 @@ export const STRINGS_TR: TranslationStrings = {
             heading: 'Davranış',
             autoCleanName: 'Her yapıştırmayı temizle',
             autoCleanDesc:
-                'Kuralları her yapıştırmada uygular. Kapalıyken kurallar yalnızca Better Paste komutlarıyla uygulanır. Tek bir not "bp: false" özelliğiyle kendini dışarıda bırakabilir, "bp: true" özelliğiyle dahil edebilir.',
+                'Kuralları her yapıştırmada uygular. Kapalıyken kurallar yalnızca Better Paste komutlarıyla uygulanır. Tek bir not "bp: false" özelliğiyle kendini dışarıda bırakabilir, "bp: true" özelliğiyle de kendini dahil edebilir.',
             autoCleanAliases: ['otomatik', 'etkinleştir', 'devre dışı', 'not', 'hariç tut', 'özellik', 'frontmatter'],
             showNoticesName: 'Yapıştırma değiştirildiğinde bildirim göster',
             showNoticesDesc: 'Nelerin değiştiğine dair tek satırlık özet. Hatalar her zaman bildirilir.',
@@ -97,7 +97,15 @@ export const STRINGS_TR: TranslationStrings = {
             customDesc: 'Kaynak adı için {{name}} ve YYYY-MM-DD gibi Moment tarih biçimlerini kullanın.',
             customMomentLink: 'Moment biçimi',
             customExample: 'Örnek: {value}',
-            customAliases: ['ad', 'dosya adı', 'tarih', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['ad', 'dosya adı', 'tarih', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'Frontmatter',
+            notePropertyName: 'Not özelliği',
+            notePropertyDesc:
+                'Better Paste’i tek bir not için açan veya kapatan özellik. "bp: false" ile not olduğu gibi bırakılır, "bp: true" ile "Her yapıştırmayı temizle" kapalı olsa bile temizlenir. Özelliği yok saymak için boş bırakın.',
+            notePropertyAliases: ['not', 'özellik', 'frontmatter', 'hariç tut', 'devre dışı', 'etkinleştir', 'bp'],
             sizePropertyName: 'Görsel genişliği özelliği',
             sizePropertyDesc:
                 'Bir nota yapıştırılan görsellerin genişliğini belirleyen frontmatter özelliği. Notta "bp-image-width: 400" varsa, yapıştırılan görsel ![[photo.png|400]] biçimine girer. Genişlik eklenmemesi için boş bırakın.',

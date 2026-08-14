@@ -107,7 +107,15 @@ export const STRINGS_FR: TranslationStrings = {
             customDesc: 'Utilisez {{name}} pour le nom de la source et les formats de date Moment comme YYYY-MM-DD.',
             customMomentLink: 'Format Moment',
             customExample: 'Exemple : {value}',
-            customAliases: ['nom', 'fichier', 'date', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['nom', 'fichier', 'date', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'Frontmatter',
+            notePropertyName: 'Propriété de note',
+            notePropertyDesc:
+                'Propriété qui active ou désactive Better Paste pour une seule note. Avec "bp: false" la note reste intacte, et avec "bp: true" elle est nettoyée même si « Nettoyer chaque collage » est désactivé. Laissez vide pour ignorer la propriété.',
+            notePropertyAliases: ['note', 'propriété', 'frontmatter', 'exclure', 'désactiver', 'activer', 'bp'],
             sizePropertyName: 'Propriété de largeur d’image',
             sizePropertyDesc:
                 'Propriété du frontmatter qui fixe la largeur des images collées dans une note. Avec "bp-image-width: 400" dans la note, une image collée devient ![[photo.png|400]]. Laissez vide pour n’ajouter aucune largeur.',

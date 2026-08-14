@@ -24,7 +24,6 @@ import { applyCommaPlacement } from '../transforms/textProcessing';
 import { buildUrlCleanupOptions, cleanUrlsInText } from '../transforms/urlCleanup';
 import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './imageReferences';
 import { extractFrontmatterBlock, isInsideVerbatimContext, notePasteOverride, resolveImageSize } from './noteOptions';
-import { DISABLE_PROPERTY } from '../settings/constants';
 import { format, plural, strings } from '../i18n';
 import type { ImageService } from './ImageService';
 import { escapeLinkTitle } from './LinkTitleService';
@@ -670,7 +669,7 @@ export class PasteService {
     private shouldCleanAutomatically(editor: Editor, settings: BetterPasteSettings): boolean {
         // One read of the document serves every check; this runs on every paste
         const content = editor.getValue();
-        const override = notePasteOverride(this.frontmatterOf(content), DISABLE_PROPERTY);
+        const override = notePasteOverride(this.frontmatterOf(content), settings.noteProperty);
 
         if (override === 'off') return false;
         if (override === null && !settings.autoClean) return false;

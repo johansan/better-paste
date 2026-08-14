@@ -71,7 +71,7 @@ export const STRINGS_TH: TranslationStrings = {
             heading: 'พฤติกรรม',
             autoCleanName: 'จัดระเบียบทุกครั้งที่วาง',
             autoCleanDesc:
-                'ใช้กฎกับการวางทุกครั้ง เมื่อปิดไว้ กฎจะทำงานเฉพาะผ่านคำสั่งของ Better Paste โน้ตแต่ละฉบับยกเว้นตัวเองได้ด้วยคุณสมบัติ "bp: false" หรือรวมตัวเองได้ด้วย "bp: true"',
+                'ใช้กฎกับการวางทุกครั้ง เมื่อปิดไว้ กฎจะทำงานเฉพาะผ่านคำสั่งของ Better Paste โน้ตแต่ละฉบับยกเว้นตัวเองได้ด้วยคุณสมบัติ "bp: false" หรือเลือกให้จัดระเบียบได้ด้วย "bp: true"',
             autoCleanAliases: ['อัตโนมัติ', 'เปิด', 'ปิด', 'โน้ต', 'ยกเว้น', 'คุณสมบัติ', 'frontmatter'],
             showNoticesName: 'แสดงการแจ้งเตือนเมื่อการวางถูกเปลี่ยน',
             showNoticesDesc: 'สรุปหนึ่งบรรทัดว่าอะไรเปลี่ยนไปบ้าง ความล้มเหลวจะแจ้งเสมอ',
@@ -94,7 +94,15 @@ export const STRINGS_TH: TranslationStrings = {
             customDesc: 'ใช้ {{name}} แทนชื่อต้นทาง และรูปแบบวันที่ของ Moment เช่น YYYY-MM-DD',
             customMomentLink: 'รูปแบบ Moment',
             customExample: 'ตัวอย่าง: {value}',
-            customAliases: ['ชื่อ', 'ชื่อไฟล์', 'วันที่', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['ชื่อ', 'ชื่อไฟล์', 'วันที่', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'Frontmatter',
+            notePropertyName: 'คุณสมบัติของโน้ต',
+            notePropertyDesc:
+                'คุณสมบัติที่เปิดหรือปิด Better Paste สำหรับโน้ตแต่ละฉบับ เมื่อเป็น "bp: false" โน้ตจะไม่ถูกแก้ไข และเมื่อเป็น "bp: true" โน้ตจะถูกจัดระเบียบแม้ว่า "จัดระเบียบทุกครั้งที่วาง" จะปิดอยู่ เว้นว่างไว้เพื่อไม่ใช้คุณสมบัตินี้',
+            notePropertyAliases: ['โน้ต', 'คุณสมบัติ', 'frontmatter', 'ยกเว้น', 'ปิด', 'เปิด', 'bp'],
             sizePropertyName: 'คุณสมบัติความกว้างรูปภาพ',
             sizePropertyDesc:
                 'คุณสมบัติใน frontmatter ที่กำหนดความกว้างของรูปภาพที่วางลงในโน้ต เมื่อโน้ตมี "bp-image-width: 400" รูปภาพที่วางจะกลายเป็น ![[photo.png|400]] เว้นว่างไว้เพื่อไม่ใส่ความกว้าง',

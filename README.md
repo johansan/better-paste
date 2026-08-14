@@ -109,7 +109,7 @@ She called it "finished", then left.
 
 ## 3 Settings in detail
 
-Seventeen settings, arranged as a landing page with three sub pages. Anything with only one sensible answer is simply how the plugin behaves, rather than a question you have to answer.
+Eighteen settings, arranged as a landing page with three sub pages. Anything with only one sensible answer is simply how the plugin behaves, rather than a question you have to answer.
 
 ### 3.1 Behavior
 
@@ -131,7 +131,8 @@ is saved as `skyline-8f21a.jpg` and embedded as `![[skyline-8f21a.jpg]]`.
 Behind **Image handling**:
 
 - **File names** uses the source name or a custom format. A custom format can combine `{{name}}` with Moment date syntax, so `{{name}}-YYYY-MM-DD` saves the picture above as `skyline-8f21a-2026-08-13.jpg`. The setting shows the resulting filename below the field.
-- **Image width property** names the note property that sets how wide pasted images are. See [section 4](#4-per-note-control).
+
+The width of a pasted image is set per note rather than here. See [section 3.6](#36-frontmatter) and [section 4](#4-per-note-control).
 
 Alt text survives the download. A copied web page that contained
 
@@ -315,11 +316,22 @@ A blank line in the middle of the same paste is content, so it stays.
 
 Several invisible characters are deliberately kept, because they carry meaning rather than being junk. The zero width joiner holds a multi part emoji together, the joiner and non-joiner are ordinary content in Persian, Arabic and the Indic scripts, the word joiner prevents a line break, direction marks and embeddings make mixed Arabic or Hebrew and Latin text render in the right order, and the ideographic space is the normal word space in CJK. `👨‍👩‍👧` and `東京　です` come through untouched.
 
+### 3.6 Frontmatter
+
+The names of the two per-note properties, described in [section 4](#4-per-note-control).
+
+- **Note property** switches the plugin on or off for one note. `bp` by default.
+- **Image width property** sets how wide images pasted into a note come out. `bp-image-width` by default.
+
+These are settings rather than fixed names because a frontmatter property has to coexist with whatever your vault and your other plugins already use, and a collision cannot be settled from inside the plugin. The plugin ships as a compiled bundle, so a fixed name would leave forking as the only way out. Rename either one to fit your own conventions.
+
+Blank switches that property off. A blank **Note property** means no note can opt out or in, and a blank **Image width property** means no width is ever added.
+
 <br/>
 
 ## 4 Per note control
 
-Two frontmatter properties change what happens in a single note. Both start with `bp`, so they sit together in Obsidian's properties panel and read as plugin directives rather than as properties of the note itself.
+Two frontmatter properties change what happens in a single note. Both start with `bp`, so they sit together in Obsidian's properties panel and read as plugin directives rather than as properties of the note itself. Both names can be changed under **Frontmatter** in the settings, described in [section 3.6](#36-frontmatter).
 
 **Leave a note alone entirely:**
 
@@ -361,8 +373,6 @@ bp-image-width: 400
 Images pasted into that note come out as `![[picture.png|400]]`, which is Obsidian's own size syntax, the same thing you would get by typing the width by hand. Markdown link vaults get `![400](picture.png)` instead. Both render identically. The value can be a width such as `400` or a width and height such as `400x300`. A value Obsidian cannot use, such as `50%`, is ignored rather than written into the link.
 
 Both properties are read from the note as it stands in the editor rather than from Obsidian's metadata cache, so a property you just typed applies to the very next paste.
-
-The name is a setting rather than a fixed value, so **Image width property** under Image handling can be set to anything, including the plainer `image-width`, if you prefer the note to read that way.
 
 One consequence worth knowing. A note with `bp-image-width` also takes screenshot pastes away from Obsidian's own handler, because that handler has no way to apply the width. Notes without it are untouched.
 

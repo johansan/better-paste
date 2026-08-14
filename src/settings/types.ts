@@ -60,6 +60,16 @@ export interface BetterPasteSettings {
     imageNameFormat: ImageNameFormat;
     /** Custom source-name and Moment date format for saved image filenames. */
     imageNameTemplate: string;
+
+    /* Frontmatter */
+
+    /**
+     * Frontmatter property switching the plugin on or off for one note. Blank disables it.
+     *
+     * Configurable rather than fixed because the name has to coexist with whatever the vault
+     * and other plugins already use, and a collision cannot be resolved from here.
+     */
+    noteProperty: string;
     /** Frontmatter property setting the width of images pasted into a note. Blank disables it. */
     imageSizeProperty: string;
 

@@ -136,17 +136,6 @@ function createImageOptionsDefinitions(context: SettingsPageContext): SettingGro
             aliases: aliases(source => source.settings.images.customAliases),
             visible: () => context.settings().imageNameFormat === 'custom',
             render: setting => renderCustomFilenameFormat(setting, context)
-        },
-        {
-            name: text.sizePropertyName,
-            desc: text.sizePropertyDesc,
-            aliases: aliases(source => source.settings.images.sizePropertyAliases),
-            control: {
-                type: 'text',
-                key: 'imageSizeProperty',
-                placeholder: DEFAULT_SETTINGS.imageSizeProperty,
-                defaultValue: DEFAULT_SETTINGS.imageSizeProperty
-            }
         }
     ];
 }

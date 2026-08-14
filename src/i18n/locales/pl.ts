@@ -109,7 +109,15 @@ export const STRINGS_PL: TranslationStrings = {
             customDesc: 'Użyj {{name}} dla nazwy źródła oraz formatów daty Moment, takich jak YYYY-MM-DD.',
             customMomentLink: 'Format Moment',
             customExample: 'Przykład: {value}',
-            customAliases: ['nazwa', 'plik', 'data', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['nazwa', 'plik', 'data', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'Frontmatter',
+            notePropertyName: 'Właściwość notatki',
+            notePropertyDesc:
+                'Właściwość włączająca lub wyłączająca Better Paste dla jednej notatki. Przy "bp: false" notatka pozostaje bez zmian, a przy "bp: true" jest czyszczona nawet wtedy, gdy „Czyść każde wklejenie” jest wyłączone. Pozostaw puste, aby zignorować tę właściwość.',
+            notePropertyAliases: ['notatka', 'właściwość', 'frontmatter', 'wyklucz', 'wyłącz', 'włącz', 'bp'],
             sizePropertyName: 'Właściwość szerokości obrazu',
             sizePropertyDesc:
                 'Właściwość frontmatter określająca szerokość obrazów wklejanych do notatki. Przy "bp-image-width: 400" w notatce wklejony obraz przybiera postać ![[photo.png|400]]. Pozostaw puste, aby nie dodawać szerokości.',

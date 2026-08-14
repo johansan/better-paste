@@ -109,7 +109,15 @@ export const STRINGS_RU: TranslationStrings = {
             customDesc: 'Используйте {{name}} для имени источника и форматы дат Moment, например YYYY-MM-DD.',
             customMomentLink: 'Формат Moment',
             customExample: 'Пример: {value}',
-            customAliases: ['имя', 'файл', 'дата', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['имя', 'файл', 'дата', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'Frontmatter',
+            notePropertyName: 'Свойство заметки',
+            notePropertyDesc:
+                'Свойство, включающее или выключающее Better Paste для одной заметки. При "bp: false" заметка остаётся нетронутой, а при "bp: true" очищается, даже когда «Очищать каждую вставку» выключено. Оставьте пустым, чтобы игнорировать свойство.',
+            notePropertyAliases: ['заметка', 'свойство', 'frontmatter', 'исключить', 'выключить', 'включить', 'bp'],
             sizePropertyName: 'Свойство ширины изображения',
             sizePropertyDesc:
                 'Свойство frontmatter, задающее ширину изображений, вставляемых в заметку. Со свойством "bp-image-width: 400" в заметке вставленное изображение принимает вид ![[photo.png|400]]. Оставьте пустым, чтобы ширина не добавлялась.',

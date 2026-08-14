@@ -71,7 +71,7 @@ export const STRINGS_ID: TranslationStrings = {
             heading: 'Perilaku',
             autoCleanName: 'Bersihkan setiap tempelan',
             autoCleanDesc:
-                'Menerapkan aturan pada setiap tempelan. Saat mati, aturan hanya dijalankan melalui perintah Better Paste. Satu catatan dapat mengecualikan diri dengan properti "bp: false", atau menyertakan diri dengan "bp: true".',
+                'Menerapkan aturan pada setiap tempelan. Saat mati, aturan hanya dijalankan melalui perintah Better Paste. Satu catatan dapat mengecualikan diri dengan properti "bp: false", atau ikut dibersihkan dengan "bp: true".',
             autoCleanAliases: ['otomatis', 'aktifkan', 'nonaktifkan', 'catatan', 'kecualikan', 'properti', 'frontmatter'],
             showNoticesName: 'Tampilkan pemberitahuan saat tempelan diubah',
             showNoticesDesc: 'Ringkasan satu baris tentang apa yang berubah. Kegagalan selalu dilaporkan.',
@@ -94,7 +94,15 @@ export const STRINGS_ID: TranslationStrings = {
             customDesc: 'Gunakan {{name}} untuk nama sumber dan format tanggal Moment seperti YYYY-MM-DD.',
             customMomentLink: 'Format Moment',
             customExample: 'Contoh: {value}',
-            customAliases: ['nama', 'berkas', 'tanggal', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['nama', 'berkas', 'tanggal', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'Frontmatter',
+            notePropertyName: 'Properti catatan',
+            notePropertyDesc:
+                'Properti yang mengaktifkan atau menonaktifkan Better Paste untuk satu catatan. Dengan "bp: false", catatan dibiarkan apa adanya, dan dengan "bp: true", catatan tetap dibersihkan meski "Bersihkan setiap tempelan" mati. Biarkan kosong untuk mengabaikan properti ini.',
+            notePropertyAliases: ['catatan', 'properti', 'frontmatter', 'kecualikan', 'nonaktifkan', 'aktifkan', 'bp'],
             sizePropertyName: 'Properti lebar gambar',
             sizePropertyDesc:
                 'Properti frontmatter yang menentukan lebar gambar yang ditempel ke sebuah catatan. Dengan "bp-image-width: 400" di catatan, gambar yang ditempel menjadi ![[photo.png|400]]. Biarkan kosong agar tidak ada lebar yang ditambahkan.',

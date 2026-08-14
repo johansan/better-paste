@@ -74,7 +74,7 @@ export const STRINGS_IT: TranslationStrings = {
             heading: 'Comportamento',
             autoCleanName: 'Pulisci ogni incollaggio',
             autoCleanDesc:
-                'Applica le regole a ogni incollaggio. Se è disattivato, le regole vengono applicate solo tramite i comandi di Better Paste. Una singola nota può escludersi con la proprietà "bp: false" o includersi con "bp: true".',
+                'Applica le regole a ogni incollaggio. Se è disattivato, le regole vengono applicate solo tramite i comandi di Better Paste. Una singola nota può essere esclusa con la proprietà "bp: false" o inclusa con "bp: true".',
             autoCleanAliases: ['automatico', 'attiva', 'disattiva', 'nota', 'escludi', 'proprietà', 'frontmatter', 'eccezione'],
             showNoticesName: 'Mostra un avviso quando un incollaggio viene modificato',
             showNoticesDesc: 'Un riepilogo su una riga di ciò che è cambiato. Gli errori sono sempre segnalati.',
@@ -97,7 +97,15 @@ export const STRINGS_IT: TranslationStrings = {
             customDesc: 'Usa {{name}} per il nome della fonte e i formati data di Moment come YYYY-MM-DD.',
             customMomentLink: 'Formato Moment',
             customExample: 'Esempio: {value}',
-            customAliases: ['nome', 'file', 'data', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['nome', 'file', 'data', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'Frontmatter',
+            notePropertyName: 'Proprietà della nota',
+            notePropertyDesc:
+                'Proprietà che attiva o disattiva Better Paste per una singola nota. Con "bp: false" la nota resta invariata, e con "bp: true" viene pulita anche quando "Pulisci ogni incollaggio" è disattivato. Lascia vuoto per ignorare la proprietà.',
+            notePropertyAliases: ['nota', 'proprietà', 'frontmatter', 'escludi', 'disattiva', 'attiva', 'bp'],
             sizePropertyName: 'Proprietà per la larghezza delle immagini',
             sizePropertyDesc:
                 'Proprietà del frontmatter che imposta la larghezza delle immagini incollate in una nota. Con "bp-image-width: 400" nella nota, un’immagine incollata diventa ![[photo.png|400]]. Lascia vuoto per non aggiungere alcuna larghezza.',

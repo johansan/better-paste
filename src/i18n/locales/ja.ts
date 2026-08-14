@@ -104,7 +104,15 @@ export const STRINGS_JA: TranslationStrings = {
             customDesc: '元の名前には {{name}} を、日付には YYYY-MM-DD のような Moment の書式を使います。',
             customMomentLink: 'Moment の書式',
             customExample: '例: {value}',
-            customAliases: ['名前', 'ファイル名', '日付', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['名前', 'ファイル名', '日付', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'フロントマター',
+            notePropertyName: 'ノートのプロパティ',
+            notePropertyDesc:
+                '個々のノートで Better Paste を有効または無効にするプロパティです。"bp: false" ならそのノートは変更されず、"bp: true" なら「貼り付けのたびに整える」がオフでも整えられます。空欄にするとこのプロパティを無視します。',
+            notePropertyAliases: ['ノート', 'プロパティ', 'フロントマター', 'frontmatter', '除外', '無効', '有効', 'bp'],
             sizePropertyName: '画像幅のプロパティ',
             sizePropertyDesc:
                 'ノートに貼り付ける画像の幅を決めるフロントマターのプロパティです。ノートに "bp-image-width: 400" があると、貼り付けた画像は ![[photo.png|400]] になります。空欄にすると幅を付けません。',

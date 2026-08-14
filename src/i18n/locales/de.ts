@@ -74,7 +74,7 @@ export const STRINGS_DE: TranslationStrings = {
             heading: 'Verhalten',
             autoCleanName: 'Jeden Einfügevorgang bereinigen',
             autoCleanDesc:
-                'Wendet die Regeln bei jedem Einfügen an. Ist dies aus, greifen die Regeln nur über die Better-Paste-Befehle. Eine einzelne Notiz kann sich mit der Eigenschaft "bp: false" ausnehmen oder mit "bp: true" einbeziehen.',
+                'Wendet die Regeln bei jedem Einfügen an. Ist dies aus, greifen die Regeln nur über die Better-Paste-Befehle. Eine einzelne Notiz kann sich mit der Eigenschaft "bp: false" ausnehmen oder sich mit "bp: true" immer bereinigen lassen.',
             autoCleanAliases: [
                 'automatisch',
                 'aktivieren',
@@ -106,7 +106,15 @@ export const STRINGS_DE: TranslationStrings = {
             customDesc: 'Verwende {{name}} für den Quellnamen und Moment-Datumsformate wie YYYY-MM-DD.',
             customMomentLink: 'Moment-Format',
             customExample: 'Beispiel: {value}',
-            customAliases: ['name', 'dateiname', 'datum', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['name', 'dateiname', 'datum', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'Frontmatter',
+            notePropertyName: 'Notizeigenschaft',
+            notePropertyDesc:
+                'Eigenschaft, die Better Paste für eine einzelne Notiz ein- oder ausschaltet. Mit "bp: false" bleibt die Notiz unverändert, mit "bp: true" wird sie auch dann bereinigt, wenn "Jeden Einfügevorgang bereinigen" aus ist. Leer lassen, um die Eigenschaft zu ignorieren.',
+            notePropertyAliases: ['notiz', 'eigenschaft', 'frontmatter', 'ausnehmen', 'deaktivieren', 'aktivieren', 'bp'],
             sizePropertyName: 'Eigenschaft für Bildbreite',
             sizePropertyDesc:
                 'Frontmatter-Eigenschaft, die die Breite der in eine Notiz eingefügten Bilder festlegt. Mit "bp-image-width: 400" in der Notiz wird ein eingefügtes Bild zu ![[photo.png|400]]. Leer lassen, um keine Breite zu setzen.',

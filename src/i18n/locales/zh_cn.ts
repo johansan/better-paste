@@ -71,7 +71,7 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             heading: '行为',
             autoCleanName: '每次粘贴都清理',
             autoCleanDesc:
-                '每次粘贴都会应用规则。关闭后规则只在 Better Paste 命令中生效。单篇笔记可以用 "bp: false" 属性排除自己，也可以用 "bp: true" 属性加入。',
+                '每次粘贴都会应用规则。关闭后规则只在 Better Paste 命令中生效。单篇笔记可以用 "bp: false" 属性排除自己，也可以用 "bp: true" 属性单独启用。',
             autoCleanAliases: ['自动', '启用', '禁用', '笔记', '排除', '属性', 'frontmatter'],
             showNoticesName: '粘贴内容被修改时显示提示',
             showNoticesDesc: '用一行说明改动了什么。失败总会提示。',
@@ -94,7 +94,15 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             customDesc: '用 {{name}} 表示来源名称，日期可用 YYYY-MM-DD 这类 Moment 格式。',
             customMomentLink: 'Moment 格式',
             customExample: '示例：{value}',
-            customAliases: ['名称', '文件名', '日期', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['名称', '文件名', '日期', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'Frontmatter',
+            notePropertyName: '笔记属性',
+            notePropertyDesc:
+                '为单篇笔记开启或关闭 Better Paste 的属性。笔记中写有 "bp: false" 时该笔记不会被改动，写有 "bp: true" 时即使“每次粘贴都清理”已关闭也会清理。留空则忽略该属性。',
+            notePropertyAliases: ['笔记', '属性', 'frontmatter', '排除', '禁用', '启用', 'bp'],
             sizePropertyName: '图片宽度属性',
             sizePropertyDesc:
                 '决定粘贴进笔记的图片宽度的 frontmatter 属性。笔记中写有 "bp-image-width: 400" 时，粘贴的图片会变成 ![[photo.png|400]]。留空则不添加宽度。',

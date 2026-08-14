@@ -123,11 +123,19 @@ export const STRINGS_EN = {
             customDesc: 'Use {{name}} for the source name and Moment date formats such as YYYY-MM-DD.',
             customMomentLink: 'Moment format',
             customExample: 'Example: {value}',
-            customAliases: ['name', 'filename', 'date', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['name', 'filename', 'date', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'Frontmatter',
+            notePropertyName: 'Note property',
+            notePropertyDesc:
+                'Property that switches Better Paste on or off for one note. With "bp: false" the note is left alone, and with "bp: true" it is cleaned even when Clean up every paste is off. Leave blank to ignore the property.',
+            notePropertyAliases: ['note', 'property', 'frontmatter', 'exclude', 'opt out', 'opt in', 'disable', 'enable', 'bp', 'verbatim'],
             sizePropertyName: 'Image width property',
             sizePropertyDesc:
                 'Frontmatter property that sets the width of images pasted into a note. With "bp-image-width: 400" in the note, a pasted image becomes ![[photo.png|400]]. Leave blank to add no width.',
-            sizePropertyAliases: ['size', 'frontmatter', 'property', 'resize']
+            sizePropertyAliases: ['size', 'frontmatter', 'property', 'resize', 'width', 'image']
         },
 
         links: {

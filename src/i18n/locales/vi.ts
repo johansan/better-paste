@@ -71,7 +71,7 @@ export const STRINGS_VI: TranslationStrings = {
             heading: 'Hành vi',
             autoCleanName: 'Dọn mọi lần dán',
             autoCleanDesc:
-                'Áp dụng các quy tắc cho mọi lần dán. Khi tắt, các quy tắc chỉ được áp dụng khi dùng các lệnh của Better Paste. Một ghi chú riêng lẻ có thể tự loại trừ bằng thuộc tính "bp: false", hoặc tự tham gia bằng "bp: true".',
+                'Áp dụng các quy tắc cho mọi lần dán. Khi tắt, các quy tắc chỉ được áp dụng khi dùng các lệnh của Better Paste. Một ghi chú riêng lẻ có thể tự loại trừ bằng thuộc tính "bp: false", hoặc tự bật lại bằng "bp: true".',
             autoCleanAliases: ['tự động', 'bật', 'tắt', 'ghi chú', 'loại trừ', 'thuộc tính', 'frontmatter'],
             showNoticesName: 'Hiện thông báo khi lần dán bị thay đổi',
             showNoticesDesc: 'Một dòng tóm tắt những gì đã thay đổi. Lỗi luôn được báo.',
@@ -104,7 +104,15 @@ export const STRINGS_VI: TranslationStrings = {
             customDesc: 'Dùng {{name}} cho tên nguồn và các định dạng ngày của Moment như YYYY-MM-DD.',
             customMomentLink: 'Định dạng Moment',
             customExample: 'Ví dụ: {value}',
-            customAliases: ['tên', 'tên tệp', 'ngày', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['tên', 'tên tệp', 'ngày', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'Frontmatter',
+            notePropertyName: 'Thuộc tính ghi chú',
+            notePropertyDesc:
+                'Thuộc tính bật hoặc tắt Better Paste cho một ghi chú. Với "bp: false", ghi chú được giữ nguyên, còn với "bp: true", ghi chú vẫn được dọn dù "Dọn mọi lần dán" đang tắt. Để trống để bỏ qua thuộc tính này.',
+            notePropertyAliases: ['ghi chú', 'thuộc tính', 'frontmatter', 'loại trừ', 'tắt', 'bật', 'bp'],
             sizePropertyName: 'Thuộc tính chiều rộng ảnh',
             sizePropertyDesc:
                 'Thuộc tính frontmatter xác định chiều rộng của ảnh dán vào một ghi chú. Với "bp-image-width: 400" trong ghi chú, ảnh dán vào sẽ thành ![[photo.png|400]]. Để trống để không thêm chiều rộng.',

@@ -66,6 +66,7 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
         imageEnabled: asBoolean(data.imageEnabled, defaults.imageEnabled),
         imageNameFormat: asEnum(data.imageNameFormat, NAME_FORMATS, defaults.imageNameFormat),
         imageNameTemplate: asString(data.imageNameTemplate, defaults.imageNameTemplate).trim() || defaults.imageNameTemplate,
+        noteProperty: asString(data.noteProperty, defaults.noteProperty).trim(),
         imageSizeProperty: asString(data.imageSizeProperty, defaults.imageSizeProperty).trim(),
 
         linkEnabled: asBoolean(data.linkEnabled, defaults.linkEnabled),

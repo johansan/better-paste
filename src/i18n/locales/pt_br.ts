@@ -97,7 +97,15 @@ export const STRINGS_PT_BR: TranslationStrings = {
             customDesc: 'Use {{name}} para o nome de origem e formatos de data do Moment como YYYY-MM-DD.',
             customMomentLink: 'Formato Moment',
             customExample: 'Exemplo: {value}',
-            customAliases: ['nome', 'arquivo', 'data', 'moment', 'YYYY', '{{name}}'],
+            customAliases: ['nome', 'arquivo', 'data', 'moment', 'YYYY', '{{name}}']
+        },
+
+        frontmatter: {
+            heading: 'Frontmatter',
+            notePropertyName: 'Propriedade da nota',
+            notePropertyDesc:
+                'Propriedade que ativa ou desativa o Better Paste em uma única nota. Com "bp: false" a nota fica intacta, e com "bp: true" ela é limpa mesmo com "Limpar toda colagem" desativado. Deixe em branco para ignorar a propriedade.',
+            notePropertyAliases: ['nota', 'propriedade', 'frontmatter', 'excluir', 'desativar', 'ativar', 'bp'],
             sizePropertyName: 'Propriedade de largura das imagens',
             sizePropertyDesc:
                 'Propriedade do frontmatter que define a largura das imagens coladas em uma nota. Com "bp-image-width: 400" na nota, uma imagem colada fica ![[photo.png|400]]. Deixe em branco para não acrescentar largura.',
