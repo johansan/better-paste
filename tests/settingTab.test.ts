@@ -225,9 +225,11 @@ describe('settings tree', () => {
             return row.desc;
         };
 
-        expect(descriptionFor('none')).toContain('"finished," then left. \u2192 He called it "finished,"');
-        expect(descriptionFor('inside')).toContain('"finished", then left. \u2192 He called it "finished,"');
-        expect(descriptionFor('outside')).toContain('"finished," then left. \u2192 He called it "finished",');
+        expect(descriptionFor('none')).toContain('pasted comma placement is preserved');
+        expect(descriptionFor('inside')).toContain('"finished," then left');
+        expect(descriptionFor('inside')).not.toContain('"finished", then left');
+        expect(descriptionFor('outside')).toContain('"finished", then left');
+        expect(descriptionFor('outside')).not.toContain('"finished," then left');
     });
 
     it('shows an example for each AI cleanup setting', () => {

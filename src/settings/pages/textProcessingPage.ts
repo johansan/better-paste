@@ -22,17 +22,16 @@ import { toggle } from './context';
 import type { SettingsPageContext } from './context';
 import type { TextCommaPlacement } from '../types';
 
-const COMMA_EXAMPLES: Record<TextCommaPlacement, readonly [before: string, after: string]> = {
-    none: ['He called it "finished," then left.', 'He called it "finished," then left.'],
-    inside: ['He called it "finished", then left.', 'He called it "finished," then left.'],
-    outside: ['He called it "finished," then left.', 'He called it "finished", then left.']
+const COMMA_EXAMPLES: Record<TextCommaPlacement, string> = {
+    none: 'No change: pasted comma placement is preserved.',
+    inside: 'Result: He called it "finished," then left.',
+    outside: 'Result: He called it "finished", then left.'
 };
 
 /** Shows the selected comma placement with the same compact example used by other rules. */
 function commasDescription(placement: TextCommaPlacement): string | DocumentFragment {
     const description = 'Choose where to place a comma next to a closing double quotation mark.';
-    const [before, after] = COMMA_EXAMPLES[placement];
-    const example = `${before} \u2192 ${after}`;
+    const example = COMMA_EXAMPLES[placement];
 
     if (typeof createFragment === 'undefined') return `${description} Example: ${example}`;
 
