@@ -25,7 +25,9 @@ import { fileURLToPath } from 'node:url';
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 
-const projectRoot = dirname(fileURLToPath(import.meta.url));
+// One level up, because this script lives in scripts/ while every path it touches, and the
+// working directory every git command needs, is the repository root
+const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const releaseTypes = new Set(['patch', 'minor', 'major']);
 const versionFiles = ['manifest.json', 'package.json', 'package-lock.json', 'versions.json'];
 
@@ -174,11 +176,11 @@ async function confirmRelease(currentVersion, targetVersion) {
 }
 
 function printUsage() {
-    console.log(`Usage: node release [patch|minor|major] [--dry-run] [--yes]
+    console.log(`Usage: node scripts/release [patch|minor|major] [--dry-run] [--yes]
 
 Examples:
-  node release
-  node release minor --dry-run
+  node scripts/release
+  node scripts/release minor --dry-run
 
 The script requires a clean main branch that matches origin/main. It runs the full
 build, uses npm version to create the version commit and annotated bare tag, then
