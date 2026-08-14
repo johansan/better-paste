@@ -178,7 +178,7 @@ describe('settings tree', () => {
         expect(names.slice(0, 2)).toEqual(['Trim surrounding whitespace', 'Commas and quotes']);
         expect(names).toContain('Trim surrounding whitespace');
         expect(names).toContain('AI cleanup: invisible characters');
-        expect(names).toContain('AI cleanup: plain punctuation');
+        expect(names).toContain('AI cleanup: dashes and quotes');
     });
 
     it('keeps the landing page short', () => {

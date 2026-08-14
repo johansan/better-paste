@@ -84,9 +84,9 @@ export function createAiTextLandingDefinitions(context: SettingsPageContext): Se
         {
             ...toggle(
                 'aiTextPlainPunctuation',
-                'AI cleanup: plain punctuation',
+                'AI cleanup: dashes and quotes',
                 withExample(
-                    'Converts long dashes into hyphens and curly quotes into straight quotes. Angle quotes such as \u00ab \u00bb are left unchanged.',
+                    'Converts long dashes into hyphens and curly quotes into straight quotes.',
                     '\u201cThe result \u2014 was fine.\u201d',
                     '"The result - was fine."'
                 ),
