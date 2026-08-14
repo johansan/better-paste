@@ -86,8 +86,8 @@ export function createAiTextLandingDefinitions(context: SettingsPageContext): Se
                 'AI cleanup: dashes and quotes',
                 withExample(
                     'Converts long dashes into hyphens and curly quotes into straight quotes.',
-                    '\u201cThe result \u2014 was fine.\u201d',
-                    '"The result - was fine."'
+                    '\u201cThis approach \u2014 while simple \u2014 can significantly improve your workflow.\u201d',
+                    '"This approach - while simple - can significantly improve your workflow."'
                 ),
                 [
                     'em dash',
