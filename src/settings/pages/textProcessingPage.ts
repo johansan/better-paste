@@ -19,13 +19,42 @@
 import type { SettingGroupItem } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../defaults';
 import { toggle } from './context';
+import type { SettingsPageContext } from './context';
+import type { TextCommaPlacement } from '../types';
+
+const COMMA_EXAMPLES: Record<TextCommaPlacement, readonly [before: string, after: string]> = {
+    none: ['He called it "finished," then left.', 'He called it "finished," then left.'],
+    inside: ['He called it "finished", then left.', 'He called it "finished," then left.'],
+    outside: ['He called it "finished," then left.', 'He called it "finished", then left.']
+};
+
+/** Shows the selected comma placement with the same compact example used by other rules. */
+function commasDescription(placement: TextCommaPlacement): string | DocumentFragment {
+    const description = 'Choose where to place a comma next to a closing double quotation mark.';
+    const [before, after] = COMMA_EXAMPLES[placement];
+    const example = `${before} \u2192 ${after}`;
+
+    if (typeof createFragment === 'undefined') return `${description} Example: ${example}`;
+
+    return createFragment(fragment => {
+        fragment.appendText(description);
+        fragment.createDiv({ cls: 'better-paste-example', text: example });
+    });
+}
 
 /** Rows shown directly under the Text processing heading. */
-export function createTextProcessingDefinitions(): SettingGroupItem[] {
+export function createTextProcessingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
     return [
+        toggle('trimPaste', 'Trim surrounding whitespace', 'Removes blank lines and spaces from the start and end of pasted text.', [
+            'whitespace',
+            'blank',
+            'space',
+            'newline',
+            'trim'
+        ]),
         {
             name: 'Commas and quotes',
-            desc: 'Choose where to place a comma next to a closing double quotation mark.',
+            desc: commasDescription(context.settings().textCommaPlacement),
             aliases: ['comma', 'quote', 'quotation', 'punctuation', 'style'],
             control: {
                 type: 'dropdown',
@@ -37,13 +66,6 @@ export function createTextProcessingDefinitions(): SettingGroupItem[] {
                     outside: 'Comma outside quotes'
                 }
             }
-        },
-        toggle('trimPaste', 'Trim surrounding whitespace', 'Removes blank lines and spaces from the start and end of pasted text.', [
-            'whitespace',
-            'blank',
-            'space',
-            'newline',
-            'trim'
-        ])
+        }
     ];
 }

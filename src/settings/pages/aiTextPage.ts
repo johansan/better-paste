@@ -32,16 +32,37 @@ function withExample(description: string, before: string, after: string): string
     });
 }
 
+/** Shows the two invisible source characters as visible, removed Unicode codes. */
+function invisibleCharactersDescription(): string | DocumentFragment {
+    const description =
+        'Turns unusual spaces into normal spaces and removes selected invisible formatting characters. Emoji and meaningful language characters are left unchanged.';
+    const start = 'The';
+    const noBreakSpace = '[U+00A0]';
+    const middle = 'result';
+    const zeroWidthSpace = '[U+200B]';
+    const end = ' was fine.';
+    const after = 'The result was fine.';
+    const example = `${start}${noBreakSpace}${middle}${zeroWidthSpace}${end} \u2192 ${after}`;
+
+    if (typeof createFragment === 'undefined') return `${description} Example: ${example}`;
+
+    return createFragment(fragment => {
+        fragment.appendText(description);
+        const row = fragment.createDiv({ cls: 'better-paste-example' });
+        row.appendText(start);
+        row.createSpan({ cls: 'better-paste-example-removed', text: noBreakSpace });
+        row.appendText(middle);
+        row.createSpan({ cls: 'better-paste-example-removed', text: zeroWidthSpace });
+        row.appendText(`${end} \u2192 ${after}`);
+    });
+}
+
 /** AI cleanup rows shown under Text processing on the landing page. */
 export function createAiTextLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
     return [
         {
             name: 'AI cleanup: invisible characters',
-            desc: withExample(
-                'Turns unusual spaces into normal spaces and removes selected invisible formatting characters. Emoji and meaningful language characters are left unchanged.',
-                'The result[zero-width space] was fine.',
-                'The result was fine.'
-            ),
+            desc: invisibleCharactersDescription(),
             aliases: [
                 'ai',
                 'chatgpt',

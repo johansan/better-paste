@@ -103,7 +103,7 @@ export class BetterPasteSettingTab extends PluginSettingTab {
                 type: 'group',
                 cls: SETTINGS_CLASS,
                 heading: 'Text processing',
-                items: [...createTextProcessingDefinitions(), ...createAiTextLandingDefinitions(context)]
+                items: [...createTextProcessingDefinitions(context), ...createAiTextLandingDefinitions(context)]
             }
         ];
     }
@@ -133,6 +133,11 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             await super.setControlValue(key, value.trim());
         } else {
             await super.setControlValue(key, value);
+        }
+
+        if (key === 'textCommaPlacement') {
+            this.update();
+            return;
         }
 
         this.afterChange();

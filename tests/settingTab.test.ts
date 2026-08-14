@@ -175,6 +175,7 @@ describe('settings tree', () => {
         const names = flatten([...(textProcessing?.items ?? [])]).map(row => row.name);
 
         expect(flatten([...(behavior?.items ?? [])]).map(row => row.name)).not.toContain('Trim surrounding whitespace');
+        expect(names.slice(0, 2)).toEqual(['Trim surrounding whitespace', 'Commas and quotes']);
         expect(names).toContain('Trim surrounding whitespace');
         expect(names).toContain('AI cleanup: invisible characters');
         expect(names).toContain('AI cleanup: plain punctuation');
@@ -215,6 +216,20 @@ describe('settings tree', () => {
         });
     });
 
+    it('updates the comma example for the selected placement', () => {
+        const descriptionFor = (placement: BetterPasteSettings['textCommaPlacement']): string => {
+            const row = flatten(makeTab(fakePlugin({ textCommaPlacement: placement })).getSettingDefinitions()).find(
+                candidate => candidate.name === 'Commas and quotes'
+            );
+            if (typeof row?.desc !== 'string') throw new Error('Commas and quotes has no text fallback');
+            return row.desc;
+        };
+
+        expect(descriptionFor('none')).toContain('"finished," then left. \u2192 He called it "finished,"');
+        expect(descriptionFor('inside')).toContain('"finished", then left. \u2192 He called it "finished,"');
+        expect(descriptionFor('outside')).toContain('"finished," then left. \u2192 He called it "finished",');
+    });
+
     it('shows an example for each AI cleanup setting', () => {
         const rows = flatten(tab.getSettingDefinitions()).filter(row => row.name.startsWith('AI cleanup:'));
 
@@ -224,6 +239,10 @@ describe('settings tree', () => {
             if (typeof row.desc !== 'string') throw new Error(`${row.name} has no text fallback`);
             expect(row.desc).toContain('\u2192');
         }
+
+        const invisible = rows.find(row => row.name === 'AI cleanup: invisible characters');
+        expect(invisible?.desc).toContain('U+00A0');
+        expect(invisible?.desc).toContain('U+200B');
     });
 
     it('puts the detail on sub-pages, declared so search can still reach it', () => {
@@ -373,6 +392,13 @@ describe('dependent settings', () => {
         const before = (tab as unknown as { refreshCount: number }).refreshCount;
         await tab.setControlValue('imagesEnabled', false);
         expect((tab as unknown as { refreshCount: number }).refreshCount).toBe(before + 1);
+    });
+
+    it('rebuilds the comma example after its selection changes', async () => {
+        const tab = makeTab(fakePlugin());
+        const before = (tab as unknown as { updateCount: number }).updateCount;
+        await tab.setControlValue('textCommaPlacement', 'outside');
+        expect((tab as unknown as { updateCount: number }).updateCount).toBe(before + 1);
     });
 
     it('does not rebuild the terminal tester when its mode changes', async () => {
