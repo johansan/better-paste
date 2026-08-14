@@ -22,22 +22,28 @@ import { toggle } from './context';
 import type { SettingsPageContext } from './context';
 import type { TextCommaPlacement } from '../types';
 
-const COMMA_EXAMPLES: Record<TextCommaPlacement, string> = {
-    none: 'No change: pasted comma placement is preserved.',
-    inside: 'Result: He called it "finished," then left.',
-    outside: 'Result: He called it "finished", then left.'
+const COMMA_EXAMPLE_SOURCE = 'He called it "finished," then left.';
+const COMMA_EXAMPLE_RESULTS: Record<TextCommaPlacement, string> = {
+    none: COMMA_EXAMPLE_SOURCE,
+    inside: COMMA_EXAMPLE_SOURCE,
+    outside: 'He called it "finished", then left.'
 };
+
+/** Comma example text, also used to update the rendered row after a dropdown change. */
+export function commaPlacementExample(placement: TextCommaPlacement): string {
+    return `${COMMA_EXAMPLE_SOURCE} \u2192 ${COMMA_EXAMPLE_RESULTS[placement]}`;
+}
 
 /** Shows the selected comma placement with the same compact example used by other rules. */
 function commasDescription(placement: TextCommaPlacement): string | DocumentFragment {
     const description = 'Choose where to place a comma next to a closing double quotation mark.';
-    const example = COMMA_EXAMPLES[placement];
+    const example = commaPlacementExample(placement);
 
     if (typeof createFragment === 'undefined') return `${description} Example: ${example}`;
 
     return createFragment(fragment => {
         fragment.appendText(description);
-        fragment.createDiv({ cls: 'better-paste-example', text: example });
+        fragment.createDiv({ cls: ['better-paste-example', 'better-paste-comma-example'], text: example });
     });
 }
 

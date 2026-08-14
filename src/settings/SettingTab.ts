@@ -26,7 +26,7 @@ import type { SettingsPageContext } from './pages/context';
 import { createImageLandingDefinitions } from './pages/imagesPage';
 import { createLinkLandingDefinitions } from './pages/linksPage';
 import { createTerminalLandingDefinitions } from './pages/terminalPage';
-import { createTextProcessingDefinitions } from './pages/textProcessingPage';
+import { commaPlacementExample, createTextProcessingDefinitions } from './pages/textProcessingPage';
 import { createAiTextLandingDefinitions } from './pages/aiTextPage';
 import { createStartDefinitions } from './pages/startPage';
 
@@ -135,12 +135,16 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             await super.setControlValue(key, value);
         }
 
-        if (key === 'textCommaPlacement') {
-            this.update();
-            return;
-        }
+        if (key === 'textCommaPlacement') this.updateCommaExample(value);
 
         this.afterChange();
+    }
+
+    /** Updates the comma example in place so it always reflects the dropdown value. */
+    private updateCommaExample(value: unknown): void {
+        if (value !== 'none' && value !== 'inside' && value !== 'outside') return;
+        const examples = this.containerEl?.querySelectorAll<HTMLElement>('.better-paste-comma-example') ?? [];
+        for (const example of examples) example.setText(commaPlacementExample(value));
     }
 
     /** Re-evaluates visibility without rebuilding controls that hold unsaved tester input. */

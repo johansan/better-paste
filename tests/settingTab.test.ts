@@ -225,11 +225,10 @@ describe('settings tree', () => {
             return row.desc;
         };
 
-        expect(descriptionFor('none')).toContain('pasted comma placement is preserved');
-        expect(descriptionFor('inside')).toContain('"finished," then left');
-        expect(descriptionFor('inside')).not.toContain('"finished", then left');
-        expect(descriptionFor('outside')).toContain('"finished", then left');
-        expect(descriptionFor('outside')).not.toContain('"finished," then left');
+        const source = 'He called it "finished," then left.';
+        expect(descriptionFor('none')).toContain(`${source} \u2192 ${source}`);
+        expect(descriptionFor('inside')).toContain(`${source} \u2192 ${source}`);
+        expect(descriptionFor('outside')).toContain(`${source} \u2192 He called it "finished", then left.`);
     });
 
     it('shows an example for each AI cleanup setting', () => {
@@ -396,11 +395,17 @@ describe('dependent settings', () => {
         expect((tab as unknown as { refreshCount: number }).refreshCount).toBe(before + 1);
     });
 
-    it('rebuilds the comma example after its selection changes', async () => {
+    it('updates the rendered comma example after its selection changes', async () => {
         const tab = makeTab(fakePlugin());
-        const before = (tab as unknown as { updateCount: number }).updateCount;
+        const rendered: string[] = [];
+        Object.assign(tab, {
+            containerEl: {
+                querySelectorAll: () => [{ setText: (value: string) => rendered.push(value) }]
+            }
+        });
+
         await tab.setControlValue('textCommaPlacement', 'outside');
-        expect((tab as unknown as { updateCount: number }).updateCount).toBe(before + 1);
+        expect(rendered).toEqual(['He called it "finished," then left. \u2192 He called it "finished", then left.']);
     });
 
     it('does not rebuild the terminal tester when its mode changes', async () => {
