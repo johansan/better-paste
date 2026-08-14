@@ -20,22 +20,22 @@ import { describe, expect, it } from 'vitest';
 import {
     extractFrontmatterBlock,
     isInsideVerbatimContext,
-    isPasteDisabledForNote,
+    notePasteOverride,
     normalizeImageSize,
     resolveImageSize
 } from '../src/paste/noteOptions';
 
 describe('extractFrontmatterBlock', () => {
     it('reads the block at the top of a note', () => {
-        expect(extractFrontmatterBlock('---\nimage-width: 400\n---\n\nBody text')).toBe('image-width: 400');
+        expect(extractFrontmatterBlock('---\nbp-image-width: 400\n---\n\nBody text')).toBe('bp-image-width: 400');
     });
 
     it('reads a block with several properties', () => {
-        expect(extractFrontmatterBlock('---\ntitle: Notes\nimage-width: 400\n---\n')).toBe('title: Notes\nimage-width: 400');
+        expect(extractFrontmatterBlock('---\ntitle: Notes\nbp-image-width: 400\n---\n')).toBe('title: Notes\nbp-image-width: 400');
     });
 
     it('accepts the "..." terminator', () => {
-        expect(extractFrontmatterBlock('---\nimage-width: 400\n...\nBody')).toBe('image-width: 400');
+        expect(extractFrontmatterBlock('---\nbp-image-width: 400\n...\nBody')).toBe('bp-image-width: 400');
     });
 
     it('handles an empty block', () => {
@@ -43,7 +43,7 @@ describe('extractFrontmatterBlock', () => {
     });
 
     it('handles Windows line endings', () => {
-        expect(extractFrontmatterBlock('---\r\nimage-width: 400\r\n---\r\nBody')).toBe('image-width: 400\r');
+        expect(extractFrontmatterBlock('---\r\nbp-image-width: 400\r\n---\r\nBody')).toBe('bp-image-width: 400\r');
     });
 
     it('returns null when there is no frontmatter', () => {
@@ -51,11 +51,11 @@ describe('extractFrontmatterBlock', () => {
     });
 
     it('ignores a rule that is not on the first line', () => {
-        expect(extractFrontmatterBlock('Some text\n---\nimage-width: 400\n---')).toBeNull();
+        expect(extractFrontmatterBlock('Some text\n---\nbp-image-width: 400\n---')).toBeNull();
     });
 
     it('returns null while the block is still unterminated', () => {
-        expect(extractFrontmatterBlock('---\nimage-width: 400\n')).toBeNull();
+        expect(extractFrontmatterBlock('---\nbp-image-width: 400\n')).toBeNull();
     });
 });
 
@@ -90,47 +90,57 @@ describe('normalizeImageSize', () => {
 
 describe('resolveImageSize', () => {
     it('reads the configured property', () => {
-        expect(resolveImageSize({ 'image-width': 400 }, 'image-width')).toBe('400');
+        expect(resolveImageSize({ 'bp-image-width': 400 }, 'bp-image-width')).toBe('400');
     });
 
     it('matches the property name regardless of case', () => {
-        expect(resolveImageSize({ 'Image-Width': 400 }, 'image-width')).toBe('400');
+        expect(resolveImageSize({ 'Bp-Image-Width': 400 }, 'bp-image-width')).toBe('400');
     });
 
     it('ignores other properties', () => {
-        expect(resolveImageSize({ title: 'Notes', width: 999 }, 'image-width')).toBeNull();
+        expect(resolveImageSize({ title: 'Notes', width: 999 }, 'bp-image-width')).toBeNull();
     });
 
     it('returns null when the feature is switched off', () => {
-        expect(resolveImageSize({ 'image-width': 400 }, '')).toBeNull();
+        expect(resolveImageSize({ 'bp-image-width': 400 }, '')).toBeNull();
     });
 
     it('returns null for missing frontmatter', () => {
-        expect(resolveImageSize(null, 'image-width')).toBeNull();
-        expect(resolveImageSize('not an object', 'image-width')).toBeNull();
+        expect(resolveImageSize(null, 'bp-image-width')).toBeNull();
+        expect(resolveImageSize('not an object', 'bp-image-width')).toBeNull();
     });
 });
 
-describe('isPasteDisabledForNote', () => {
-    it('recognises a boolean false', () => {
-        expect(isPasteDisabledForNote({ 'better-paste': false }, 'better-paste')).toBe(true);
+describe('notePasteOverride', () => {
+    it('reads a boolean, which is the documented form', () => {
+        expect(notePasteOverride({ bp: false }, 'bp')).toBe('off');
+        expect(notePasteOverride({ bp: true }, 'bp')).toBe('on');
     });
 
-    it('recognises an unquoted numeric zero, which YAML parses as a number', () => {
-        expect(isPasteDisabledForNote({ 'better-paste': 0 }, 'better-paste')).toBe(true);
+    it('reads an unquoted number, which YAML parses as a number rather than a string', () => {
+        expect(notePasteOverride({ bp: 0 }, 'bp')).toBe('off');
+        expect(notePasteOverride({ bp: 1 }, 'bp')).toBe('on');
     });
 
-    it('recognises the written forms of no', () => {
-        for (const value of ['false', 'off', 'no', '0', 'disabled', 'OFF']) {
-            expect(isPasteDisabledForNote({ 'better-paste': value }, 'better-paste'), value).toBe(true);
+    it('reads the written forms, so a property already typed as text still answers', () => {
+        for (const value of ['false', 'off', 'no', '0', 'disabled', 'OFF', ' off ']) {
+            expect(notePasteOverride({ bp: value }, 'bp'), value).toBe('off');
+        }
+        for (const value of ['true', 'on', 'yes', '1', 'enabled', 'ON', ' on ']) {
+            expect(notePasteOverride({ bp: value }, 'bp'), value).toBe('on');
         }
     });
 
-    it('leaves the plugin on for anything else', () => {
-        expect(isPasteDisabledForNote({ 'better-paste': true }, 'better-paste')).toBe(false);
-        expect(isPasteDisabledForNote({ 'better-paste': 'yes' }, 'better-paste')).toBe(false);
-        expect(isPasteDisabledForNote({ title: 'Notes' }, 'better-paste')).toBe(false);
-        expect(isPasteDisabledForNote(null, 'better-paste')).toBe(false);
+    it('treats an unrecognised value as no opinion, so a later version degrades to the global setting', () => {
+        expect(notePasteOverride({ bp: 'text' }, 'bp')).toBeNull();
+        expect(notePasteOverride({ bp: 2 }, 'bp')).toBeNull();
+        expect(notePasteOverride({ bp: ['off'] }, 'bp')).toBeNull();
+    });
+
+    it('returns null when the note says nothing', () => {
+        expect(notePasteOverride({ title: 'Notes' }, 'bp')).toBeNull();
+        expect(notePasteOverride(null, 'bp')).toBeNull();
+        expect(notePasteOverride({ bp: false }, '')).toBeNull();
     });
 });
 

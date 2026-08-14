@@ -71,7 +71,7 @@ export const STRINGS_JA: TranslationStrings = {
             heading: '動作',
             autoCleanName: '貼り付けのたびに整える',
             autoCleanDesc:
-                '貼り付けのたびにルールを適用します。オフのときは Better Paste のコマンドを使ったときだけ適用されます。個々のノートは "better-paste: false" プロパティで対象外にできます。',
+                '貼り付けのたびにルールを適用します。オフのときは Better Paste のコマンドを使ったときだけ適用されます。個々のノートは "bp: false" プロパティで対象外にでき、"bp: true" で対象にできます。',
             autoCleanAliases: ['自動', '有効', '無効', 'ノート', '除外', 'プロパティ', 'フロントマター', 'frontmatter'],
             showNoticesName: '貼り付けが変更されたときに通知を表示',
             showNoticesDesc: '何が変わったかを 1 行でまとめます。失敗は必ず通知されます。',
@@ -107,7 +107,7 @@ export const STRINGS_JA: TranslationStrings = {
             customAliases: ['名前', 'ファイル名', '日付', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: '画像幅のプロパティ',
             sizePropertyDesc:
-                'ノートに貼り付ける画像の幅を決めるフロントマターのプロパティです。ノートに "image-width: 400" があると、貼り付けた画像は ![[photo.png|400]] になります。空欄にすると幅を付けません。',
+                'ノートに貼り付ける画像の幅を決めるフロントマターのプロパティです。ノートに "bp-image-width: 400" があると、貼り付けた画像は ![[photo.png|400]] になります。空欄にすると幅を付けません。',
             sizePropertyAliases: ['サイズ', 'フロントマター', 'frontmatter', 'プロパティ', 'リサイズ']
         },
 
@@ -227,7 +227,7 @@ export const STRINGS_JA: TranslationStrings = {
             'Better Paste は、クリップボードの内容をノートに貼り付ける際に変換します。',
             'リンクされた画像を保管庫の添付ファイルとして保存し、リンクから追跡パラメーターを取り除き、ターミナル出力の折り返された行をつなぎ直し、丸い引用符や不可視文字を素朴な文字に置き換えます。',
             'ルールはそれぞれ個別にオフにできます。',
-            '個々のノートは "better-paste: false" プロパティで完全に対象外にできます。設定は 設定、Better Paste にあります。'
+            '個々のノートは "bp: false" プロパティで完全に対象外にできます。設定は 設定、Better Paste にあります。'
         ],
         startButton: 'はじめる'
     },

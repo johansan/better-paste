@@ -300,7 +300,7 @@ describe('image width from frontmatter', () => {
 
     /** A note whose frontmatter asks for a width, with the cursor at the end. */
     function noteAsking(width: string): FakeEditor {
-        return new FakeEditor(`---\nimage-width: ${width}\n---\n\n`);
+        return new FakeEditor(`---\nbp-image-width: ${width}\n---\n\n`);
     }
 
     it('sizes a clipboard bitmap to the width the note asks for', async () => {
@@ -309,7 +309,7 @@ describe('image width from frontmatter', () => {
 
         service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO);
         await settle();
-        expect(editor.getValue()).toBe('---\nimage-width: 400\n---\n\n![[photo.png|400]]');
+        expect(editor.getValue()).toBe('---\nbp-image-width: 400\n---\n\n![[photo.png|400]]');
     });
 
     it('passes a width and height through', async () => {
@@ -326,7 +326,7 @@ describe('image width from frontmatter', () => {
 
         service.handleEditorPaste(event, editor.asEditor(), INFO);
         await settle();
-        expect(editor.getValue()).toBe('---\nimage-width: 250\n---\n\n![[image-0.png|250]]');
+        expect(editor.getValue()).toBe('---\nbp-image-width: 250\n---\n\n![[image-0.png|250]]');
     });
 
     it('sizes images pulled out of rich content', async () => {
@@ -342,7 +342,7 @@ describe('image width from frontmatter', () => {
         editor.replaceSelection('![](https://example.com/a.png)');
         await settle();
 
-        expect(editor.getValue()).toBe('---\nimage-width: 120\n---\n\n![[image-0.png|120]]');
+        expect(editor.getValue()).toBe('---\nbp-image-width: 120\n---\n\n![[image-0.png|120]]');
     });
 
     it('takes over a plain screenshot paste so the width still applies', async () => {
@@ -399,7 +399,7 @@ describe('image width from frontmatter', () => {
 
         service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO);
         await settle();
-        expect(editor.getValue()).toBe('---\nimage-width: 400\n---\n\n![400](https://example.com/photo.webp)');
+        expect(editor.getValue()).toBe('---\nbp-image-width: 400\n---\n\n![400](https://example.com/photo.webp)');
     });
 });
 
@@ -865,18 +865,38 @@ describe('leaving a paste alone', () => {
 
     it('skips a note that opts out with the disable property', () => {
         const { service } = build();
-        const editor = new FakeEditor('---\nbetter-paste: false\n---\n\n');
+        const editor = new FakeEditor('---\nbp: false\n---\n\n');
 
         expect(service.handleEditorPaste(fakeClipboardEvent({ plain: TRACKED }), editor.asEditor(), INFO)).toBe(false);
-        expect(editor.getValue()).toBe('---\nbetter-paste: false\n---\n\n');
+        expect(editor.getValue()).toBe('---\nbp: false\n---\n\n');
     });
 
     it('still processes a note whose property says yes', () => {
         const { service } = build();
-        const editor = new FakeEditor('---\nbetter-paste: true\n---\n\n');
+        const editor = new FakeEditor('---\nbp: true\n---\n\n');
 
         expect(service.handleEditorPaste(fakeClipboardEvent({ plain: TRACKED }), editor.asEditor(), INFO)).toBe(true);
-        expect(editor.getValue()).toBe('---\nbetter-paste: true\n---\n\nhttps://example.com/a');
+        expect(editor.getValue()).toBe('---\nbp: true\n---\n\nhttps://example.com/a');
+    });
+
+    it('cleans a note that opts in while automatic cleanup is off', () => {
+        // The property overrides the global setting in both directions, so this is the one
+        // case where a note is cleaned even though nothing else is
+        const { service } = build({ autoClean: false });
+        const editor = new FakeEditor('---\nbp: true\n---\n\n');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: TRACKED }), editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe('---\nbp: true\n---\n\nhttps://example.com/a');
+    });
+
+    it('does not let a note opt in to pasting inside a code fence', () => {
+        // Opting in overrides the global setting, not the protection of code
+        const { service } = build({ autoClean: false });
+        const content = '---\nbp: true\n---\n\n```sh\n';
+        const editor = new FakeEditor(content);
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: TRACKED }), editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe(content);
     });
 
     it('skips a paste landing inside a code fence', () => {
@@ -947,11 +967,11 @@ describe('leaving a paste alone', () => {
         // An explicit command means the user asked for the rules by name, so the property
         // must not suppress it. The selection is real, or this would pass vacuously.
         const { service } = build();
-        const document = '---\nbetter-paste: false\n---\n\nhttps://example.com/a?utm_source=x';
+        const document = '---\nbp: false\n---\n\nhttps://example.com/a?utm_source=x';
         const editor = selecting(document, 'https://example.com/a?utm_source=x');
 
         service.cleanSelection(editor.asEditor());
-        expect(editor.getValue()).toBe('---\nbetter-paste: false\n---\n\nhttps://example.com/a');
+        expect(editor.getValue()).toBe('---\nbp: false\n---\n\nhttps://example.com/a');
     });
 });
 

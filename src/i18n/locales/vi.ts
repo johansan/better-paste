@@ -71,7 +71,7 @@ export const STRINGS_VI: TranslationStrings = {
             heading: 'Hành vi',
             autoCleanName: 'Dọn mọi lần dán',
             autoCleanDesc:
-                'Áp dụng các quy tắc cho mọi lần dán. Khi tắt, các quy tắc chỉ được áp dụng khi dùng các lệnh của Better Paste. Một ghi chú riêng lẻ có thể tự loại trừ bằng thuộc tính "better-paste: false".',
+                'Áp dụng các quy tắc cho mọi lần dán. Khi tắt, các quy tắc chỉ được áp dụng khi dùng các lệnh của Better Paste. Một ghi chú riêng lẻ có thể tự loại trừ bằng thuộc tính "bp: false", hoặc tự tham gia bằng "bp: true".',
             autoCleanAliases: ['tự động', 'bật', 'tắt', 'ghi chú', 'loại trừ', 'thuộc tính', 'frontmatter'],
             showNoticesName: 'Hiện thông báo khi lần dán bị thay đổi',
             showNoticesDesc: 'Một dòng tóm tắt những gì đã thay đổi. Lỗi luôn được báo.',
@@ -107,7 +107,7 @@ export const STRINGS_VI: TranslationStrings = {
             customAliases: ['tên', 'tên tệp', 'ngày', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Thuộc tính chiều rộng ảnh',
             sizePropertyDesc:
-                'Thuộc tính frontmatter xác định chiều rộng của ảnh dán vào một ghi chú. Với "image-width: 400" trong ghi chú, ảnh dán vào sẽ thành ![[photo.png|400]]. Để trống để không thêm chiều rộng.',
+                'Thuộc tính frontmatter xác định chiều rộng của ảnh dán vào một ghi chú. Với "bp-image-width: 400" trong ghi chú, ảnh dán vào sẽ thành ![[photo.png|400]]. Để trống để không thêm chiều rộng.',
             sizePropertyAliases: ['kích thước', 'frontmatter', 'thuộc tính', 'đổi cỡ']
         },
 
@@ -236,7 +236,7 @@ export const STRINGS_VI: TranslationStrings = {
             'Better Paste thay đổi nội dung bảng nhớ tạm ngay khi nó được dán vào một ghi chú.',
             'Tiện ích này lưu ảnh được liên kết thành tệp đính kèm trong kho, loại bỏ tham số theo dõi khỏi liên kết, nối lại những dòng bị ngắt trong đầu ra dòng lệnh, và thay dấu nháy cong cùng ký tự vô hình bằng ký tự thường.',
             'Mỗi quy tắc có thể tắt riêng.',
-            'Một ghi chú riêng lẻ có thể tự loại trừ hoàn toàn bằng thuộc tính "better-paste: false". Thiết lập nằm ở Cài đặt, Better Paste.'
+            'Một ghi chú riêng lẻ có thể tự loại trừ hoàn toàn bằng thuộc tính "bp: false". Thiết lập nằm ở Cài đặt, Better Paste.'
         ],
         startButton: 'Bắt đầu'
     },

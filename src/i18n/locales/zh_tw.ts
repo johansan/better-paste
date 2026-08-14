@@ -71,7 +71,7 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             heading: '行為',
             autoCleanName: '每次貼上都整理',
             autoCleanDesc:
-                '每次貼上都會套用規則。關閉後規則只在 Better Paste 指令中生效。單篇筆記可以用 "better-paste: false" 屬性排除自己。',
+                '每次貼上都會套用規則。關閉後規則只在 Better Paste 指令中生效。單篇筆記可以用 "bp: false" 屬性排除自己，也可以用 "bp: true" 屬性加入。',
             autoCleanAliases: ['自動', '啟用', '停用', '筆記', '排除', '屬性', 'frontmatter'],
             showNoticesName: '貼上內容被修改時顯示通知',
             showNoticesDesc: '用一行說明改動了什麼。失敗一律會通知。',
@@ -97,7 +97,7 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             customAliases: ['名稱', '檔案名稱', '日期', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: '圖片寬度屬性',
             sizePropertyDesc:
-                '決定貼進筆記的圖片寬度的 frontmatter 屬性。筆記中寫有 "image-width: 400" 時，貼上的圖片會變成 ![[photo.png|400]]。留空則不加上寬度。',
+                '決定貼進筆記的圖片寬度的 frontmatter 屬性。筆記中寫有 "bp-image-width: 400" 時，貼上的圖片會變成 ![[photo.png|400]]。留空則不加上寬度。',
             sizePropertyAliases: ['尺寸', 'frontmatter', '屬性', '縮放']
         },
 
@@ -207,7 +207,7 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             'Better Paste 會在剪貼簿內容被貼進筆記時加以處理。',
             '它把連結的圖片儲存成儲存庫附件，移除連結中的追蹤參數，把終端機輸出中被折斷的行重新接起來，並把彎引號與不可見字元換成樸素的等價字元。',
             '每條規則都可以單獨關閉。',
-            '單篇筆記可以用 "better-paste: false" 屬性完全排除自己。設定位於 設定、Better Paste。'
+            '單篇筆記可以用 "bp: false" 屬性完全排除自己。設定位於 設定、Better Paste。'
         ],
         startButton: '開始使用'
     },

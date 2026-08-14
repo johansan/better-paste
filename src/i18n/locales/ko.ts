@@ -71,7 +71,7 @@ export const STRINGS_KO: TranslationStrings = {
             heading: '동작',
             autoCleanName: '붙여넣을 때마다 정리',
             autoCleanDesc:
-                '붙여넣을 때마다 규칙을 적용합니다. 꺼 두면 Better Paste 명령에서만 규칙이 적용됩니다. 개별 노트는 "better-paste: false" 속성으로 제외할 수 있습니다.',
+                '붙여넣을 때마다 규칙을 적용합니다. 꺼 두면 Better Paste 명령에서만 규칙이 적용됩니다. 개별 노트는 "bp: false" 속성으로 제외하거나 "bp: true" 속성으로 포함할 수 있습니다.',
             autoCleanAliases: ['자동', '켜기', '끄기', '노트', '제외', '속성', '프론트매터', 'frontmatter'],
             showNoticesName: '붙여넣기가 변경되면 알림 표시',
             showNoticesDesc: '무엇이 바뀌었는지 한 줄로 요약합니다. 실패는 항상 알립니다.',
@@ -97,7 +97,7 @@ export const STRINGS_KO: TranslationStrings = {
             customAliases: ['이름', '파일 이름', '날짜', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: '이미지 너비 속성',
             sizePropertyDesc:
-                '노트에 붙여넣는 이미지의 너비를 정하는 프론트매터 속성입니다. 노트에 "image-width: 400"이 있으면 붙여넣은 이미지가 ![[photo.png|400]]이 됩니다. 비워 두면 너비를 넣지 않습니다.',
+                '노트에 붙여넣는 이미지의 너비를 정하는 프론트매터 속성입니다. 노트에 "bp-image-width: 400"이 있으면 붙여넣은 이미지가 ![[photo.png|400]]이 됩니다. 비워 두면 너비를 넣지 않습니다.',
             sizePropertyAliases: ['크기', '프론트매터', 'frontmatter', '속성', '크기 조정']
         },
 
@@ -207,7 +207,7 @@ export const STRINGS_KO: TranslationStrings = {
             'Better Paste는 클립보드 내용을 노트에 붙여넣는 순간에 바꿔 줍니다.',
             '링크된 이미지를 보관함 첨부 파일로 저장하고, 링크에서 추적 매개변수를 제거하며, 터미널 출력에서 줄바꿈된 행을 다시 잇고, 둥근 따옴표와 보이지 않는 문자를 단순한 문자로 바꿉니다.',
             '규칙은 각각 따로 끌 수 있습니다.',
-            '개별 노트는 "better-paste: false" 속성으로 전부 제외할 수 있습니다. 설정은 설정, Better Paste에 있습니다.'
+            '개별 노트는 "bp: false" 속성으로 전부 제외할 수 있습니다. 설정은 설정, Better Paste에 있습니다.'
         ],
         startButton: '시작하기'
     },

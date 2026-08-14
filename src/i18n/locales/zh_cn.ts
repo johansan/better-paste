@@ -71,7 +71,7 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             heading: '行为',
             autoCleanName: '每次粘贴都清理',
             autoCleanDesc:
-                '每次粘贴都会应用规则。关闭后规则只在 Better Paste 命令中生效。单篇笔记可以用 "better-paste: false" 属性排除自己。',
+                '每次粘贴都会应用规则。关闭后规则只在 Better Paste 命令中生效。单篇笔记可以用 "bp: false" 属性排除自己，也可以用 "bp: true" 属性加入。',
             autoCleanAliases: ['自动', '启用', '禁用', '笔记', '排除', '属性', 'frontmatter'],
             showNoticesName: '粘贴内容被修改时显示提示',
             showNoticesDesc: '用一行说明改动了什么。失败总会提示。',
@@ -97,7 +97,7 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             customAliases: ['名称', '文件名', '日期', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: '图片宽度属性',
             sizePropertyDesc:
-                '决定粘贴进笔记的图片宽度的 frontmatter 属性。笔记中写有 "image-width: 400" 时，粘贴的图片会变成 ![[photo.png|400]]。留空则不添加宽度。',
+                '决定粘贴进笔记的图片宽度的 frontmatter 属性。笔记中写有 "bp-image-width: 400" 时，粘贴的图片会变成 ![[photo.png|400]]。留空则不添加宽度。',
             sizePropertyAliases: ['尺寸', 'frontmatter', '属性', '缩放']
         },
 
@@ -207,7 +207,7 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             'Better Paste 会在剪贴板内容被粘贴进笔记时对其进行处理。',
             '它把链接的图片保存为仓库附件，移除链接中的跟踪参数，把终端输出中被折断的行重新接起来，并把弯引号和不可见字符替换成朴素的等价字符。',
             '每条规则都可以单独关闭。',
-            '单篇笔记可以用 "better-paste: false" 属性完全排除自己。设置位于 设置、Better Paste。'
+            '单篇笔记可以用 "bp: false" 属性完全排除自己。设置位于 设置、Better Paste。'
         ],
         startButton: '开始使用'
     },

@@ -86,7 +86,7 @@ export const STRINGS_PL: TranslationStrings = {
             heading: 'Zachowanie',
             autoCleanName: 'Czyść każde wklejenie',
             autoCleanDesc:
-                'Stosuje reguły przy każdym wklejeniu. Gdy jest wyłączone, reguły działają tylko po użyciu poleceń Better Paste. Pojedyncza notatka może się wyłączyć właściwością "better-paste: false".',
+                'Stosuje reguły przy każdym wklejeniu. Gdy jest wyłączone, reguły działają tylko po użyciu poleceń Better Paste. Pojedyncza notatka może się wyłączyć właściwością "bp: false" lub włączyć właściwością "bp: true".',
             autoCleanAliases: ['automatycznie', 'włącz', 'wyłącz', 'notatka', 'wyklucz', 'właściwość', 'frontmatter'],
             showNoticesName: 'Pokazuj powiadomienie, gdy wklejenie zostało zmienione',
             showNoticesDesc: 'Jednowierszowe podsumowanie zmian. Błędy są zgłaszane zawsze.',
@@ -112,7 +112,7 @@ export const STRINGS_PL: TranslationStrings = {
             customAliases: ['nazwa', 'plik', 'data', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Właściwość szerokości obrazu',
             sizePropertyDesc:
-                'Właściwość frontmatter określająca szerokość obrazów wklejanych do notatki. Przy "image-width: 400" w notatce wklejony obraz przybiera postać ![[photo.png|400]]. Pozostaw puste, aby nie dodawać szerokości.',
+                'Właściwość frontmatter określająca szerokość obrazów wklejanych do notatki. Przy "bp-image-width: 400" w notatce wklejony obraz przybiera postać ![[photo.png|400]]. Pozostaw puste, aby nie dodawać szerokości.',
             sizePropertyAliases: ['rozmiar', 'frontmatter', 'właściwość', 'skalowanie']
         },
 
@@ -243,7 +243,7 @@ export const STRINGS_PL: TranslationStrings = {
             'Better Paste zmienia zawartość schowka w chwili wklejania jej do notatki.',
             'Zapisuje powiązane obrazy jako załączniki sejfu, usuwa parametry śledzące z odnośników, ponownie łączy zawinięte wiersze wyniku terminala oraz zamienia cudzysłowy drukarskie i niewidoczne znaki na proste odpowiedniki.',
             'Każdą regułę można wyłączyć osobno.',
-            'Pojedyncza notatka może wyłączyć się całkowicie właściwością "better-paste: false". Ustawienia znajdują się w Ustawienia, Better Paste.'
+            'Pojedyncza notatka może wyłączyć się całkowicie właściwością "bp: false". Ustawienia znajdują się w Ustawienia, Better Paste.'
         ],
         startButton: 'Zaczynajmy'
     },

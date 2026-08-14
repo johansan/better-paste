@@ -29,8 +29,15 @@ import { markdownCodeRanges } from '../transforms/markdownRanges';
 /** Accepts "400", "400x300", "400 x 300" and the multiplication sign variant. */
 const SIZE_PATTERN = /^(\d+)(?:\s*[x×]\s*(\d+))?$/i;
 
-/** Frontmatter values that read as "no". */
+/**
+ * Values that switch the plugin off for a note, and values that switch it on.
+ *
+ * A boolean is the documented form, because Obsidian fixes a property's type from the
+ * first value entered and a checkbox is the shape this property wants. The strings are
+ * accepted as well so a property already typed as text still answers.
+ */
 const FALSEY = new Set(['false', 'off', 'no', '0', 'disabled']);
+const TRUTHY = new Set(['true', 'on', 'yes', '1', 'enabled']);
 
 /** True when a line closes a frontmatter block. */
 function isFrontmatterEnd(line: string): boolean {
@@ -155,16 +162,31 @@ export function resolveImageSize(frontmatter: unknown, property: string): string
     return normalizeImageSize(readProperty(frontmatter, property));
 }
 
+/** What a note asks for, overriding the global setting in that direction. */
+export type NotePasteOverride = 'on' | 'off';
+
 /**
- * True when a note asks to be left alone entirely, via a falsey value on the disable
- * property. Serves notes that are deliberately verbatim: logs, transcripts, scratchpads.
+ * Reads a note's override of automatic cleanup, or null when the note does not ask for one.
+ *
+ * Off serves notes that are deliberately verbatim: logs, transcripts, scratchpads. On is
+ * the other direction, letting one note be cleaned while automatic cleanup is switched off
+ * everywhere else.
+ *
+ * An unrecognised value means no opinion rather than off, so a note written for a later
+ * version follows the global setting instead of silently going unprocessed here.
  */
-export function isPasteDisabledForNote(frontmatter: unknown, property: string): boolean {
+export function notePasteOverride(frontmatter: unknown, property: string): NotePasteOverride | null {
     const value = readProperty(frontmatter, property);
-    if (value === false) return true;
-    // An unquoted "better-paste: 0" parses as a number, not a string
-    if (value === 0) return true;
-    return typeof value === 'string' && FALSEY.has(value.trim().toLowerCase());
+    if (value === false) return 'off';
+    if (value === true) return 'on';
+    // An unquoted "bp: 0" parses as a number, not a string
+    if (value === 0) return 'off';
+    if (value === 1) return 'on';
+
+    if (typeof value !== 'string') return null;
+    const normalized = value.trim().toLowerCase();
+    if (FALSEY.has(normalized)) return 'off';
+    return TRUTHY.has(normalized) ? 'on' : null;
 }
 
 /**

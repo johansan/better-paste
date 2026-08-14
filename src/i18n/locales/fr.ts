@@ -74,7 +74,7 @@ export const STRINGS_FR: TranslationStrings = {
             heading: 'Comportement',
             autoCleanName: 'Nettoyer chaque collage',
             autoCleanDesc:
-                'Applique les règles à chaque collage. Si cette option est désactivée, les règles ne s’appliquent que via les commandes Better Paste. Une note peut s’en exclure avec la propriété "better-paste: false".',
+                'Applique les règles à chaque collage. Si cette option est désactivée, les règles ne s’appliquent que via les commandes Better Paste. Une note peut s’en exclure avec la propriété "bp: false", ou s’y inclure avec "bp: true".',
             autoCleanAliases: ['automatique', 'activer', 'désactiver', 'note', 'exclure', 'propriété', 'frontmatter', 'exception'],
             showNoticesName: 'Afficher une notification quand un collage est modifié',
             showNoticesDesc: 'Un résumé sur une ligne de ce qui a changé. Les échecs sont toujours signalés.',
@@ -110,7 +110,7 @@ export const STRINGS_FR: TranslationStrings = {
             customAliases: ['nom', 'fichier', 'date', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Propriété de largeur d’image',
             sizePropertyDesc:
-                'Propriété du frontmatter qui fixe la largeur des images collées dans une note. Avec "image-width: 400" dans la note, une image collée devient ![[photo.png|400]]. Laissez vide pour n’ajouter aucune largeur.',
+                'Propriété du frontmatter qui fixe la largeur des images collées dans une note. Avec "bp-image-width: 400" dans la note, une image collée devient ![[photo.png|400]]. Laissez vide pour n’ajouter aucune largeur.',
             sizePropertyAliases: ['taille', 'frontmatter', 'propriété', 'redimensionner']
         },
 
@@ -230,7 +230,7 @@ export const STRINGS_FR: TranslationStrings = {
             'Better Paste modifie le contenu du presse-papiers au moment où il est collé dans une note.',
             'Il enregistre les images liées comme pièces jointes du coffre, supprime les paramètres de suivi des liens, rassemble les lignes coupées de la sortie de terminal et remplace les guillemets courbes et les caractères invisibles par leurs équivalents simples.',
             'Chaque règle peut être désactivée séparément.',
-            'Une note peut s’exclure entièrement avec la propriété "better-paste: false". Les réglages se trouvent dans Paramètres, Better Paste.'
+            'Une note peut s’exclure entièrement avec la propriété "bp: false". Les réglages se trouvent dans Paramètres, Better Paste.'
         ],
         startButton: 'Commencer'
     },

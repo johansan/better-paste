@@ -74,7 +74,7 @@ export const STRINGS_DE: TranslationStrings = {
             heading: 'Verhalten',
             autoCleanName: 'Jeden Einfügevorgang bereinigen',
             autoCleanDesc:
-                'Wendet die Regeln bei jedem Einfügen an. Ist dies aus, greifen die Regeln nur über die Better-Paste-Befehle. Eine einzelne Notiz kann sich mit der Eigenschaft "better-paste: false" ausnehmen.',
+                'Wendet die Regeln bei jedem Einfügen an. Ist dies aus, greifen die Regeln nur über die Better-Paste-Befehle. Eine einzelne Notiz kann sich mit der Eigenschaft "bp: false" ausnehmen oder mit "bp: true" einbeziehen.',
             autoCleanAliases: [
                 'automatisch',
                 'aktivieren',
@@ -109,7 +109,7 @@ export const STRINGS_DE: TranslationStrings = {
             customAliases: ['name', 'dateiname', 'datum', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Eigenschaft für Bildbreite',
             sizePropertyDesc:
-                'Frontmatter-Eigenschaft, die die Breite der in eine Notiz eingefügten Bilder festlegt. Mit "image-width: 400" in der Notiz wird ein eingefügtes Bild zu ![[photo.png|400]]. Leer lassen, um keine Breite zu setzen.',
+                'Frontmatter-Eigenschaft, die die Breite der in eine Notiz eingefügten Bilder festlegt. Mit "bp-image-width: 400" in der Notiz wird ein eingefügtes Bild zu ![[photo.png|400]]. Leer lassen, um keine Breite zu setzen.',
             sizePropertyAliases: ['größe', 'frontmatter', 'eigenschaft', 'skalieren']
         },
 
@@ -229,7 +229,7 @@ export const STRINGS_DE: TranslationStrings = {
             'Better Paste verändert Inhalte der Zwischenablage, während sie in eine Notiz eingefügt werden.',
             'Es speichert verlinkte Bilder als Anhänge im Tresor, entfernt Tracking-Parameter aus Links, fügt umbrochene Zeilen in Terminalausgaben wieder zusammen und ersetzt typografische Anführungszeichen und unsichtbare Zeichen durch einfache Entsprechungen.',
             'Jede Regel lässt sich einzeln abschalten.',
-            'Eine einzelne Notiz kann sich mit der Eigenschaft "better-paste: false" vollständig ausnehmen. Die Einstellungen findest du unter Einstellungen, Better Paste.'
+            'Eine einzelne Notiz kann sich mit der Eigenschaft "bp: false" vollständig ausnehmen. Die Einstellungen findest du unter Einstellungen, Better Paste.'
         ],
         startButton: 'Los geht’s'
     },

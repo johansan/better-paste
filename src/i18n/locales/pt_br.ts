@@ -74,7 +74,7 @@ export const STRINGS_PT_BR: TranslationStrings = {
             heading: 'Comportamento',
             autoCleanName: 'Limpar toda colagem',
             autoCleanDesc:
-                'Aplica as regras em toda colagem. Com a opção desativada, as regras só são aplicadas pelos comandos do Better Paste. Uma nota específica pode ficar de fora com a propriedade "better-paste: false".',
+                'Aplica as regras em toda colagem. Com a opção desativada, as regras só são aplicadas pelos comandos do Better Paste. Uma nota específica pode ficar de fora com a propriedade "bp: false", ou ser incluída com "bp: true".',
             autoCleanAliases: ['automático', 'ativar', 'desativar', 'nota', 'excluir', 'propriedade', 'frontmatter', 'exceção'],
             showNoticesName: 'Mostrar um aviso quando uma colagem for alterada',
             showNoticesDesc: 'Um resumo de uma linha do que mudou. As falhas são sempre informadas.',
@@ -100,7 +100,7 @@ export const STRINGS_PT_BR: TranslationStrings = {
             customAliases: ['nome', 'arquivo', 'data', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Propriedade de largura das imagens',
             sizePropertyDesc:
-                'Propriedade do frontmatter que define a largura das imagens coladas em uma nota. Com "image-width: 400" na nota, uma imagem colada fica ![[photo.png|400]]. Deixe em branco para não acrescentar largura.',
+                'Propriedade do frontmatter que define a largura das imagens coladas em uma nota. Com "bp-image-width: 400" na nota, uma imagem colada fica ![[photo.png|400]]. Deixe em branco para não acrescentar largura.',
             sizePropertyAliases: ['tamanho', 'frontmatter', 'propriedade', 'redimensionar']
         },
 
@@ -210,7 +210,7 @@ export const STRINGS_PT_BR: TranslationStrings = {
             'O Better Paste altera o conteúdo da área de transferência enquanto ele é colado em uma nota.',
             'Ele salva as imagens vinculadas como anexos do cofre, remove parâmetros de rastreamento dos links, junta de novo as linhas quebradas na saída do terminal e substitui aspas curvas e caracteres invisíveis por equivalentes simples.',
             'Cada regra pode ser desligada separadamente.',
-            'Uma nota específica pode ficar totalmente de fora com a propriedade "better-paste: false". As configurações estão em Configurações, Better Paste.'
+            'Uma nota específica pode ficar totalmente de fora com a propriedade "bp: false". As configurações estão em Configurações, Better Paste.'
         ],
         startButton: 'Começar'
     },

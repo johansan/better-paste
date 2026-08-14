@@ -74,7 +74,7 @@ export const STRINGS_IT: TranslationStrings = {
             heading: 'Comportamento',
             autoCleanName: 'Pulisci ogni incollaggio',
             autoCleanDesc:
-                'Applica le regole a ogni incollaggio. Se è disattivato, le regole vengono applicate solo tramite i comandi di Better Paste. Una singola nota può escludersi con la proprietà "better-paste: false".',
+                'Applica le regole a ogni incollaggio. Se è disattivato, le regole vengono applicate solo tramite i comandi di Better Paste. Una singola nota può escludersi con la proprietà "bp: false" o includersi con "bp: true".',
             autoCleanAliases: ['automatico', 'attiva', 'disattiva', 'nota', 'escludi', 'proprietà', 'frontmatter', 'eccezione'],
             showNoticesName: 'Mostra un avviso quando un incollaggio viene modificato',
             showNoticesDesc: 'Un riepilogo su una riga di ciò che è cambiato. Gli errori sono sempre segnalati.',
@@ -100,7 +100,7 @@ export const STRINGS_IT: TranslationStrings = {
             customAliases: ['nome', 'file', 'data', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Proprietà per la larghezza delle immagini',
             sizePropertyDesc:
-                'Proprietà del frontmatter che imposta la larghezza delle immagini incollate in una nota. Con "image-width: 400" nella nota, un’immagine incollata diventa ![[photo.png|400]]. Lascia vuoto per non aggiungere alcuna larghezza.',
+                'Proprietà del frontmatter che imposta la larghezza delle immagini incollate in una nota. Con "bp-image-width: 400" nella nota, un’immagine incollata diventa ![[photo.png|400]]. Lascia vuoto per non aggiungere alcuna larghezza.',
             sizePropertyAliases: ['dimensione', 'frontmatter', 'proprietà', 'ridimensiona']
         },
 
@@ -219,7 +219,7 @@ export const STRINGS_IT: TranslationStrings = {
             'Better Paste modifica il contenuto degli appunti mentre viene incollato in una nota.',
             'Salva le immagini collegate come allegati nel vault, rimuove i parametri di tracciamento dai collegamenti, riunisce le righe spezzate nell’output del terminale e sostituisce virgolette curve e caratteri invisibili con equivalenti semplici.',
             'Ogni regola può essere disattivata singolarmente.',
-            'Una singola nota può escludersi del tutto con la proprietà "better-paste: false". Le impostazioni si trovano in Impostazioni, Better Paste.'
+            'Una singola nota può escludersi del tutto con la proprietà "bp: false". Le impostazioni si trovano in Impostazioni, Better Paste.'
         ],
         startButton: 'Inizia'
     },

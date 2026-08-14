@@ -74,7 +74,7 @@ export const STRINGS_NL: TranslationStrings = {
             heading: 'Gedrag',
             autoCleanName: 'Elke plakactie opschonen',
             autoCleanDesc:
-                'Past de regels toe bij elke plakactie. Staat dit uit, dan werken de regels alleen via de Better Paste-opdrachten. Een losse notitie kan zichzelf uitsluiten met de eigenschap "better-paste: false".',
+                'Past de regels toe bij elke plakactie. Staat dit uit, dan werken de regels alleen via de Better Paste-opdrachten. Een losse notitie kan zichzelf uitsluiten met de eigenschap "bp: false" of insluiten met "bp: true".',
             autoCleanAliases: ['automatisch', 'inschakelen', 'uitschakelen', 'notitie', 'uitsluiten', 'eigenschap', 'frontmatter'],
             showNoticesName: 'Melding tonen wanneer een plakactie is aangepast',
             showNoticesDesc: 'Een samenvatting van één regel van wat er is veranderd. Fouten worden altijd gemeld.',
@@ -110,7 +110,7 @@ export const STRINGS_NL: TranslationStrings = {
             customAliases: ['naam', 'bestandsnaam', 'datum', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Eigenschap voor afbeeldingsbreedte',
             sizePropertyDesc:
-                'Frontmatter-eigenschap die de breedte bepaalt van afbeeldingen die in een notitie worden geplakt. Met "image-width: 400" in de notitie wordt een geplakte afbeelding ![[photo.png|400]]. Laat leeg om geen breedte toe te voegen.',
+                'Frontmatter-eigenschap die de breedte bepaalt van afbeeldingen die in een notitie worden geplakt. Met "bp-image-width: 400" in de notitie wordt een geplakte afbeelding ![[photo.png|400]]. Laat leeg om geen breedte toe te voegen.',
             sizePropertyAliases: ['grootte', 'frontmatter', 'eigenschap', 'schalen']
         },
 
@@ -229,7 +229,7 @@ export const STRINGS_NL: TranslationStrings = {
             'Better Paste past klembordinhoud aan terwijl die in een notitie wordt geplakt.',
             'Het slaat gelinkte afbeeldingen als bijlagen in de kluis op, verwijdert trackingparameters uit links, voegt afgebroken regels in terminaluitvoer weer samen en vervangt gekrulde aanhalingstekens en onzichtbare tekens door gewone equivalenten.',
             'Elke regel kan afzonderlijk worden uitgezet.',
-            'Een losse notitie kan zichzelf volledig uitsluiten met de eigenschap "better-paste: false". De instellingen staan onder Instellingen, Better Paste.'
+            'Een losse notitie kan zichzelf volledig uitsluiten met de eigenschap "bp: false". De instellingen staan onder Instellingen, Better Paste.'
         ],
         startButton: 'Aan de slag'
     },

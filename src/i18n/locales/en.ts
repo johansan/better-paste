@@ -89,8 +89,8 @@ export const STRINGS_EN = {
             heading: 'Behavior',
             autoCleanName: 'Clean up every paste',
             autoCleanDesc:
-                'Applies the rules to every paste. When off, the rules run only from the Better Paste commands. A single note can opt out with the "better-paste: false" property.',
-            autoCleanAliases: ['automatic', 'enable', 'disable', 'note', 'exclude', 'property', 'frontmatter', 'opt out'],
+                'Applies the rules to every paste. When off, the rules run only from the Better Paste commands. A single note can opt out with the "bp: false" property, or opt in with "bp: true".',
+            autoCleanAliases: ['automatic', 'enable', 'disable', 'note', 'exclude', 'property', 'frontmatter', 'opt out', 'opt in', 'bp'],
             showNoticesName: 'Show a notice when a paste is changed',
             showNoticesDesc: 'A one-line summary of what changed. Failures are always reported.',
             showNoticesAliases: ['notice', 'summary', 'message', 'toast', 'quiet', 'silent']
@@ -126,7 +126,7 @@ export const STRINGS_EN = {
             customAliases: ['name', 'filename', 'date', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Image width property',
             sizePropertyDesc:
-                'Frontmatter property that sets the width of images pasted into a note. With "image-width: 400" in the note, a pasted image becomes ![[photo.png|400]]. Leave blank to add no width.',
+                'Frontmatter property that sets the width of images pasted into a note. With "bp-image-width: 400" in the note, a pasted image becomes ![[photo.png|400]]. Leave blank to add no width.',
             sizePropertyAliases: ['size', 'frontmatter', 'property', 'resize']
         },
 
@@ -255,7 +255,7 @@ export const STRINGS_EN = {
             'Better Paste alters clipboard content as it is pasted into a note.',
             'It saves linked images into the vault as attachments, removes tracking parameters from links, rejoins wrapped lines in terminal output, and replaces curly quotes and invisible characters with plain equivalents.',
             'Every rule can be turned off on its own.',
-            'A single note can opt out entirely with the "better-paste: false" property. Settings are under Settings, Better Paste.'
+            'A single note can opt out entirely with the "bp: false" property. Settings are under Settings, Better Paste.'
         ],
         startButton: 'Get started'
     },

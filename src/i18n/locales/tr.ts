@@ -74,7 +74,7 @@ export const STRINGS_TR: TranslationStrings = {
             heading: 'Davranış',
             autoCleanName: 'Her yapıştırmayı temizle',
             autoCleanDesc:
-                'Kuralları her yapıştırmada uygular. Kapalıyken kurallar yalnızca Better Paste komutlarıyla uygulanır. Tek bir not "better-paste: false" özelliğiyle kendini dışarıda bırakabilir.',
+                'Kuralları her yapıştırmada uygular. Kapalıyken kurallar yalnızca Better Paste komutlarıyla uygulanır. Tek bir not "bp: false" özelliğiyle kendini dışarıda bırakabilir, "bp: true" özelliğiyle dahil edebilir.',
             autoCleanAliases: ['otomatik', 'etkinleştir', 'devre dışı', 'not', 'hariç tut', 'özellik', 'frontmatter'],
             showNoticesName: 'Yapıştırma değiştirildiğinde bildirim göster',
             showNoticesDesc: 'Nelerin değiştiğine dair tek satırlık özet. Hatalar her zaman bildirilir.',
@@ -100,7 +100,7 @@ export const STRINGS_TR: TranslationStrings = {
             customAliases: ['ad', 'dosya adı', 'tarih', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Görsel genişliği özelliği',
             sizePropertyDesc:
-                'Bir nota yapıştırılan görsellerin genişliğini belirleyen frontmatter özelliği. Notta "image-width: 400" varsa, yapıştırılan görsel ![[photo.png|400]] biçimine girer. Genişlik eklenmemesi için boş bırakın.',
+                'Bir nota yapıştırılan görsellerin genişliğini belirleyen frontmatter özelliği. Notta "bp-image-width: 400" varsa, yapıştırılan görsel ![[photo.png|400]] biçimine girer. Genişlik eklenmemesi için boş bırakın.',
             sizePropertyAliases: ['boyut', 'frontmatter', 'özellik', 'yeniden boyutlandır']
         },
 
@@ -220,7 +220,7 @@ export const STRINGS_TR: TranslationStrings = {
             'Better Paste, pano içeriğini bir nota yapıştırılırken değiştirir.',
             'Bağlantılı görselleri kasaya ek olarak kaydeder, bağlantılardan izleme parametrelerini kaldırır, uçbirim çıktısındaki bölünmüş satırları yeniden birleştirir ve kıvrık tırnaklarla görünmez karakterleri yalın karşılıklarıyla değiştirir.',
             'Her kural tek tek kapatılabilir.',
-            'Tek bir not "better-paste: false" özelliğiyle kendini tamamen dışarıda bırakabilir. Ayarlara Ayarlar, Better Paste bölümünden ulaşabilirsiniz.'
+            'Tek bir not "bp: false" özelliğiyle kendini tamamen dışarıda bırakabilir. Ayarlara Ayarlar, Better Paste bölümünden ulaşabilirsiniz.'
         ],
         startButton: 'Başla'
     },

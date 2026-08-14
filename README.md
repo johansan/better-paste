@@ -113,7 +113,7 @@ Seventeen settings, arranged as a landing page with three sub pages. Anything wi
 
 ### 3.1 Behavior
 
-- **Clean up every paste** applies the rules whenever you paste. Turn it off to use the commands only.
+- **Clean up every paste** applies the rules whenever you paste. Turn it off to use the commands only, or to clean nothing but the notes that ask for it with `bp: true`. See [section 4](#4-per-note-control).
 - **Show a notice when a paste is changed** gives a one line summary. Failures are reported whatever this is set to.
 
 ### 3.2 Images
@@ -319,23 +319,42 @@ Several invisible characters are deliberately kept, because they carry meaning r
 
 ## 4 Per note control
 
-Two frontmatter properties change what happens in a single note.
+Two frontmatter properties change what happens in a single note. Both start with `bp`, so they sit together in Obsidian's properties panel and read as plugin directives rather than as properties of the note itself.
 
 **Leave a note alone entirely:**
 
 ```yaml
 ---
-better-paste: false
+bp: false
 ---
 ```
 
-Nothing is touched in that note. `off`, `no` and `0` work too. This suits notes that are deliberately verbatim, such as logs, transcripts and scratchpads. The commands still work if you invoke one by name, since asking for the rules explicitly overrides the property.
+Nothing is touched in that note. This suits notes that are deliberately verbatim, such as logs, transcripts and scratchpads. The commands still work if you invoke one by name, because asking for the rules explicitly overrides the property.
+
+**Clean one note while the rest are left alone:**
+
+```yaml
+---
+bp: true
+---
+```
+
+`bp` overrides **Clean up every paste** in both directions, so this is the case where a note is cleaned even though automatic cleanup is switched off everywhere else.
+
+| Clean up every paste | No `bp` property | `bp: true` | `bp: false` |
+| -------------------- | ---------------- | ---------- | ----------- |
+| On                   | cleaned          | cleaned    | left alone  |
+| Off                  | left alone       | cleaned    | left alone  |
+
+A boolean is the form to use, because Obsidian fixes a property's type from whatever is entered first and a checkbox is the shape this property wants. `off`, `no`, `0`, `disabled` and their opposites `on`, `yes`, `1`, `enabled` are read as well, so a `bp` already typed as text still answers. A value the plugin does not recognise means no opinion, so the note follows the setting.
+
+Opting in does not reach into code. A paste landing in a fenced block or the frontmatter is left alone whatever `bp` says, because pasting there is an act of preservation.
 
 **Set the width of pasted images:**
 
 ```yaml
 ---
-image-width: 400
+bp-image-width: 400
 ---
 ```
 
@@ -343,7 +362,9 @@ Images pasted into that note come out as `![[picture.png|400]]`, which is Obsidi
 
 Both properties are read from the note as it stands in the editor rather than from Obsidian's metadata cache, so a property you just typed applies to the very next paste.
 
-One consequence worth knowing. A note with `image-width` also takes screenshot pastes away from Obsidian's own handler, since that handler has no way to apply the width. Notes without it are untouched.
+The name is a setting rather than a fixed value, so **Image width property** under Image handling can be set to anything, including the plainer `image-width`, if you prefer the note to read that way.
+
+One consequence worth knowing. A note with `bp-image-width` also takes screenshot pastes away from Obsidian's own handler, because that handler has no way to apply the width. Notes without it are untouched.
 
 <br/>
 

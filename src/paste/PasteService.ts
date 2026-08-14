@@ -23,7 +23,7 @@ import { cleanAiText } from '../transforms/aiText';
 import { applyCommaPlacement } from '../transforms/textProcessing';
 import { buildUrlCleanupOptions, cleanUrlsInText } from '../transforms/urlCleanup';
 import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './imageReferences';
-import { extractFrontmatterBlock, isInsideVerbatimContext, isPasteDisabledForNote, resolveImageSize } from './noteOptions';
+import { extractFrontmatterBlock, isInsideVerbatimContext, notePasteOverride, resolveImageSize } from './noteOptions';
 import { DISABLE_PROPERTY } from '../settings/constants';
 import { format, plural, strings } from '../i18n';
 import type { ImageService } from './ImageService';
@@ -153,15 +153,15 @@ export class PasteService {
      */
     handleEditorPaste(event: ClipboardEvent, editor: Editor, info: MarkdownView | MarkdownFileInfo): boolean {
         const settings = this.getSettings();
-        if (!settings.autoClean) return false;
 
         // Async work tracks one inserted range. Leave multi-selection pastes to Obsidian so
         // every cursor receives the native paste instead of only one range being rewritten.
         if (editor.listSelections().length !== 1) return false;
 
-        // A note or Markdown code can opt out. Explicit commands deliberately ignore this:
-        // if the user asks for the rules by name, they get them.
-        if (this.shouldLeaveAlone(editor)) return false;
+        // A note or Markdown code can opt out, and a note can opt in while automatic cleanup
+        // is off. Explicit commands deliberately ignore both: if the user asks for the rules
+        // by name, they get them.
+        if (!this.shouldCleanAutomatically(editor, settings)) return false;
 
         const clipboard = event.clipboardData;
         if (!clipboard) return false;
@@ -657,17 +657,25 @@ export class PasteService {
     }
 
     /**
-     * True when an automatic paste must be left completely alone: the note carries the
-     * disable property, or the cursor sits inside a code fence or the frontmatter block.
-     * Pasting terminal output into a fence is an act of preservation, so rejoining its
-     * lines there would destroy the thing the user was protecting.
+     * True when an automatic paste should be cleaned.
+     *
+     * The note property overrides the global setting in both directions, so it is read even
+     * when automatic cleanup is off: that is exactly when a note asking to be cleaned has
+     * something to say. A note that asks for nothing follows the global setting.
+     *
+     * Markdown code and the frontmatter block are never touched either way. Pasting terminal
+     * output into a fence is an act of preservation, so rejoining its lines there would
+     * destroy the thing the user was protecting.
      */
-    private shouldLeaveAlone(editor: Editor): boolean {
-        // One read of the document serves both checks; this runs on every paste
+    private shouldCleanAutomatically(editor: Editor, settings: BetterPasteSettings): boolean {
+        // One read of the document serves every check; this runs on every paste
         const content = editor.getValue();
-        if (isPasteDisabledForNote(this.frontmatterOf(content), DISABLE_PROPERTY)) return true;
+        const override = notePasteOverride(this.frontmatterOf(content), DISABLE_PROPERTY);
 
-        return isInsideVerbatimContext(content, editor.posToOffset(editor.getCursor('from')));
+        if (override === 'off') return false;
+        if (override === null && !settings.autoClean) return false;
+
+        return !isInsideVerbatimContext(content, editor.posToOffset(editor.getCursor('from')));
     }
 
     /** Parses the note's frontmatter from the editor buffer, or null when there is none. */

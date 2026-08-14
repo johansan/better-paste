@@ -74,7 +74,7 @@ export const STRINGS_ES: TranslationStrings = {
             heading: 'Comportamiento',
             autoCleanName: 'Limpiar cada pegado',
             autoCleanDesc:
-                'Aplica las reglas en cada pegado. Si se desactiva, las reglas solo se aplican mediante los comandos de Better Paste. Una nota concreta puede quedar excluida con la propiedad "better-paste: false".',
+                'Aplica las reglas en cada pegado. Si se desactiva, las reglas solo se aplican mediante los comandos de Better Paste. Una nota concreta puede quedar excluida con la propiedad "bp: false", o incluida con "bp: true".',
             autoCleanAliases: ['automático', 'activar', 'desactivar', 'nota', 'excluir', 'propiedad', 'frontmatter', 'excepción'],
             showNoticesName: 'Mostrar un aviso cuando se modifica un pegado',
             showNoticesDesc: 'Un resumen de una línea de lo que cambió. Los fallos se informan siempre.',
@@ -110,7 +110,7 @@ export const STRINGS_ES: TranslationStrings = {
             customAliases: ['nombre', 'archivo', 'fecha', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Propiedad de ancho de imagen',
             sizePropertyDesc:
-                'Propiedad del frontmatter que fija el ancho de las imágenes pegadas en una nota. Con "image-width: 400" en la nota, una imagen pegada queda como ![[photo.png|400]]. Déjala en blanco para no añadir ancho.',
+                'Propiedad del frontmatter que fija el ancho de las imágenes pegadas en una nota. Con "bp-image-width: 400" en la nota, una imagen pegada queda como ![[photo.png|400]]. Déjala en blanco para no añadir ancho.',
             sizePropertyAliases: ['tamaño', 'frontmatter', 'propiedad', 'redimensionar']
         },
 
@@ -231,7 +231,7 @@ export const STRINGS_ES: TranslationStrings = {
             'Better Paste modifica el contenido del portapapeles mientras se pega en una nota.',
             'Guarda como adjuntos en la bóveda las imágenes enlazadas, elimina los parámetros de seguimiento de los enlaces, vuelve a unir las líneas partidas de la salida de terminal y sustituye las comillas tipográficas y los caracteres invisibles por sus equivalentes simples.',
             'Cada regla se puede desactivar por separado.',
-            'Una nota concreta puede quedar excluida por completo con la propiedad "better-paste: false". Los ajustes están en Ajustes, Better Paste.'
+            'Una nota concreta puede quedar excluida por completo con la propiedad "bp: false". Los ajustes están en Ajustes, Better Paste.'
         ],
         startButton: 'Empezar'
     },
