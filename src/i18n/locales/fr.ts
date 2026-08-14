@@ -42,7 +42,7 @@ export const STRINGS_FR: TranslationStrings = {
             other: '{count} images n’ont pas pu être enregistrées'
         },
         imagesFailedLinkKept: '{images}, le lien d’origine a été conservé',
-        imagesFailedNothingPasted: '{images}, donc rien n’a été collé. Le presse-papiers le contient toujours.',
+        imagesFailedNothingPasted: '{images}, donc rien n’a été collé',
         aiTextCleaned: 'texte d’IA nettoyé',
         terminalCleaned: 'sortie de terminal nettoyée',
         textProcessed: 'style du texte ajusté',
@@ -70,11 +70,10 @@ export const STRINGS_FR: TranslationStrings = {
             heading: 'Comportement',
             autoCleanName: 'Nettoyer chaque collage',
             autoCleanDesc:
-                'Applique les règles à chaque collage. Désactivez cette option pour n’utiliser que les commandes. Une note peut s’en exclure avec la propriété "better-paste: false".',
+                'Applique les règles à chaque collage. Si cette option est désactivée, les règles ne s’appliquent que via les commandes Better Paste. Une note peut s’en exclure avec la propriété "better-paste: false".',
             autoCleanAliases: ['automatique', 'activer', 'désactiver', 'note', 'exclure', 'propriété', 'frontmatter', 'exception'],
             showNoticesName: 'Afficher une notification quand un collage est modifié',
-            showNoticesDesc:
-                'Un résumé sur une ligne de ce qui a été nettoyé. Les échecs sont toujours signalés, quelle que soit cette option.',
+            showNoticesDesc: 'Un résumé sur une ligne de ce qui a changé. Les échecs sont toujours signalés.',
             showNoticesAliases: ['notification', 'résumé', 'message', 'avis', 'silencieux']
         },
 
@@ -82,7 +81,7 @@ export const STRINGS_FR: TranslationStrings = {
             heading: 'Images',
             savingName: 'Enregistrer les images collées dans le coffre',
             savingDesc:
-                'Enregistre les images collées sous forme de fichiers locaux plutôt que de laisser des liens externes. Cela vaut pour « Copier l’image » de Safari, les images contenues dans du contenu web copié et les adresses d’image isolées. Les images sont enregistrées dans le dossier de pièces jointes de votre coffre. Avec « Nom d’après la source » :',
+                'Enregistre les images collées dans votre dossier de pièces jointes et crée un lien vers le fichier local plutôt que vers l’adresse web. Concerne « Copier l’image » de Safari, les images contenues dans du contenu web copié et les adresses d’image collées. Par défaut, le nom du fichier vient de l’adresse :',
             savingAliases: [
                 'télécharger',
                 'pièce jointe',
@@ -95,9 +94,9 @@ export const STRINGS_FR: TranslationStrings = {
                 'taille'
             ],
             pageName: 'Traitement des images',
-            pageDesc: 'Noms de fichiers et largeur d’image par note.',
+            pageDesc: 'Noms de fichiers et largeur d’image.',
             nameFormatName: 'Noms de fichiers',
-            nameFormatDesc: 'Choisissez comment nommer les fichiers image enregistrés.',
+            nameFormatDesc: 'Comment les images enregistrées sont nommées.',
             nameFormatSource: 'Nom d’après la source',
             nameFormatCustom: 'Format personnalisé',
             customName: 'Format personnalisé',
@@ -107,7 +106,7 @@ export const STRINGS_FR: TranslationStrings = {
             customAliases: ['nom', 'fichier', 'date', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Propriété de largeur d’image',
             sizePropertyDesc:
-                'La propriété du frontmatter qui définit la largeur des images collées dans une note. Une note utilisant cette propriété prend en charge les captures d’écran à la place d’Obsidian. Laissez vide pour désactiver.',
+                'Propriété du frontmatter qui fixe la largeur des images collées dans une note. Avec "image-width: 400" dans la note, une image collée devient ![[photo.png|400]]. Laissez vide pour n’ajouter aucune largeur.',
             sizePropertyAliases: ['taille', 'frontmatter', 'propriété', 'redimensionner']
         },
 
@@ -115,28 +114,27 @@ export const STRINGS_FR: TranslationStrings = {
             heading: 'Liens',
             titlesName: 'Récupérer le titre des liens collés',
             titlesDesc:
-                'Lorsque le presse-papiers ne contient qu’une adresse web qui n’est pas une image, son titre de page est récupéré et un lien Markdown est collé. Tout autre texte sélectionné devient le libellé sans aucune requête. Si le titre ne peut pas être récupéré, l’adresse d’origine est conservée.',
+                'Coller une adresse web seule insère un lien Markdown portant le titre de la page. Si du texte est sélectionné, ce texte devient le libellé et aucun titre n’est récupéré. L’adresse brute est conservée si le titre ne peut pas être récupéré.',
             titlesAliases: ['titre', 'page', 'site web', 'lien markdown', 'télécharger'],
             cleaningName: 'Nettoyer les liens collés',
-            cleaningDesc: 'Supprime les paramètres de suivi des liens collés. La partie barrée est supprimée :',
+            cleaningDesc: 'Supprime les paramètres de suivi des liens collés :',
             cleaningAliases: ['url', 'suivi', 'utm', 'paramètres', 'requête', 'site', 'domaine', 'youtube', 'exception'],
             stripName: 'Quels paramètres supprimer',
-            stripDesc:
-                'Choisissez de supprimer tous les paramètres de requête ou seulement les paramètres de suivi connus. Les règles de site peuvent conserver des paramètres dans les deux modes.',
+            stripDesc: 'Les paramètres de suivi sont des noms comme utm_source, fbclid et gclid.',
             stripAliases: ['utm', 'suivi', 'requête', 'paramètres'],
             stripAll: 'Tous les paramètres, sauf si une règle de site les conserve',
             stripTracking: 'Uniquement les paramètres de suivi connus',
-            rulesName: 'Règles de conservation des paramètres',
-            rulesDesc: 'Règles de site pour conserver certains paramètres de requête dans les deux modes de suppression.',
+            rulesName: 'Règles de site',
+            rulesDesc: 'Paramètres à conserver sur certains sites.',
             rulesCount: { one: '{count} site', other: '{count} sites' },
             listName: 'Vos règles de site',
             listDesc:
-                '{sites} sont déjà pris en charge et restent à jour avec le module. Ajoutez ici vos propres règles de site, une par ligne. « example.com » conserve tous les paramètres de ce site, « example.com: a, b » n’en conserve que deux, et « !example.com » supprime une règle livrée avec le module. En mode « Uniquement les paramètres de suivi connus », une règle ne récupère que les paramètres de suivi correspondants, car les autres sont déjà conservés. Les sous-domaines sont reconnus automatiquement.',
+                '{sites} sont déjà pris en charge par le module. Ajoutez ici vos propres règles, une par ligne. « example.com » conserve tous les paramètres de ce site, « example.com: a, b » n’en conserve que deux, et « !example.com » retire une règle livrée avec le module. Les sous-domaines sont reconnus automatiquement.',
             listShippedCount: { one: '{count} site courant', other: '{count} sites courants' },
             listAliases: ['domaine', 'exception', 'liste blanche', 'youtube'],
             listInvalid: 'Ce n’est pas un nom de site : {values}',
             testerName: 'Essayer',
-            testerDesc: 'Collez un lien pour voir ce que ces règles conserveraient.',
+            testerDesc: 'Collez un lien pour voir ce que les règles conservent.',
             testerLabel: 'Lien à nettoyer',
             testerEmpty: 'Le lien nettoyé apparaît ici.'
         },
@@ -145,24 +143,23 @@ export const STRINGS_FR: TranslationStrings = {
             heading: 'Texte de terminal',
             cleanupName: 'Nettoyer la sortie de terminal',
             cleanupDesc:
-                'Rassemble les lignes coupées de la sortie de terminal et supprime l’indentation. Les codes de couleur sont retirés. Les blocs de code, les tableaux et les éléments de liste ne sont pas touchés.',
+                'Rassemble les lignes coupées par le terminal et retire les codes de couleur et l’indentation de début. Les blocs de code, les tableaux et les listes ne sont pas touchés.',
             cleanupAliases: ['retour à la ligne', 'rassembler', 'ansi', 'console', 'shell', 'indentation', 'puce', 'liste', 'markdown'],
             pageName: 'Traitement du texte de terminal',
-            pageDesc: 'Conditions de rassemblement et caractères de puce.',
+            pageDesc: 'Rassemblement des lignes et caractères de puce.',
             rejoinName: 'Quand rassembler une ligne coupée',
-            rejoinDesc: 'La condition requise pour traiter une ligne comme la suite de la précédente.',
+            rejoinDesc: 'Une ligne n’est rattachée à celle du dessus que si celle-ci semble pleine.',
             rejoinAliases: ['indentation', 'retour à la ligne', 'agressif', 'sûr', 'git log'],
-            rejoinIndented: 'Seulement si la ligne suivante est indentée',
-            rejoinAny: 'Dès que la ligne du dessus semble pleine',
-            rejoinNever: 'Ne jamais rassembler, seulement retirer les codes et l’indentation',
+            rejoinIndented: 'Seulement si la ligne est indentée',
+            rejoinAny: 'Que la ligne soit indentée ou non',
+            rejoinNever: 'Jamais, retirer seulement les codes et l’indentation',
             bulletsName: 'Caractères de puce',
-            bulletsDesc:
-                'Détermine si les caractères de puce (comme •) de la sortie de terminal sont conservés ou convertis en éléments de liste Markdown.',
+            bulletsDesc: 'Que faire des caractères de puce comme • dans la sortie de terminal.',
             bulletsAliases: ['liste', 'markdown', 'tiret'],
             bulletsMarkdown: 'Convertir en éléments de liste Markdown',
             bulletsPreserve: 'Les laisser tels quels',
             testerName: 'Essayer',
-            testerDesc: 'Collez une sortie de terminal pour voir comment elle serait nettoyée.',
+            testerDesc: 'Collez une sortie de terminal pour voir comment elle est nettoyée.',
             testerLabel: 'Texte de terminal à nettoyer',
             testerEmpty: 'Le texte nettoyé apparaît ici.',
             testerSample: [
@@ -177,7 +174,7 @@ export const STRINGS_FR: TranslationStrings = {
             trimDesc: 'Supprime les lignes vides et les espaces au début et à la fin du texte collé.',
             trimAliases: ['espace', 'ligne vide', 'saut de ligne', 'rogner'],
             commasName: 'Virgules et guillemets',
-            commasDesc: 'Choisissez où placer une virgule à côté d’un guillemet double fermant.',
+            commasDesc: 'Où placer une virgule à côté d’un guillemet double fermant.',
             commasAliases: ['virgule', 'guillemet', 'citation', 'ponctuation', 'style'],
             commasNone: 'Aucun changement',
             commasInside: 'Virgule à l’intérieur des guillemets',

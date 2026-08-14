@@ -39,7 +39,7 @@ export const STRINGS_VI: TranslationStrings = {
         fetchingTitle: 'đang lấy tiêu đề{dots}',
         imagesFailed: { other: 'không lưu được {count} ảnh' },
         imagesFailedLinkKept: '{images}, đã giữ liên kết gốc',
-        imagesFailedNothingPasted: '{images}, nên không dán gì cả. Nội dung vẫn còn trong bảng nhớ tạm.',
+        imagesFailedNothingPasted: '{images}, nên không dán gì cả',
         aiTextCleaned: 'đã chỉnh văn bản AI',
         terminalCleaned: 'đã dọn đầu ra dòng lệnh',
         textProcessed: 'đã chỉnh kiểu văn bản',
@@ -57,7 +57,7 @@ export const STRINGS_VI: TranslationStrings = {
             whatsNewAliases: ['ghi chú phát hành', 'thay đổi', 'nhật ký thay đổi', 'phiên bản', 'cập nhật', 'lịch sử'],
             whatsNewButton: 'Xem cập nhật gần đây',
             supportName: 'Ủng hộ việc phát triển',
-            supportDesc: 'Nếu Better Paste hữu ích với bạn, hãy cân nhắc ủng hộ việc phát triển tiếp.',
+            supportDesc: 'Nếu Better Paste hữu ích với bạn, hãy cân nhắc ủng hộ việc phát triển.',
             supportAliases: ['tài trợ', 'quyên góp', 'cà phê', 'github'],
             sponsorButton: '❤️ Tài trợ',
             coffeeButton: '☕️ Mời tôi ly cà phê'
@@ -67,10 +67,10 @@ export const STRINGS_VI: TranslationStrings = {
             heading: 'Hành vi',
             autoCleanName: 'Dọn mọi lần dán',
             autoCleanDesc:
-                'Áp dụng các quy tắc cho mọi lần dán. Tắt đi để chỉ dùng các lệnh. Một ghi chú riêng lẻ có thể tự loại trừ bằng thuộc tính "better-paste: false".',
+                'Áp dụng các quy tắc cho mọi lần dán. Khi tắt, các quy tắc chỉ được áp dụng khi dùng các lệnh của Better Paste. Một ghi chú riêng lẻ có thể tự loại trừ bằng thuộc tính "better-paste: false".',
             autoCleanAliases: ['tự động', 'bật', 'tắt', 'ghi chú', 'loại trừ', 'thuộc tính', 'frontmatter'],
             showNoticesName: 'Hiện thông báo khi lần dán bị thay đổi',
-            showNoticesDesc: 'Một dòng tóm tắt những gì đã được dọn. Lỗi luôn được báo, bất kể tùy chọn này.',
+            showNoticesDesc: 'Một dòng tóm tắt những gì đã thay đổi. Lỗi luôn được báo.',
             showNoticesAliases: ['thông báo', 'tóm tắt', 'tin nhắn', 'im lặng']
         },
 
@@ -78,7 +78,7 @@ export const STRINGS_VI: TranslationStrings = {
             heading: 'Hình ảnh',
             savingName: 'Lưu ảnh đã dán vào kho',
             savingDesc:
-                'Lưu ảnh đã dán thành tệp cục bộ thay vì để lại liên kết ảnh bên ngoài. Bao gồm "Sao chép hình ảnh" của Safari, ảnh trong nội dung web đã sao chép và địa chỉ ảnh đứng riêng. Ảnh được lưu vào thư mục tệp đính kèm của kho. Với "Lấy tên từ nguồn":',
+                'Lưu ảnh đã dán vào thư mục tệp đính kèm của bạn và liên kết tới tệp cục bộ thay vì địa chỉ web. Bao gồm "Sao chép hình ảnh" của Safari, ảnh trong nội dung web đã sao chép và địa chỉ ảnh được dán. Theo mặc định, tên tệp lấy từ địa chỉ:',
             savingAliases: [
                 'tải xuống',
                 'tệp đính kèm',
@@ -91,9 +91,9 @@ export const STRINGS_VI: TranslationStrings = {
                 'kích thước'
             ],
             pageName: 'Xử lý hình ảnh',
-            pageDesc: 'Tên tệp và chiều rộng ảnh theo từng ghi chú.',
+            pageDesc: 'Tên tệp và chiều rộng ảnh.',
             nameFormatName: 'Tên tệp',
-            nameFormatDesc: 'Chọn cách đặt tên cho tệp ảnh đã lưu.',
+            nameFormatDesc: 'Cách đặt tên cho ảnh đã lưu.',
             nameFormatSource: 'Lấy tên từ nguồn',
             nameFormatCustom: 'Định dạng tùy chỉnh',
             customName: 'Định dạng tùy chỉnh',
@@ -103,7 +103,7 @@ export const STRINGS_VI: TranslationStrings = {
             customAliases: ['tên', 'tên tệp', 'ngày', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Thuộc tính chiều rộng ảnh',
             sizePropertyDesc:
-                'Thuộc tính frontmatter xác định chiều rộng của ảnh dán vào một ghi chú. Ghi chú dùng thuộc tính này sẽ tiếp quản việc dán ảnh chụp màn hình thay cho Obsidian. Để trống để tắt.',
+                'Thuộc tính frontmatter xác định chiều rộng của ảnh dán vào một ghi chú. Với "image-width: 400" trong ghi chú, ảnh dán vào sẽ thành ![[photo.png|400]]. Để trống để không thêm chiều rộng.',
             sizePropertyAliases: ['kích thước', 'frontmatter', 'thuộc tính', 'đổi cỡ']
         },
 
@@ -111,28 +111,27 @@ export const STRINGS_VI: TranslationStrings = {
             heading: 'Liên kết',
             titlesName: 'Lấy tiêu đề cho liên kết đã dán',
             titlesDesc:
-                'Khi bảng nhớ tạm chỉ chứa một địa chỉ web không phải ảnh, tiêu đề trang sẽ được lấy về và dán thành liên kết Markdown. Văn bản khác đang được chọn sẽ thành nhãn mà không cần gửi yêu cầu nào. Nếu không lấy được tiêu đề, địa chỉ gốc được giữ nguyên.',
+                'Dán riêng một địa chỉ web sẽ chèn liên kết Markdown kèm tiêu đề trang. Nếu đang chọn văn bản, phần văn bản đó thành nhãn và không lấy tiêu đề. Địa chỉ nguyên dạng được giữ lại khi không lấy được tiêu đề.',
             titlesAliases: ['tiêu đề', 'trang', 'trang web', 'liên kết markdown', 'tải xuống'],
             cleaningName: 'Dọn liên kết đã dán',
-            cleaningDesc: 'Loại bỏ tham số theo dõi khỏi liên kết đã dán. Phần bị gạch ngang sẽ bị bỏ:',
+            cleaningDesc: 'Loại bỏ tham số theo dõi khỏi liên kết đã dán:',
             cleaningAliases: ['url', 'theo dõi', 'utm', 'tham số', 'truy vấn', 'trang web', 'tên miền', 'youtube', 'ngoại lệ'],
             stripName: 'Bỏ những tham số nào',
-            stripDesc:
-                'Chọn bỏ mọi tham số truy vấn hay chỉ những tham số theo dõi đã biết. Quy tắc theo trang web có thể giữ lại tham số trong cả hai chế độ.',
+            stripDesc: 'Tham số theo dõi là những tên như utm_source, fbclid và gclid.',
             stripAliases: ['utm', 'theo dõi', 'truy vấn', 'tham số'],
             stripAll: 'Mọi tham số, trừ khi một quy tắc trang web giữ lại',
             stripTracking: 'Chỉ những tham số theo dõi đã biết',
-            rulesName: 'Quy tắc giữ lại tham số',
-            rulesDesc: 'Quy tắc theo trang web để giữ lại một số tham số truy vấn trong cả hai chế độ loại bỏ.',
+            rulesName: 'Quy tắc trang web',
+            rulesDesc: 'Tham số cần giữ trên một số trang web.',
             rulesCount: { other: '{count} trang web' },
             listName: 'Quy tắc trang web của bạn',
             listDesc:
-                '{sites} đã được xử lý sẵn và luôn cập nhật cùng phần mở rộng. Thêm quy tắc của riêng bạn ở đây, mỗi dòng một quy tắc. "example.com" giữ mọi tham số của trang đó, "example.com: a, b" chỉ giữ hai tham số đó, còn "!example.com" bỏ đi một quy tắc đi kèm phần mở rộng. Ở chế độ "Chỉ những tham số theo dõi đã biết", một quy tắc chỉ cứu những tham số theo dõi khớp, vì các tham số khác vốn đã được giữ. Tên miền con được khớp tự động.',
+                '{sites} đã được phần mở rộng xử lý sẵn. Thêm quy tắc của riêng bạn ở đây, mỗi dòng một quy tắc. "example.com" giữ mọi tham số của trang đó, "example.com: a, b" chỉ giữ hai tham số đó, còn "!example.com" gỡ một quy tắc đi kèm phần mở rộng. Tên miền con được khớp tự động.',
             listShippedCount: { other: '{count} trang web phổ biến' },
             listAliases: ['tên miền', 'ngoại lệ', 'danh sách trắng', 'youtube'],
             listInvalid: 'Không phải tên trang web: {values}',
             testerName: 'Thử xem',
-            testerDesc: 'Dán một liên kết để xem các quy tắc này sẽ giữ lại gì.',
+            testerDesc: 'Dán một liên kết để xem các quy tắc giữ lại gì.',
             testerLabel: 'Liên kết cần dọn',
             testerEmpty: 'Liên kết đã dọn sẽ hiện ở đây.'
         },
@@ -141,7 +140,7 @@ export const STRINGS_VI: TranslationStrings = {
             heading: 'Văn bản dòng lệnh',
             cleanupName: 'Dọn đầu ra dòng lệnh',
             cleanupDesc:
-                'Nối lại những dòng bị ngắt trong đầu ra dòng lệnh và bỏ thụt lề. Mã màu bị loại bỏ. Khối mã, bảng và mục danh sách được giữ nguyên.',
+                'Nối lại các dòng bị tự động xuống dòng trong đầu ra dòng lệnh, đồng thời bỏ mã màu và thụt lề ở đầu dòng. Khối mã, bảng và danh sách được giữ nguyên.',
             cleanupAliases: [
                 'ngắt dòng',
                 'nối dòng',
@@ -154,21 +153,20 @@ export const STRINGS_VI: TranslationStrings = {
                 'markdown'
             ],
             pageName: 'Xử lý văn bản dòng lệnh',
-            pageDesc: 'Điều kiện nối dòng và ký tự đầu dòng.',
+            pageDesc: 'Nối dòng và ký tự đầu dòng.',
             rejoinName: 'Khi nào nối lại một dòng bị ngắt',
-            rejoinDesc: 'Điều kiện để coi một dòng là phần tiếp theo của dòng trước.',
+            rejoinDesc: 'Một dòng chỉ được nối vào dòng trên khi dòng đó trông đã đầy.',
             rejoinAliases: ['thụt lề', 'ngắt dòng', 'mạnh tay', 'an toàn', 'git log'],
-            rejoinIndented: 'Chỉ khi dòng kế tiếp có thụt lề',
-            rejoinAny: 'Mỗi khi dòng phía trên trông đã đầy',
-            rejoinNever: 'Không bao giờ nối, chỉ bỏ mã màu và thụt lề',
+            rejoinIndented: 'Chỉ khi dòng có thụt lề',
+            rejoinAny: 'Dù dòng có thụt lề hay không',
+            rejoinNever: 'Không bao giờ, chỉ bỏ mã màu và thụt lề',
             bulletsName: 'Ký tự đầu dòng',
-            bulletsDesc:
-                'Quyết định ký tự đầu dòng (như •) trong đầu ra dòng lệnh được giữ nguyên hay chuyển thành mục danh sách Markdown.',
+            bulletsDesc: 'Xử lý thế nào với ký tự đầu dòng như • trong đầu ra dòng lệnh.',
             bulletsAliases: ['danh sách', 'markdown', 'gạch ngang'],
             bulletsMarkdown: 'Chuyển thành mục danh sách Markdown',
             bulletsPreserve: 'Giữ nguyên như cũ',
             testerName: 'Thử xem',
-            testerDesc: 'Dán đầu ra dòng lệnh để xem nó sẽ được dọn như thế nào.',
+            testerDesc: 'Dán đầu ra dòng lệnh để xem nó được dọn như thế nào.',
             testerLabel: 'Văn bản dòng lệnh cần dọn',
             testerEmpty: 'Văn bản đã dọn sẽ hiện ở đây.',
             testerSample: [
@@ -183,7 +181,7 @@ export const STRINGS_VI: TranslationStrings = {
             trimDesc: 'Bỏ dòng trống và khoảng trắng ở đầu và cuối văn bản đã dán.',
             trimAliases: ['khoảng trắng', 'dòng trống', 'dấu cách', 'xuống dòng', 'cắt'],
             commasName: 'Dấu phẩy và dấu nháy kép',
-            commasDesc: 'Chọn vị trí đặt dấu phẩy bên cạnh dấu nháy kép đóng.',
+            commasDesc: 'Vị trí dấu phẩy bên cạnh dấu nháy kép đóng.',
             commasAliases: ['dấu phẩy', 'dấu nháy', 'trích dẫn', 'dấu câu', 'kiểu'],
             commasNone: 'Không thay đổi',
             commasInside: 'Dấu phẩy bên trong dấu nháy',

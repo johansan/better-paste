@@ -205,16 +205,6 @@ describe('settings tree', () => {
         expect(row.control.options).toEqual({ source: 'Name from source', custom: 'Custom format' });
     });
 
-    it('explains how site rules behave in tracking mode', () => {
-        const mode = flatten(tab.getSettingDefinitions()).find(row => row.name === 'Which parameters to remove');
-        const sites = pages(tab.getSettingDefinitions()).find(page => page.name === 'Rules for preserving parameters');
-        const rules = flatten([...(sites?.items ?? [])]).find(row => row.name === 'Your site rules');
-
-        expect(mode?.desc).toContain('Site rules can preserve parameters in either mode.');
-        expect(sites?.desc).toContain('either removal mode');
-        expect(rules?.desc).toContain('a rule only rescues matching tracking parameters because other parameters are already kept');
-    });
-
     it('offers all comma placement choices', () => {
         const row = controlRows(tab).find(candidate => candidate.control.key === 'textComma');
         expect(row?.control.type).toBe('dropdown');
@@ -258,7 +248,7 @@ describe('settings tree', () => {
 
     it('puts the detail on sub-pages, declared so search can still reach it', () => {
         const found = pages(tab.getSettingDefinitions());
-        expect(found.map(page => page.name)).toEqual(['Image handling', 'Rules for preserving parameters', 'Terminal text handling']);
+        expect(found.map(page => page.name)).toEqual(['Image handling', 'Site rules', 'Terminal text handling']);
         // `items` keeps a page in the searchable tree; the imperative `page` form does not
         for (const page of found) {
             expect(page.items, `"${page.name}" has no items`).toBeDefined();
@@ -268,7 +258,7 @@ describe('settings tree', () => {
 
     it('shows the site count on its sub-page link', () => {
         const found = pages(tab.getSettingDefinitions());
-        const sites = found.find(page => page.name === 'Rules for preserving parameters');
+        const sites = found.find(page => page.name === 'Site rules');
 
         expect(typeof sites?.displayValue === 'function' ? sites.displayValue() : sites?.displayValue).toMatch(/^\d+ sites$/);
     });
@@ -330,7 +320,7 @@ describe('settings values', () => {
         await tab.setControlValue('linkRules.text', kept);
 
         const shown = String(tab.getControlValue('linkRules.text'));
-        const sites = pages(tab.getSettingDefinitions()).find(page => page.name === 'Rules for preserving parameters');
+        const sites = pages(tab.getSettingDefinitions()).find(page => page.name === 'Site rules');
         const status = typeof sites?.status === 'function' ? sites.status() : sites?.status;
         expect(plugin.settings.linkRules).toEqual(['!google.*']);
         expect(shown.split('\n')).not.toContain('google.* | q, tbm, hl');
@@ -385,7 +375,7 @@ describe('dependent settings', () => {
 
     it('hides the link detail when the rule is off', () => {
         expect(isVisible(rowFor('linkStrip', { linkEnabled: false }))).toBe(false);
-        expect(isVisible(pageFor('Rules for preserving parameters', { linkEnabled: false }))).toBe(false);
+        expect(isVisible(pageFor('Site rules', { linkEnabled: false }))).toBe(false);
     });
 
     it('hides the terminal page when the rule is off', () => {

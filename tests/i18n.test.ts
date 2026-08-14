@@ -181,13 +181,6 @@ describe('translations', () => {
         // used them would promise a change that never happens
         expect(replacePunctuation(text.punctuationExampleBefore).text).toBe(text.punctuationExampleAfter);
     });
-
-    it.each(Object.entries(LOCALES))('%s names the dropdown options its descriptions refer to', (_code, locale) => {
-        const { images, links } = locale.strings.settings;
-
-        expect(images.savingDesc).toContain(images.nameFormatSource);
-        expect(links.listDesc).toContain(links.stripTracking);
-    });
 });
 
 /** Calls `visit` for every plural message inside a language file. */

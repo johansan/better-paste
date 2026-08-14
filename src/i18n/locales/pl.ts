@@ -44,7 +44,7 @@ export const STRINGS_PL: TranslationStrings = {
             other: 'nie udało się zapisać {count} obrazu'
         },
         imagesFailedLinkKept: '{images}, zachowano oryginalny odnośnik',
-        imagesFailedNothingPasted: '{images}, więc nic nie zostało wklejone. Zawartość nadal jest w schowku.',
+        imagesFailedNothingPasted: '{images}, więc nic nie zostało wklejone',
         aiTextCleaned: 'uporządkowano tekst AI',
         terminalCleaned: 'wyczyszczono wynik terminala',
         textProcessed: 'poprawiono styl tekstu',
@@ -72,7 +72,7 @@ export const STRINGS_PL: TranslationStrings = {
             whatsNewAliases: ['informacje o wydaniu', 'zmiany', 'lista zmian', 'wersja', 'aktualizacja', 'historia'],
             whatsNewButton: 'Zobacz nowości',
             supportName: 'Wesprzyj rozwój',
-            supportDesc: 'Jeśli Better Paste jest dla ciebie przydatny, rozważ wsparcie jego dalszego rozwoju.',
+            supportDesc: 'Jeśli Better Paste jest dla ciebie przydatny, rozważ wsparcie jego rozwoju.',
             supportAliases: ['sponsor', 'darowizna', 'kawa', 'github'],
             sponsorButton: '❤️ Zostań sponsorem',
             coffeeButton: '☕️ Postaw mi kawę'
@@ -82,11 +82,10 @@ export const STRINGS_PL: TranslationStrings = {
             heading: 'Zachowanie',
             autoCleanName: 'Czyść każde wklejenie',
             autoCleanDesc:
-                'Stosuje reguły przy każdym wklejeniu. Wyłącz, aby korzystać tylko z poleceń. Pojedyncza notatka może się wyłączyć właściwością "better-paste: false".',
+                'Stosuje reguły przy każdym wklejeniu. Gdy jest wyłączone, reguły działają tylko po użyciu poleceń Better Paste. Pojedyncza notatka może się wyłączyć właściwością "better-paste: false".',
             autoCleanAliases: ['automatycznie', 'włącz', 'wyłącz', 'notatka', 'wyklucz', 'właściwość', 'frontmatter'],
             showNoticesName: 'Pokazuj powiadomienie, gdy wklejenie zostało zmienione',
-            showNoticesDesc:
-                'Jednowierszowe podsumowanie tego, co wyczyszczono. Błędy są zgłaszane zawsze, niezależnie od tego ustawienia.',
+            showNoticesDesc: 'Jednowierszowe podsumowanie zmian. Błędy są zgłaszane zawsze.',
             showNoticesAliases: ['powiadomienie', 'podsumowanie', 'komunikat', 'cicho']
         },
 
@@ -94,12 +93,12 @@ export const STRINGS_PL: TranslationStrings = {
             heading: 'Obrazy',
             savingName: 'Zapisuj wklejone obrazy w sejfie',
             savingDesc:
-                'Zapisuje wklejone obrazy jako pliki lokalne zamiast pozostawiać zewnętrzne odnośniki. Dotyczy to opcji „Kopiuj obraz” w Safari, obrazów w skopiowanej treści z sieci oraz pojedynczych adresów obrazów. Obrazy trafiają do folderu załączników twojego sejfu. Przy opcji „Nazwa ze źródła”:',
+                'Zapisuje wklejone obrazy w folderze załączników i wstawia odnośnik do pliku lokalnego zamiast adresu internetowego. Dotyczy opcji „Kopiuj obraz” w Safari, obrazów w skopiowanej treści z sieci oraz wklejanych adresów obrazów. Domyślnie nazwa pliku pochodzi z adresu:',
             savingAliases: ['pobieranie', 'załącznik', 'safari', 'zrzut ekranu', 'obraz', 'folder', 'nazwa pliku', 'szerokość', 'rozmiar'],
             pageName: 'Obsługa obrazów',
-            pageDesc: 'Nazwy plików i szerokość obrazów dla notatki.',
+            pageDesc: 'Nazwy plików i szerokość obrazów.',
             nameFormatName: 'Nazwy plików',
-            nameFormatDesc: 'Wybierz, jak nazywane są zapisane pliki obrazów.',
+            nameFormatDesc: 'Jak nazywane są zapisane obrazy.',
             nameFormatSource: 'Nazwa ze źródła',
             nameFormatCustom: 'Własny format',
             customName: 'Własny format',
@@ -109,7 +108,7 @@ export const STRINGS_PL: TranslationStrings = {
             customAliases: ['nazwa', 'plik', 'data', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Właściwość szerokości obrazu',
             sizePropertyDesc:
-                'Właściwość frontmatter określająca szerokość obrazów wklejanych do notatki. Notatka z tą właściwością przejmuje wklejanie zrzutów ekranu od Obsidiana. Pozostaw puste, aby wyłączyć.',
+                'Właściwość frontmatter określająca szerokość obrazów wklejanych do notatki. Przy "image-width: 400" w notatce wklejony obraz przybiera postać ![[photo.png|400]]. Pozostaw puste, aby nie dodawać szerokości.',
             sizePropertyAliases: ['rozmiar', 'frontmatter', 'właściwość', 'skalowanie']
         },
 
@@ -117,19 +116,18 @@ export const STRINGS_PL: TranslationStrings = {
             heading: 'Odnośniki',
             titlesName: 'Pobieraj tytuły wklejanych odnośników',
             titlesDesc:
-                'Gdy schowek zawiera tylko adres internetowy, który nie jest obrazem, pobierany jest tytuł strony i wklejany odnośnik Markdown. Inny zaznaczony tekst staje się etykietą bez wykonywania żądania. Jeśli tytułu nie da się pobrać, zostaje pierwotny adres.',
+                'Wklejenie samego adresu internetowego wstawia odnośnik Markdown z tytułem strony. Jeśli tekst jest zaznaczony, staje się on etykietą i tytuł nie jest pobierany. Gdy tytułu nie da się pobrać, zostaje sam adres.',
             titlesAliases: ['tytuł', 'strona', 'witryna', 'odnośnik markdown', 'pobieranie'],
             cleaningName: 'Czyść wklejane odnośniki',
-            cleaningDesc: 'Usuwa parametry śledzące z wklejanych odnośników. Przekreślona część zostaje usunięta:',
+            cleaningDesc: 'Usuwa parametry śledzące z wklejanych odnośników:',
             cleaningAliases: ['url', 'śledzenie', 'utm', 'parametry', 'zapytanie', 'witryna', 'domena', 'youtube', 'wyjątek'],
             stripName: 'Które parametry usuwać',
-            stripDesc:
-                'Wybierz, czy usuwać wszystkie parametry zapytania, czy tylko znane parametry śledzące. Reguły witryn mogą zachować parametry w obu trybach.',
+            stripDesc: 'Parametry śledzące to nazwy takie jak utm_source, fbclid i gclid.',
             stripAliases: ['utm', 'śledzenie', 'zapytanie', 'parametry'],
             stripAll: 'Każdy parametr, o ile reguła witryny go nie zachowa',
-            stripTracking: 'Tylko parametry znane jako śledzące',
-            rulesName: 'Reguły zachowywania parametrów',
-            rulesDesc: 'Reguły witryn zachowujące określone parametry zapytania w obu trybach usuwania.',
+            stripTracking: 'Tylko znane parametry śledzące',
+            rulesName: 'Reguły witryn',
+            rulesDesc: 'Parametry zachowywane w wybranych witrynach.',
             rulesCount: {
                 one: '{count} witryna',
                 few: '{count} witryny',
@@ -138,7 +136,7 @@ export const STRINGS_PL: TranslationStrings = {
             },
             listName: 'Twoje reguły witryn',
             listDesc:
-                'Reguły dla {sites} są już wbudowane i pozostają aktualne wraz z wtyczką. Dodaj tutaj własne reguły, po jednej w wierszu. „example.com” zachowuje wszystkie parametry tej witryny, „example.com: a, b” zachowuje tylko te dwa, a „!example.com” usuwa regułę dostarczaną z wtyczką. W trybie „Tylko parametry znane jako śledzące” reguła ratuje wyłącznie pasujące parametry śledzące, ponieważ pozostałe i tak są zachowywane. Poddomeny są rozpoznawane automatycznie.',
+                'Reguły dla {sites} są już częścią wtyczki. Dodaj tutaj własne reguły, po jednej w wierszu. „example.com” zachowuje wszystkie parametry tej witryny, „example.com: a, b” zachowuje tylko te dwa, a „!example.com” usuwa regułę dostarczaną z wtyczką. Poddomeny są rozpoznawane automatycznie.',
             listShippedCount: {
                 one: '{count} popularnej witryny',
                 few: '{count} popularnych witryn',
@@ -148,7 +146,7 @@ export const STRINGS_PL: TranslationStrings = {
             listAliases: ['domena', 'wyjątek', 'biała lista', 'youtube'],
             listInvalid: 'To nie jest nazwa witryny: {values}',
             testerName: 'Wypróbuj',
-            testerDesc: 'Wklej odnośnik, aby zobaczyć, co zachowałyby te reguły.',
+            testerDesc: 'Wklej odnośnik, aby zobaczyć, co zachowują reguły.',
             testerLabel: 'Odnośnik do wyczyszczenia',
             testerEmpty: 'Wyczyszczony odnośnik pojawi się tutaj.'
         },
@@ -157,24 +155,23 @@ export const STRINGS_PL: TranslationStrings = {
             heading: 'Tekst terminala',
             cleanupName: 'Czyść wynik terminala',
             cleanupDesc:
-                'Ponownie łączy zawinięte wiersze wyniku terminala i usuwa wcięcia. Kody kolorów są usuwane. Bloki kodu, tabele i elementy list pozostają nietknięte.',
+                'Ponownie łączy wiersze zawinięte przez terminal oraz usuwa kody kolorów i początkowe wcięcia. Bloki kodu, tabele i listy pozostają nietknięte.',
             cleanupAliases: ['zawijanie', 'łączenie', 'ansi', 'konsola', 'powłoka', 'wcięcie', 'punktor', 'lista', 'markdown'],
             pageName: 'Obsługa tekstu terminala',
-            pageDesc: 'Warunki łączenia wierszy i znaki punktorów.',
+            pageDesc: 'Łączenie wierszy i znaki punktorów.',
             rejoinName: 'Kiedy łączyć przerwany wiersz',
-            rejoinDesc: 'Warunek, przy którym wiersz jest traktowany jako ciąg dalszy poprzedniego.',
+            rejoinDesc: 'Wiersz jest dołączany do poprzedniego tylko wtedy, gdy tamten wygląda na pełny.',
             rejoinAliases: ['wcięcie', 'zawijanie', 'agresywnie', 'bezpiecznie', 'git log'],
-            rejoinIndented: 'Tylko gdy następny wiersz ma wcięcie',
-            rejoinAny: 'Zawsze, gdy wiersz powyżej wygląda na pełny',
-            rejoinNever: 'Nigdy nie łącz, usuwaj tylko kody i wcięcia',
+            rejoinIndented: 'Tylko gdy wiersz ma wcięcie',
+            rejoinAny: 'Niezależnie od wcięcia',
+            rejoinNever: 'Nigdy, usuwaj tylko kody i wcięcia',
             bulletsName: 'Znaki punktorów',
-            bulletsDesc:
-                'Określa, czy znaki punktorów (takie jak •) w wyniku terminala są zachowywane, czy zamieniane na elementy listy Markdown.',
+            bulletsDesc: 'Co robić ze znakami punktorów, takimi jak •, w wyniku terminala.',
             bulletsAliases: ['lista', 'markdown', 'myślnik'],
             bulletsMarkdown: 'Zamień na elementy listy Markdown',
             bulletsPreserve: 'Zostaw bez zmian',
             testerName: 'Wypróbuj',
-            testerDesc: 'Wklej wynik terminala, aby zobaczyć, jak zostałby wyczyszczony.',
+            testerDesc: 'Wklej wynik terminala, aby zobaczyć, jak zostaje wyczyszczony.',
             testerLabel: 'Tekst terminala do wyczyszczenia',
             testerEmpty: 'Wyczyszczony tekst pojawi się tutaj.',
             testerSample: [
@@ -189,7 +186,7 @@ export const STRINGS_PL: TranslationStrings = {
             trimDesc: 'Usuwa puste wiersze i spacje z początku i końca wklejanego tekstu.',
             trimAliases: ['odstęp', 'pusty wiersz', 'spacja', 'nowy wiersz', 'przycinanie'],
             commasName: 'Przecinki i cudzysłowy',
-            commasDesc: 'Wybierz, gdzie umieścić przecinek obok zamykającego cudzysłowu.',
+            commasDesc: 'Gdzie stoi przecinek obok zamykającego cudzysłowu.',
             commasAliases: ['przecinek', 'cudzysłów', 'cytat', 'interpunkcja', 'styl'],
             commasNone: 'Bez zmian',
             commasInside: 'Przecinek wewnątrz cudzysłowu',

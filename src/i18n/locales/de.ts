@@ -42,7 +42,7 @@ export const STRINGS_DE: TranslationStrings = {
             other: '{count} Bilder konnten nicht gespeichert werden'
         },
         imagesFailedLinkKept: '{images}, der ursprüngliche Link wurde behalten',
-        imagesFailedNothingPasted: '{images}, daher wurde nichts eingefügt. Die Zwischenablage enthält es weiterhin.',
+        imagesFailedNothingPasted: '{images}, daher wurde nichts eingefügt',
         aiTextCleaned: 'KI-Text bereinigt',
         terminalCleaned: 'Terminalausgabe bereinigt',
         textProcessed: 'Textstil angepasst',
@@ -60,7 +60,7 @@ export const STRINGS_DE: TranslationStrings = {
             whatsNewAliases: ['versionshinweise', 'änderungen', 'changelog', 'version', 'aktualisierung', 'verlauf'],
             whatsNewButton: 'Neuerungen ansehen',
             supportName: 'Entwicklung unterstützen',
-            supportDesc: 'Wenn dir Better Paste nützlich ist, unterstütze bitte die weitere Entwicklung.',
+            supportDesc: 'Wenn dir Better Paste nützlich ist, unterstütze bitte seine Entwicklung.',
             supportAliases: ['sponsor', 'spende', 'kaffee', 'github'],
             sponsorButton: '❤️ Sponsor',
             coffeeButton: '☕️ Spendier mir einen Kaffee'
@@ -70,7 +70,7 @@ export const STRINGS_DE: TranslationStrings = {
             heading: 'Verhalten',
             autoCleanName: 'Jeden Einfügevorgang bereinigen',
             autoCleanDesc:
-                'Wendet die Regeln bei jedem Einfügen an. Schalte dies aus, um nur die Befehle zu verwenden. Eine einzelne Notiz kann sich mit der Eigenschaft "better-paste: false" ausnehmen.',
+                'Wendet die Regeln bei jedem Einfügen an. Ist dies aus, greifen die Regeln nur über die Better-Paste-Befehle. Eine einzelne Notiz kann sich mit der Eigenschaft "better-paste: false" ausnehmen.',
             autoCleanAliases: [
                 'automatisch',
                 'aktivieren',
@@ -82,8 +82,7 @@ export const STRINGS_DE: TranslationStrings = {
                 'ausnehmen'
             ],
             showNoticesName: 'Hinweis anzeigen, wenn ein Einfügevorgang geändert wurde',
-            showNoticesDesc:
-                'Eine einzeilige Zusammenfassung des Bereinigten. Fehler werden unabhängig von dieser Einstellung immer gemeldet.',
+            showNoticesDesc: 'Eine einzeilige Zusammenfassung der Änderungen. Fehler werden immer gemeldet.',
             showNoticesAliases: ['hinweis', 'zusammenfassung', 'meldung', 'benachrichtigung', 'still']
         },
 
@@ -91,12 +90,12 @@ export const STRINGS_DE: TranslationStrings = {
             heading: 'Bilder',
             savingName: 'Eingefügte Bilder im Tresor speichern',
             savingDesc:
-                'Speichert eingefügte Bilder als lokale Dateien, statt externe Bildlinks zu belassen. Das umfasst "Bild kopieren" in Safari, Bilder in kopierten Webinhalten und einzelne Bildadressen. Bilder werden im Anhangordner deines Tresors gespeichert. Mit "Name aus der Quelle":',
+                'Speichert eingefügte Bilder im Anhangordner und verlinkt die lokale Datei statt der Webadresse. Gilt für "Bild kopieren" in Safari, Bilder in kopierten Webinhalten und eingefügte Bildadressen. Standardmäßig stammt der Dateiname aus der Adresse:',
             savingAliases: ['herunterladen', 'anhang', 'safari', 'bildschirmfoto', 'bild', 'ordner', 'dateiname', 'breite', 'größe'],
             pageName: 'Bildbehandlung',
-            pageDesc: 'Dateinamen und Bildbreite pro Notiz.',
+            pageDesc: 'Dateinamen und Bildbreite.',
             nameFormatName: 'Dateinamen',
-            nameFormatDesc: 'Lege fest, wie gespeicherte Bilddateien benannt werden.',
+            nameFormatDesc: 'Wie gespeicherte Bilder benannt werden.',
             nameFormatSource: 'Name aus der Quelle',
             nameFormatCustom: 'Eigenes Format',
             customName: 'Eigenes Format',
@@ -106,7 +105,7 @@ export const STRINGS_DE: TranslationStrings = {
             customAliases: ['name', 'dateiname', 'datum', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Eigenschaft für Bildbreite',
             sizePropertyDesc:
-                'Die Frontmatter-Eigenschaft, die die Breite der in eine Notiz eingefügten Bilder festlegt. Eine Notiz mit dieser Eigenschaft übernimmt das Einfügen von Bildschirmfotos von Obsidian. Leer lassen, um dies zu deaktivieren.',
+                'Frontmatter-Eigenschaft, die die Breite der in eine Notiz eingefügten Bilder festlegt. Mit "image-width: 400" in der Notiz wird ein eingefügtes Bild zu ![[photo.png|400]]. Leer lassen, um keine Breite zu setzen.',
             sizePropertyAliases: ['größe', 'frontmatter', 'eigenschaft', 'skalieren']
         },
 
@@ -114,28 +113,27 @@ export const STRINGS_DE: TranslationStrings = {
             heading: 'Links',
             titlesName: 'Titel für eingefügte Links abrufen',
             titlesDesc:
-                'Enthält die Zwischenablage nur eine Webadresse ohne Bild, wird deren Seitentitel abgerufen und ein Markdown-Link eingefügt. Anderer ausgewählter Text wird ohne Anfrage zur Beschriftung. Lässt sich der Titel nicht abrufen, bleibt die ursprüngliche Adresse erhalten.',
+                'Wird eine Webadresse allein eingefügt, entsteht ein Markdown-Link mit dem Seitentitel. Ist Text ausgewählt, wird dieser die Beschriftung und es wird kein Titel abgerufen. Lässt sich der Titel nicht abrufen, bleibt die reine Adresse stehen.',
             titlesAliases: ['titel', 'seite', 'webseite', 'markdown-link', 'herunterladen'],
             cleaningName: 'Eingefügte Links bereinigen',
-            cleaningDesc: 'Entfernt Tracking-Parameter aus eingefügten Links. Der durchgestrichene Teil wird entfernt:',
+            cleaningDesc: 'Entfernt Tracking-Parameter aus eingefügten Links:',
             cleaningAliases: ['url', 'tracking', 'utm', 'parameter', 'abfrage', 'seite', 'domain', 'youtube', 'ausnahme'],
             stripName: 'Welche Parameter entfernt werden',
-            stripDesc:
-                'Lege fest, ob alle Abfrageparameter oder nur bekannte Tracking-Parameter entfernt werden. Seitenregeln können Parameter in beiden Modi bewahren.',
+            stripDesc: 'Tracking-Parameter sind Namen wie utm_source, fbclid und gclid.',
             stripAliases: ['utm', 'tracking', 'abfrage', 'parameter'],
-            stripAll: 'Jeder Parameter, außer eine Seitenregel behält ihn',
+            stripAll: 'Jeder Parameter, sofern keine Seitenregel ihn behält',
             stripTracking: 'Nur bekannte Tracking-Parameter',
-            rulesName: 'Regeln zum Bewahren von Parametern',
-            rulesDesc: 'Seitenregeln, die bestimmte Abfrageparameter in beiden Entfernungsmodi behalten.',
+            rulesName: 'Seitenregeln',
+            rulesDesc: 'Parameter, die auf bestimmten Seiten behalten werden.',
             rulesCount: { one: '{count} Seite', other: '{count} Seiten' },
             listName: 'Deine Seitenregeln',
             listDesc:
-                '{sites} werden bereits behandelt und bleiben mit dem Plugin aktuell. Ergänze hier eigene Seitenregeln, eine pro Zeile. "example.com" behält jeden Parameter dieser Seite, "example.com: a, b" behält nur diese beiden, und "!example.com" entfernt eine Regel, die mit dem Plugin ausgeliefert wird. Im Modus "Nur bekannte Tracking-Parameter" rettet eine Regel nur passende Tracking-Parameter, weil andere Parameter ohnehin behalten werden. Subdomains werden automatisch berücksichtigt.',
+                '{sites} werden bereits vom Plugin abgedeckt. Ergänze hier eigene Regeln, eine pro Zeile. "example.com" behält jeden Parameter dieser Seite, "example.com: a, b" behält nur diese beiden, und "!example.com" entfernt eine Regel, die mit dem Plugin ausgeliefert wird. Subdomains werden automatisch berücksichtigt.',
             listShippedCount: { one: '{count} verbreitete Seite', other: '{count} verbreitete Seiten' },
             listAliases: ['domain', 'ausnahme', 'whitelist', 'youtube'],
             listInvalid: 'Kein Seitenname: {values}',
             testerName: 'Ausprobieren',
-            testerDesc: 'Füge einen Link ein, um zu sehen, was diese Regeln behalten würden.',
+            testerDesc: 'Füge einen Link ein, um zu sehen, was die Regeln behalten.',
             testerLabel: 'Zu bereinigender Link',
             testerEmpty: 'Der bereinigte Link erscheint hier.'
         },
@@ -144,24 +142,23 @@ export const STRINGS_DE: TranslationStrings = {
             heading: 'Terminaltext',
             cleanupName: 'Terminalausgabe bereinigen',
             cleanupDesc:
-                'Fügt umbrochene Zeilen in Terminalausgaben wieder zusammen und entfernt Einrückungen. Farbcodes werden entfernt. Codeblöcke, Tabellen und Listeneinträge bleiben unberührt.',
+                'Fügt vom Terminal umbrochene Zeilen wieder zusammen und entfernt Farbcodes und führende Einrückungen. Codeblöcke, Tabellen und Listen bleiben unberührt.',
             cleanupAliases: ['umbruch', 'zusammenfügen', 'ansi', 'konsole', 'shell', 'einrückung', 'aufzählung', 'liste', 'markdown'],
             pageName: 'Behandlung von Terminaltext',
-            pageDesc: 'Bedingungen zum Zusammenfügen und Aufzählungszeichen.',
+            pageDesc: 'Zeilen zusammenfügen und Aufzählungszeichen.',
             rejoinName: 'Wann eine umbrochene Zeile zusammengefügt wird',
-            rejoinDesc: 'Die Bedingung, unter der eine Zeile als Fortsetzung der vorherigen Zeile gilt.',
+            rejoinDesc: 'Eine Zeile wird nur an die darüber angefügt, wenn diese voll wirkt.',
             rejoinAliases: ['einrückung', 'umbruch', 'aggressiv', 'sicher', 'git log'],
-            rejoinIndented: 'Nur wenn die nächste Zeile eingerückt ist',
-            rejoinAny: 'Wann immer die Zeile darüber voll wirkt',
-            rejoinNever: 'Nie zusammenfügen, nur Codes und Einrückungen entfernen',
+            rejoinIndented: 'Nur wenn die Zeile eingerückt ist',
+            rejoinAny: 'Ob die Zeile eingerückt ist oder nicht',
+            rejoinNever: 'Nie, nur Codes und Einrückungen entfernen',
             bulletsName: 'Aufzählungszeichen',
-            bulletsDesc:
-                'Legt fest, ob Aufzählungszeichen (wie •) in Terminalausgaben erhalten bleiben oder in Markdown-Listeneinträge umgewandelt werden.',
+            bulletsDesc: 'Was mit Aufzählungszeichen wie • in Terminalausgaben passiert.',
             bulletsAliases: ['liste', 'markdown', 'strich'],
             bulletsMarkdown: 'In Markdown-Listeneinträge umwandeln',
             bulletsPreserve: 'Unverändert lassen',
             testerName: 'Ausprobieren',
-            testerDesc: 'Füge Terminalausgabe ein, um zu sehen, wie sie bereinigt würde.',
+            testerDesc: 'Füge Terminalausgabe ein, um zu sehen, wie sie bereinigt wird.',
             testerLabel: 'Zu bereinigender Terminaltext',
             testerEmpty: 'Der bereinigte Text erscheint hier.',
             testerSample: [
@@ -176,7 +173,7 @@ export const STRINGS_DE: TranslationStrings = {
             trimDesc: 'Entfernt leere Zeilen und Leerzeichen am Anfang und Ende des eingefügten Textes.',
             trimAliases: ['leerzeichen', 'leerzeile', 'zeilenumbruch', 'kürzen'],
             commasName: 'Kommas und Anführungszeichen',
-            commasDesc: 'Lege fest, wo ein Komma neben einem schließenden Anführungszeichen steht.',
+            commasDesc: 'Wo ein Komma neben einem schließenden Anführungszeichen steht.',
             commasAliases: ['komma', 'anführungszeichen', 'zitat', 'zeichensetzung', 'stil'],
             commasNone: 'Keine Änderung',
             commasInside: 'Komma innerhalb der Anführungszeichen',
