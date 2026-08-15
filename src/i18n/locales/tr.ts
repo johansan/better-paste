@@ -67,7 +67,7 @@ export const STRINGS_TR: TranslationStrings = {
             pluginsName: 'Diğer eklentilerime göz at',
             pluginsAliases: ['eklentiler', 'notebook navigator', 'pixel perfect image', 'yazar', 'daha fazlası'],
             notebookNavigatorDesc: 'Daha iyi bir dosya tarayıcısı ve takvim',
-            pixelPerfectImageDesc: 'Tam isabetli görsel boyutlandırma ve çok daha fazlası'
+            pixelPerfectImageDesc: 'Tam isabetli görsel boyutlandırma ve daha fazlası'
         },
 
         behavior: {

@@ -79,7 +79,7 @@ export const STRINGS_RU: TranslationStrings = {
             pluginsName: 'Посмотрите мои другие плагины',
             pluginsAliases: ['плагины', 'notebook navigator', 'pixel perfect image', 'автор', 'ещё'],
             notebookNavigatorDesc: 'Улучшенный файловый браузер и календарь',
-            pixelPerfectImageDesc: 'Точное изменение размера изображений и многое другое'
+            pixelPerfectImageDesc: 'Точное изменение размера изображений и другое'
         },
 
         behavior: {

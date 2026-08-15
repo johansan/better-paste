@@ -67,7 +67,7 @@ export const STRINGS_DE: TranslationStrings = {
             pluginsName: 'Schau dir meine anderen Plugins an',
             pluginsAliases: ['plugins', 'notebook navigator', 'pixel perfect image', 'autor', 'mehr'],
             notebookNavigatorDesc: 'Ein besserer Dateibrowser und Kalender',
-            pixelPerfectImageDesc: 'Exakte Bildgrößen und vieles mehr'
+            pixelPerfectImageDesc: 'Exakte Bildgrößen und mehr'
         },
 
         behavior: {

@@ -82,7 +82,7 @@ export const STRINGS_EN = {
             pluginsName: 'Check out my other plugins',
             pluginsAliases: ['plugins', 'notebook navigator', 'pixel perfect image', 'author', 'more'],
             notebookNavigatorDesc: 'A better file browser and calendar',
-            pixelPerfectImageDesc: 'Exact image resizing and much more'
+            pixelPerfectImageDesc: 'Exact image resizing and more'
         },
 
         behavior: {

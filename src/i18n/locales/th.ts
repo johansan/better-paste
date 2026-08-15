@@ -64,7 +64,7 @@ export const STRINGS_TH: TranslationStrings = {
             pluginsName: 'ดูปลั๊กอินอื่นของฉัน',
             pluginsAliases: ['ปลั๊กอิน', 'notebook navigator', 'pixel perfect image', 'ผู้พัฒนา', 'เพิ่มเติม'],
             notebookNavigatorDesc: 'ตัวเรียกดูไฟล์และปฏิทินที่ดีกว่า',
-            pixelPerfectImageDesc: 'ปรับขนาดภาพได้แม่นยำและอื่น ๆ อีกมาก'
+            pixelPerfectImageDesc: 'ปรับขนาดภาพได้แม่นยำและอื่น ๆ'
         },
 
         behavior: {
