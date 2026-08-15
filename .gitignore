@@ -28,6 +28,9 @@ AGENTS.md
 CLAUDE.md
 GEMINI.md
 
+# Ignore local build script
+scripts/build-local.sh
+
 # Test vault state
 .obsidian
 
