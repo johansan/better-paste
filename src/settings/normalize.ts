@@ -24,6 +24,8 @@ import type {
     TerminalBulletMode,
     TerminalRejoinMode,
     TextCommaPlacement,
+    TextDashStyle,
+    TextQuoteStyle,
     LinkStripMode
 } from './types';
 
@@ -49,6 +51,8 @@ const BULLET_MODES: readonly TerminalBulletMode[] = ['preserve', 'markdown'];
 const REJOIN_MODES: readonly TerminalRejoinMode[] = ['indented', 'any', 'never'];
 const NAME_FORMATS: readonly ImageNameFormat[] = ['source', 'custom'];
 const COMMA_PLACEMENTS: readonly TextCommaPlacement[] = ['none', 'inside', 'outside'];
+const QUOTE_STYLES: readonly TextQuoteStyle[] = ['none', 'straight', 'curly'];
+const DASH_STYLES: readonly TextDashStyle[] = ['none', 'hyphen', 'en', 'em', 'em-spaced'];
 
 /**
  * Builds a complete settings object from whatever was stored on disk. Every field is
@@ -81,7 +85,8 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
         textTrim: asBoolean(data.textTrim, defaults.textTrim),
         textComma: asEnum(data.textComma, COMMA_PLACEMENTS, defaults.textComma),
         textInvisible: asBoolean(data.textInvisible, defaults.textInvisible),
-        textPunctuation: asBoolean(data.textPunctuation, defaults.textPunctuation),
+        textQuotes: asEnum(data.textQuotes, QUOTE_STYLES, defaults.textQuotes),
+        textDashes: asEnum(data.textDashes, DASH_STYLES, defaults.textDashes),
 
         lastShownVersion: normalizeVersion(data.lastShownVersion)
     };

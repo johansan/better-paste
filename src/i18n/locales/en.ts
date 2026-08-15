@@ -191,7 +191,44 @@ export const STRINGS_EN = {
             trimName: 'Trim surrounding whitespace',
             trimDesc: 'Removes blank lines and spaces from the start and end of pasted text.',
             trimAliases: ['whitespace', 'blank', 'space', 'newline', 'trim'],
-            commasName: 'Commas and quotes',
+            invisibleName: 'Invisible characters',
+            invisibleDesc: 'Removes zero-width spaces and turns non-breaking spaces into normal spaces.',
+            invisibleAliases: ['ai', 'chatgpt', 'claude', 'llm', 'unicode', 'invisible', 'nbsp', 'whitespace'],
+            // Three fragments of one sentence. An invisible character is drawn as its
+            // Unicode code point between each pair, so they cannot be one string.
+            invisibleExampleStart: 'The',
+            invisibleExampleMiddle: 'result',
+            invisibleExampleEnd: ' was fine.',
+            invisibleExampleAfter: 'The result was fine.',
+            quotesName: 'Quotes',
+            quotesDesc: 'Converts quotation marks and apostrophes to this style.',
+            quotesAliases: [
+                'quote',
+                'quotes',
+                'smart quotes',
+                'curly quotes',
+                'straight quotes',
+                'apostrophe',
+                'punctuation',
+                'typography',
+                'ai'
+            ],
+            quotesNone: 'No change',
+            quotesStraight: 'Straight quotes',
+            quotesCurly: 'Curly quotes',
+            // Holds a curly pair and a straight pair, so both styles change it
+            quotesExample: '“Fine,” she said. "Don\'t stop."',
+            dashesName: 'Dashes',
+            dashesDesc: 'Converts dashes between words to this style.',
+            dashesAliases: ['dash', 'em dash', 'en dash', 'hyphen', 'punctuation', 'typography', 'ai'],
+            dashesNone: 'No change',
+            dashesHyphen: 'Hyphens',
+            dashesEn: 'En dashes',
+            dashesEm: 'Em dashes',
+            dashesEmSpaced: 'Em dashes with spaces',
+            // Holds a spaced hyphen and an em dash, so every style changes it
+            dashesExample: 'The result - against all odds — was fine.',
+            commasName: 'Commas',
             commasDesc: 'Where a comma goes next to a closing double quotation mark.',
             commasAliases: ['comma', 'quote', 'quotation', 'punctuation', 'style'],
             commasNone: 'No change',
@@ -200,47 +237,7 @@ export const STRINGS_EN = {
             // The two halves of the comma example. The source has the comma inside the
             // closing quotation mark, so only the outside setting changes it.
             commasExampleSource: 'He called it "finished," then left.',
-            commasExampleOutside: 'He called it "finished", then left.',
-            invisibleName: 'AI cleanup: invisible characters',
-            invisibleDesc: 'Removes zero-width spaces and turns non-breaking spaces into normal spaces.',
-            invisibleAliases: [
-                'ai',
-                'chatgpt',
-                'claude',
-                'llm',
-                'dash',
-                'em dash',
-                'en dash',
-                'hyphen',
-                'unicode',
-                'invisible',
-                'nbsp',
-                'typography',
-                'punctuation',
-                'whitespace'
-            ],
-            // Three fragments of one sentence. An invisible character is drawn as its
-            // Unicode code point between each pair, so they cannot be one string.
-            invisibleExampleStart: 'The',
-            invisibleExampleMiddle: 'result',
-            invisibleExampleEnd: ' was fine.',
-            invisibleExampleAfter: 'The result was fine.',
-            punctuationName: 'AI cleanup: dashes and quotes',
-            punctuationDesc: 'Converts long dashes into hyphens and curly quotes into straight quotes.',
-            punctuationAliases: [
-                'em dash',
-                'en dash',
-                'hyphen',
-                'quote',
-                'quotes',
-                'smart quotes',
-                'curly quotes',
-                'apostrophe',
-                'punctuation',
-                'typography'
-            ],
-            punctuationExampleBefore: '“The result — against all odds — was perfect.”',
-            punctuationExampleAfter: '"The result - against all odds - was perfect."'
+            commasExampleOutside: 'He called it "finished", then left.'
         }
     },
 

@@ -2,7 +2,7 @@
 
 Read in your language: [English](https://betterpaste.md/docs.html) • [العربية](https://betterpaste.md/ar/docs.html) • [Deutsch](https://betterpaste.md/de/docs.html) • [Español](https://betterpaste.md/es/docs.html) • [فارسی](https://betterpaste.md/fa/docs.html) • [Français](https://betterpaste.md/fr/docs.html) • [Bahasa Indonesia](https://betterpaste.md/id/docs.html) • [Italiano](https://betterpaste.md/it/docs.html) • [Nederlands](https://betterpaste.md/nl/docs.html) • [Polski](https://betterpaste.md/pl/docs.html) • [Português](https://betterpaste.md/pt/docs.html) • [Português (Brasil)](https://betterpaste.md/pt-br/docs.html) • [Русский](https://betterpaste.md/ru/docs.html) • [ไทย](https://betterpaste.md/th/docs.html) • [Türkçe](https://betterpaste.md/tr/docs.html) • [Українська](https://betterpaste.md/uk/docs.html) • [Tiếng Việt](https://betterpaste.md/vi/docs.html) • [日本語](https://betterpaste.md/ja/docs.html) • [한국어](https://betterpaste.md/ko/docs.html) • [中文简体](https://betterpaste.md/zh-cn/docs.html) • [中文繁體](https://betterpaste.md/zh-tw/docs.html)
 
-Stop fixing formatting after every paste! Better Paste finally lets you copy images from Safari to Obsidian, it strips tracking parameters from URLs, fetches page titles, rejoins broken lines in terminal output, and removes invisible characters and curly quotes from AI text. Just paste, and the plugin handles the rest.
+Stop fixing formatting after every paste! Better Paste finally lets you copy images from Safari to Obsidian, it strips tracking parameters from URLs, fetches page titles, rejoins broken lines in terminal output, and cleans up AI-generated text. Quotes and dashes come out in the style you prefer, straight or typographic. Just paste, and the plugin handles the rest.
 
 If you find Better Paste useful, please consider [☕️ Buying me a coffee](https://buymeacoffee.com/johansan) or [Sponsor on GitHub ❤️](https://github.com/sponsors/johansan).
 
@@ -81,7 +81,7 @@ becomes
 npm warn deprecated inflight@1.0.6: This module is not supported and leaks memory. Do not use it. Check out lru-cache instead.
 ```
 
-### 2.5 AI text
+### 2.5 Cleanup of AI-generated text
 
 Chatbot text comes with curly quotes, long dashes and invisible characters. Better Paste turns it into plain text:
 
@@ -96,6 +96,18 @@ becomes
 ```
 
 The invisible characters (zero-width spaces and friends) are removed at the same time.
+
+Prefer real typography instead? Set **Quotes** to curly and **Dashes** to em dashes, and every paste comes out the other way:
+
+```
+"It works," she said - finally.
+```
+
+becomes
+
+```
+“It works,” she said—finally.
+```
 
 ### 2.6 Commas and quotes
 
@@ -169,9 +181,10 @@ Subdomains are covered automatically, `google.*` matches google.com and google.s
 ### 3.5 Text processing
 
 - **Trim surrounding whitespace**: removes blank lines and stray spaces around the paste. Blank lines in the middle stay.
-- **Commas and quotes**: inside, outside, or no change (the default).
-- **AI cleanup: invisible characters**: removes zero-width spaces and turns non-breaking spaces into normal ones. Emoji, Persian and Arabic joiners, and CJK spacing are left alone.
-- **AI cleanup: dashes and quotes**: turns long dashes into `-` and curly quotes into straight ones.
+- **Invisible characters**: removes zero-width spaces and turns non-breaking spaces into normal ones. Emoji, Persian and Arabic joiners, and CJK spacing are left alone.
+- **Quotes**: straight quotes (the default), curly quotes, or no change. `“don’t”` becomes `"don't"`, or the other way around.
+- **Dashes**: hyphens (the default), en dashes, em dashes, em dashes with spaces, or no change. Only dashes between words are converted, so `well-known` and `2020-2024` stay as they are.
+- **Commas**: comma inside or outside closing quotes, or no change (the default).
 
 ### 3.6 Frontmatter
 

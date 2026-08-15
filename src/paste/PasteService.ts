@@ -19,9 +19,9 @@
 import { Notice, parseYaml } from 'obsidian';
 import type { Editor, MarkdownFileInfo, MarkdownView, TFile } from 'obsidian';
 import { runTextPipeline } from '../transforms';
-import { cleanAiText } from '../transforms/aiText';
+import { applyDashStyle, applyQuoteStyle, normalizeInvisibleCharacters } from '../transforms/typography';
 import { applyCommaPlacement } from '../transforms/textProcessing';
-import { buildUrlCleanupOptions, cleanUrlsInText } from '../transforms/urlCleanup';
+import { buildUrlCleanupOptions, cleanUrlsInText, httpUrlRanges } from '../transforms/urlCleanup';
 import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './imageReferences';
 import { extractFrontmatterBlock, isInsideVerbatimContext, notePasteOverride, resolveImageSize } from './noteOptions';
 import { format, plural, strings } from '../i18n';
@@ -324,7 +324,15 @@ export class PasteService {
      */
     private scheduleRichPostProcess(editor: Editor, info: MarkdownView | MarkdownFileInfo): void {
         const settings = this.getSettings();
-        if (!settings.textInvisible && settings.textComma === 'none' && !settings.linkEnabled && !settings.imageEnabled) return;
+        if (
+            !settings.textInvisible &&
+            settings.textQuotes === 'none' &&
+            settings.textDashes === 'none' &&
+            settings.textComma === 'none' &&
+            !settings.linkEnabled &&
+            !settings.imageEnabled
+        )
+            return;
 
         const targetFile = info.file;
         const targetPath = targetFile?.path ?? '';
@@ -358,8 +366,10 @@ export class PasteService {
         let text = range.inserted;
 
         // Content copied out of a browser arrives as HTML, which is how most people paste
-        // an assistant's answer. Without this the character rule would never see it.
-        if (settings.textInvisible) text = cleanAiText(text, settings).text;
+        // an assistant's answer. Without this the character rules would never see it.
+        if (settings.textInvisible) text = normalizeInvisibleCharacters(text, httpUrlRanges(text)).text;
+        if (settings.textDashes !== 'none') text = applyDashStyle(text, settings.textDashes, httpUrlRanges(text)).text;
+        if (settings.textQuotes !== 'none') text = applyQuoteStyle(text, settings.textQuotes, httpUrlRanges(text)).text;
 
         if (settings.textComma !== 'none') text = applyCommaPlacement(text, settings.textComma).text;
 

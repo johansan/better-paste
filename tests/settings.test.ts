@@ -294,6 +294,14 @@ describe('runTextPipeline', () => {
         expect(runTextPipeline('https://example.com/a?utm_source=x', { ...DEFAULT_SETTINGS, linkEnabled: false }).text).toBe(
             'https://example.com/a?utm_source=x'
         );
-        expect(runTextPipeline('a \u2014 b', { ...DEFAULT_SETTINGS, textInvisible: false }).text).toBe('a \u2014 b');
+        expect(runTextPipeline('a \u2014 b', { ...DEFAULT_SETTINGS, textDashes: 'none' }).text).toBe('a \u2014 b');
+        expect(runTextPipeline('\u201cq\u201d', { ...DEFAULT_SETTINGS, textQuotes: 'none' }).text).toBe('\u201cq\u201d');
+    });
+
+    it('converts dashes and quotes to the typographic styles', () => {
+        const settings = { ...DEFAULT_SETTINGS, textQuotes: 'curly', textDashes: 'em' } as const;
+        expect(runTextPipeline('"It works," she said - finally.', { ...DEFAULT_SETTINGS, ...settings }).text).toBe(
+            '\u201cIt works,\u201d she said\u2014finally.'
+        );
     });
 });

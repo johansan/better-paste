@@ -181,7 +181,7 @@ describe('settings tree', () => {
         expect(flatten([...(images?.items ?? [])]).map(row => row.name)).not.toContain('Image width property');
     });
 
-    it('puts text preferences and AI cleanup under Text processing', () => {
+    it('puts the text preferences under Text processing', () => {
         const groups = tab
             .getSettingDefinitions()
             .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
@@ -190,10 +190,7 @@ describe('settings tree', () => {
         const names = flatten([...(textProcessing?.items ?? [])]).map(row => row.name);
 
         expect(flatten([...(behavior?.items ?? [])]).map(row => row.name)).not.toContain('Trim surrounding whitespace');
-        expect(names.slice(0, 2)).toEqual(['Trim surrounding whitespace', 'Commas and quotes']);
-        expect(names).toContain('Trim surrounding whitespace');
-        expect(names).toContain('AI cleanup: invisible characters');
-        expect(names).toContain('AI cleanup: dashes and quotes');
+        expect(names).toEqual(['Trim surrounding whitespace', 'Invisible characters', 'Quotes', 'Dashes', 'Commas']);
     });
 
     it('puts title fetching above link cleaning', () => {
@@ -218,7 +215,7 @@ describe('settings tree', () => {
     it('offers all comma placement choices', () => {
         const row = controlRows(tab).find(candidate => candidate.control.key === 'textComma');
         expect(row?.control.type).toBe('dropdown');
-        if (row?.control.type !== 'dropdown') throw new Error('Commas and quotes is not a dropdown');
+        if (row?.control.type !== 'dropdown') throw new Error('Commas is not a dropdown');
         expect(row.control.options).toEqual({
             none: 'No change',
             inside: 'Comma inside quotes',
@@ -226,12 +223,36 @@ describe('settings tree', () => {
         });
     });
 
+    it('offers all quote styles', () => {
+        const row = controlRows(tab).find(candidate => candidate.control.key === 'textQuotes');
+        expect(row?.control.type).toBe('dropdown');
+        if (row?.control.type !== 'dropdown') throw new Error('Quotes is not a dropdown');
+        expect(row.control.options).toEqual({
+            none: 'No change',
+            straight: 'Straight quotes',
+            curly: 'Curly quotes'
+        });
+    });
+
+    it('offers all dash styles', () => {
+        const row = controlRows(tab).find(candidate => candidate.control.key === 'textDashes');
+        expect(row?.control.type).toBe('dropdown');
+        if (row?.control.type !== 'dropdown') throw new Error('Dashes is not a dropdown');
+        expect(row.control.options).toEqual({
+            none: 'No change',
+            hyphen: 'Hyphens',
+            en: 'En dashes',
+            em: 'Em dashes',
+            'em-spaced': 'Em dashes with spaces'
+        });
+    });
+
     it('updates the comma example for the selected placement', () => {
         const descriptionFor = (placement: BetterPasteSettings['textComma']): string => {
             const row = flatten(makeTab(fakePlugin({ textComma: placement })).getSettingDefinitions()).find(
-                candidate => candidate.name === 'Commas and quotes'
+                candidate => candidate.name === 'Commas'
             );
-            if (typeof row?.desc !== 'string') throw new Error('Commas and quotes has no text fallback');
+            if (typeof row?.desc !== 'string') throw new Error('Commas has no text fallback');
             return row.desc;
         };
 
@@ -241,17 +262,17 @@ describe('settings tree', () => {
         expect(descriptionFor('outside')).toContain(`${source} \u2192 He called it "finished", then left.`);
     });
 
-    it('shows an example for each AI cleanup setting', () => {
-        const rows = flatten(tab.getSettingDefinitions()).filter(row => row.name.startsWith('AI cleanup:'));
+    it('shows an example for each character cleanup setting', () => {
+        const rows = flatten(tab.getSettingDefinitions()).filter(row => ['Invisible characters', 'Quotes', 'Dashes'].includes(row.name));
 
-        expect(rows).toHaveLength(2);
+        expect(rows).toHaveLength(3);
         for (const row of rows) {
             expect(typeof row.desc).toBe('string');
             if (typeof row.desc !== 'string') throw new Error(`${row.name} has no text fallback`);
             expect(row.desc).toContain('\u2192');
         }
 
-        const invisible = rows.find(row => row.name === 'AI cleanup: invisible characters');
+        const invisible = rows.find(row => row.name === 'Invisible characters');
         expect(invisible?.desc).toContain('U+00A0');
         expect(invisible?.desc).toContain('U+200B');
     });
@@ -394,9 +415,9 @@ describe('dependent settings', () => {
         expect(isVisible(pageFor('Terminal text handling', { terminalEnabled: true }))).toBe(true);
     });
 
-    it('hides the punctuation choice when AI cleanup is off', () => {
-        expect(isVisible(rowFor('textPunctuation', { textInvisible: false }))).toBe(false);
-        expect(isVisible(rowFor('textPunctuation', { textInvisible: true }))).toBe(true);
+    it('keeps the quote and dash choices independent of invisible characters', () => {
+        expect(isVisible(rowFor('textQuotes', { textInvisible: false }))).toBeUndefined();
+        expect(isVisible(rowFor('textDashes', { textInvisible: false }))).toBeUndefined();
     });
 
     it('re-evaluates dependent settings after a change', async () => {
@@ -417,6 +438,23 @@ describe('dependent settings', () => {
 
         await tab.setControlValue('textComma', 'outside');
         expect(rendered).toEqual(['He called it "finished," then left. \u2192 He called it "finished", then left.']);
+    });
+
+    it('updates the rendered quote and dash examples after their selections change', async () => {
+        const tab = makeTab(fakePlugin());
+        const rendered: string[] = [];
+        Object.assign(tab, {
+            containerEl: {
+                querySelectorAll: () => [{ setText: (value: string) => rendered.push(value) }]
+            }
+        });
+
+        await tab.setControlValue('textQuotes', 'curly');
+        await tab.setControlValue('textDashes', 'em');
+        expect(rendered).toEqual([
+            '\u201cFine,\u201d she said. "Don\'t stop." \u2192 \u201cFine,\u201d she said. \u201cDon\u2019t stop.\u201d',
+            'The result - against all odds \u2014 was fine. \u2192 The result\u2014against all odds\u2014was fine.'
+        ]);
     });
 
     it('does not rebuild the terminal tester when its mode changes', async () => {

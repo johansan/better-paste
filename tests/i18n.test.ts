@@ -19,10 +19,10 @@
 import { describe, expect, it } from 'vitest';
 import { aliases, format, LOCALES, plural, strings } from '../src/i18n';
 import { STRINGS_EN } from '../src/i18n/locales/en';
-import { normalizeInvisibleCharacters, replacePunctuation } from '../src/transforms/aiText';
+import { applyDashStyle, applyQuoteStyle, normalizeInvisibleCharacters } from '../src/transforms/typography';
 import { applyCommaPlacement } from '../src/transforms/textProcessing';
 
-/** The two invisible characters the AI cleanup example puts between its fragments. */
+/** The two invisible characters the invisible-characters example puts between its fragments. */
 const NO_BREAK_SPACE = '\u00A0';
 const ZERO_WIDTH_SPACE = '\u200B';
 
@@ -172,14 +172,20 @@ describe('translations', () => {
         expect(applyCommaPlacement(source, 'inside').text).toBe(source);
     });
 
-    it.each(Object.entries(LOCALES))('%s writes an AI cleanup example the rule really produces', (_code, locale) => {
+    it.each(Object.entries(LOCALES))('%s writes text cleanup examples the rules really produce', (_code, locale) => {
         const text = locale.strings.settings.text;
         const invisible = `${text.invisibleExampleStart}${NO_BREAK_SPACE}${text.invisibleExampleMiddle}${ZERO_WIDTH_SPACE}${text.invisibleExampleEnd}`;
 
         expect(normalizeInvisibleCharacters(invisible).text).toBe(text.invisibleExampleAfter);
-        // Guillemets are deliberately left alone by the rule, so a language whose example
-        // used them would promise a change that never happens
-        expect(replacePunctuation(text.punctuationExampleBefore).text).toBe(text.punctuationExampleAfter);
+
+        // Every selectable style must visibly change its example, otherwise the settings
+        // row would promise a change that never happens. Guillemets are deliberately left
+        // alone by the quote rule, so a language cannot use them as the curly pair.
+        expect(applyQuoteStyle(text.quotesExample, 'straight').changed, 'straight quotes').toBe(true);
+        expect(applyQuoteStyle(text.quotesExample, 'curly').changed, 'curly quotes').toBe(true);
+        for (const style of ['hyphen', 'en', 'em', 'em-spaced'] as const) {
+            expect(applyDashStyle(text.dashesExample, style).changed, `${style} dashes`).toBe(true);
+        }
     });
 });
 
