@@ -61,7 +61,6 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
 
     return {
         autoClean: asBoolean(data.autoClean, defaults.autoClean),
-        showNotices: asBoolean(data.showNotices, defaults.showNotices),
 
         imageEnabled: asBoolean(data.imageEnabled, defaults.imageEnabled),
         imageNameFormat: asEnum(data.imageNameFormat, NAME_FORMATS, defaults.imageNameFormat),

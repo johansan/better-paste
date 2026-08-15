@@ -29,25 +29,19 @@ export const STRINGS_NL: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: ', ',
         cleanupOn: 'automatische bewerking aan',
         cleanupOff: 'automatische bewerking uit',
         selectTextFirst: 'selecteer eerst tekst',
         nothingToClean: 'niets op te schonen',
         clipboardFailed: 'kon het klembord niet lezen',
         titleFailed: 'kon de titel niet ophalen.',
-        fetchingTitle: 'titel ophalen{dots}',
+        fetchingTitle: 'titel ophalen...',
         imagesFailed: {
             one: '{count} afbeelding kon niet worden opgeslagen',
             other: '{count} afbeeldingen konden niet worden opgeslagen'
         },
         imagesFailedLinkKept: '{images}, de oorspronkelijke link is behouden',
-        imagesFailedNothingPasted: '{images}, dus er is niets geplakt',
-        aiTextCleaned: 'AI-tekst opgeschoond',
-        terminalCleaned: 'terminaluitvoer opgeschoond',
-        textProcessed: 'tekststijl aangepast',
-        urlsCleaned: { one: '{count} URL opgeschoond', other: '{count} URL’s opgeschoond' },
-        imagesSaved: { one: '{count} afbeelding opgeslagen', other: '{count} afbeeldingen opgeslagen' }
+        imagesFailedNothingPasted: '{images}, dus er is niets geplakt'
     },
 
     settings: {
@@ -75,10 +69,7 @@ export const STRINGS_NL: TranslationStrings = {
             autoCleanName: 'Elke plakactie opschonen',
             autoCleanDesc:
                 'Past de regels toe bij elke plakactie. Staat dit uit, dan werken de regels alleen via de Better Paste-opdrachten. Een losse notitie kan zichzelf uitsluiten met de eigenschap "bp: false" of zich altijd laten opschonen met "bp: true".',
-            autoCleanAliases: ['automatisch', 'inschakelen', 'uitschakelen', 'notitie', 'uitsluiten', 'eigenschap', 'frontmatter'],
-            showNoticesName: 'Melding tonen wanneer een plakactie is aangepast',
-            showNoticesDesc: 'Een samenvatting van één regel van wat er is veranderd. Fouten worden altijd gemeld.',
-            showNoticesAliases: ['melding', 'samenvatting', 'bericht', 'notificatie', 'stil']
+            autoCleanAliases: ['automatisch', 'inschakelen', 'uitschakelen', 'notitie', 'uitsluiten', 'eigenschap', 'frontmatter']
         },
 
         images: {

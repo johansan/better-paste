@@ -29,22 +29,16 @@ export const STRINGS_KO: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: ', ',
         cleanupOn: '자동 처리 켜짐',
         cleanupOff: '자동 처리 꺼짐',
         selectTextFirst: '먼저 텍스트를 선택하세요',
         nothingToClean: '정리할 것이 없습니다',
         clipboardFailed: '클립보드를 읽지 못했습니다',
         titleFailed: '제목을 가져오지 못했습니다.',
-        fetchingTitle: '제목 가져오는 중{dots}',
+        fetchingTitle: '제목 가져오는 중...',
         imagesFailed: { other: '이미지 {count}개를 저장하지 못했습니다' },
         imagesFailedLinkKept: '{images}. 원래 링크를 유지했습니다',
-        imagesFailedNothingPasted: '{images}. 그래서 아무것도 붙여넣지 않았습니다',
-        aiTextCleaned: 'AI 텍스트 정돈',
-        terminalCleaned: '터미널 출력 정리',
-        textProcessed: '텍스트 스타일 조정',
-        urlsCleaned: { other: 'URL {count}개 정리' },
-        imagesSaved: { other: '이미지 {count}개 저장' }
+        imagesFailedNothingPasted: '{images}. 그래서 아무것도 붙여넣지 않았습니다'
     },
 
     settings: {
@@ -72,10 +66,7 @@ export const STRINGS_KO: TranslationStrings = {
             autoCleanName: '붙여넣을 때마다 정리',
             autoCleanDesc:
                 '붙여넣을 때마다 규칙을 적용합니다. 꺼 두면 Better Paste 명령에서만 규칙이 적용됩니다. 개별 노트는 "bp: false" 속성으로 제외하거나 "bp: true" 속성으로 포함할 수 있습니다.',
-            autoCleanAliases: ['자동', '켜기', '끄기', '노트', '제외', '속성', '프론트매터', 'frontmatter'],
-            showNoticesName: '붙여넣기가 변경되면 알림 표시',
-            showNoticesDesc: '무엇이 바뀌었는지 한 줄로 요약합니다. 실패는 항상 알립니다.',
-            showNoticesAliases: ['알림', '요약', '메시지', '조용히']
+            autoCleanAliases: ['자동', '켜기', '끄기', '노트', '제외', '속성', '프론트매터', 'frontmatter']
         },
 
         images: {

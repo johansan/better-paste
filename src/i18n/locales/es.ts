@@ -29,25 +29,19 @@ export const STRINGS_ES: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: ', ',
         cleanupOn: 'procesamiento automático activado',
         cleanupOff: 'procesamiento automático desactivado',
         selectTextFirst: 'selecciona texto primero',
         nothingToClean: 'no hay nada que limpiar',
         clipboardFailed: 'no se pudo leer el portapapeles',
         titleFailed: 'no se pudo obtener el título.',
-        fetchingTitle: 'obteniendo el título{dots}',
+        fetchingTitle: 'obteniendo el título...',
         imagesFailed: {
             one: 'no se pudo guardar {count} imagen',
             other: 'no se pudieron guardar {count} imágenes'
         },
         imagesFailedLinkKept: '{images}, se conservó el enlace original',
-        imagesFailedNothingPasted: '{images}, así que no se pegó nada',
-        aiTextCleaned: 'texto de IA depurado',
-        terminalCleaned: 'salida de terminal limpiada',
-        textProcessed: 'estilo de texto ajustado',
-        urlsCleaned: { one: '{count} URL limpiada', other: '{count} URL limpiadas' },
-        imagesSaved: { one: '{count} imagen guardada', other: '{count} imágenes guardadas' }
+        imagesFailedNothingPasted: '{images}, así que no se pegó nada'
     },
 
     settings: {
@@ -75,10 +69,7 @@ export const STRINGS_ES: TranslationStrings = {
             autoCleanName: 'Limpiar cada pegado',
             autoCleanDesc:
                 'Aplica las reglas en cada pegado. Si se desactiva, las reglas solo se aplican mediante los comandos de Better Paste. Una nota concreta puede quedar excluida con la propiedad "bp: false", o incluida con "bp: true".',
-            autoCleanAliases: ['automático', 'activar', 'desactivar', 'nota', 'excluir', 'propiedad', 'frontmatter', 'excepción'],
-            showNoticesName: 'Mostrar un aviso cuando se modifica un pegado',
-            showNoticesDesc: 'Un resumen de una línea de lo que cambió. Los fallos se informan siempre.',
-            showNoticesAliases: ['aviso', 'resumen', 'mensaje', 'notificación', 'silencio']
+            autoCleanAliases: ['automático', 'activar', 'desactivar', 'nota', 'excluir', 'propiedad', 'frontmatter', 'excepción']
         },
 
         images: {

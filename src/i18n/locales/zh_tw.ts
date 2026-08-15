@@ -29,22 +29,16 @@ export const STRINGS_ZH_TW: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste：{message}',
-        separator: '，',
         cleanupOn: '自動處理已開啟',
         cleanupOff: '自動處理已關閉',
         selectTextFirst: '請先選取文字',
         nothingToClean: '沒有需要整理的內容',
         clipboardFailed: '無法讀取剪貼簿',
         titleFailed: '無法取得標題。',
-        fetchingTitle: '正在取得標題{dots}',
+        fetchingTitle: '正在取得標題...',
         imagesFailed: { other: '有 {count} 張圖片未能儲存' },
         imagesFailedLinkKept: '{images}，已保留原始連結',
-        imagesFailedNothingPasted: '{images}，因此沒有貼上任何內容',
-        aiTextCleaned: '已整理 AI 文字',
-        terminalCleaned: '已整理終端機輸出',
-        textProcessed: '已調整文字樣式',
-        urlsCleaned: { other: '已整理 {count} 個連結' },
-        imagesSaved: { other: '已儲存 {count} 張圖片' }
+        imagesFailedNothingPasted: '{images}，因此沒有貼上任何內容'
     },
 
     settings: {
@@ -72,10 +66,7 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             autoCleanName: '每次貼上都整理',
             autoCleanDesc:
                 '每次貼上都會套用規則。關閉後規則只在 Better Paste 指令中生效。單篇筆記可以用 "bp: false" 屬性排除自己，也可以用 "bp: true" 屬性單獨啟用。',
-            autoCleanAliases: ['自動', '啟用', '停用', '筆記', '排除', '屬性', 'frontmatter'],
-            showNoticesName: '貼上內容被修改時顯示通知',
-            showNoticesDesc: '用一行說明改動了什麼。失敗一律會通知。',
-            showNoticesAliases: ['通知', '提示', '摘要', '訊息', '安靜']
+            autoCleanAliases: ['自動', '啟用', '停用', '筆記', '排除', '屬性', 'frontmatter']
         },
 
         images: {

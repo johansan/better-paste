@@ -77,7 +77,7 @@ function fakeTitles(settings: BetterPasteSettings, fetched: string[]): LinkTitle
 }
 
 function build(overrides: Partial<BetterPasteSettings> = {}, failing = false) {
-    const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, showNotices: false, ...overrides };
+    const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, ...overrides };
     const saved: SavedClipboardImages[] = [];
     const fetchedTitles: string[] = [];
     const service = new PasteService(() => settings, fakeImages(settings, failing, saved), fakeTitles(settings, fetchedTitles));
@@ -492,7 +492,6 @@ describe('handleEditorPaste: link titles', () => {
         vi.useFakeTimers();
         const settings: BetterPasteSettings = {
             ...DEFAULT_SETTINGS,
-            showNotices: true,
             linkTitles: true,
             linkEnabled: false
         };
@@ -514,14 +513,14 @@ describe('handleEditorPaste: link titles', () => {
             service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
 
             expect(editor.getValue()).toBe(url);
-            expect(Notice.instances).toHaveLength(noticeCount + 1);
-            const progress = Notice.instances[noticeCount];
-            expect(progress.message).toBe('Better Paste: fetching title.');
-            expect(progress.duration).toBe(0);
-            expect(progress.hidden).toBe(false);
+            expect(Notice.instances).toHaveLength(noticeCount);
 
             await vi.advanceTimersByTimeAsync(500);
-            expect(progress.message).toBe('Better Paste: fetching title..');
+            expect(Notice.instances).toHaveLength(noticeCount + 1);
+            const progress = Notice.instances[noticeCount];
+            expect(progress.message).toBe('Better Paste: fetching title...');
+            expect(progress.duration).toBe(0);
+            expect(progress.hidden).toBe(false);
 
             finishTitleFetch(null);
             await titleResult;
@@ -537,29 +536,17 @@ describe('handleEditorPaste: link titles', () => {
         }
     });
 
-    it('reports a title failure when ordinary notices are off', async () => {
-        const settings: BetterPasteSettings = {
-            ...DEFAULT_SETTINGS,
-            showNotices: false,
-            linkTitles: true,
-            linkEnabled: false
-        };
-        const titles = {
-            hasWork: (text: string) => /^https?:\/\/\S+$/i.test(text),
-            materializeTitle: async () => null,
-            dispose: () => undefined
-        } as unknown as LinkTitleService;
-        const service = new PasteService(() => settings, fakeImages(settings), titles);
+    it('never shows the progress notice when the title arrives quickly', async () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false });
         const editor = new FakeEditor('');
         const noticeCount = Notice.instances.length;
-        const url = 'https://x.com/home';
 
-        service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO);
         await settle();
 
-        expect(editor.getValue()).toBe(url);
-        expect(Notice.instances).toHaveLength(noticeCount + 1);
-        expect(Notice.instances[noticeCount].message).toBe('Better Paste: could not fetch the title.');
+        expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
+        const messages = Notice.instances.slice(noticeCount).map(notice => notice.message);
+        expect(messages.some(message => message.includes('fetching title'))).toBe(false);
     });
 
     it('uses selected text as the link label without fetching a title', async () => {

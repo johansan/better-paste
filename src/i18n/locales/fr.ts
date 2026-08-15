@@ -29,25 +29,19 @@ export const STRINGS_FR: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste : {message}',
-        separator: ', ',
         cleanupOn: 'traitement automatique activé',
         cleanupOff: 'traitement automatique désactivé',
         selectTextFirst: 'sélectionnez d’abord du texte',
         nothingToClean: 'rien à nettoyer',
         clipboardFailed: 'impossible de lire le presse-papiers',
         titleFailed: 'impossible de récupérer le titre.',
-        fetchingTitle: 'récupération du titre{dots}',
+        fetchingTitle: 'récupération du titre...',
         imagesFailed: {
             one: '{count} image n’a pas pu être enregistrée',
             other: '{count} images n’ont pas pu être enregistrées'
         },
         imagesFailedLinkKept: '{images}, le lien d’origine a été conservé',
-        imagesFailedNothingPasted: '{images}, donc rien n’a été collé',
-        aiTextCleaned: 'texte d’IA nettoyé',
-        terminalCleaned: 'sortie de terminal nettoyée',
-        textProcessed: 'style du texte ajusté',
-        urlsCleaned: { one: '{count} URL nettoyée', other: '{count} URL nettoyées' },
-        imagesSaved: { one: '{count} image enregistrée', other: '{count} images enregistrées' }
+        imagesFailedNothingPasted: '{images}, donc rien n’a été collé'
     },
 
     settings: {
@@ -75,10 +69,7 @@ export const STRINGS_FR: TranslationStrings = {
             autoCleanName: 'Nettoyer chaque collage',
             autoCleanDesc:
                 'Applique les règles à chaque collage. Si cette option est désactivée, les règles ne s’appliquent que via les commandes Better Paste. Une note peut s’en exclure avec la propriété "bp: false", ou s’y inclure avec "bp: true".',
-            autoCleanAliases: ['automatique', 'activer', 'désactiver', 'note', 'exclure', 'propriété', 'frontmatter', 'exception'],
-            showNoticesName: 'Afficher une notification quand un collage est modifié',
-            showNoticesDesc: 'Un résumé sur une ligne de ce qui a changé. Les échecs sont toujours signalés.',
-            showNoticesAliases: ['notification', 'résumé', 'message', 'avis', 'silencieux']
+            autoCleanAliases: ['automatique', 'activer', 'désactiver', 'note', 'exclure', 'propriété', 'frontmatter', 'exception']
         },
 
         images: {

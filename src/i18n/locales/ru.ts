@@ -29,14 +29,13 @@ export const STRINGS_RU: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: ', ',
         cleanupOn: 'автоматическая обработка включена',
         cleanupOff: 'автоматическая обработка выключена',
         selectTextFirst: 'сначала выделите текст',
         nothingToClean: 'очищать нечего',
         clipboardFailed: 'не удалось прочитать буфер обмена',
         titleFailed: 'не удалось получить заголовок.',
-        fetchingTitle: 'получение заголовка{dots}',
+        fetchingTitle: 'получение заголовка...',
         imagesFailed: {
             one: 'не удалось сохранить {count} изображение',
             few: 'не удалось сохранить {count} изображения',
@@ -44,22 +43,7 @@ export const STRINGS_RU: TranslationStrings = {
             other: 'не удалось сохранить {count} изображения'
         },
         imagesFailedLinkKept: '{images}, исходная ссылка сохранена',
-        imagesFailedNothingPasted: '{images}, поэтому ничего не вставлено',
-        aiTextCleaned: 'текст ИИ приведён в порядок',
-        terminalCleaned: 'вывод терминала очищен',
-        textProcessed: 'стиль текста поправлен',
-        urlsCleaned: {
-            one: 'очищен {count} URL',
-            few: 'очищено {count} URL',
-            many: 'очищено {count} URL',
-            other: 'очищено {count} URL'
-        },
-        imagesSaved: {
-            one: 'сохранено {count} изображение',
-            few: 'сохранено {count} изображения',
-            many: 'сохранено {count} изображений',
-            other: 'сохранено {count} изображения'
-        }
+        imagesFailedNothingPasted: '{images}, поэтому ничего не вставлено'
     },
 
     settings: {
@@ -87,10 +71,7 @@ export const STRINGS_RU: TranslationStrings = {
             autoCleanName: 'Очищать каждую вставку',
             autoCleanDesc:
                 'Применяет правила при каждой вставке. Когда выключено, правила работают только через команды Better Paste. Отдельную заметку можно исключить свойством "bp: false" или включить свойством "bp: true".',
-            autoCleanAliases: ['автоматически', 'включить', 'выключить', 'заметка', 'исключить', 'свойство', 'frontmatter'],
-            showNoticesName: 'Показывать уведомление, когда вставка изменена',
-            showNoticesDesc: 'Однострочная сводка изменений. Об ошибках сообщается всегда.',
-            showNoticesAliases: ['уведомление', 'сводка', 'сообщение', 'тихо']
+            autoCleanAliases: ['автоматически', 'включить', 'выключить', 'заметка', 'исключить', 'свойство', 'frontmatter']
         },
 
         images: {

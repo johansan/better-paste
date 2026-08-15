@@ -29,22 +29,16 @@ export const STRINGS_ZH_CN: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste：{message}',
-        separator: '，',
         cleanupOn: '自动处理已开启',
         cleanupOff: '自动处理已关闭',
         selectTextFirst: '请先选择文本',
         nothingToClean: '没有需要清理的内容',
         clipboardFailed: '无法读取剪贴板',
         titleFailed: '无法获取标题。',
-        fetchingTitle: '正在获取标题{dots}',
+        fetchingTitle: '正在获取标题...',
         imagesFailed: { other: '有 {count} 张图片未能保存' },
         imagesFailedLinkKept: '{images}，已保留原始链接',
-        imagesFailedNothingPasted: '{images}，因此没有粘贴任何内容',
-        aiTextCleaned: '已整理 AI 文本',
-        terminalCleaned: '已清理终端输出',
-        textProcessed: '已调整文本样式',
-        urlsCleaned: { other: '已清理 {count} 个链接' },
-        imagesSaved: { other: '已保存 {count} 张图片' }
+        imagesFailedNothingPasted: '{images}，因此没有粘贴任何内容'
     },
 
     settings: {
@@ -72,10 +66,7 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             autoCleanName: '每次粘贴都清理',
             autoCleanDesc:
                 '每次粘贴都会应用规则。关闭后规则只在 Better Paste 命令中生效。单篇笔记可以用 "bp: false" 属性排除自己，也可以用 "bp: true" 属性单独启用。',
-            autoCleanAliases: ['自动', '启用', '禁用', '笔记', '排除', '属性', 'frontmatter'],
-            showNoticesName: '粘贴内容被修改时显示提示',
-            showNoticesDesc: '用一行说明改动了什么。失败总会提示。',
-            showNoticesAliases: ['通知', '提示', '摘要', '消息', '安静']
+            autoCleanAliases: ['自动', '启用', '禁用', '笔记', '排除', '属性', 'frontmatter']
         },
 
         images: {

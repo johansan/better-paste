@@ -29,14 +29,13 @@ export const STRINGS_PL: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: ', ',
         cleanupOn: 'automatyczne przetwarzanie włączone',
         cleanupOff: 'automatyczne przetwarzanie wyłączone',
         selectTextFirst: 'najpierw zaznacz tekst',
         nothingToClean: 'nie ma czego czyścić',
         clipboardFailed: 'nie udało się odczytać schowka',
         titleFailed: 'nie udało się pobrać tytułu.',
-        fetchingTitle: 'pobieranie tytułu{dots}',
+        fetchingTitle: 'pobieranie tytułu...',
         imagesFailed: {
             one: 'nie udało się zapisać {count} obrazu',
             few: 'nie udało się zapisać {count} obrazów',
@@ -44,22 +43,7 @@ export const STRINGS_PL: TranslationStrings = {
             other: 'nie udało się zapisać {count} obrazu'
         },
         imagesFailedLinkKept: '{images}, zachowano oryginalny odnośnik',
-        imagesFailedNothingPasted: '{images}, więc nic nie zostało wklejone',
-        aiTextCleaned: 'uporządkowano tekst AI',
-        terminalCleaned: 'wyczyszczono wynik terminala',
-        textProcessed: 'poprawiono styl tekstu',
-        urlsCleaned: {
-            one: 'wyczyszczono {count} adres URL',
-            few: 'wyczyszczono {count} adresy URL',
-            many: 'wyczyszczono {count} adresów URL',
-            other: 'wyczyszczono {count} adresu URL'
-        },
-        imagesSaved: {
-            one: 'zapisano {count} obraz',
-            few: 'zapisano {count} obrazy',
-            many: 'zapisano {count} obrazów',
-            other: 'zapisano {count} obrazu'
-        }
+        imagesFailedNothingPasted: '{images}, więc nic nie zostało wklejone'
     },
 
     settings: {
@@ -87,10 +71,7 @@ export const STRINGS_PL: TranslationStrings = {
             autoCleanName: 'Czyść każde wklejenie',
             autoCleanDesc:
                 'Stosuje reguły przy każdym wklejeniu. Gdy jest wyłączone, reguły działają tylko po użyciu poleceń Better Paste. Pojedyncza notatka może się wyłączyć właściwością "bp: false" lub włączyć właściwością "bp: true".',
-            autoCleanAliases: ['automatycznie', 'włącz', 'wyłącz', 'notatka', 'wyklucz', 'właściwość', 'frontmatter'],
-            showNoticesName: 'Pokazuj powiadomienie, gdy wklejenie zostało zmienione',
-            showNoticesDesc: 'Jednowierszowe podsumowanie zmian. Błędy są zgłaszane zawsze.',
-            showNoticesAliases: ['powiadomienie', 'podsumowanie', 'komunikat', 'cicho']
+            autoCleanAliases: ['automatycznie', 'włącz', 'wyłącz', 'notatka', 'wyklucz', 'właściwość', 'frontmatter']
         },
 
         images: {

@@ -29,22 +29,16 @@ export const STRINGS_TH: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: ', ',
         cleanupOn: 'เปิดการประมวลผลอัตโนมัติแล้ว',
         cleanupOff: 'ปิดการประมวลผลอัตโนมัติแล้ว',
         selectTextFirst: 'เลือกข้อความก่อน',
         nothingToClean: 'ไม่มีอะไรให้จัดระเบียบ',
         clipboardFailed: 'อ่านคลิปบอร์ดไม่ได้',
         titleFailed: 'ดึงชื่อเรื่องไม่สำเร็จ',
-        fetchingTitle: 'กำลังดึงชื่อเรื่อง{dots}',
+        fetchingTitle: 'กำลังดึงชื่อเรื่อง...',
         imagesFailed: { other: 'บันทึกรูปภาพ {count} รูปไม่สำเร็จ' },
         imagesFailedLinkKept: '{images} จึงคงลิงก์เดิมไว้',
-        imagesFailedNothingPasted: '{images} จึงไม่ได้วางอะไรเลย',
-        aiTextCleaned: 'จัดระเบียบข้อความ AI แล้ว',
-        terminalCleaned: 'จัดระเบียบผลลัพธ์เทอร์มินัลแล้ว',
-        textProcessed: 'ปรับรูปแบบข้อความแล้ว',
-        urlsCleaned: { other: 'จัดระเบียบลิงก์ {count} รายการ' },
-        imagesSaved: { other: 'บันทึกรูปภาพ {count} รูป' }
+        imagesFailedNothingPasted: '{images} จึงไม่ได้วางอะไรเลย'
     },
 
     settings: {
@@ -72,10 +66,7 @@ export const STRINGS_TH: TranslationStrings = {
             autoCleanName: 'จัดระเบียบทุกครั้งที่วาง',
             autoCleanDesc:
                 'ใช้กฎกับการวางทุกครั้ง เมื่อปิดไว้ กฎจะทำงานเฉพาะผ่านคำสั่งของ Better Paste โน้ตแต่ละฉบับยกเว้นตัวเองได้ด้วยคุณสมบัติ "bp: false" หรือเลือกให้จัดระเบียบได้ด้วย "bp: true"',
-            autoCleanAliases: ['อัตโนมัติ', 'เปิด', 'ปิด', 'โน้ต', 'ยกเว้น', 'คุณสมบัติ', 'frontmatter'],
-            showNoticesName: 'แสดงการแจ้งเตือนเมื่อการวางถูกเปลี่ยน',
-            showNoticesDesc: 'สรุปหนึ่งบรรทัดว่าอะไรเปลี่ยนไปบ้าง ความล้มเหลวจะแจ้งเสมอ',
-            showNoticesAliases: ['การแจ้งเตือน', 'สรุป', 'ข้อความ', 'เงียบ']
+            autoCleanAliases: ['อัตโนมัติ', 'เปิด', 'ปิด', 'โน้ต', 'ยกเว้น', 'คุณสมบัติ', 'frontmatter']
         },
 
         images: {

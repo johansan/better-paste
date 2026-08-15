@@ -44,24 +44,16 @@ export const STRINGS_EN = {
     notices: {
         // Wraps every notice, so a language can move the plugin name or drop the colon
         prefix: 'Better Paste: {message}',
-        // Joins the parts of the summary notice, which several languages do not punctuate with a comma
-        separator: ', ',
         cleanupOn: 'automatic processing on',
         cleanupOff: 'automatic processing off',
         selectTextFirst: 'select some text first',
         nothingToClean: 'nothing to clean up',
         clipboardFailed: 'could not read the clipboard',
         titleFailed: 'could not fetch the title.',
-        // {dots} is one to three full stops, cycled while the request is open
-        fetchingTitle: 'fetching title{dots}',
+        fetchingTitle: 'fetching title...',
         imagesFailed: { one: '{count} image could not be saved', other: '{count} images could not be saved' } as PluralForms,
         imagesFailedLinkKept: '{images}, the original link was kept',
-        imagesFailedNothingPasted: '{images}, so nothing was pasted',
-        aiTextCleaned: 'tidied AI text',
-        terminalCleaned: 'cleaned up terminal text',
-        textProcessed: 'adjusted text style',
-        urlsCleaned: { one: 'cleaned {count} URL', other: 'cleaned {count} URLs' } as PluralForms,
-        imagesSaved: { one: 'saved {count} image', other: 'saved {count} images' } as PluralForms
+        imagesFailedNothingPasted: '{images}, so nothing was pasted'
     },
 
     settings: {
@@ -90,10 +82,7 @@ export const STRINGS_EN = {
             autoCleanName: 'Clean up every paste',
             autoCleanDesc:
                 'Applies the rules to every paste. When off, the rules run only from the Better Paste commands. A single note can opt out with the "bp: false" property, or opt in with "bp: true".',
-            autoCleanAliases: ['automatic', 'enable', 'disable', 'note', 'exclude', 'property', 'frontmatter', 'opt out', 'opt in', 'bp'],
-            showNoticesName: 'Show a notice when a paste is changed',
-            showNoticesDesc: 'A one-line summary of what changed. Failures are always reported.',
-            showNoticesAliases: ['notice', 'summary', 'message', 'toast', 'quiet', 'silent']
+            autoCleanAliases: ['automatic', 'enable', 'disable', 'note', 'exclude', 'property', 'frontmatter', 'opt out', 'opt in', 'bp']
         },
 
         images: {

@@ -210,12 +210,12 @@ describe('format', () => {
 
 describe('plural', () => {
     it('picks the singular for one', () => {
-        expect(plural(STRINGS_EN.notices.imagesSaved, 1)).toBe('saved 1 image');
+        expect(plural(STRINGS_EN.notices.imagesFailed, 1)).toBe('1 image could not be saved');
     });
 
     it('picks the plural for everything else', () => {
-        expect(plural(STRINGS_EN.notices.imagesSaved, 0)).toBe('saved 0 images');
-        expect(plural(STRINGS_EN.notices.imagesSaved, 3)).toBe('saved 3 images');
+        expect(plural(STRINGS_EN.notices.imagesFailed, 0)).toBe('0 images could not be saved');
+        expect(plural(STRINGS_EN.notices.imagesFailed, 3)).toBe('3 images could not be saved');
     });
 
     it('falls back to other for a category the language file leaves out', () => {

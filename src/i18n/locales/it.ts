@@ -29,25 +29,19 @@ export const STRINGS_IT: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: ', ',
         cleanupOn: 'elaborazione automatica attiva',
         cleanupOff: 'elaborazione automatica disattivata',
         selectTextFirst: 'seleziona prima del testo',
         nothingToClean: 'niente da pulire',
         clipboardFailed: 'impossibile leggere gli appunti',
         titleFailed: 'impossibile recuperare il titolo.',
-        fetchingTitle: 'recupero del titolo{dots}',
+        fetchingTitle: 'recupero del titolo...',
         imagesFailed: {
             one: '{count} immagine non è stata salvata',
             other: '{count} immagini non sono state salvate'
         },
         imagesFailedLinkKept: '{images}, il collegamento originale è stato mantenuto',
-        imagesFailedNothingPasted: '{images}, quindi non è stato incollato nulla',
-        aiTextCleaned: 'testo IA ripulito',
-        terminalCleaned: 'output del terminale ripulito',
-        textProcessed: 'stile del testo corretto',
-        urlsCleaned: { one: '{count} URL ripulito', other: '{count} URL ripuliti' },
-        imagesSaved: { one: '{count} immagine salvata', other: '{count} immagini salvate' }
+        imagesFailedNothingPasted: '{images}, quindi non è stato incollato nulla'
     },
 
     settings: {
@@ -75,10 +69,7 @@ export const STRINGS_IT: TranslationStrings = {
             autoCleanName: 'Pulisci ogni incollaggio',
             autoCleanDesc:
                 'Applica le regole a ogni incollaggio. Se è disattivato, le regole vengono applicate solo tramite i comandi di Better Paste. Una singola nota può essere esclusa con la proprietà "bp: false" o inclusa con "bp: true".',
-            autoCleanAliases: ['automatico', 'attiva', 'disattiva', 'nota', 'escludi', 'proprietà', 'frontmatter', 'eccezione'],
-            showNoticesName: 'Mostra un avviso quando un incollaggio viene modificato',
-            showNoticesDesc: 'Un riepilogo su una riga di ciò che è cambiato. Gli errori sono sempre segnalati.',
-            showNoticesAliases: ['avviso', 'riepilogo', 'messaggio', 'notifica', 'silenzioso']
+            autoCleanAliases: ['automatico', 'attiva', 'disattiva', 'nota', 'escludi', 'proprietà', 'frontmatter', 'eccezione']
         },
 
         images: {

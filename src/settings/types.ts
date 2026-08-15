@@ -49,8 +49,6 @@ export interface BetterPasteSettings {
 
     /** Run the rules automatically on paste. When off, only the commands apply them. */
     autoClean: boolean;
-    /** Show a notice summarising what a paste changed. Failures are always reported. */
-    showNotices: boolean;
 
     /* Images */
 

@@ -29,14 +29,13 @@ export const STRINGS_UK: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: ', ',
         cleanupOn: 'автоматичну обробку увімкнено',
         cleanupOff: 'автоматичну обробку вимкнено',
         selectTextFirst: 'спершу виділіть текст',
         nothingToClean: 'немає чого очищати',
         clipboardFailed: 'не вдалося прочитати буфер обміну',
         titleFailed: 'не вдалося отримати заголовок.',
-        fetchingTitle: 'отримання заголовка{dots}',
+        fetchingTitle: 'отримання заголовка...',
         imagesFailed: {
             one: 'не вдалося зберегти {count} зображення',
             few: 'не вдалося зберегти {count} зображення',
@@ -44,22 +43,7 @@ export const STRINGS_UK: TranslationStrings = {
             other: 'не вдалося зберегти {count} зображення'
         },
         imagesFailedLinkKept: '{images}, початкове посилання збережено',
-        imagesFailedNothingPasted: '{images}, тому нічого не вставлено',
-        aiTextCleaned: 'текст ШІ впорядковано',
-        terminalCleaned: 'вивід термінала очищено',
-        textProcessed: 'стиль тексту скориговано',
-        urlsCleaned: {
-            one: 'очищено {count} URL',
-            few: 'очищено {count} URL',
-            many: 'очищено {count} URL',
-            other: 'очищено {count} URL'
-        },
-        imagesSaved: {
-            one: 'збережено {count} зображення',
-            few: 'збережено {count} зображення',
-            many: 'збережено {count} зображень',
-            other: 'збережено {count} зображення'
-        }
+        imagesFailedNothingPasted: '{images}, тому нічого не вставлено'
     },
 
     settings: {
@@ -87,10 +71,7 @@ export const STRINGS_UK: TranslationStrings = {
             autoCleanName: 'Очищати кожну вставку',
             autoCleanDesc:
                 'Застосовує правила під час кожної вставки. Коли вимкнено, правила працюють лише через команди Better Paste. Окрему нотатку можна виключити властивістю "bp: false" або увімкнути обробку властивістю "bp: true".',
-            autoCleanAliases: ['автоматично', 'увімкнути', 'вимкнути', 'нотатка', 'виключити', 'властивість', 'frontmatter'],
-            showNoticesName: 'Показувати сповіщення, коли вставку змінено',
-            showNoticesDesc: 'Однорядковий підсумок змін. Про помилки повідомляється завжди.',
-            showNoticesAliases: ['сповіщення', 'підсумок', 'повідомлення', 'тихо']
+            autoCleanAliases: ['автоматично', 'увімкнути', 'вимкнути', 'нотатка', 'виключити', 'властивість', 'frontmatter']
         },
 
         images: {

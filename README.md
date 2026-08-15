@@ -117,12 +117,11 @@ Or inside, or leave them alone. No change is the default.
 
 ## 3 Settings
 
-Eighteen settings. Here are the ones you will actually look for.
+Seventeen settings. Here are the ones you will actually look for.
 
 ### 3.1 Behavior
 
 - **Clean up every paste**: the master switch. Turn it off to use only the commands, or to clean only notes marked with `bp: true` (see [section 4](#4-per-note-control)).
-- **Show a notice when a paste is changed**: a one line summary of what was fixed.
 
 ### 3.2 Images
 

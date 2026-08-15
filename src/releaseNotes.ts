@@ -53,7 +53,10 @@ const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.2',
         date: '2026-08-15',
-        improved: ['Reorganized the settings pane and moved ==About== to the bottom.']
+        improved: [
+            'Reorganized the settings pane and moved ==About== to the bottom.',
+            'Removed the summary notice after each paste. A notice now only appears when something fails.'
+        ]
     },
     {
         version: '1.0.1',

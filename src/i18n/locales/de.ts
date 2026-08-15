@@ -29,25 +29,19 @@ export const STRINGS_DE: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: ', ',
         cleanupOn: 'automatische Verarbeitung an',
         cleanupOff: 'automatische Verarbeitung aus',
         selectTextFirst: 'zuerst Text auswählen',
         nothingToClean: 'nichts zu bereinigen',
         clipboardFailed: 'Zwischenablage konnte nicht gelesen werden',
         titleFailed: 'Titel konnte nicht abgerufen werden.',
-        fetchingTitle: 'Titel wird abgerufen{dots}',
+        fetchingTitle: 'Titel wird abgerufen...',
         imagesFailed: {
             one: '{count} Bild konnte nicht gespeichert werden',
             other: '{count} Bilder konnten nicht gespeichert werden'
         },
         imagesFailedLinkKept: '{images}, der ursprüngliche Link wurde behalten',
-        imagesFailedNothingPasted: '{images}, daher wurde nichts eingefügt',
-        aiTextCleaned: 'KI-Text bereinigt',
-        terminalCleaned: 'Terminalausgabe bereinigt',
-        textProcessed: 'Textstil angepasst',
-        urlsCleaned: { one: '{count} URL bereinigt', other: '{count} URLs bereinigt' },
-        imagesSaved: { one: '{count} Bild gespeichert', other: '{count} Bilder gespeichert' }
+        imagesFailedNothingPasted: '{images}, daher wurde nichts eingefügt'
     },
 
     settings: {
@@ -84,10 +78,7 @@ export const STRINGS_DE: TranslationStrings = {
                 'eigenschaft',
                 'frontmatter',
                 'ausnehmen'
-            ],
-            showNoticesName: 'Hinweis anzeigen, wenn ein Einfügevorgang geändert wurde',
-            showNoticesDesc: 'Eine einzeilige Zusammenfassung der Änderungen. Fehler werden immer gemeldet.',
-            showNoticesAliases: ['hinweis', 'zusammenfassung', 'meldung', 'benachrichtigung', 'still']
+            ]
         },
 
         images: {

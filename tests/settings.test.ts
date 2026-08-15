@@ -187,8 +187,6 @@ describe('runTextPipeline', () => {
         expect(result.text).toBe(
             '- Read the announcement at https://support.claude.com/en/articles/16266773-how-claude-marks-ai and then decide whether the change matters for us.'
         );
-        expect(result.terminalCleaned).toBe(true);
-        expect(result.urlsCleaned).toBe(1);
         expect(result.changed).toBe(true);
     });
 
@@ -197,7 +195,6 @@ describe('runTextPipeline', () => {
         // not run first the terminal rule would treat this line as non-blank
         const result = runTextPipeline('a\u00a0\u2014\u00a0b', DEFAULT_SETTINGS);
         expect(result.text).toBe('a - b');
-        expect(result.aiTextCleaned).toBe(true);
     });
 
     it('reports no change for text that needs none', () => {
@@ -213,7 +210,6 @@ describe('runTextPipeline', () => {
         const result = runTextPipeline('He called it "finished," then left.', settings);
 
         expect(result.text).toBe('He called it "finished", then left.');
-        expect(result.textProcessed).toBe(true);
     });
 
     it('moves commas inside quotation marks when selected', () => {

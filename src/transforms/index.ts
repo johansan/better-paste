@@ -27,14 +27,6 @@ export interface TextPipelineResult {
     text: string;
     /** True when any rule modified the text. */
     changed: boolean;
-    /** True when AI typography was normalised. */
-    aiTextCleaned: boolean;
-    /** True when terminal cleanup modified the text. */
-    terminalCleaned: boolean;
-    /** True when a Text processing rule modified the text. */
-    textProcessed: boolean;
-    /** Number of URLs that were cleaned. */
-    urlsCleaned: number;
 }
 
 /** Trims surrounding paste noise while preserving indentation that makes the first line code. */
@@ -62,46 +54,24 @@ function trimPasteEdges(text: string): string {
  */
 export function runTextPipeline(input: string, settings: BetterPasteSettings): TextPipelineResult {
     let text = input;
-    let aiTextCleaned = false;
-    let terminalCleaned = false;
-    let textProcessed = false;
-    let urlsCleaned = 0;
 
-    if (settings.textInvisible) {
-        const result = normalizeInvisibleCharacters(text, httpUrlRanges(text));
-        aiTextCleaned = result.changed;
-        text = result.text;
-    }
+    if (settings.textInvisible) text = normalizeInvisibleCharacters(text, httpUrlRanges(text)).text;
 
-    if (settings.terminalEnabled) {
-        const result = cleanTerminalText(text, settings);
-        terminalCleaned = result.changed;
-        text = result.text;
-    }
+    if (settings.terminalEnabled) text = cleanTerminalText(text, settings).text;
 
     if (settings.linkEnabled) {
         // Anything that is about to be downloaded as an image is off limits to URL
         // cleaning, which would otherwise strip the token out of a signed link
         const protect = settings.imageEnabled ? imageReferenceRanges(text) : [];
-        const result = cleanUrlsInText(text, buildUrlCleanupOptions(settings), protect);
-        urlsCleaned = result.count;
-        text = result.text;
+        text = cleanUrlsInText(text, buildUrlCleanupOptions(settings), protect).text;
     }
 
-    if (settings.textInvisible && settings.textPunctuation) {
-        const result = replacePunctuation(text, httpUrlRanges(text));
-        aiTextCleaned = aiTextCleaned || result.changed;
-        text = result.text;
-    }
+    if (settings.textInvisible && settings.textPunctuation) text = replacePunctuation(text, httpUrlRanges(text)).text;
 
-    if (settings.textComma !== 'none') {
-        const result = applyCommaPlacement(text, settings.textComma);
-        textProcessed = result.changed;
-        text = result.text;
-    }
+    if (settings.textComma !== 'none') text = applyCommaPlacement(text, settings.textComma).text;
 
     // Last, so it also clears whatever the rules above left at the edges
     if (settings.textTrim) text = trimPasteEdges(text);
 
-    return { text, changed: text !== input, aiTextCleaned, terminalCleaned, textProcessed, urlsCleaned };
+    return { text, changed: text !== input };
 }

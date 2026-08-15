@@ -89,12 +89,6 @@ export class BetterPasteSettingTab extends PluginSettingTab {
                         strings.settings.behavior.autoCleanName,
                         strings.settings.behavior.autoCleanDesc,
                         aliases(source => source.settings.behavior.autoCleanAliases)
-                    ),
-                    toggle(
-                        'showNotices',
-                        strings.settings.behavior.showNoticesName,
-                        strings.settings.behavior.showNoticesDesc,
-                        aliases(source => source.settings.behavior.showNoticesAliases)
                     )
                 ]
             },

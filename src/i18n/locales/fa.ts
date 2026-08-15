@@ -29,25 +29,19 @@ export const STRINGS_FA: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: '، ',
         cleanupOn: 'پردازش خودکار روشن است',
         cleanupOff: 'پردازش خودکار خاموش است',
         selectTextFirst: 'ابتدا متنی را انتخاب کنید',
         nothingToClean: 'چیزی برای پاک‌سازی نیست',
         clipboardFailed: 'خواندن حافظه موقت ممکن نشد',
         titleFailed: 'دریافت عنوان ممکن نشد.',
-        fetchingTitle: 'در حال دریافت عنوان{dots}',
+        fetchingTitle: 'در حال دریافت عنوان...',
         imagesFailed: {
             one: '{count} تصویر ذخیره نشد',
             other: '{count} تصویر ذخیره نشد'
         },
         imagesFailedLinkKept: '{images}، پیوند اصلی نگه داشته شد',
-        imagesFailedNothingPasted: '{images}، بنابراین چیزی چسبانده نشد',
-        aiTextCleaned: 'متن هوش مصنوعی مرتب شد',
-        terminalCleaned: 'خروجی پایانه پاک‌سازی شد',
-        textProcessed: 'سبک متن تنظیم شد',
-        urlsCleaned: { one: '{count} نشانی پاک‌سازی شد', other: '{count} نشانی پاک‌سازی شد' },
-        imagesSaved: { one: '{count} تصویر ذخیره شد', other: '{count} تصویر ذخیره شد' }
+        imagesFailedNothingPasted: '{images}، بنابراین چیزی چسبانده نشد'
     },
 
     settings: {
@@ -75,10 +69,7 @@ export const STRINGS_FA: TranslationStrings = {
             autoCleanName: 'پاک‌سازی هر بار چسباندن',
             autoCleanDesc:
                 'قوانین را در هر چسباندن اعمال می‌کند. وقتی خاموش باشد، قوانین فقط از طریق دستورهای Better Paste اجرا می‌شوند. یک یادداشت می‌تواند با ویژگی "bp: false" خود را کنار بگذارد، یا با "bp: true" پاک‌سازی را برای خودش روشن کند.',
-            autoCleanAliases: ['خودکار', 'فعال', 'غیرفعال', 'یادداشت', 'استثنا', 'ویژگی', 'frontmatter'],
-            showNoticesName: 'نمایش اعلان وقتی چسباندن تغییر کرد',
-            showNoticesDesc: 'خلاصه‌ای یک‌خطی از آنچه تغییر کرد. خطاها همیشه گزارش می‌شوند.',
-            showNoticesAliases: ['اعلان', 'خلاصه', 'پیام', 'بی‌صدا']
+            autoCleanAliases: ['خودکار', 'فعال', 'غیرفعال', 'یادداشت', 'استثنا', 'ویژگی', 'frontmatter']
         },
 
         images: {

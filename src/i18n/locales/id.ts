@@ -29,22 +29,16 @@ export const STRINGS_ID: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: ', ',
         cleanupOn: 'pemrosesan otomatis aktif',
         cleanupOff: 'pemrosesan otomatis nonaktif',
         selectTextFirst: 'pilih teks terlebih dahulu',
         nothingToClean: 'tidak ada yang perlu dibersihkan',
         clipboardFailed: 'tidak dapat membaca papan klip',
         titleFailed: 'tidak dapat mengambil judul.',
-        fetchingTitle: 'mengambil judul{dots}',
+        fetchingTitle: 'mengambil judul...',
         imagesFailed: { other: '{count} gambar gagal disimpan' },
         imagesFailedLinkKept: '{images}, tautan aslinya dipertahankan',
-        imagesFailedNothingPasted: '{images}, jadi tidak ada yang ditempel',
-        aiTextCleaned: 'teks AI dirapikan',
-        terminalCleaned: 'keluaran terminal dibersihkan',
-        textProcessed: 'gaya teks disesuaikan',
-        urlsCleaned: { other: '{count} URL dibersihkan' },
-        imagesSaved: { other: '{count} gambar disimpan' }
+        imagesFailedNothingPasted: '{images}, jadi tidak ada yang ditempel'
     },
 
     settings: {
@@ -72,10 +66,7 @@ export const STRINGS_ID: TranslationStrings = {
             autoCleanName: 'Bersihkan setiap tempelan',
             autoCleanDesc:
                 'Menerapkan aturan pada setiap tempelan. Saat mati, aturan hanya dijalankan melalui perintah Better Paste. Satu catatan dapat mengecualikan diri dengan properti "bp: false", atau ikut dibersihkan dengan "bp: true".',
-            autoCleanAliases: ['otomatis', 'aktifkan', 'nonaktifkan', 'catatan', 'kecualikan', 'properti', 'frontmatter'],
-            showNoticesName: 'Tampilkan pemberitahuan saat tempelan diubah',
-            showNoticesDesc: 'Ringkasan satu baris tentang apa yang berubah. Kegagalan selalu dilaporkan.',
-            showNoticesAliases: ['pemberitahuan', 'ringkasan', 'pesan', 'senyap']
+            autoCleanAliases: ['otomatis', 'aktifkan', 'nonaktifkan', 'catatan', 'kecualikan', 'properti', 'frontmatter']
         },
 
         images: {

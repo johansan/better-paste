@@ -29,25 +29,19 @@ export const STRINGS_TR: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: ', ',
         cleanupOn: 'otomatik işleme açık',
         cleanupOff: 'otomatik işleme kapalı',
         selectTextFirst: 'önce metin seçin',
         nothingToClean: 'temizlenecek bir şey yok',
         clipboardFailed: 'pano okunamadı',
         titleFailed: 'başlık alınamadı.',
-        fetchingTitle: 'başlık alınıyor{dots}',
+        fetchingTitle: 'başlık alınıyor...',
         imagesFailed: {
             one: '{count} görsel kaydedilemedi',
             other: '{count} görsel kaydedilemedi'
         },
         imagesFailedLinkKept: '{images}, özgün bağlantı korundu',
-        imagesFailedNothingPasted: '{images}, bu yüzden hiçbir şey yapıştırılmadı',
-        aiTextCleaned: 'yapay zekâ metni düzeltildi',
-        terminalCleaned: 'uçbirim çıktısı temizlendi',
-        textProcessed: 'metin biçemi ayarlandı',
-        urlsCleaned: { one: '{count} URL temizlendi', other: '{count} URL temizlendi' },
-        imagesSaved: { one: '{count} görsel kaydedildi', other: '{count} görsel kaydedildi' }
+        imagesFailedNothingPasted: '{images}, bu yüzden hiçbir şey yapıştırılmadı'
     },
 
     settings: {
@@ -75,10 +69,7 @@ export const STRINGS_TR: TranslationStrings = {
             autoCleanName: 'Her yapıştırmayı temizle',
             autoCleanDesc:
                 'Kuralları her yapıştırmada uygular. Kapalıyken kurallar yalnızca Better Paste komutlarıyla uygulanır. Tek bir not "bp: false" özelliğiyle kendini dışarıda bırakabilir, "bp: true" özelliğiyle de kendini dahil edebilir.',
-            autoCleanAliases: ['otomatik', 'etkinleştir', 'devre dışı', 'not', 'hariç tut', 'özellik', 'frontmatter'],
-            showNoticesName: 'Yapıştırma değiştirildiğinde bildirim göster',
-            showNoticesDesc: 'Nelerin değiştiğine dair tek satırlık özet. Hatalar her zaman bildirilir.',
-            showNoticesAliases: ['bildirim', 'özet', 'ileti', 'sessiz']
+            autoCleanAliases: ['otomatik', 'etkinleştir', 'devre dışı', 'not', 'hariç tut', 'özellik', 'frontmatter']
         },
 
         images: {

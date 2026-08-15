@@ -38,18 +38,8 @@ const REALIGN_WINDOW = 512;
 /** Surrounding text kept to distinguish a pasted occurrence from an older identical one. */
 const RANGE_CONTEXT = 64;
 
-/** Delay between progress message updates while a page title is being fetched. */
-const TITLE_PROGRESS_INTERVAL_MS = 500;
-
-/** Summary of everything a single paste changed, used to build the notice. */
-interface PasteSummary {
-    aiTextCleaned: boolean;
-    terminalCleaned: boolean;
-    textProcessed: boolean;
-    urlsCleaned: number;
-    imagesDownloaded: number;
-    imagesFailed: number;
-}
+/** Delay before the title-fetch notice appears, so a quick fetch never flashes it. */
+const TITLE_PROGRESS_DELAY_MS = 500;
 
 /** Editor state that identifies one inserted range while network or vault work is pending. */
 interface AsyncPasteRange {
@@ -61,9 +51,9 @@ interface AsyncPasteRange {
     afterContext: string;
 }
 
-/** One visible title-fetch notice and its next scheduled animation step. */
+/** One title-fetch notice and its pending show timer. The notice is null until the show delay passes. */
 interface TitleProgressNotice {
-    notice: Notice;
+    notice: Notice | null;
     timer: number;
 }
 
@@ -206,18 +196,8 @@ export class PasteService {
         editor.replaceSelection(inserted);
         const range = asyncPasteRange(startOffset, inserted, valueBefore, editor.getValue());
 
-        const summary: PasteSummary = {
-            aiTextCleaned: result.aiTextCleaned,
-            terminalCleaned: result.terminalCleaned,
-            textProcessed: result.textProcessed,
-            urlsCleaned: result.urlsCleaned,
-            imagesDownloaded: 0,
-            imagesFailed: 0
-        };
-
-        if (needsImages) void this.runImagePass(editor, info, targetFile, targetPath, range, summary);
-        else if (needsTitle && selectedLink === null) void this.runTitlePass(editor, info, targetFile, range, summary);
-        else this.notify(summary);
+        if (needsImages) void this.runImagePass(editor, info, targetFile, targetPath, range);
+        else if (needsTitle && selectedLink === null) void this.runTitlePass(editor, info, targetFile, range);
 
         return true;
     }
@@ -245,22 +225,11 @@ export class PasteService {
         const file = clipboard.files[0];
         const sources = imageSourcesFromHtml(html);
 
-        const summary: PasteSummary = {
-            aiTextCleaned: false,
-            terminalCleaned: false,
-            textProcessed: false,
-            urlsCleaned: 0,
-            imagesDownloaded: 0,
-            imagesFailed: 0
-        };
         let embed: string | null = null;
 
         try {
             embed = await this.images.saveClipboardImage(file, sources[0] ?? '', targetPath, size);
-            if (embed) summary.imagesDownloaded = 1;
-            else summary.imagesFailed = 1;
         } catch (error) {
-            summary.imagesFailed = 1;
             logError('Could not save a pasted image', error);
         }
 
@@ -274,7 +243,7 @@ export class PasteService {
         if (!text) {
             // Nothing to insert and the default paste was already suppressed, so this is
             // the one path where staying quiet would lose the clipboard silently
-            this.notify(summary, { insertedNothing: true });
+            this.reportImageFailures(1, { insertedNothing: true });
             return;
         }
 
@@ -288,7 +257,7 @@ export class PasteService {
             editor.replaceRange(text, cursor, cursor);
         }
 
-        this.notify(summary);
+        if (embed === null) this.reportImageFailures(1);
     }
 
     /** Command handler: pastes the clipboard's plain text through the full rule pipeline. */
@@ -312,26 +281,12 @@ export class PasteService {
         const startOffset = this.insertAfterClipboardRead(editor, valueAtInvocation, fromOffset, toOffset, inserted);
         const range = asyncPasteRange(startOffset, inserted, valueBefore, editor.getValue());
 
-        const summary: PasteSummary = {
-            aiTextCleaned: result.aiTextCleaned,
-            terminalCleaned: result.terminalCleaned,
-            textProcessed: result.textProcessed,
-            urlsCleaned: result.urlsCleaned,
-            imagesDownloaded: 0,
-            imagesFailed: 0
-        };
-
         if (needsImages) {
-            await this.runImagePass(editor, info, targetFile, targetPath, range, summary);
+            await this.runImagePass(editor, info, targetFile, targetPath, range);
             return;
         }
 
-        if (!needsTitle || selectedLink !== null) {
-            this.notify(summary);
-            return;
-        }
-
-        await this.runTitlePass(editor, info, targetFile, range, summary);
+        if (needsTitle && selectedLink === null) await this.runTitlePass(editor, info, targetFile, range);
     }
 
     /** Command handler: pastes the clipboard's plain text with no transforms applied. */
@@ -360,14 +315,6 @@ export class PasteService {
         }
 
         editor.replaceSelection(result.text);
-        this.notify({
-            aiTextCleaned: result.aiTextCleaned,
-            terminalCleaned: result.terminalCleaned,
-            textProcessed: result.textProcessed,
-            urlsCleaned: result.urlsCleaned,
-            imagesDownloaded: 0,
-            imagesFailed: 0
-        });
     }
 
     /**
@@ -407,46 +354,27 @@ export class PasteService {
     ): Promise<void> {
         this.pendingRanges.add(range);
         const settings = this.getSettings();
-        const summary: PasteSummary = {
-            aiTextCleaned: false,
-            terminalCleaned: false,
-            textProcessed: false,
-            urlsCleaned: 0,
-            imagesDownloaded: 0,
-            imagesFailed: 0
-        };
-
+        let imagesFailed = 0;
         let text = range.inserted;
 
         // Content copied out of a browser arrives as HTML, which is how most people paste
         // an assistant's answer. Without this the character rule would never see it.
-        if (settings.textInvisible) {
-            const cleaned = cleanAiText(text, settings);
-            summary.aiTextCleaned = cleaned.changed;
-            text = cleaned.text;
-        }
+        if (settings.textInvisible) text = cleanAiText(text, settings).text;
 
-        if (settings.textComma !== 'none') {
-            const processed = applyCommaPlacement(text, settings.textComma);
-            summary.textProcessed = processed.changed;
-            text = processed.text;
-        }
+        if (settings.textComma !== 'none') text = applyCommaPlacement(text, settings.textComma).text;
 
         if (settings.linkEnabled) {
             // Same protection as the plain-text pipeline: an image about to be fetched
             // keeps its query, since a signed link needs it
             const protect = settings.imageEnabled ? imageReferenceRanges(text) : [];
-            const cleaned = cleanUrlsInText(text, buildUrlCleanupOptions(settings), protect);
-            text = cleaned.text;
-            summary.urlsCleaned = cleaned.count;
+            text = cleanUrlsInText(text, buildUrlCleanupOptions(settings), protect).text;
         }
 
         if (this.images.hasWork(text)) {
             try {
                 const result = await this.images.materializeImages(text, targetPath, this.imageSizeFor(editor));
                 text = result.text;
-                summary.imagesDownloaded = result.downloaded;
-                summary.imagesFailed = result.failed;
+                imagesFailed = result.failed;
             } catch (error) {
                 logError('Image download failed', error);
             }
@@ -454,8 +382,8 @@ export class PasteService {
 
         try {
             if (!this.canEdit(info, targetFile)) return;
-            if (text !== range.inserted && !this.replaceRange(editor, range, text)) summary.imagesDownloaded = 0;
-            this.notify(summary);
+            if (text !== range.inserted) this.replaceRange(editor, range, text);
+            this.reportImageFailures(imagesFailed);
         } finally {
             this.pendingRanges.delete(range);
         }
@@ -467,23 +395,22 @@ export class PasteService {
         info: MarkdownView | MarkdownFileInfo,
         targetFile: TFile | null,
         targetPath: string,
-        range: AsyncPasteRange,
-        summary: PasteSummary
+        range: AsyncPasteRange
     ): Promise<void> {
         this.pendingRanges.add(range);
         try {
+            let failed = 0;
             try {
                 const result = await this.images.materializeImages(range.inserted, targetPath, this.imageSizeFor(editor));
                 if (!this.canEdit(info, targetFile)) return;
-                summary.imagesDownloaded = result.downloaded;
-                summary.imagesFailed = result.failed;
-                if (result.text !== range.inserted && !this.replaceRange(editor, range, result.text)) summary.imagesDownloaded = 0;
+                failed = result.failed;
+                if (result.text !== range.inserted) this.replaceRange(editor, range, result.text);
             } catch (error) {
                 logError('Image download failed', error);
             }
 
             if (!this.canEdit(info, targetFile)) return;
-            this.notify(summary);
+            this.reportImageFailures(failed);
         } finally {
             this.pendingRanges.delete(range);
         }
@@ -494,8 +421,7 @@ export class PasteService {
         editor: Editor,
         info: MarkdownView | MarkdownFileInfo,
         targetFile: TFile | null,
-        range: AsyncPasteRange,
-        summary: PasteSummary
+        range: AsyncPasteRange
     ): Promise<void> {
         this.pendingRanges.add(range);
         const progress = this.showTitleProgress();
@@ -507,46 +433,30 @@ export class PasteService {
                 this.hideTitleProgress(progress);
                 showNotice(format(strings.notices.prefix, { message: strings.notices.titleFailed }), { variant: 'warning' });
             } else this.replaceRange(editor, range, link);
-            this.hideTitleProgress(progress);
-            this.notify(summary);
         } finally {
             this.hideTitleProgress(progress);
             this.pendingRanges.delete(range);
         }
     }
 
-    /** Shows an animated notice for title work when ordinary paste notices are enabled. */
-    private showTitleProgress(): TitleProgressNotice | null {
-        if (!this.getSettings().showNotices) return null;
-
-        const fetchingTitle = (dots: number): string =>
-            format(strings.notices.prefix, { message: format(strings.notices.fetchingTitle, { dots: '.'.repeat(dots) }) });
-
-        const progress: TitleProgressNotice = {
-            notice: showNotice(fetchingTitle(1), { timeout: 0, variant: 'loading' }),
-            timer: 0
-        };
-        let dots = 1;
-
-        const animate = (): void => {
-            progress.timer = window.setTimeout(() => {
-                if (!this.titleProgressNotices.has(progress)) return;
-                dots = (dots % 3) + 1;
-                progress.notice.setMessage(fetchingTitle(dots));
-                animate();
-            }, TITLE_PROGRESS_INTERVAL_MS);
-        };
+    /** Shows a spinner notice for title work, delayed so a quick fetch never flashes it. */
+    private showTitleProgress(): TitleProgressNotice {
+        const progress: TitleProgressNotice = { notice: null, timer: 0 };
+        progress.timer = window.setTimeout(() => {
+            if (!this.titleProgressNotices.has(progress)) return;
+            const message = format(strings.notices.prefix, { message: strings.notices.fetchingTitle });
+            progress.notice = showNotice(message, { timeout: 0, variant: 'loading' });
+        }, TITLE_PROGRESS_DELAY_MS);
 
         this.titleProgressNotices.add(progress);
-        animate();
         return progress;
     }
 
     /** Stops and dismisses a title-fetch progress notice. */
-    private hideTitleProgress(progress: TitleProgressNotice | null): void {
-        if (progress === null || !this.titleProgressNotices.delete(progress)) return;
+    private hideTitleProgress(progress: TitleProgressNotice): void {
+        if (!this.titleProgressNotices.delete(progress)) return;
         window.clearTimeout(progress.timer);
-        progress.notice.hide();
+        progress.notice?.hide();
     }
 
     /**
@@ -695,29 +605,14 @@ export class PasteService {
         return !this.disposed && info.file === targetFile;
     }
 
-    /** Shows a one-line summary of what the paste changed, when notices are enabled. */
-    private notify(summary: PasteSummary, options: { insertedNothing?: boolean } = {}): void {
-        // A failure is reported whether or not the user asked for notices: it is the one
-        // case where silence would leave them with a note they think is complete.
-        if (summary.imagesFailed > 0) {
-            const images = plural(strings.notices.imagesFailed, summary.imagesFailed);
-            // A screenshot has no link to fall back to, so say what actually happened
-            const message = format(
-                options.insertedNothing ? strings.notices.imagesFailedNothingPasted : strings.notices.imagesFailedLinkKept,
-                { images }
-            );
-            new Notice(format(strings.notices.prefix, { message }));
-        }
-
-        if (!this.getSettings().showNotices) return;
-
-        const parts: string[] = [];
-        if (summary.aiTextCleaned) parts.push(strings.notices.aiTextCleaned);
-        if (summary.terminalCleaned) parts.push(strings.notices.terminalCleaned);
-        if (summary.textProcessed) parts.push(strings.notices.textProcessed);
-        if (summary.urlsCleaned > 0) parts.push(plural(strings.notices.urlsCleaned, summary.urlsCleaned));
-        if (summary.imagesDownloaded > 0) parts.push(plural(strings.notices.imagesSaved, summary.imagesDownloaded));
-        if (parts.length === 0) return;
-        new Notice(format(strings.notices.prefix, { message: parts.join(strings.notices.separator) }));
+    /** Reports images that could not be saved, because silence would leave a note that looks complete. */
+    private reportImageFailures(failed: number, options: { insertedNothing?: boolean } = {}): void {
+        if (failed === 0) return;
+        const images = plural(strings.notices.imagesFailed, failed);
+        // A screenshot has no link to fall back to, so say what actually happened
+        const message = format(options.insertedNothing ? strings.notices.imagesFailedNothingPasted : strings.notices.imagesFailedLinkKept, {
+            images
+        });
+        new Notice(format(strings.notices.prefix, { message }));
     }
 }

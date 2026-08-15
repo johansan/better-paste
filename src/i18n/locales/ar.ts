@@ -29,14 +29,13 @@ export const STRINGS_AR: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: '، ',
         cleanupOn: 'المعالجة التلقائية مفعّلة',
         cleanupOff: 'المعالجة التلقائية معطّلة',
         selectTextFirst: 'حدّد نصًا أولًا',
         nothingToClean: 'لا شيء لتنظيفه',
         clipboardFailed: 'تعذّرت قراءة الحافظة',
         titleFailed: 'تعذّر جلب العنوان.',
-        fetchingTitle: 'جارٍ جلب العنوان{dots}',
+        fetchingTitle: 'جارٍ جلب العنوان...',
         imagesFailed: {
             zero: 'تعذّر حفظ {count} صور',
             one: 'تعذّر حفظ {count} صورة',
@@ -46,26 +45,7 @@ export const STRINGS_AR: TranslationStrings = {
             other: 'تعذّر حفظ {count} صورة'
         },
         imagesFailedLinkKept: '{images}، وأُبقي الرابط الأصلي',
-        imagesFailedNothingPasted: '{images}، لذلك لم يُلصق شيء',
-        aiTextCleaned: 'تم ترتيب نص الذكاء الاصطناعي',
-        terminalCleaned: 'تم تنظيف مخرجات الطرفية',
-        textProcessed: 'تم ضبط نمط النص',
-        urlsCleaned: {
-            zero: 'تم تنظيف {count} روابط',
-            one: 'تم تنظيف {count} رابط',
-            two: 'تم تنظيف {count} رابط',
-            few: 'تم تنظيف {count} روابط',
-            many: 'تم تنظيف {count} رابطًا',
-            other: 'تم تنظيف {count} رابط'
-        },
-        imagesSaved: {
-            zero: 'تم حفظ {count} صور',
-            one: 'تم حفظ {count} صورة',
-            two: 'تم حفظ {count} صورة',
-            few: 'تم حفظ {count} صور',
-            many: 'تم حفظ {count} صورةً',
-            other: 'تم حفظ {count} صورة'
-        }
+        imagesFailedNothingPasted: '{images}، لذلك لم يُلصق شيء'
     },
 
     settings: {
@@ -93,10 +73,7 @@ export const STRINGS_AR: TranslationStrings = {
             autoCleanName: 'تنظيف كل عملية لصق',
             autoCleanDesc:
                 'يطبّق القواعد عند كل لصق. عند إيقافه لا تُطبّق القواعد إلا عبر أوامر Better Paste. يمكن لملاحظة واحدة أن تستثني نفسها بالخاصية "bp: false"، أو أن تطلب التنظيف بالخاصية "bp: true".',
-            autoCleanAliases: ['تلقائي', 'تفعيل', 'تعطيل', 'ملاحظة', 'استثناء', 'خاصية', 'frontmatter'],
-            showNoticesName: 'إظهار إشعار عند تغيير عملية لصق',
-            showNoticesDesc: 'ملخّص من سطر واحد لما تغيّر. يتم الإبلاغ عن الأعطال دائمًا.',
-            showNoticesAliases: ['إشعار', 'ملخّص', 'رسالة', 'صامت']
+            autoCleanAliases: ['تلقائي', 'تفعيل', 'تعطيل', 'ملاحظة', 'استثناء', 'خاصية', 'frontmatter']
         },
 
         images: {

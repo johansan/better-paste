@@ -29,22 +29,16 @@ export const STRINGS_JA: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: '、',
         cleanupOn: '自動処理をオンにしました',
         cleanupOff: '自動処理をオフにしました',
         selectTextFirst: '先にテキストを選択してください',
         nothingToClean: '整えるものはありません',
         clipboardFailed: 'クリップボードを読み取れませんでした',
         titleFailed: 'タイトルを取得できませんでした。',
-        fetchingTitle: 'タイトルを取得中{dots}',
+        fetchingTitle: 'タイトルを取得中...',
         imagesFailed: { other: '画像 {count} 件を保存できませんでした' },
         imagesFailedLinkKept: '{images}。元のリンクを残しました',
-        imagesFailedNothingPasted: '{images}。そのため何も貼り付けていません',
-        aiTextCleaned: 'AI テキストの整形',
-        terminalCleaned: 'ターミナル出力の整形',
-        textProcessed: 'テキスト体裁の調整',
-        urlsCleaned: { other: 'URL {count} 件の整理' },
-        imagesSaved: { other: '画像 {count} 件の保存' }
+        imagesFailedNothingPasted: '{images}。そのため何も貼り付けていません'
     },
 
     settings: {
@@ -72,10 +66,7 @@ export const STRINGS_JA: TranslationStrings = {
             autoCleanName: '貼り付けのたびに整える',
             autoCleanDesc:
                 '貼り付けのたびにルールを適用します。オフのときは Better Paste のコマンドを使ったときだけ適用されます。個々のノートは "bp: false" プロパティで対象外にでき、"bp: true" で対象にできます。',
-            autoCleanAliases: ['自動', '有効', '無効', 'ノート', '除外', 'プロパティ', 'フロントマター', 'frontmatter'],
-            showNoticesName: '貼り付けが変更されたときに通知を表示',
-            showNoticesDesc: '何が変わったかを 1 行でまとめます。失敗は必ず通知されます。',
-            showNoticesAliases: ['通知', '要約', 'メッセージ', '静か']
+            autoCleanAliases: ['自動', '有効', '無効', 'ノート', '除外', 'プロパティ', 'フロントマター', 'frontmatter']
         },
 
         images: {

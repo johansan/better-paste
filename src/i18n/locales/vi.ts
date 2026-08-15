@@ -29,22 +29,16 @@ export const STRINGS_VI: TranslationStrings = {
 
     notices: {
         prefix: 'Better Paste: {message}',
-        separator: ', ',
         cleanupOn: 'đã bật xử lý tự động',
         cleanupOff: 'đã tắt xử lý tự động',
         selectTextFirst: 'hãy chọn văn bản trước',
         nothingToClean: 'không có gì để dọn',
         clipboardFailed: 'không đọc được bảng nhớ tạm',
         titleFailed: 'không lấy được tiêu đề.',
-        fetchingTitle: 'đang lấy tiêu đề{dots}',
+        fetchingTitle: 'đang lấy tiêu đề...',
         imagesFailed: { other: 'không lưu được {count} ảnh' },
         imagesFailedLinkKept: '{images}, đã giữ liên kết gốc',
-        imagesFailedNothingPasted: '{images}, nên không dán gì cả',
-        aiTextCleaned: 'đã chỉnh văn bản AI',
-        terminalCleaned: 'đã dọn đầu ra dòng lệnh',
-        textProcessed: 'đã chỉnh kiểu văn bản',
-        urlsCleaned: { other: 'đã dọn {count} liên kết' },
-        imagesSaved: { other: 'đã lưu {count} ảnh' }
+        imagesFailedNothingPasted: '{images}, nên không dán gì cả'
     },
 
     settings: {
@@ -72,10 +66,7 @@ export const STRINGS_VI: TranslationStrings = {
             autoCleanName: 'Dọn mọi lần dán',
             autoCleanDesc:
                 'Áp dụng các quy tắc cho mọi lần dán. Khi tắt, các quy tắc chỉ được áp dụng khi dùng các lệnh của Better Paste. Một ghi chú riêng lẻ có thể tự loại trừ bằng thuộc tính "bp: false", hoặc tự bật lại bằng "bp: true".',
-            autoCleanAliases: ['tự động', 'bật', 'tắt', 'ghi chú', 'loại trừ', 'thuộc tính', 'frontmatter'],
-            showNoticesName: 'Hiện thông báo khi lần dán bị thay đổi',
-            showNoticesDesc: 'Một dòng tóm tắt những gì đã thay đổi. Lỗi luôn được báo.',
-            showNoticesAliases: ['thông báo', 'tóm tắt', 'tin nhắn', 'im lặng']
+            autoCleanAliases: ['tự động', 'bật', 'tắt', 'ghi chú', 'loại trừ', 'thuộc tính', 'frontmatter']
         },
 
         images: {
