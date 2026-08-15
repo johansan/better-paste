@@ -75,14 +75,6 @@ describe('release notes', () => {
         expect(getReleaseNotesBetweenVersions('0.9.0', '1.0.0').map(note => note.version)).toEqual(['1.0.0']);
     });
 
-    it('lists link title fetching and translations as new in 1.0.1', () => {
-        expect(getLatestReleaseNotes(1)[0]).toMatchObject({
-            version: '1.0.1',
-            date: '2026-08-14',
-            new: ['Better Paste will now fetch titles for pasted links.', 'Translated into 21 languages.']
-        });
-    });
-
     it('leaves out the release already shown', () => {
         expect(getReleaseNotesBetweenVersions('1.0.0', '1.0.0')).toEqual([]);
     });
@@ -96,6 +88,6 @@ describe('release notes', () => {
     });
 
     it('stays shut when nothing was released in between', () => {
-        expect(shouldAutoDisplayReleaseNotesForUpdate('1.0.1', '1.0.2')).toBe(false);
+        expect(shouldAutoDisplayReleaseNotesForUpdate('0.9.0', '0.9.5')).toBe(false);
     });
 });

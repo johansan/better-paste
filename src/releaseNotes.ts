@@ -51,6 +51,11 @@ export interface ReleaseNote {
 /** Newest first. A new release goes at the top. */
 const RELEASE_NOTES: ReleaseNote[] = [
     {
+        version: '1.0.2',
+        date: '2026-08-15',
+        improved: ['Reorganized the settings pane and moved ==About== to the bottom.']
+    },
+    {
         version: '1.0.1',
         date: '2026-08-14',
         new: ['Better Paste will now fetch titles for pasted links.', 'Translated into 21 languages.']
