@@ -55,6 +55,7 @@ export const STRINGS_IT: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: 'Informazioni',
             whatsNewName: 'Novità di Better Paste {version}',
             whatsNewDesc: 'Cosa è cambiato nelle versioni più recenti.',
             whatsNewAliases: ['note di rilascio', 'modifiche', 'changelog', 'versione', 'aggiornamento', 'cronologia'],
@@ -71,7 +72,6 @@ export const STRINGS_IT: TranslationStrings = {
         },
 
         behavior: {
-            heading: 'Comportamento',
             autoCleanName: 'Pulisci ogni incollaggio',
             autoCleanDesc:
                 'Applica le regole a ogni incollaggio. Se è disattivato, le regole vengono applicate solo tramite i comandi di Better Paste. Una singola nota può essere esclusa con la proprietà "bp: false" o inclusa con "bp: true".',
@@ -87,8 +87,6 @@ export const STRINGS_IT: TranslationStrings = {
             savingDesc:
                 'Salva le immagini incollate nella cartella allegati e collega il file locale invece dell’indirizzo web. Riguarda "Copia immagine" di Safari, le immagini dentro contenuti web copiati e gli indirizzi di immagine incollati. Per impostazione predefinita il nome del file viene dall’indirizzo:',
             savingAliases: ['scarica', 'allegato', 'safari', 'schermata', 'immagine', 'cartella', 'nome file', 'larghezza', 'dimensione'],
-            pageName: 'Gestione delle immagini',
-            pageDesc: 'Nomi dei file e larghezza delle immagini.',
             nameFormatName: 'Nomi dei file',
             nameFormatDesc: 'Come vengono nominate le immagini salvate.',
             nameFormatSource: 'Nome dalla fonte',

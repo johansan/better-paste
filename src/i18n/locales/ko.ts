@@ -52,6 +52,7 @@ export const STRINGS_KO: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: '정보',
             whatsNewName: 'Better Paste {version}의 새로운 기능',
             whatsNewDesc: '최근 릴리스에서 달라진 점입니다.',
             whatsNewAliases: ['릴리스 노트', '변경 사항', '변경 기록', '버전', '업데이트', '기록'],
@@ -68,7 +69,6 @@ export const STRINGS_KO: TranslationStrings = {
         },
 
         behavior: {
-            heading: '동작',
             autoCleanName: '붙여넣을 때마다 정리',
             autoCleanDesc:
                 '붙여넣을 때마다 규칙을 적용합니다. 꺼 두면 Better Paste 명령에서만 규칙이 적용됩니다. 개별 노트는 "bp: false" 속성으로 제외하거나 "bp: true" 속성으로 포함할 수 있습니다.',
@@ -84,8 +84,6 @@ export const STRINGS_KO: TranslationStrings = {
             savingDesc:
                 '붙여넣은 이미지를 첨부 파일 폴더에 저장하고 웹 주소 대신 로컬 파일을 링크합니다. Safari의 "이미지 복사", 복사한 웹 콘텐츠 속 이미지, 붙여넣은 이미지 주소가 여기에 해당합니다. 파일 이름은 기본적으로 주소에서 가져옵니다:',
             savingAliases: ['다운로드', '첨부 파일', 'safari', '스크린샷', '이미지', '폴더', '파일 이름', '너비', '크기'],
-            pageName: '이미지 처리',
-            pageDesc: '파일 이름과 이미지 너비.',
             nameFormatName: '파일 이름',
             nameFormatDesc: '저장한 이미지의 이름을 정하는 방식.',
             nameFormatSource: '원본 이름 사용',

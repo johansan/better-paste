@@ -52,6 +52,7 @@ export const STRINGS_ZH_CN: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: '关于',
             whatsNewName: 'Better Paste {version} 的新功能',
             whatsNewDesc: '最近几个版本的改动。',
             whatsNewAliases: ['发行说明', '更新内容', '更新日志', '版本', '更新', '历史'],
@@ -68,7 +69,6 @@ export const STRINGS_ZH_CN: TranslationStrings = {
         },
 
         behavior: {
-            heading: '行为',
             autoCleanName: '每次粘贴都清理',
             autoCleanDesc:
                 '每次粘贴都会应用规则。关闭后规则只在 Better Paste 命令中生效。单篇笔记可以用 "bp: false" 属性排除自己，也可以用 "bp: true" 属性单独启用。',
@@ -84,8 +84,6 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             savingDesc:
                 '把粘贴的图片保存到附件文件夹，并链接本地文件而不是网址。涵盖 Safari 的“拷贝图像”、复制的网页内容中的图片，以及粘贴的图片地址。文件名默认取自地址：',
             savingAliases: ['下载', '附件', 'safari', '截图', '图片', '文件夹', '文件名', '宽度', '尺寸'],
-            pageName: '图片处理',
-            pageDesc: '文件名与图片宽度。',
             nameFormatName: '文件名',
             nameFormatDesc: '保存的图片如何命名。',
             nameFormatSource: '沿用来源名称',

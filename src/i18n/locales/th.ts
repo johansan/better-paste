@@ -52,6 +52,7 @@ export const STRINGS_TH: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: 'เกี่ยวกับ',
             whatsNewName: 'มีอะไรใหม่ใน Better Paste {version}',
             whatsNewDesc: 'สิ่งที่เปลี่ยนไปในรุ่นล่าสุด',
             whatsNewAliases: ['บันทึกการเปลี่ยนแปลง', 'การเปลี่ยนแปลง', 'รุ่น', 'อัปเดต', 'ประวัติ'],
@@ -68,7 +69,6 @@ export const STRINGS_TH: TranslationStrings = {
         },
 
         behavior: {
-            heading: 'พฤติกรรม',
             autoCleanName: 'จัดระเบียบทุกครั้งที่วาง',
             autoCleanDesc:
                 'ใช้กฎกับการวางทุกครั้ง เมื่อปิดไว้ กฎจะทำงานเฉพาะผ่านคำสั่งของ Better Paste โน้ตแต่ละฉบับยกเว้นตัวเองได้ด้วยคุณสมบัติ "bp: false" หรือเลือกให้จัดระเบียบได้ด้วย "bp: true"',
@@ -84,8 +84,6 @@ export const STRINGS_TH: TranslationStrings = {
             savingDesc:
                 'บันทึกรูปภาพที่วางลงในโฟลเดอร์ไฟล์แนบของคุณ และลิงก์ไปยังไฟล์ในเครื่องแทนที่อยู่เว็บ ครอบคลุมทั้ง "คัดลอกรูปภาพ" ของ Safari รูปภาพในเนื้อหาเว็บที่คัดลอกมา และที่อยู่รูปภาพที่วาง โดยค่าเริ่มต้นชื่อไฟล์มาจากที่อยู่:',
             savingAliases: ['ดาวน์โหลด', 'ไฟล์แนบ', 'safari', 'ภาพหน้าจอ', 'รูปภาพ', 'โฟลเดอร์', 'ชื่อไฟล์', 'ความกว้าง', 'ขนาด'],
-            pageName: 'การจัดการรูปภาพ',
-            pageDesc: 'ชื่อไฟล์และความกว้างของรูปภาพ',
             nameFormatName: 'ชื่อไฟล์',
             nameFormatDesc: 'วิธีตั้งชื่อรูปภาพที่บันทึก',
             nameFormatSource: 'ใช้ชื่อจากต้นทาง',

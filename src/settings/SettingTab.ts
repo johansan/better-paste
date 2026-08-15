@@ -79,11 +79,10 @@ export class BetterPasteSettingTab extends PluginSettingTab {
         const context = this.context;
 
         return [
-            { type: 'group', cls: SETTINGS_CLASS, items: createStartDefinitions(context) },
+            // No heading, because the settings tab is already named for the plugin
             {
                 type: 'group',
                 cls: SETTINGS_CLASS,
-                heading: strings.settings.behavior.heading,
                 items: [
                     toggle(
                         'autoClean',
@@ -113,8 +112,10 @@ export class BetterPasteSettingTab extends PluginSettingTab {
                 heading: strings.settings.text.heading,
                 items: [...createTextProcessingDefinitions(context), ...createAiTextLandingDefinitions(context)]
             },
-            // Last, because these name the per-note properties rather than changing a rule
-            { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.frontmatter.heading, items: createFrontmatterDefinitions() }
+            // Below the rules, because these name the per-note properties rather than changing a rule
+            { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.frontmatter.heading, items: createFrontmatterDefinitions() },
+            // Last, because release notes, support links and the other plugins are not settings
+            { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.start.heading, items: createStartDefinitions(context) }
         ];
     }
 

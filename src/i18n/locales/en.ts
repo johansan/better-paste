@@ -70,6 +70,7 @@ export const STRINGS_EN = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: 'About',
             whatsNewName: "What's new in Better Paste {version}",
             whatsNewDesc: 'What changed in the most recent releases.',
             whatsNewAliases: ['release notes', 'changelog', 'version', 'update', 'history'],
@@ -86,7 +87,6 @@ export const STRINGS_EN = {
         },
 
         behavior: {
-            heading: 'Behavior',
             autoCleanName: 'Clean up every paste',
             autoCleanDesc:
                 'Applies the rules to every paste. When off, the rules run only from the Better Paste commands. A single note can opt out with the "bp: false" property, or opt in with "bp: true".',
@@ -113,8 +113,6 @@ export const STRINGS_EN = {
                 'width',
                 'size'
             ],
-            pageName: 'Image handling',
-            pageDesc: 'File names and image width.',
             nameFormatName: 'File names',
             nameFormatDesc: 'How saved images are named.',
             nameFormatSource: 'Name from source',

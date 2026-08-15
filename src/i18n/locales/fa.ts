@@ -55,6 +55,7 @@ export const STRINGS_FA: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: 'درباره',
             whatsNewName: 'تازه‌های Better Paste {version}',
             whatsNewDesc: 'آنچه در نسخه‌های اخیر تغییر کرده است.',
             whatsNewAliases: ['یادداشت انتشار', 'تغییرات', 'فهرست تغییرات', 'نسخه', 'به‌روزرسانی', 'تاریخچه'],
@@ -71,7 +72,6 @@ export const STRINGS_FA: TranslationStrings = {
         },
 
         behavior: {
-            heading: 'رفتار',
             autoCleanName: 'پاک‌سازی هر بار چسباندن',
             autoCleanDesc:
                 'قوانین را در هر چسباندن اعمال می‌کند. وقتی خاموش باشد، قوانین فقط از طریق دستورهای Better Paste اجرا می‌شوند. یک یادداشت می‌تواند با ویژگی "bp: false" خود را کنار بگذارد، یا با "bp: true" پاک‌سازی را برای خودش روشن کند.',
@@ -87,8 +87,6 @@ export const STRINGS_FA: TranslationStrings = {
             savingDesc:
                 'تصاویر چسبانده‌شده را در پوشه پیوست‌های شما ذخیره می‌کند و به جای نشانی وب به پرونده محلی پیوند می‌دهد. شامل «کپی تصویر» در Safari، تصاویر درون محتوای وب کپی‌شده و نشانی‌های تصویر چسبانده‌شده است. نام پرونده به‌طور پیش‌فرض از نشانی گرفته می‌شود:',
             savingAliases: ['دانلود', 'پیوست', 'safari', 'نماگرفت', 'تصویر', 'پوشه', 'نام پرونده', 'عرض', 'اندازه'],
-            pageName: 'مدیریت تصاویر',
-            pageDesc: 'نام پرونده‌ها و عرض تصویر.',
             nameFormatName: 'نام پرونده‌ها',
             nameFormatDesc: 'نام‌گذاری تصاویر ذخیره‌شده.',
             nameFormatSource: 'نام از منبع',

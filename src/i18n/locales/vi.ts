@@ -52,6 +52,7 @@ export const STRINGS_VI: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: 'Giới thiệu',
             whatsNewName: 'Có gì mới trong Better Paste {version}',
             whatsNewDesc: 'Những thay đổi trong các bản phát hành gần đây.',
             whatsNewAliases: ['ghi chú phát hành', 'thay đổi', 'nhật ký thay đổi', 'phiên bản', 'cập nhật', 'lịch sử'],
@@ -68,7 +69,6 @@ export const STRINGS_VI: TranslationStrings = {
         },
 
         behavior: {
-            heading: 'Hành vi',
             autoCleanName: 'Dọn mọi lần dán',
             autoCleanDesc:
                 'Áp dụng các quy tắc cho mọi lần dán. Khi tắt, các quy tắc chỉ được áp dụng khi dùng các lệnh của Better Paste. Một ghi chú riêng lẻ có thể tự loại trừ bằng thuộc tính "bp: false", hoặc tự bật lại bằng "bp: true".',
@@ -94,8 +94,6 @@ export const STRINGS_VI: TranslationStrings = {
                 'chiều rộng',
                 'kích thước'
             ],
-            pageName: 'Xử lý hình ảnh',
-            pageDesc: 'Tên tệp và chiều rộng ảnh.',
             nameFormatName: 'Tên tệp',
             nameFormatDesc: 'Cách đặt tên cho ảnh đã lưu.',
             nameFormatSource: 'Lấy tên từ nguồn',

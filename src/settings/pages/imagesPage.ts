@@ -90,7 +90,7 @@ function renderCustomFilenameFormat(setting: Setting, context: SettingsPageConte
     renderExample(context.settings().imageNameTemplate);
 }
 
-/** Rows shown directly under the Images heading on the landing page. */
+/** Rows shown under the Images heading. Naming only applies once saving is on. */
 export function createImageLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
     const enabled = (): boolean => context.settings().imageEnabled;
 
@@ -104,23 +104,9 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
             control: { type: 'toggle', key: 'imageEnabled', defaultValue: DEFAULT_SETTINGS.imageEnabled }
         },
         {
-            type: 'page',
-            name: text.pageName,
-            desc: text.pageDesc,
-            visible: enabled,
-            items: createImageOptionsDefinitions(context)
-        }
-    ];
-}
-
-/** The Image options sub-page. */
-function createImageOptionsDefinitions(context: SettingsPageContext): SettingGroupItem[] {
-    const text = strings.settings.images;
-
-    return [
-        {
             name: text.nameFormatName,
             desc: text.nameFormatDesc,
+            visible: enabled,
             control: {
                 type: 'dropdown',
                 key: 'imageNameFormat',
@@ -134,7 +120,7 @@ function createImageOptionsDefinitions(context: SettingsPageContext): SettingGro
         {
             name: text.customName,
             aliases: aliases(source => source.settings.images.customAliases),
-            visible: () => context.settings().imageNameFormat === 'custom',
+            visible: () => enabled() && context.settings().imageNameFormat === 'custom',
             render: setting => renderCustomFilenameFormat(setting, context)
         }
     ];

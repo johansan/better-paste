@@ -55,6 +55,7 @@ export const STRINGS_DE: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: 'Über',
             whatsNewName: 'Neu in Better Paste {version}',
             whatsNewDesc: 'Was sich in den letzten Versionen geändert hat.',
             whatsNewAliases: ['versionshinweise', 'änderungen', 'changelog', 'version', 'aktualisierung', 'verlauf'],
@@ -71,7 +72,6 @@ export const STRINGS_DE: TranslationStrings = {
         },
 
         behavior: {
-            heading: 'Verhalten',
             autoCleanName: 'Jeden Einfügevorgang bereinigen',
             autoCleanDesc:
                 'Wendet die Regeln bei jedem Einfügen an. Ist dies aus, greifen die Regeln nur über die Better-Paste-Befehle. Eine einzelne Notiz kann sich mit der Eigenschaft "bp: false" ausnehmen oder sich mit "bp: true" immer bereinigen lassen.',
@@ -96,8 +96,6 @@ export const STRINGS_DE: TranslationStrings = {
             savingDesc:
                 'Speichert eingefügte Bilder im Anhangordner und verlinkt die lokale Datei statt der Webadresse. Gilt für "Bild kopieren" in Safari, Bilder in kopierten Webinhalten und eingefügte Bildadressen. Standardmäßig stammt der Dateiname aus der Adresse:',
             savingAliases: ['herunterladen', 'anhang', 'safari', 'bildschirmfoto', 'bild', 'ordner', 'dateiname', 'breite', 'größe'],
-            pageName: 'Bildbehandlung',
-            pageDesc: 'Dateinamen und Bildbreite.',
             nameFormatName: 'Dateinamen',
             nameFormatDesc: 'Wie gespeicherte Bilder benannt werden.',
             nameFormatSource: 'Name aus der Quelle',

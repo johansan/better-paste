@@ -52,6 +52,7 @@ export const STRINGS_ID: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: 'Tentang',
             whatsNewName: 'Yang baru di Better Paste {version}',
             whatsNewDesc: 'Apa yang berubah pada rilis terbaru.',
             whatsNewAliases: ['catatan rilis', 'perubahan', 'log perubahan', 'versi', 'pembaruan', 'riwayat'],
@@ -68,7 +69,6 @@ export const STRINGS_ID: TranslationStrings = {
         },
 
         behavior: {
-            heading: 'Perilaku',
             autoCleanName: 'Bersihkan setiap tempelan',
             autoCleanDesc:
                 'Menerapkan aturan pada setiap tempelan. Saat mati, aturan hanya dijalankan melalui perintah Better Paste. Satu catatan dapat mengecualikan diri dengan properti "bp: false", atau ikut dibersihkan dengan "bp: true".',
@@ -84,8 +84,6 @@ export const STRINGS_ID: TranslationStrings = {
             savingDesc:
                 'Menyimpan gambar yang ditempel ke folder lampiran Anda dan menaut ke berkas lokal alih-alih alamat web. Mencakup "Salin gambar" di Safari, gambar di dalam konten web yang disalin, dan alamat gambar yang ditempel. Secara baku nama berkas diambil dari alamatnya:',
             savingAliases: ['unduh', 'lampiran', 'safari', 'tangkapan layar', 'gambar', 'folder', 'nama berkas', 'lebar', 'ukuran'],
-            pageName: 'Penanganan gambar',
-            pageDesc: 'Nama berkas dan lebar gambar.',
             nameFormatName: 'Nama berkas',
             nameFormatDesc: 'Cara penamaan gambar yang disimpan.',
             nameFormatSource: 'Nama dari sumber',

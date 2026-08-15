@@ -55,6 +55,7 @@ export const STRINGS_FR: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: 'À propos',
             whatsNewName: 'Nouveautés de Better Paste {version}',
             whatsNewDesc: 'Ce qui a changé dans les versions les plus récentes.',
             whatsNewAliases: ['notes de version', 'changements', 'journal des modifications', 'version', 'mise à jour', 'historique'],
@@ -71,7 +72,6 @@ export const STRINGS_FR: TranslationStrings = {
         },
 
         behavior: {
-            heading: 'Comportement',
             autoCleanName: 'Nettoyer chaque collage',
             autoCleanDesc:
                 'Applique les règles à chaque collage. Si cette option est désactivée, les règles ne s’appliquent que via les commandes Better Paste. Une note peut s’en exclure avec la propriété "bp: false", ou s’y inclure avec "bp: true".',
@@ -97,8 +97,6 @@ export const STRINGS_FR: TranslationStrings = {
                 'largeur',
                 'taille'
             ],
-            pageName: 'Traitement des images',
-            pageDesc: 'Noms de fichiers et largeur d’image.',
             nameFormatName: 'Noms de fichiers',
             nameFormatDesc: 'Comment les images enregistrées sont nommées.',
             nameFormatSource: 'Nom d’après la source',

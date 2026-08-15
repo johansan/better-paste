@@ -73,6 +73,7 @@ export const STRINGS_AR: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: 'حول',
             whatsNewName: 'الجديد في Better Paste {version}',
             whatsNewDesc: 'ما الذي تغيّر في أحدث الإصدارات.',
             whatsNewAliases: ['ملاحظات الإصدار', 'التغييرات', 'سجل التغييرات', 'إصدار', 'تحديث', 'السجل'],
@@ -89,7 +90,6 @@ export const STRINGS_AR: TranslationStrings = {
         },
 
         behavior: {
-            heading: 'السلوك',
             autoCleanName: 'تنظيف كل عملية لصق',
             autoCleanDesc:
                 'يطبّق القواعد عند كل لصق. عند إيقافه لا تُطبّق القواعد إلا عبر أوامر Better Paste. يمكن لملاحظة واحدة أن تستثني نفسها بالخاصية "bp: false"، أو أن تطلب التنظيف بالخاصية "bp: true".',
@@ -105,8 +105,6 @@ export const STRINGS_AR: TranslationStrings = {
             savingDesc:
                 'يحفظ الصور الملصقة في مجلد المرفقات ويربط الملف المحلي بدل عنوان الويب. يشمل «نسخ الصورة» في Safari، والصور داخل محتوى ويب منسوخ، وعناوين الصور الملصقة. يأتي اسم الملف من العنوان افتراضيًا:',
             savingAliases: ['تنزيل', 'مرفق', 'safari', 'لقطة شاشة', 'صورة', 'مجلد', 'اسم الملف', 'عرض', 'حجم'],
-            pageName: 'معالجة الصور',
-            pageDesc: 'أسماء الملفات وعرض الصور.',
             nameFormatName: 'أسماء الملفات',
             nameFormatDesc: 'كيف تُسمّى الصور المحفوظة.',
             nameFormatSource: 'الاسم من المصدر',

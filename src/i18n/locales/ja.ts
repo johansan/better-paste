@@ -52,6 +52,7 @@ export const STRINGS_JA: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: 'このプラグインについて',
             whatsNewName: 'Better Paste {version} の新機能',
             whatsNewDesc: '直近のリリースで変わった点。',
             whatsNewAliases: ['リリースノート', '変更点', '変更履歴', 'バージョン', '更新', '履歴'],
@@ -68,7 +69,6 @@ export const STRINGS_JA: TranslationStrings = {
         },
 
         behavior: {
-            heading: '動作',
             autoCleanName: '貼り付けのたびに整える',
             autoCleanDesc:
                 '貼り付けのたびにルールを適用します。オフのときは Better Paste のコマンドを使ったときだけ適用されます。個々のノートは "bp: false" プロパティで対象外にでき、"bp: true" で対象にできます。',
@@ -94,8 +94,6 @@ export const STRINGS_JA: TranslationStrings = {
                 '幅',
                 'サイズ'
             ],
-            pageName: '画像の扱い',
-            pageDesc: 'ファイル名と画像の幅。',
             nameFormatName: 'ファイル名',
             nameFormatDesc: '保存する画像の名前の付け方。',
             nameFormatSource: '元の名前を使う',

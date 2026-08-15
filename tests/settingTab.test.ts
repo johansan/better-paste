@@ -143,24 +143,28 @@ describe('settings tree', () => {
         }
     });
 
-    it('puts the release notes and support rows above the rules', () => {
+    it('puts the release notes and support rows below the rules', () => {
         const rows = flatten(tab.getSettingDefinitions());
-        expect(rows.slice(0, 2).map(row => row.name)).toEqual(["What's new in Better Paste 1.0.0", 'Support development']);
+        expect(rows.slice(-3).map(row => row.name)).toEqual([
+            "What's new in Better Paste 1.0.0",
+            'Support development',
+            'Check out my other plugins'
+        ]);
     });
 
-    it('groups every rule under a heading, leaving only the start rows loose', () => {
+    it('leaves the first group unheaded and names every group below it', () => {
         const groups = tab
             .getSettingDefinitions()
             .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
 
         expect(groups.map(group => group.heading)).toEqual([
             undefined,
-            'Behavior',
             'Images',
             'Links',
             'Terminal text',
             'Text processing',
-            'Frontmatter'
+            'Frontmatter',
+            'About'
         ]);
     });
 
@@ -254,7 +258,7 @@ describe('settings tree', () => {
 
     it('puts the detail on sub-pages, declared so search can still reach it', () => {
         const found = pages(tab.getSettingDefinitions());
-        expect(found.map(page => page.name)).toEqual(['Image handling', 'Site rules', 'Terminal text handling']);
+        expect(found.map(page => page.name)).toEqual(['Site rules', 'Terminal text handling']);
         // `items` keeps a page in the searchable tree; the imperative `page` form does not
         for (const page of found) {
             expect(page.items, `"${page.name}" has no items`).toBeDefined();
@@ -367,8 +371,8 @@ describe('dependent settings', () => {
     }
 
     it('hides the image detail when the rule is off', () => {
-        expect(isVisible(pageFor('Image handling', { imageEnabled: false }))).toBe(false);
-        expect(isVisible(pageFor('Image handling', { imageEnabled: true }))).toBe(true);
+        expect(isVisible(rowFor('imageNameFormat', { imageEnabled: false }))).toBe(false);
+        expect(isVisible(rowFor('imageNameFormat', { imageEnabled: true }))).toBe(true);
     });
 
     it('shows the custom filename row only for the custom format', () => {
@@ -377,6 +381,7 @@ describe('dependent settings', () => {
 
         expect(isVisible(customRow({ imageNameFormat: 'source' }))).toBe(false);
         expect(isVisible(customRow({ imageNameFormat: 'custom' }))).toBe(true);
+        expect(isVisible(customRow({ imageNameFormat: 'custom', imageEnabled: false }))).toBe(false);
     });
 
     it('hides the link detail when the rule is off', () => {

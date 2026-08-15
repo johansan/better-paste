@@ -55,6 +55,7 @@ export const STRINGS_TR: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: 'Hakkında',
             whatsNewName: 'Better Paste {version} sürümünde yenilikler',
             whatsNewDesc: 'Son sürümlerde nelerin değiştiği.',
             whatsNewAliases: ['sürüm notları', 'değişiklikler', 'değişiklik günlüğü', 'sürüm', 'güncelleme', 'geçmiş'],
@@ -71,7 +72,6 @@ export const STRINGS_TR: TranslationStrings = {
         },
 
         behavior: {
-            heading: 'Davranış',
             autoCleanName: 'Her yapıştırmayı temizle',
             autoCleanDesc:
                 'Kuralları her yapıştırmada uygular. Kapalıyken kurallar yalnızca Better Paste komutlarıyla uygulanır. Tek bir not "bp: false" özelliğiyle kendini dışarıda bırakabilir, "bp: true" özelliğiyle de kendini dahil edebilir.',
@@ -87,8 +87,6 @@ export const STRINGS_TR: TranslationStrings = {
             savingDesc:
                 'Yapıştırılan görselleri ek klasörünüze kaydeder ve web adresi yerine yerel dosyaya bağlantı verir. Safari’deki "Görseli kopyala", kopyalanan web içeriğindeki görseller ve yapıştırılan görsel adresleri buna dahildir. Dosya adı öntanımlı olarak adresten gelir:',
             savingAliases: ['indir', 'ek', 'safari', 'ekran görüntüsü', 'görsel', 'klasör', 'dosya adı', 'genişlik', 'boyut'],
-            pageName: 'Görsel işleme',
-            pageDesc: 'Dosya adları ve görsel genişliği.',
             nameFormatName: 'Dosya adları',
             nameFormatDesc: 'Kaydedilen görsellerin nasıl adlandırılacağı.',
             nameFormatSource: 'Kaynaktan gelen ad',

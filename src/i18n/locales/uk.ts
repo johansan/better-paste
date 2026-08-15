@@ -67,6 +67,7 @@ export const STRINGS_UK: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: 'Про плагін',
             whatsNewName: 'Що нового в Better Paste {version}',
             whatsNewDesc: 'Що змінилося в останніх випусках.',
             whatsNewAliases: ['примітки до випуску', 'зміни', 'список змін', 'версія', 'оновлення', 'історія'],
@@ -83,7 +84,6 @@ export const STRINGS_UK: TranslationStrings = {
         },
 
         behavior: {
-            heading: 'Поведінка',
             autoCleanName: 'Очищати кожну вставку',
             autoCleanDesc:
                 'Застосовує правила під час кожної вставки. Коли вимкнено, правила працюють лише через команди Better Paste. Окрему нотатку можна виключити властивістю "bp: false" або увімкнути обробку властивістю "bp: true".',
@@ -99,8 +99,6 @@ export const STRINGS_UK: TranslationStrings = {
             savingDesc:
                 'Зберігає вставлені зображення до теки вкладень і посилається на локальний файл замість вебадреси. Стосується «Копіювати зображення» в Safari, зображень у скопійованому вебвмісті та вставлених адрес зображень. Типово імʼя файлу походить з адреси:',
             savingAliases: ['завантажити', 'вкладення', 'safari', 'знімок екрана', 'зображення', 'тека', 'імʼя файлу', 'ширина', 'розмір'],
-            pageName: 'Обробка зображень',
-            pageDesc: 'Імена файлів і ширина зображень.',
             nameFormatName: 'Імена файлів',
             nameFormatDesc: 'Як називаються збережені зображення.',
             nameFormatSource: 'Назва з джерела',

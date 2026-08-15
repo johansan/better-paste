@@ -67,6 +67,7 @@ export const STRINGS_PL: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: 'O wtyczce',
             whatsNewName: 'Co nowego w Better Paste {version}',
             whatsNewDesc: 'Co zmieniło się w najnowszych wydaniach.',
             whatsNewAliases: ['informacje o wydaniu', 'zmiany', 'lista zmian', 'wersja', 'aktualizacja', 'historia'],
@@ -83,7 +84,6 @@ export const STRINGS_PL: TranslationStrings = {
         },
 
         behavior: {
-            heading: 'Zachowanie',
             autoCleanName: 'Czyść każde wklejenie',
             autoCleanDesc:
                 'Stosuje reguły przy każdym wklejeniu. Gdy jest wyłączone, reguły działają tylko po użyciu poleceń Better Paste. Pojedyncza notatka może się wyłączyć właściwością "bp: false" lub włączyć właściwością "bp: true".',
@@ -99,8 +99,6 @@ export const STRINGS_PL: TranslationStrings = {
             savingDesc:
                 'Zapisuje wklejone obrazy w folderze załączników i wstawia odnośnik do pliku lokalnego zamiast adresu internetowego. Dotyczy opcji „Kopiuj obraz” w Safari, obrazów w skopiowanej treści z sieci oraz wklejanych adresów obrazów. Domyślnie nazwa pliku pochodzi z adresu:',
             savingAliases: ['pobieranie', 'załącznik', 'safari', 'zrzut ekranu', 'obraz', 'folder', 'nazwa pliku', 'szerokość', 'rozmiar'],
-            pageName: 'Obsługa obrazów',
-            pageDesc: 'Nazwy plików i szerokość obrazów.',
             nameFormatName: 'Nazwy plików',
             nameFormatDesc: 'Jak nazywane są zapisane obrazy.',
             nameFormatSource: 'Nazwa ze źródła',

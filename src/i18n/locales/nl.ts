@@ -55,6 +55,7 @@ export const STRINGS_NL: TranslationStrings = {
         plainFallback: '{description} {example}',
 
         start: {
+            heading: 'Over',
             whatsNewName: 'Nieuw in Better Paste {version}',
             whatsNewDesc: 'Wat er in de meest recente versies is veranderd.',
             whatsNewAliases: ['releaseopmerkingen', 'wijzigingen', 'changelog', 'versie', 'update', 'geschiedenis'],
@@ -71,7 +72,6 @@ export const STRINGS_NL: TranslationStrings = {
         },
 
         behavior: {
-            heading: 'Gedrag',
             autoCleanName: 'Elke plakactie opschonen',
             autoCleanDesc:
                 'Past de regels toe bij elke plakactie. Staat dit uit, dan werken de regels alleen via de Better Paste-opdrachten. Een losse notitie kan zichzelf uitsluiten met de eigenschap "bp: false" of zich altijd laten opschonen met "bp: true".',
@@ -97,8 +97,6 @@ export const STRINGS_NL: TranslationStrings = {
                 'breedte',
                 'grootte'
             ],
-            pageName: 'Afbeeldingen verwerken',
-            pageDesc: 'Bestandsnamen en afbeeldingsbreedte.',
             nameFormatName: 'Bestandsnamen',
             nameFormatDesc: 'Hoe opgeslagen afbeeldingen worden genoemd.',
             nameFormatSource: 'Naam uit de bron',

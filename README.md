@@ -128,8 +128,6 @@ https://images.example.com/2026/05/skyline-8f21a.jpg?auto=format&w=2400
 
 is saved as `skyline-8f21a.jpg` and embedded as `![[skyline-8f21a.jpg]]`.
 
-Behind **Image handling**:
-
 - **File names** uses the source name or a custom format. A custom format can combine `{{name}}` with Moment date syntax, so `{{name}}-YYYY-MM-DD` saves the picture above as `skyline-8f21a-2026-08-13.jpg`. The setting shows the resulting filename below the field.
 
 The width of a pasted image is set per note rather than here. See [section 3.6](#36-frontmatter) and [section 4](#4-per-note-control).
