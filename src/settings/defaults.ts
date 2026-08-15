@@ -27,7 +27,7 @@ export const DEFAULT_SETTINGS: BetterPasteSettings = {
     imageNameTemplate: DEFAULT_IMAGE_NAME_TEMPLATE,
 
     noteProperty: 'bp',
-    imageSizeProperty: 'bp-image-width',
+    imageSizeProperty: 'image-width',
 
     linkEnabled: true,
     linkTitles: true,

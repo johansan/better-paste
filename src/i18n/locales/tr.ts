@@ -97,7 +97,7 @@ export const STRINGS_TR: TranslationStrings = {
             notePropertyAliases: ['not', 'özellik', 'frontmatter', 'hariç tut', 'devre dışı', 'etkinleştir', 'bp'],
             sizePropertyName: 'Görsel genişliği özelliği',
             sizePropertyDesc:
-                'Bir nota yapıştırılan görsellerin genişliğini belirleyen frontmatter özelliği. Notta "bp-image-width: 400" varsa, yapıştırılan görsel ![[photo.png|400]] biçimine girer. Genişlik eklenmemesi için boş bırakın.',
+                'Bir nota yapıştırılan görsellerin genişliğini belirleyen frontmatter özelliği. Notta "image-width: 400" varsa, yapıştırılan görsel ![[photo.png|400]] biçimine girer. Genişlik eklenmemesi için boş bırakın.',
             sizePropertyAliases: ['boyut', 'frontmatter', 'özellik', 'yeniden boyutlandır']
         },
 

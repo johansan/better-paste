@@ -104,7 +104,7 @@ export const STRINGS_JA: TranslationStrings = {
             notePropertyAliases: ['ノート', 'プロパティ', 'フロントマター', 'frontmatter', '除外', '無効', '有効', 'bp'],
             sizePropertyName: '画像幅のプロパティ',
             sizePropertyDesc:
-                'ノートに貼り付ける画像の幅を決めるフロントマターのプロパティです。ノートに "bp-image-width: 400" があると、貼り付けた画像は ![[photo.png|400]] になります。空欄にすると幅を付けません。',
+                'ノートに貼り付ける画像の幅を決めるフロントマターのプロパティです。ノートに "image-width: 400" があると、貼り付けた画像は ![[photo.png|400]] になります。空欄にすると幅を付けません。',
             sizePropertyAliases: ['サイズ', 'フロントマター', 'frontmatter', 'プロパティ', 'リサイズ']
         },
 

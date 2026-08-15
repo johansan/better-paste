@@ -94,7 +94,7 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             notePropertyAliases: ['笔记', '属性', 'frontmatter', '排除', '禁用', '启用', 'bp'],
             sizePropertyName: '图片宽度属性',
             sizePropertyDesc:
-                '决定粘贴进笔记的图片宽度的 frontmatter 属性。笔记中写有 "bp-image-width: 400" 时，粘贴的图片会变成 ![[photo.png|400]]。留空则不添加宽度。',
+                '决定粘贴进笔记的图片宽度的 frontmatter 属性。笔记中写有 "image-width: 400" 时，粘贴的图片会变成 ![[photo.png|400]]。留空则不添加宽度。',
             sizePropertyAliases: ['尺寸', 'frontmatter', '属性', '缩放']
         },
 

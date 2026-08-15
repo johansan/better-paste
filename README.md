@@ -175,7 +175,7 @@ Subdomains are covered automatically, `google.*` matches google.com and google.s
 
 ### 3.6 Frontmatter
 
-- **Note property** (default `bp`) and **Image width property** (default `bp-image-width`): the two per-note properties from [section 4](#4-per-note-control). Rename them if they collide with something in your vault, or leave one blank to turn it off.
+- **Note property** (default `bp`) and **Image width property** (default `image-width`): the two per-note properties from [section 4](#4-per-note-control). Rename them if they collide with something in your vault, or leave one blank to turn it off.
 
 <br/>
 
@@ -196,11 +196,11 @@ It works the other way too: `bp: true` cleans a note even when **Clean up every 
 | On                   | cleaned          | cleaned    | left alone  |
 | Off                  | left alone       | cleaned    | left alone  |
 
-And `bp-image-width` sets the width of images pasted into that note:
+And `image-width` sets the width of images pasted into that note:
 
 ```yaml
 ---
-bp-image-width: 400
+image-width: 400
 ---
 ```
 

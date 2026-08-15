@@ -121,7 +121,7 @@ export const STRINGS_EN = {
             notePropertyAliases: ['note', 'property', 'frontmatter', 'exclude', 'opt out', 'opt in', 'disable', 'enable', 'bp', 'verbatim'],
             sizePropertyName: 'Image width property',
             sizePropertyDesc:
-                'Frontmatter property that sets the width of images pasted into a note. With "bp-image-width: 400" in the note, a pasted image becomes ![[photo.png|400]]. Leave blank to add no width.',
+                'Frontmatter property that sets the width of images pasted into a note. With "image-width: 400" in the note, a pasted image becomes ![[photo.png|400]]. Leave blank to add no width.',
             sizePropertyAliases: ['size', 'frontmatter', 'property', 'resize', 'width', 'image']
         },
 

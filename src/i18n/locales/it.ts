@@ -97,7 +97,7 @@ export const STRINGS_IT: TranslationStrings = {
             notePropertyAliases: ['nota', 'proprietà', 'frontmatter', 'escludi', 'disattiva', 'attiva', 'bp'],
             sizePropertyName: 'Proprietà per la larghezza delle immagini',
             sizePropertyDesc:
-                'Proprietà del frontmatter che imposta la larghezza delle immagini incollate in una nota. Con "bp-image-width: 400" nella nota, un’immagine incollata diventa ![[photo.png|400]]. Lascia vuoto per non aggiungere alcuna larghezza.',
+                'Proprietà del frontmatter che imposta la larghezza delle immagini incollate in una nota. Con "image-width: 400" nella nota, un’immagine incollata diventa ![[photo.png|400]]. Lascia vuoto per non aggiungere alcuna larghezza.',
             sizePropertyAliases: ['dimensione', 'frontmatter', 'proprietà', 'ridimensiona']
         },
 

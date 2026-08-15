@@ -27,15 +27,15 @@ import {
 
 describe('extractFrontmatterBlock', () => {
     it('reads the block at the top of a note', () => {
-        expect(extractFrontmatterBlock('---\nbp-image-width: 400\n---\n\nBody text')).toBe('bp-image-width: 400');
+        expect(extractFrontmatterBlock('---\nimage-width: 400\n---\n\nBody text')).toBe('image-width: 400');
     });
 
     it('reads a block with several properties', () => {
-        expect(extractFrontmatterBlock('---\ntitle: Notes\nbp-image-width: 400\n---\n')).toBe('title: Notes\nbp-image-width: 400');
+        expect(extractFrontmatterBlock('---\ntitle: Notes\nimage-width: 400\n---\n')).toBe('title: Notes\nimage-width: 400');
     });
 
     it('accepts the "..." terminator', () => {
-        expect(extractFrontmatterBlock('---\nbp-image-width: 400\n...\nBody')).toBe('bp-image-width: 400');
+        expect(extractFrontmatterBlock('---\nimage-width: 400\n...\nBody')).toBe('image-width: 400');
     });
 
     it('handles an empty block', () => {
@@ -43,7 +43,7 @@ describe('extractFrontmatterBlock', () => {
     });
 
     it('handles Windows line endings', () => {
-        expect(extractFrontmatterBlock('---\r\nbp-image-width: 400\r\n---\r\nBody')).toBe('bp-image-width: 400\r');
+        expect(extractFrontmatterBlock('---\r\nimage-width: 400\r\n---\r\nBody')).toBe('image-width: 400\r');
     });
 
     it('returns null when there is no frontmatter', () => {
@@ -51,11 +51,11 @@ describe('extractFrontmatterBlock', () => {
     });
 
     it('ignores a rule that is not on the first line', () => {
-        expect(extractFrontmatterBlock('Some text\n---\nbp-image-width: 400\n---')).toBeNull();
+        expect(extractFrontmatterBlock('Some text\n---\nimage-width: 400\n---')).toBeNull();
     });
 
     it('returns null while the block is still unterminated', () => {
-        expect(extractFrontmatterBlock('---\nbp-image-width: 400\n')).toBeNull();
+        expect(extractFrontmatterBlock('---\nimage-width: 400\n')).toBeNull();
     });
 });
 
@@ -90,24 +90,24 @@ describe('normalizeImageSize', () => {
 
 describe('resolveImageSize', () => {
     it('reads the configured property', () => {
-        expect(resolveImageSize({ 'bp-image-width': 400 }, 'bp-image-width')).toBe('400');
+        expect(resolveImageSize({ 'image-width': 400 }, 'image-width')).toBe('400');
     });
 
     it('matches the property name regardless of case', () => {
-        expect(resolveImageSize({ 'Bp-Image-Width': 400 }, 'bp-image-width')).toBe('400');
+        expect(resolveImageSize({ 'Image-Width': 400 }, 'image-width')).toBe('400');
     });
 
     it('ignores other properties', () => {
-        expect(resolveImageSize({ title: 'Notes', width: 999 }, 'bp-image-width')).toBeNull();
+        expect(resolveImageSize({ title: 'Notes', width: 999 }, 'image-width')).toBeNull();
     });
 
     it('returns null when the feature is switched off', () => {
-        expect(resolveImageSize({ 'bp-image-width': 400 }, '')).toBeNull();
+        expect(resolveImageSize({ 'image-width': 400 }, '')).toBeNull();
     });
 
     it('returns null for missing frontmatter', () => {
-        expect(resolveImageSize(null, 'bp-image-width')).toBeNull();
-        expect(resolveImageSize('not an object', 'bp-image-width')).toBeNull();
+        expect(resolveImageSize(null, 'image-width')).toBeNull();
+        expect(resolveImageSize('not an object', 'image-width')).toBeNull();
     });
 });
 

@@ -94,7 +94,7 @@ export const STRINGS_KO: TranslationStrings = {
             notePropertyAliases: ['노트', '속성', '프론트매터', 'frontmatter', '제외', '끄기', '켜기', 'bp'],
             sizePropertyName: '이미지 너비 속성',
             sizePropertyDesc:
-                '노트에 붙여넣는 이미지의 너비를 정하는 프론트매터 속성입니다. 노트에 "bp-image-width: 400"이 있으면 붙여넣은 이미지가 ![[photo.png|400]]이 됩니다. 비워 두면 너비를 넣지 않습니다.',
+                '노트에 붙여넣는 이미지의 너비를 정하는 프론트매터 속성입니다. 노트에 "image-width: 400"이 있으면 붙여넣은 이미지가 ![[photo.png|400]]이 됩니다. 비워 두면 너비를 넣지 않습니다.',
             sizePropertyAliases: ['크기', '프론트매터', 'frontmatter', '속성', '크기 조정']
         },
 

@@ -300,7 +300,7 @@ describe('image width from frontmatter', () => {
 
     /** A note whose frontmatter asks for a width, with the cursor at the end. */
     function noteAsking(width: string): FakeEditor {
-        return new FakeEditor(`---\nbp-image-width: ${width}\n---\n\n`);
+        return new FakeEditor(`---\nimage-width: ${width}\n---\n\n`);
     }
 
     it('sizes a clipboard bitmap to the width the note asks for', async () => {
@@ -309,7 +309,7 @@ describe('image width from frontmatter', () => {
 
         service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO);
         await settle();
-        expect(editor.getValue()).toBe('---\nbp-image-width: 400\n---\n\n![[photo.png|400]]');
+        expect(editor.getValue()).toBe('---\nimage-width: 400\n---\n\n![[photo.png|400]]');
     });
 
     it('passes a width and height through', async () => {
@@ -326,7 +326,7 @@ describe('image width from frontmatter', () => {
 
         service.handleEditorPaste(event, editor.asEditor(), INFO);
         await settle();
-        expect(editor.getValue()).toBe('---\nbp-image-width: 250\n---\n\n![[image-0.png|250]]');
+        expect(editor.getValue()).toBe('---\nimage-width: 250\n---\n\n![[image-0.png|250]]');
     });
 
     it('sizes images pulled out of rich content', async () => {
@@ -342,7 +342,7 @@ describe('image width from frontmatter', () => {
         editor.replaceSelection('![](https://example.com/a.png)');
         await settle();
 
-        expect(editor.getValue()).toBe('---\nbp-image-width: 120\n---\n\n![[image-0.png|120]]');
+        expect(editor.getValue()).toBe('---\nimage-width: 120\n---\n\n![[image-0.png|120]]');
     });
 
     it('takes over a plain screenshot paste so the width still applies', async () => {
@@ -399,7 +399,7 @@ describe('image width from frontmatter', () => {
 
         service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO);
         await settle();
-        expect(editor.getValue()).toBe('---\nbp-image-width: 400\n---\n\n![400](https://example.com/photo.webp)');
+        expect(editor.getValue()).toBe('---\nimage-width: 400\n---\n\n![400](https://example.com/photo.webp)');
     });
 });
 
