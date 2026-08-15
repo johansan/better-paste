@@ -21,6 +21,7 @@ import {
     compareVersions,
     getLatestReleaseNotes,
     getReleaseNotesBetweenVersions,
+    getReleaseNotesForUpdate,
     normalizeVersion,
     shouldAutoDisplayReleaseNotesForUpdate
 } from '../src/releaseNotes';
@@ -81,6 +82,22 @@ describe('release notes', () => {
 
     it('leaves out a release newer than the version running', () => {
         expect(getReleaseNotesBetweenVersions('0.9.0', '0.9.5')).toEqual([]);
+    });
+
+    it('pads an upgrade with earlier releases so the dialog carries some history', () => {
+        expect(getReleaseNotesForUpdate('1.0.1', '1.0.2', 3).map(note => note.version)).toEqual(['1.0.2', '1.0.1', '1.0.0']);
+    });
+
+    it('cannot pad past what has been released', () => {
+        expect(getReleaseNotesForUpdate('0.9.0', '1.0.0', 5).map(note => note.version)).toEqual(['1.0.0']);
+    });
+
+    it('shows the full span when the upgrade covers more than the minimum', () => {
+        expect(getReleaseNotesForUpdate('0.9.0', '1.0.2', 1).map(note => note.version)).toEqual(['1.0.2', '1.0.1', '1.0.0']);
+    });
+
+    it('keeps a release newer than the version running out of the padded list', () => {
+        expect(getReleaseNotesForUpdate('1.0.0', '1.0.1', 5).map(note => note.version)).not.toContain('1.0.3');
     });
 
     it('opens by itself for an upgrade that has notes', () => {

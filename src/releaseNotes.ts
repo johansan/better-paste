@@ -51,6 +51,14 @@ export interface ReleaseNote {
 /** Newest first. A new release goes at the top. */
 const RELEASE_NOTES: ReleaseNote[] = [
     {
+        version: '1.0.3',
+        date: '2026-08-15',
+        new: [
+            'The new ==Quotes== setting can turn straight quotes into curly ones, not just the other way around.',
+            'The new ==Dashes== setting can turn dashes between words into en dashes or em dashes, with or without spaces.'
+        ]
+    },
+    {
         version: '1.0.2',
         date: '2026-08-15',
         improved: [
@@ -108,6 +116,17 @@ export function getLatestReleaseNotes(count = 5): ReleaseNote[] {
 /** Every release after `fromVersion` and up to `toVersion`, newest first. */
 export function getReleaseNotesBetweenVersions(fromVersion: string, toVersion: string): ReleaseNote[] {
     return RELEASE_NOTES.filter(note => compareVersions(note.version, fromVersion) > 0 && compareVersions(note.version, toVersion) <= 0);
+}
+
+/**
+ * The releases the upgrade dialog shows: everything after `fromVersion`, padded with the
+ * releases below it so the dialog always holds a few for context. Releases above
+ * `toVersion` stay hidden, because a note can sit in the code before its release ships.
+ */
+export function getReleaseNotesForUpdate(fromVersion: string, toVersion: string, minimum = 5): ReleaseNote[] {
+    const released = RELEASE_NOTES.filter(note => compareVersions(note.version, toVersion) <= 0);
+    const unseen = released.filter(note => compareVersions(note.version, fromVersion) > 0).length;
+    return released.slice(0, Math.max(unseen, minimum));
 }
 
 /**

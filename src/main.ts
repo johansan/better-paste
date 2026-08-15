@@ -30,7 +30,7 @@ import { normalizeSettings } from './settings/normalize';
 import {
     compareVersions,
     getLatestReleaseNotes,
-    getReleaseNotesBetweenVersions,
+    getReleaseNotesForUpdate,
     normalizeVersion,
     shouldAutoDisplayReleaseNotesForUpdate
 } from './releaseNotes';
@@ -135,7 +135,8 @@ export default class BetterPastePlugin extends Plugin {
     /**
      * The welcome dialog on a first run, the release notes after an upgrade, nothing
      * otherwise. An upgrade shows every release since the one last shown, so a version
-     * installed and skipped still gets its notes read.
+     * installed and skipped still gets its notes read, padded with a few earlier releases
+     * so the dialog carries some history.
      */
     private async showStartupDialog(): Promise<void> {
         const currentVersion = this.manifest.version;
@@ -153,7 +154,7 @@ export default class BetterPastePlugin extends Plugin {
         if (compareVersions(currentVersion, lastShownVersion) <= 0) return;
         if (!shouldAutoDisplayReleaseNotesForUpdate(lastShownVersion, currentVersion)) return;
 
-        this.openWhatsNew(getReleaseNotesBetweenVersions(lastShownVersion, currentVersion));
+        this.openWhatsNew(getReleaseNotesForUpdate(lastShownVersion, currentVersion));
     }
 
     private openWhatsNew(releaseNotes: ReleaseNote[]): void {
