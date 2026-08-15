@@ -82,6 +82,18 @@ export const STRINGS_AR: TranslationStrings = {
             savingDesc:
                 'يحفظ الصور الملصقة في مجلد المرفقات ويربط الملف المحلي بدل عنوان الويب. يشمل «نسخ الصورة» في Safari، والصور داخل محتوى ويب منسوخ، وعناوين الصور الملصقة. يأتي اسم الملف من العنوان افتراضيًا:',
             savingAliases: ['تنزيل', 'مرفق', 'safari', 'لقطة شاشة', 'صورة', 'مجلد', 'اسم الملف', 'عرض', 'حجم'],
+            sizeChoiceName: 'تطبيق الحجم عند اللصق',
+            sizeChoiceDesc: 'يضيف عرضًا إلى كل صورة مضمّنة تُحفظ، مثل ![[photo.jpg|400]]. خاصية العرض في الملاحظة لها الأولوية.',
+            sizeChoiceAliases: ['حجم', 'عرض', 'حجم الصورة', 'تغيير الحجم', 'تضمين', '400'],
+            sizeOptionsName: 'خيارات الحجم',
+            sizeOptionsDesc: 'قيم العرض المعروضة أعلاه وفي مربع الحوار عند اللصق، مفصولة بفواصل.',
+            classChoiceName: 'تطبيق فئة CSS عند اللصق',
+            classChoiceDesc: 'يضيف فئة إلى كل صورة مضمّنة تُحفظ، مثل ![[photo.jpg#invert]]. تحدد السمات ومقتطفات CSS ما تفعله الفئة.',
+            classChoiceAliases: ['css', 'فئة', 'مقتطف', 'invert', 'سمة', 'مرشح', 'تضمين'],
+            classOptionsName: 'خيارات الفئة',
+            classOptionsDesc: 'الفئات المعروضة أعلاه وفي مربع الحوار عند اللصق، مفصولة بفواصل.',
+            choiceNone: 'لا تفعل شيئًا',
+            choiceAsk: 'اسأل عند كل لصق',
             nameFormatName: 'أسماء الملفات',
             nameFormatDesc: 'كيف تُسمّى الصور المحفوظة.',
             nameFormatSource: 'الاسم من المصدر',
@@ -214,6 +226,15 @@ export const STRINGS_AR: TranslationStrings = {
             dashesEmSpaced: 'شرطات طويلة بمسافات',
             dashesExample: 'كانت النتيجة - رغم كل الصعاب — جيدة.'
         }
+    },
+
+    imageModal: {
+        title: 'خيارات الصورة',
+        sizeName: 'الحجم',
+        className: 'فئة CSS',
+        none: 'لا تفعل شيئًا',
+        apply: 'تطبيق',
+        cancel: 'إلغاء'
     },
 
     welcome: {

@@ -88,6 +88,20 @@ export const STRINGS_ES: TranslationStrings = {
                 'ancho',
                 'tamaño'
             ],
+            sizeChoiceName: 'Aplicar tamaño al pegar',
+            sizeChoiceDesc:
+                'Añade un ancho a cada imagen incrustada que se guarda, como ![[photo.jpg|400]]. La propiedad de ancho de la nota tiene prioridad.',
+            sizeChoiceAliases: ['tamaño', 'ancho', 'tamaño de imagen', 'redimensionar', 'incrustar', '400'],
+            sizeOptionsName: 'Opciones de tamaño',
+            sizeOptionsDesc: 'Los anchos ofrecidos arriba y en el diálogo al pegar, separados por comas.',
+            classChoiceName: 'Aplicar clase CSS al pegar',
+            classChoiceDesc:
+                'Añade una clase a cada imagen incrustada que se guarda, como ![[photo.jpg#invert]]. Los temas y los fragmentos CSS deciden qué hace una clase.',
+            classChoiceAliases: ['css', 'clase', 'fragmento', 'invert', 'tema', 'filtro', 'incrustar'],
+            classOptionsName: 'Opciones de clase',
+            classOptionsDesc: 'Las clases ofrecidas arriba y en el diálogo al pegar, separadas por comas.',
+            choiceNone: 'No hacer nada',
+            choiceAsk: 'Preguntar en cada pegado',
             nameFormatName: 'Nombres de archivo',
             nameFormatDesc: 'Cómo se nombran las imágenes guardadas.',
             nameFormatSource: 'Nombre del origen',
@@ -206,6 +220,15 @@ export const STRINGS_ES: TranslationStrings = {
             dashesEmSpaced: 'Rayas con espacios',
             dashesExample: 'El resultado - contra todo pronóstico — fue bueno.'
         }
+    },
+
+    imageModal: {
+        title: 'Opciones de imagen',
+        sizeName: 'Tamaño',
+        className: 'Clase CSS',
+        none: 'No hacer nada',
+        apply: 'Aplicar',
+        cancel: 'Cancelar'
     },
 
     welcome: {

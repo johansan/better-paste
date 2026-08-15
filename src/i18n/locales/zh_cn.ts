@@ -75,6 +75,18 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             savingDesc:
                 '把粘贴的图片保存到附件文件夹，并链接本地文件而不是网址。涵盖 Safari 的“拷贝图像”、复制的网页内容中的图片，以及粘贴的图片地址。文件名默认取自地址：',
             savingAliases: ['下载', '附件', 'safari', '截图', '图片', '文件夹', '文件名', '宽度', '尺寸'],
+            sizeChoiceName: '粘贴时应用尺寸',
+            sizeChoiceDesc: '为每张保存的图片添加宽度，例如 ![[photo.jpg|400]]。笔记自己的宽度属性优先。',
+            sizeChoiceAliases: ['尺寸', '宽度', '图片尺寸', '缩放', '嵌入', '400'],
+            sizeOptionsName: '尺寸选项',
+            sizeOptionsDesc: '上方和粘贴对话框中提供的宽度，用逗号分隔。',
+            classChoiceName: '粘贴时应用 CSS 类',
+            classChoiceDesc: '为每张保存的图片添加 CSS 类，例如 ![[photo.jpg#invert]]。类的效果由主题和 CSS 片段决定。',
+            classChoiceAliases: ['css', '类', '片段', 'invert', '主题', '滤镜', '嵌入'],
+            classOptionsName: 'CSS 类选项',
+            classOptionsDesc: '上方和粘贴对话框中提供的类，用逗号分隔。',
+            choiceNone: '什么都不做',
+            choiceAsk: '每次粘贴时询问',
             nameFormatName: '文件名',
             nameFormatDesc: '保存的图片如何命名。',
             nameFormatSource: '沿用来源名称',
@@ -192,6 +204,15 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             dashesEmSpaced: '带空格的破折号',
             dashesExample: '这个结果 - 出乎意料 — 很好。'
         }
+    },
+
+    imageModal: {
+        title: '图片选项',
+        sizeName: '尺寸',
+        className: 'CSS 类',
+        none: '什么都不做',
+        apply: '应用',
+        cancel: '取消'
     },
 
     welcome: {

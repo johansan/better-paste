@@ -21,6 +21,8 @@ import type { Editor, MarkdownFileInfo, MarkdownView } from 'obsidian';
 import { ImageService } from './paste/ImageService';
 import { LinkTitleService } from './paste/LinkTitleService';
 import { PasteService } from './paste/PasteService';
+import { ImageEmbedModal } from './modals/ImageEmbedModal';
+import type { ImageEmbedChoice } from './modals/ImageEmbedModal';
 import { WelcomeModal } from './modals/WelcomeModal';
 import { WhatsNewModal } from './modals/WhatsNewModal';
 import { BetterPasteSettingTab } from './settings/SettingTab';
@@ -48,13 +50,20 @@ const LAST_SHOWN_VERSION_KEY = 'better-paste-last-shown-version';
 export default class BetterPastePlugin extends Plugin {
     settings: BetterPasteSettings = DEFAULT_SETTINGS;
     private pasteService!: PasteService;
+    /** The image options dialog while it is open, closed on unload so it cannot outlive the plugin. */
+    private imageModal: ImageEmbedModal | null = null;
 
     async onload(): Promise<void> {
         await this.loadSettings();
 
         const imageService = new ImageService(this.app, () => this.settings);
         const linkTitleService = new LinkTitleService(() => this.settings);
-        this.pasteService = new PasteService(() => this.settings, imageService, linkTitleService);
+        this.pasteService = new PasteService(
+            () => this.settings,
+            imageService,
+            linkTitleService,
+            (sizes, classes) => this.promptImageOptions(sizes, classes)
+        );
 
         this.registerEvent(
             this.app.workspace.on('editor-paste', (event: ClipboardEvent, editor: Editor, info: MarkdownView | MarkdownFileInfo) => {
@@ -106,9 +115,30 @@ export default class BetterPastePlugin extends Plugin {
     }
 
     onunload(): void {
+        this.imageModal?.close();
         // An image write may still be in flight; this stops it editing a note that the
         // plugin no longer owns
         this.pasteService.dispose();
+    }
+
+    /** Opens the image options dialog and remembers the picks for the next paste. */
+    private promptImageOptions(sizes: readonly string[] | null, classes: readonly string[] | null): Promise<ImageEmbedChoice | null> {
+        return new Promise(resolve => {
+            this.imageModal = new ImageEmbedModal(
+                this.app,
+                { sizes, classes, initialSize: this.settings.imageLastSize, initialClass: this.settings.imageLastClass },
+                choice => {
+                    this.imageModal = null;
+                    if (choice) {
+                        if (sizes) this.settings.imageLastSize = choice.size ?? '';
+                        if (classes) this.settings.imageLastClass = choice.cssClass ?? '';
+                        void this.saveSettings();
+                    }
+                    resolve(choice);
+                }
+            );
+            this.imageModal.open();
+        });
     }
 
     async loadSettings(): Promise<void> {

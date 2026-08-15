@@ -78,6 +78,20 @@ export const STRINGS_IT: TranslationStrings = {
             savingDesc:
                 'Salva le immagini incollate nella cartella allegati e collega il file locale invece dell’indirizzo web. Riguarda "Copia immagine" di Safari, le immagini dentro contenuti web copiati e gli indirizzi di immagine incollati. Per impostazione predefinita il nome del file viene dall’indirizzo:',
             savingAliases: ['scarica', 'allegato', 'safari', 'schermata', 'immagine', 'cartella', 'nome file', 'larghezza', 'dimensione'],
+            sizeChoiceName: 'Applica dimensione quando incolli',
+            sizeChoiceDesc:
+                'Aggiunge una larghezza a ogni immagine salvata, ad esempio ![[photo.jpg|400]]. La proprietà di larghezza della nota ha la precedenza.',
+            sizeChoiceAliases: ['dimensione', 'larghezza', 'dimensione immagine', 'ridimensiona', 'incorporamento', '400'],
+            sizeOptionsName: 'Opzioni di dimensione',
+            sizeOptionsDesc: 'Le larghezze offerte qui sopra e nella finestra al momento di incollare, separate da virgole.',
+            classChoiceName: 'Applica classe CSS quando incolli',
+            classChoiceDesc:
+                'Aggiunge una classe a ogni immagine salvata, ad esempio ![[photo.jpg#invert]]. Temi e snippet CSS decidono cosa fa una classe.',
+            classChoiceAliases: ['css', 'classe', 'snippet', 'invert', 'tema', 'filtro', 'incorporamento'],
+            classOptionsName: 'Opzioni di classe',
+            classOptionsDesc: 'Le classi offerte qui sopra e nella finestra al momento di incollare, separate da virgole.',
+            choiceNone: 'Non fare nulla',
+            choiceAsk: 'Chiedi a ogni incollaggio',
             nameFormatName: 'Nomi dei file',
             nameFormatDesc: 'Come vengono nominate le immagini salvate.',
             nameFormatSource: 'Nome dalla fonte',
@@ -196,6 +210,15 @@ export const STRINGS_IT: TranslationStrings = {
             dashesEmSpaced: 'Trattini lunghi con spazi',
             dashesExample: 'Il risultato - contro ogni previsione — era buono.'
         }
+    },
+
+    imageModal: {
+        title: 'Opzioni immagine',
+        sizeName: 'Dimensione',
+        className: 'Classe CSS',
+        none: 'Non fare nulla',
+        apply: 'Applica',
+        cancel: 'Annulla'
     },
 
     welcome: {

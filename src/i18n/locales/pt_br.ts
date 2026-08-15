@@ -78,6 +78,20 @@ export const STRINGS_PT_BR: TranslationStrings = {
             savingDesc:
                 'Salva as imagens coladas na sua pasta de anexos e aponta para o arquivo local em vez do endereço da web. Abrange o "Copiar imagem" do Safari, as imagens dentro de conteúdo da web copiado e os endereços de imagem colados. Por padrão, o nome do arquivo vem do endereço:',
             savingAliases: ['baixar', 'anexo', 'safari', 'captura de tela', 'imagem', 'pasta', 'nome do arquivo', 'largura', 'tamanho'],
+            sizeChoiceName: 'Aplicar tamanho ao colar',
+            sizeChoiceDesc:
+                'Adiciona uma largura a cada imagem salva, como ![[photo.jpg|400]]. A propriedade de largura da nota tem prioridade.',
+            sizeChoiceAliases: ['tamanho', 'largura', 'tamanho da imagem', 'redimensionar', 'incorporar', '400'],
+            sizeOptionsName: 'Opções de tamanho',
+            sizeOptionsDesc: 'As larguras oferecidas acima e no diálogo ao colar, separadas por vírgulas.',
+            classChoiceName: 'Aplicar classe CSS ao colar',
+            classChoiceDesc:
+                'Adiciona uma classe a cada imagem salva, como ![[photo.jpg#invert]]. Temas e trechos CSS decidem o que uma classe faz.',
+            classChoiceAliases: ['css', 'classe', 'trecho', 'invert', 'tema', 'filtro', 'incorporar'],
+            classOptionsName: 'Opções de classe',
+            classOptionsDesc: 'As classes oferecidas acima e no diálogo ao colar, separadas por vírgulas.',
+            choiceNone: 'Não fazer nada',
+            choiceAsk: 'Perguntar em cada colagem',
             nameFormatName: 'Nomes de arquivo',
             nameFormatDesc: 'Como as imagens salvas são nomeadas.',
             nameFormatSource: 'Nome a partir da origem',
@@ -196,6 +210,15 @@ export const STRINGS_PT_BR: TranslationStrings = {
             dashesEmSpaced: 'Travessões com espaços',
             dashesExample: 'O resultado - contra todas as expectativas — ficou bom.'
         }
+    },
+
+    imageModal: {
+        title: 'Opções de imagem',
+        sizeName: 'Tamanho',
+        className: 'Classe CSS',
+        none: 'Não fazer nada',
+        apply: 'Aplicar',
+        cancel: 'Cancelar'
     },
 
     welcome: {

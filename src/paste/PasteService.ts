@@ -23,6 +23,8 @@ import { applyDashStyle, applyQuoteStyle, normalizeInvisibleCharacters } from '.
 import { applyCommaPlacement } from '../transforms/textProcessing';
 import { buildUrlCleanupOptions, cleanUrlsInText, httpUrlRanges } from '../transforms/urlCleanup';
 import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './imageReferences';
+import { parseCommaList } from '../settings/normalize';
+import type { ImageEmbedChoice } from '../modals/ImageEmbedModal';
 import { extractFrontmatterBlock, isInsideVerbatimContext, notePasteOverride, resolveImageSize } from './noteOptions';
 import { format, plural, strings } from '../i18n';
 import type { ImageService } from './ImageService';
@@ -105,11 +107,21 @@ export function isPreformattedHtml(html: string): boolean {
     return outsidePre.length === 0;
 }
 
+/** Asks the user which size and class this paste's embeds should get. */
+export type ImageOptionsPrompt = (sizes: readonly string[] | null, classes: readonly string[] | null) => Promise<ImageEmbedChoice | null>;
+
+/** A stored embed choice is honoured only while its value is still one of the options. */
+function embedChoice(choice: string, options: readonly string[]): string {
+    if (choice === 'ask') return options.length > 0 ? 'ask' : '';
+    return options.includes(choice) ? choice : '';
+}
+
 /** Applies the paste rules to editor content, both on paste and from the plugin's commands. */
 export class PasteService {
     private readonly getSettings: () => BetterPasteSettings;
     private readonly images: ImageService;
     private readonly titles: LinkTitleService;
+    private readonly promptImageOptions: ImageOptionsPrompt;
     /** Set on unload, so awaited work that is still in flight stops touching the editor. */
     private disposed = false;
     /** Ranges still awaiting work, kept aligned when another pending paste is rewritten. */
@@ -117,10 +129,16 @@ export class PasteService {
     /** Title progress notices still visible, kept so unload can dismiss them immediately. */
     private readonly titleProgressNotices = new Set<TitleProgressNotice>();
 
-    constructor(getSettings: () => BetterPasteSettings, images: ImageService, titles: LinkTitleService) {
+    constructor(
+        getSettings: () => BetterPasteSettings,
+        images: ImageService,
+        titles: LinkTitleService,
+        promptImageOptions: ImageOptionsPrompt = () => Promise.resolve(null)
+    ) {
         this.getSettings = getSettings;
         this.images = images;
         this.titles = titles;
+        this.promptImageOptions = promptImageOptions;
     }
 
     /** Called from the plugin's onunload. */
@@ -164,13 +182,12 @@ export class PasteService {
 
             // Two reasons to take over a bitmap paste. Safari's "Copy image" puts the bitmap
             // AND an <img> tag on the clipboard, and Obsidian prefers the HTML there, which
-            // turns a copied picture into an external link. And when the note asks for a
-            // specific image width, only this plugin knows to apply it. Otherwise Obsidian's
-            // own handler already stores the bitmap correctly and is left to do so.
-            const size = this.imageSizeFor(editor);
-            if (!htmlHasImages(html) && size === null) return false;
+            // turns a copied picture into an external link. And when the note or the embed
+            // settings ask for a size or class, only this plugin knows to apply it. Otherwise
+            // Obsidian's own handler already stores the bitmap correctly and is left to do so.
+            if (!htmlHasImages(html) && !this.decoratesEmbeds(editor)) return false;
 
-            void this.pasteClipboardImage(clipboard, editor, info, html, size);
+            void this.pasteClipboardImage(clipboard, editor, info, html);
             return true;
         }
 
@@ -211,8 +228,7 @@ export class PasteService {
         clipboard: DataTransfer,
         editor: Editor,
         info: MarkdownView | MarkdownFileInfo,
-        html: string,
-        size: string | null
+        html: string
     ): Promise<void> {
         const targetFile = info.file;
         const targetPath = targetFile?.path ?? '';
@@ -225,10 +241,11 @@ export class PasteService {
         const file = clipboard.files[0];
         const sources = imageSourcesFromHtml(html);
 
+        const { size, cssClass } = await this.resolveEmbedOptions(editor);
         let embed: string | null = null;
 
         try {
-            embed = await this.images.saveClipboardImage(file, sources[0] ?? '', targetPath, size);
+            embed = await this.images.saveClipboardImage(file, sources[0] ?? '', targetPath, size, cssClass);
         } catch (error) {
             logError('Could not save a pasted image', error);
         }
@@ -382,7 +399,8 @@ export class PasteService {
 
         if (this.images.hasWork(text)) {
             try {
-                const result = await this.images.materializeImages(text, targetPath, this.imageSizeFor(editor));
+                const embedOptions = await this.resolveEmbedOptions(editor);
+                const result = await this.images.materializeImages(text, targetPath, embedOptions.size, embedOptions.cssClass);
                 text = result.text;
                 imagesFailed = result.failed;
             } catch (error) {
@@ -411,7 +429,8 @@ export class PasteService {
         try {
             let failed = 0;
             try {
-                const result = await this.images.materializeImages(range.inserted, targetPath, this.imageSizeFor(editor));
+                const embedOptions = await this.resolveEmbedOptions(editor);
+                const result = await this.images.materializeImages(range.inserted, targetPath, embedOptions.size, embedOptions.cssClass);
                 if (!this.canEdit(info, targetFile)) return;
                 failed = result.failed;
                 if (result.text !== range.inserted) this.replaceRange(editor, range, result.text);
@@ -573,6 +592,44 @@ export class PasteService {
         const property = this.getSettings().imageSizeProperty;
         if (!property.trim()) return null;
         return resolveImageSize(this.frontmatterOf(editor.getValue()), property);
+    }
+
+    /** True when the note or the embed settings add a size or class to saved embeds. */
+    private decoratesEmbeds(editor: Editor): boolean {
+        const settings = this.getSettings();
+        if (this.imageSizeFor(editor) !== null) return true;
+        if (embedChoice(settings.imageSizeChoice, parseCommaList(settings.imageSizeOptions)) !== '') return true;
+        return embedChoice(settings.imageClassChoice, parseCommaList(settings.imageClassOptions)) !== '';
+    }
+
+    /**
+     * The size and class this paste applies to saved image embeds, opening the dialog once
+     * when a choice says to ask. Closing the dialog without applying decorates nothing.
+     */
+    private async resolveEmbedOptions(editor: Editor): Promise<ImageEmbedChoice> {
+        const settings = this.getSettings();
+        const noteSize = this.imageSizeFor(editor);
+        const sizes = parseCommaList(settings.imageSizeOptions);
+        const classes = parseCommaList(settings.imageClassOptions);
+        const sizeChoice = embedChoice(settings.imageSizeChoice, sizes);
+        const classChoice = embedChoice(settings.imageClassChoice, classes);
+
+        // The note's own width property is the more specific request, so it wins and its
+        // half of the dialog is skipped
+        let size = noteSize ?? (sizeChoice === 'ask' ? null : sizeChoice || null);
+        let cssClass = classChoice === 'ask' ? null : classChoice || null;
+
+        const askSizes = noteSize === null && sizeChoice === 'ask' ? sizes : null;
+        const askClasses = classChoice === 'ask' ? classes : null;
+        if (askSizes || askClasses) {
+            const picked = await this.promptImageOptions(askSizes, askClasses);
+            if (picked) {
+                if (askSizes) size = picked.size;
+                if (askClasses) cssClass = picked.cssClass;
+            }
+        }
+
+        return { size, cssClass };
     }
 
     /**

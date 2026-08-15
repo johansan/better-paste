@@ -35,10 +35,10 @@ import { SHIPPED_DOMAIN_RULES } from '../src/settings/constants';
  * Settings the tab deliberately has no row for, because they are state the plugin keeps
  * rather than a choice the user makes.
  */
-const STORED_STATE_KEYS = ['lastShownVersion'];
+const STORED_STATE_KEYS = ['lastShownVersion', 'imageLastSize', 'imageLastClass'];
 
 /** Settings owned by a custom-rendered row rather than a declarative control. */
-const CUSTOM_RENDER_SETTING_KEYS = ['imageNameTemplate'];
+const CUSTOM_RENDER_SETTING_KEYS = ['imageNameTemplate', 'imageSizeChoice', 'imageSizeOptions', 'imageClassChoice', 'imageClassOptions'];
 
 /** Minimal plugin double exposing only what the setting tab touches. */
 function fakePlugin(overrides: Partial<BetterPasteSettings> = {}) {

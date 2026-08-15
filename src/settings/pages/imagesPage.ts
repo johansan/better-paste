@@ -16,13 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Setting, SettingGroupItem } from 'obsidian';
+import type { DropdownComponent, Setting, SettingGroupItem } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../defaults';
 import { DEFAULT_IMAGE_NAME_TEMPLATE } from '../constants';
 import { applyFileNameTemplate, buildFileNameTokens } from '../../utils/filenames';
 import { aliases, format, strings } from '../../i18n';
+import { parseCommaList } from '../normalize';
 import { MOMENT_FORMAT_DOCS_URL } from '../../urls';
 import type { SettingsPageContext } from './context';
+
+/** Example lists shown while an options field is empty. */
+const SIZE_OPTIONS_PLACEHOLDER = '200, 400, 600';
+const CLASS_OPTIONS_PLACEHOLDER = 'invert, invertW';
 
 const FILENAME_EXAMPLE_URL = 'https://images.example.com/2026/05/skyline-8f21a.jpg';
 const FILENAME_EXAMPLE_DATE = new Date(2026, 7, 13, 14, 5, 6);
@@ -90,11 +95,29 @@ function renderCustomFilenameFormat(setting: Setting, context: SettingsPageConte
     renderExample(context.settings().imageNameTemplate);
 }
 
+/** Fills a choice dropdown with none, the offered values, and ask. */
+function populateChoiceDropdown(dropdown: DropdownComponent, options: string, choice: string): void {
+    const text = strings.settings.images;
+    const values = parseCommaList(options);
+    dropdown.selectEl.empty();
+    dropdown.addOption('', text.choiceNone);
+    for (const value of values) dropdown.addOption(value, value);
+    dropdown.addOption('ask', text.choiceAsk);
+    // A stored choice whose value was removed from the list displays as none but is not
+    // rewritten, so typing the value back restores it
+    dropdown.setValue(choice === 'ask' || values.includes(choice) ? choice : '');
+}
+
 /** Rows shown under the Images heading. Naming only applies once saving is on. */
 export function createImageLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
     const enabled = (): boolean => context.settings().imageEnabled;
 
     const text = strings.settings.images;
+
+    // Each options field rebuilds its dropdown while it is edited, so a value can be
+    // picked right after it is typed without reopening the settings tab
+    let refreshSizeChoices: (() => void) | undefined;
+    let refreshClassChoices: (() => void) | undefined;
 
     return [
         {
@@ -122,6 +145,82 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
             aliases: aliases(source => source.settings.images.customAliases),
             visible: () => enabled() && context.settings().imageNameFormat === 'custom',
             render: setting => renderCustomFilenameFormat(setting, context)
+        },
+        {
+            name: text.sizeChoiceName,
+            aliases: aliases(source => source.settings.images.sizeChoiceAliases),
+            visible: enabled,
+            render: setting => {
+                setting.setName(text.sizeChoiceName);
+                setting.setDesc(text.sizeChoiceDesc);
+                setting.addDropdown(dropdown => {
+                    dropdown.onChange(value => {
+                        context.settings().imageSizeChoice = value;
+                        return context.saveSettings();
+                    });
+                    const populate = (): void =>
+                        populateChoiceDropdown(dropdown, context.settings().imageSizeOptions, context.settings().imageSizeChoice);
+                    populate();
+                    refreshSizeChoices = populate;
+                });
+            }
+        },
+        {
+            name: text.sizeOptionsName,
+            aliases: aliases(source => source.settings.images.sizeChoiceAliases),
+            visible: enabled,
+            render: setting => {
+                setting.setName(text.sizeOptionsName);
+                setting.setDesc(text.sizeOptionsDesc);
+                setting.addText(input => {
+                    input
+                        .setPlaceholder(SIZE_OPTIONS_PLACEHOLDER)
+                        .setValue(context.settings().imageSizeOptions)
+                        .onChange(value => {
+                            context.settings().imageSizeOptions = value;
+                            refreshSizeChoices?.();
+                            return context.saveSettings();
+                        });
+                });
+            }
+        },
+        {
+            name: text.classChoiceName,
+            aliases: aliases(source => source.settings.images.classChoiceAliases),
+            visible: enabled,
+            render: setting => {
+                setting.setName(text.classChoiceName);
+                setting.setDesc(text.classChoiceDesc);
+                setting.addDropdown(dropdown => {
+                    dropdown.onChange(value => {
+                        context.settings().imageClassChoice = value;
+                        return context.saveSettings();
+                    });
+                    const populate = (): void =>
+                        populateChoiceDropdown(dropdown, context.settings().imageClassOptions, context.settings().imageClassChoice);
+                    populate();
+                    refreshClassChoices = populate;
+                });
+            }
+        },
+        {
+            name: text.classOptionsName,
+            aliases: aliases(source => source.settings.images.classChoiceAliases),
+            visible: enabled,
+            render: setting => {
+                setting.setName(text.classOptionsName);
+                setting.setDesc(text.classOptionsDesc);
+                setting.addText(input => {
+                    input
+                        .setPlaceholder(CLASS_OPTIONS_PLACEHOLDER)
+                        .setValue(context.settings().imageClassOptions)
+                        .onChange(value => {
+                            context.settings().imageClassOptions = value;
+                            refreshClassChoices?.();
+                            return context.saveSettings();
+                        });
+                });
+            }
         }
     ];
 }

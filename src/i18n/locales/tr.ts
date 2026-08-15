@@ -78,6 +78,20 @@ export const STRINGS_TR: TranslationStrings = {
             savingDesc:
                 'Yapıştırılan görselleri ek klasörünüze kaydeder ve web adresi yerine yerel dosyaya bağlantı verir. Safari’deki "Görseli kopyala", kopyalanan web içeriğindeki görseller ve yapıştırılan görsel adresleri buna dahildir. Dosya adı öntanımlı olarak adresten gelir:',
             savingAliases: ['indir', 'ek', 'safari', 'ekran görüntüsü', 'görsel', 'klasör', 'dosya adı', 'genişlik', 'boyut'],
+            sizeChoiceName: 'Yapıştırırken boyut uygula',
+            sizeChoiceDesc:
+                'Kaydedilen her gömülü görsele bir genişlik ekler, örneğin ![[photo.jpg|400]]. Notun kendi genişlik özelliği önceliklidir.',
+            sizeChoiceAliases: ['boyut', 'genişlik', 'görsel boyutu', 'yeniden boyutlandır', 'gömme', '400'],
+            sizeOptionsName: 'Boyut seçenekleri',
+            sizeOptionsDesc: 'Yukarıda ve yapıştırma penceresinde sunulan genişlikler, virgülle ayrılır.',
+            classChoiceName: 'Yapıştırırken CSS sınıfı uygula',
+            classChoiceDesc:
+                'Kaydedilen her gömülü görsele bir sınıf ekler, örneğin ![[photo.jpg#invert]]. Bir sınıfın ne yaptığına temalar ve CSS parçacıkları karar verir.',
+            classChoiceAliases: ['css', 'sınıf', 'parçacık', 'invert', 'tema', 'filtre', 'gömme'],
+            classOptionsName: 'Sınıf seçenekleri',
+            classOptionsDesc: 'Yukarıda ve yapıştırma penceresinde sunulan sınıflar, virgülle ayrılır.',
+            choiceNone: 'Hiçbir şey yapma',
+            choiceAsk: 'Her yapıştırmada sor',
             nameFormatName: 'Dosya adları',
             nameFormatDesc: 'Kaydedilen görsellerin nasıl adlandırılacağı.',
             nameFormatSource: 'Kaynaktan gelen ad',
@@ -205,6 +219,15 @@ export const STRINGS_TR: TranslationStrings = {
             dashesEmSpaced: 'Boşluklu uzun çizgiler',
             dashesExample: 'Sonuç - her şeye rağmen — iyiydi.'
         }
+    },
+
+    imageModal: {
+        title: 'Görsel seçenekleri',
+        sizeName: 'Boyut',
+        className: 'CSS sınıfı',
+        none: 'Hiçbir şey yapma',
+        apply: 'Uygula',
+        cancel: 'İptal'
     },
 
     welcome: {

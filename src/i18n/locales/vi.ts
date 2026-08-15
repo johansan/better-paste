@@ -85,6 +85,20 @@ export const STRINGS_VI: TranslationStrings = {
                 'chiều rộng',
                 'kích thước'
             ],
+            sizeChoiceName: 'Áp dụng kích thước khi dán',
+            sizeChoiceDesc:
+                'Thêm chiều rộng cho mỗi ảnh nhúng được lưu, ví dụ ![[photo.jpg|400]]. Thuộc tính chiều rộng của ghi chú được ưu tiên.',
+            sizeChoiceAliases: ['kích thước', 'chiều rộng', 'kích thước ảnh', 'đổi kích thước', 'nhúng', '400'],
+            sizeOptionsName: 'Tùy chọn kích thước',
+            sizeOptionsDesc: 'Các chiều rộng hiển thị ở trên và trong hộp thoại khi dán, phân tách bằng dấu phẩy.',
+            classChoiceName: 'Áp dụng lớp CSS khi dán',
+            classChoiceDesc:
+                'Thêm một lớp cho mỗi ảnh nhúng được lưu, ví dụ ![[photo.jpg#invert]]. Chủ đề và đoạn mã CSS quyết định tác dụng của lớp.',
+            classChoiceAliases: ['css', 'lớp', 'đoạn css', 'invert', 'chủ đề', 'bộ lọc', 'nhúng'],
+            classOptionsName: 'Tùy chọn lớp',
+            classOptionsDesc: 'Các lớp hiển thị ở trên và trong hộp thoại khi dán, phân tách bằng dấu phẩy.',
+            choiceNone: 'Không làm gì',
+            choiceAsk: 'Hỏi mỗi lần dán',
             nameFormatName: 'Tên tệp',
             nameFormatDesc: 'Cách đặt tên cho ảnh đã lưu.',
             nameFormatSource: 'Lấy tên từ nguồn',
@@ -213,6 +227,15 @@ export const STRINGS_VI: TranslationStrings = {
             dashesEmSpaced: 'Gạch ngang em có khoảng trắng',
             dashesExample: 'Kết quả - bất chấp mọi thứ — rất tốt.'
         }
+    },
+
+    imageModal: {
+        title: 'Tùy chọn ảnh',
+        sizeName: 'Kích thước',
+        className: 'Lớp CSS',
+        none: 'Không làm gì',
+        apply: 'Áp dụng',
+        cancel: 'Hủy'
     },
 
     welcome: {

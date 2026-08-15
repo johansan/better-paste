@@ -24,6 +24,13 @@ export const DEFAULT_SETTINGS: BetterPasteSettings = {
 
     imageEnabled: true,
     imageNameFormat: 'source',
+    // Capped below Obsidian's 700 px readable line length, where larger widths do nothing
+    imageSizeOptions: '200, 400, 600',
+    imageSizeChoice: '',
+    imageClassOptions: '',
+    imageClassChoice: '',
+    imageLastSize: '',
+    imageLastClass: '',
     imageNameTemplate: DEFAULT_IMAGE_NAME_TEMPLATE,
 
     noteProperty: 'bp',

@@ -55,7 +55,8 @@ const RELEASE_NOTES: ReleaseNote[] = [
         date: '2026-08-15',
         new: [
             'The new ==Quotes== setting can turn straight quotes into curly ones, not just the other way around.',
-            'The new ==Dashes== setting can turn dashes between words into en dashes or em dashes, with or without spaces.'
+            'The new ==Dashes== setting can turn dashes between words into en dashes or em dashes, with or without spaces.',
+            'You can now define image sizes and CSS classes to assign to images on paste. Either automatic or through a picker.'
         ]
     },
     {

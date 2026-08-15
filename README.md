@@ -138,9 +138,10 @@ Seventeen settings. Here are the ones you will actually look for.
 ### 3.2 Images
 
 - **Save pasted images into the vault**: covers Safari's "Copy image", pictures inside copied web content, and pasted image URLs. Images land wherever your attachment settings point, named after the source file, so no more `image.png`.
+- **Apply size on paste** and **Apply CSS class on paste**: give every saved image a width, a class, or both, so a paste comes out as `![[photo.jpg#invert|400]]`. Define your own comma-separated lists like `200, 400, 600` and `invert, invertW`, then apply one value everywhere or pick **Ask on every paste** to choose in a small dialog each time (Enter applies, and your last pick is preselected). Classes like `#invert` are defined by themes and CSS snippets, for example to invert an image in dark mode.
 - **File names**: add your own format, like `{{name}}-YYYY-MM-DD`.
 
-Alt text survives the download, and if a download fails the original link stays in your note. Images over 50 MB or slower than 30 seconds are left as links.
+Alt text survives the download, and if a download fails the original link stays in your note. Images over 50 MB or slower than 30 seconds are left as links. A note with its own `image-width` property (see [section 4](#4-per-note-control)) overrides the size setting.
 
 ### 3.3 Links
 

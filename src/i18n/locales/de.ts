@@ -87,6 +87,20 @@ export const STRINGS_DE: TranslationStrings = {
             savingDesc:
                 'Speichert eingefügte Bilder im Anhangordner und verlinkt die lokale Datei statt der Webadresse. Gilt für "Bild kopieren" in Safari, Bilder in kopierten Webinhalten und eingefügte Bildadressen. Standardmäßig stammt der Dateiname aus der Adresse:',
             savingAliases: ['herunterladen', 'anhang', 'safari', 'bildschirmfoto', 'bild', 'ordner', 'dateiname', 'breite', 'größe'],
+            sizeChoiceName: 'Größe beim Einfügen anwenden',
+            sizeChoiceDesc:
+                'Fügt jeder gespeicherten Bildeinbettung eine Breite hinzu, etwa ![[photo.jpg|400]]. Die Breiteneigenschaft einer Notiz hat Vorrang.',
+            sizeChoiceAliases: ['größe', 'breite', 'bildgröße', 'skalieren', 'embed', '400'],
+            sizeOptionsName: 'Größenoptionen',
+            sizeOptionsDesc: 'Die oben und im Einfügedialog angebotenen Breiten, durch Kommas getrennt.',
+            classChoiceName: 'CSS-Klasse beim Einfügen anwenden',
+            classChoiceDesc:
+                'Fügt jeder gespeicherten Bildeinbettung eine Klasse hinzu, etwa ![[photo.jpg#invert]]. Was eine Klasse bewirkt, bestimmen Themes und CSS-Snippets.',
+            classChoiceAliases: ['css', 'klasse', 'snippet', 'invert', 'theme', 'filter', 'embed'],
+            classOptionsName: 'Klassenoptionen',
+            classOptionsDesc: 'Die oben und im Einfügedialog angebotenen Klassen, durch Kommas getrennt.',
+            choiceNone: 'Nichts tun',
+            choiceAsk: 'Bei jedem Einfügen fragen',
             nameFormatName: 'Dateinamen',
             nameFormatDesc: 'Wie gespeicherte Bilder benannt werden.',
             nameFormatSource: 'Name aus der Quelle',
@@ -223,6 +237,15 @@ export const STRINGS_DE: TranslationStrings = {
             dashesEmSpaced: 'Geviertstriche mit Leerzeichen',
             dashesExample: 'Das Ergebnis - allen Widerständen zum Trotz — war gut.'
         }
+    },
+
+    imageModal: {
+        title: 'Bildoptionen',
+        sizeName: 'Größe',
+        className: 'CSS-Klasse',
+        none: 'Nichts tun',
+        apply: 'Anwenden',
+        cancel: 'Abbrechen'
     },
 
     welcome: {

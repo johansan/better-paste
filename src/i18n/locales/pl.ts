@@ -80,6 +80,20 @@ export const STRINGS_PL: TranslationStrings = {
             savingDesc:
                 'Zapisuje wklejone obrazy w folderze załączników i wstawia odnośnik do pliku lokalnego zamiast adresu internetowego. Dotyczy opcji „Kopiuj obraz” w Safari, obrazów w skopiowanej treści z sieci oraz wklejanych adresów obrazów. Domyślnie nazwa pliku pochodzi z adresu:',
             savingAliases: ['pobieranie', 'załącznik', 'safari', 'zrzut ekranu', 'obraz', 'folder', 'nazwa pliku', 'szerokość', 'rozmiar'],
+            sizeChoiceName: 'Stosuj rozmiar przy wklejaniu',
+            sizeChoiceDesc:
+                'Dodaje szerokość do każdego zapisanego osadzenia obrazu, np. ![[photo.jpg|400]]. Właściwość szerokości notatki ma pierwszeństwo.',
+            sizeChoiceAliases: ['rozmiar', 'szerokość', 'rozmiar obrazu', 'skalowanie', 'osadzenie', '400'],
+            sizeOptionsName: 'Opcje rozmiaru',
+            sizeOptionsDesc: 'Szerokości dostępne powyżej i w oknie dialogowym przy wklejaniu, rozdzielone przecinkami.',
+            classChoiceName: 'Stosuj klasę CSS przy wklejaniu',
+            classChoiceDesc:
+                'Dodaje klasę do każdego zapisanego osadzenia obrazu, np. ![[photo.jpg#invert]]. O działaniu klasy decydują motywy i fragmenty CSS.',
+            classChoiceAliases: ['css', 'klasa', 'fragment', 'invert', 'motyw', 'filtr', 'osadzenie'],
+            classOptionsName: 'Opcje klasy',
+            classOptionsDesc: 'Klasy dostępne powyżej i w oknie dialogowym przy wklejaniu, rozdzielone przecinkami.',
+            choiceNone: 'Nic nie rób',
+            choiceAsk: 'Pytaj przy każdym wklejeniu',
             nameFormatName: 'Nazwy plików',
             nameFormatDesc: 'Jak nazywane są zapisane obrazy.',
             nameFormatSource: 'Nazwa ze źródła',
@@ -208,6 +222,15 @@ export const STRINGS_PL: TranslationStrings = {
             dashesEmSpaced: 'Pauzy ze spacjami',
             dashesExample: 'Wynik - wbrew wszystkiemu — był dobry.'
         }
+    },
+
+    imageModal: {
+        title: 'Opcje obrazu',
+        sizeName: 'Rozmiar',
+        className: 'Klasa CSS',
+        none: 'Nic nie rób',
+        apply: 'Zastosuj',
+        cancel: 'Anuluj'
     },
 
     welcome: {

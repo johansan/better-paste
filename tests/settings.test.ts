@@ -36,6 +36,13 @@ describe('normalizeSettings', () => {
         expect(normalizeSettings({}).linkTitles).toBe(true);
     });
 
+    it('keeps an embed choice only while its value is still offered', () => {
+        expect(normalizeSettings({ imageSizeChoice: '600' }).imageSizeChoice).toBe('600');
+        expect(normalizeSettings({ imageSizeOptions: '400', imageSizeChoice: '600' }).imageSizeChoice).toBe('');
+        expect(normalizeSettings({ imageClassChoice: 'ask' }).imageClassChoice).toBe('ask');
+        expect(normalizeSettings({ imageClassOptions: 'invert', imageClassChoice: 'invert' }).imageClassChoice).toBe('invert');
+    });
+
     it('converts terminal bullets to Markdown by default', () => {
         expect(normalizeSettings({}).terminalBullets).toBe('markdown');
     });

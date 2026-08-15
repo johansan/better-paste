@@ -88,6 +88,20 @@ export const STRINGS_NL: TranslationStrings = {
                 'breedte',
                 'grootte'
             ],
+            sizeChoiceName: 'Grootte toepassen bij plakken',
+            sizeChoiceDesc:
+                'Geeft elke opgeslagen afbeelding bij het insluiten een breedte mee, zoals ![[photo.jpg|400]]. De breedte-eigenschap van een notitie heeft voorrang.',
+            sizeChoiceAliases: ['grootte', 'breedte', 'afbeeldingsgrootte', 'schalen', 'embed', '400'],
+            sizeOptionsName: 'Grootteopties',
+            sizeOptionsDesc: 'De breedtes die hierboven en in het plakvenster worden aangeboden, gescheiden door komma’s.',
+            classChoiceName: 'CSS-klasse toepassen bij plakken',
+            classChoiceDesc:
+                'Geeft elke opgeslagen afbeelding bij het insluiten een klasse mee, zoals ![[photo.jpg#invert]]. Thema’s en CSS-snippets bepalen wat een klasse doet.',
+            classChoiceAliases: ['css', 'klasse', 'snippet', 'invert', 'thema', 'filter', 'embed'],
+            classOptionsName: 'Klassenopties',
+            classOptionsDesc: 'De klassen die hierboven en in het plakvenster worden aangeboden, gescheiden door komma’s.',
+            choiceNone: 'Niets doen',
+            choiceAsk: 'Bij elke plakactie vragen',
             nameFormatName: 'Bestandsnamen',
             nameFormatDesc: 'Hoe opgeslagen afbeeldingen worden genoemd.',
             nameFormatSource: 'Naam uit de bron',
@@ -215,6 +229,15 @@ export const STRINGS_NL: TranslationStrings = {
             dashesEmSpaced: 'Kastlijntjes met spaties',
             dashesExample: 'Het resultaat - tegen alle verwachtingen in — was goed.'
         }
+    },
+
+    imageModal: {
+        title: 'Afbeeldingsopties',
+        sizeName: 'Grootte',
+        className: 'CSS-klasse',
+        none: 'Niets doen',
+        apply: 'Toepassen',
+        cancel: 'Annuleren'
     },
 
     welcome: {

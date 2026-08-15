@@ -21,6 +21,7 @@ import { PasteService } from '../src/paste/PasteService';
 import type { ImageService } from '../src/paste/ImageService';
 import type { LinkTitleService } from '../src/paste/LinkTitleService';
 import { findImageReferences, replaceImageReferences } from '../src/paste/imageReferences';
+import type { ImageEmbedChoice } from '../src/modals/ImageEmbedModal';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import type { BetterPasteSettings } from '../src/settings/types';
 import { FakeEditor, fakeClipboardEvent, fakeFile } from './stubs/editor';
@@ -35,25 +36,37 @@ interface SavedClipboardImages {
     source: string;
     sourcePath: string;
     size: string | null;
+    cssClass: string | null;
+}
+
+/** The embed suffix the real service produces: class as a subpath, size in the alias slot. */
+function embedSuffix(size: string | null, cssClass: string | null): string {
+    return `${cssClass ? `#${cssClass}` : ''}${size ? `|${size}` : ''}`;
 }
 
 /** Image service double that resolves every reference to a predictable embed. */
 function fakeImages(settings: BetterPasteSettings, failing = false, saved?: SavedClipboardImages[]): ImageService {
     return {
         hasWork: (text: string) => settings.imageEnabled && findImageReferences(text).length > 0,
-        materializeImages: async (text: string, _sourcePath: string, size: string | null = null) => {
+        materializeImages: async (text: string, _sourcePath: string, size: string | null = null, cssClass: string | null = null) => {
             const references = findImageReferences(text);
             if (failing) return { text, downloaded: 0, failed: references.length };
-            const suffix = size ? `|${size}` : '';
+            const suffix = embedSuffix(size, cssClass);
             const embeds = new Map(references.map((reference, index) => [reference.index, `![[image-${index}.png${suffix}]]`]));
             return { text: replaceImageReferences(text, references, embeds), downloaded: embeds.size, failed: 0 };
         },
-        saveClipboardImage: async (file: File, source: string, sourcePath: string, size: string | null = null) => {
-            saved?.push({ file, source, sourcePath, size });
+        saveClipboardImage: async (
+            file: File,
+            source: string,
+            sourcePath: string,
+            size: string | null = null,
+            cssClass: string | null = null
+        ) => {
+            saved?.push({ file, source, sourcePath, size, cssClass });
             if (failing) return null;
             // Name the saved file after the source picture, as the real service does
             const base = source ? (source.split('/').pop() ?? file.name).replace(/\.[a-z0-9]+$/i, '') : file.name;
-            return `![[${base}.png${size ? `|${size}` : ''}]]`;
+            return `![[${base}.png${embedSuffix(size, cssClass)}]]`;
         },
         dispose: () => undefined
     } as unknown as ImageService;
@@ -76,11 +89,25 @@ function fakeTitles(settings: BetterPasteSettings, fetched: string[]): LinkTitle
     } as unknown as LinkTitleService;
 }
 
-function build(overrides: Partial<BetterPasteSettings> = {}, failing = false) {
+/** Dialog double: records what was asked and answers with a fixed pick. */
+interface PromptDouble {
+    response: ImageEmbedChoice | null;
+    calls: { sizes: readonly string[] | null; classes: readonly string[] | null }[];
+}
+
+function build(overrides: Partial<BetterPasteSettings> = {}, failing = false, prompt?: PromptDouble) {
     const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, ...overrides };
     const saved: SavedClipboardImages[] = [];
     const fetchedTitles: string[] = [];
-    const service = new PasteService(() => settings, fakeImages(settings, failing, saved), fakeTitles(settings, fetchedTitles));
+    const service = new PasteService(
+        () => settings,
+        fakeImages(settings, failing, saved),
+        fakeTitles(settings, fetchedTitles),
+        async (sizes, classes) => {
+            prompt?.calls.push({ sizes, classes });
+            return prompt?.response ?? null;
+        }
+    );
     return { settings, service, saved, fetchedTitles };
 }
 
@@ -466,6 +493,87 @@ describe('handleEditorPaste: images in plain text', () => {
         await settle();
 
         expect(editor.getValue()).toBe('![[image-0.png]]\n![[image-0.png]]');
+    });
+});
+
+describe('image embed options', () => {
+    const SAFARI_HTML = '<img src="https://example.com/photo.webp" alt="a photo">';
+    const bitmapEvent = (): ClipboardEvent => fakeClipboardEvent({ html: SAFARI_HTML, files: [fakeFile('image.png', 'image/png')] });
+    const imageUrlEvent = (): ClipboardEvent => fakeClipboardEvent({ plain: 'https://example.com/pic.png' });
+
+    it('applies the chosen size to a downloaded image', async () => {
+        const { service } = build({ imageSizeChoice: '600' });
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(imageUrlEvent(), editor.asEditor(), INFO);
+        await settle();
+        expect(editor.getValue()).toBe('![[image-0.png|600]]');
+    });
+
+    it('takes over a plain bitmap paste for the chosen class', async () => {
+        const { service, saved } = build({ imageClassChoice: 'invert', imageClassOptions: 'invert, invertW' });
+        const editor = new FakeEditor('');
+        // Without a class to apply this clipboard would be left to Obsidian
+        const event = fakeClipboardEvent({ files: [fakeFile('image.png', 'image/png')] });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        await settle();
+        expect(saved[0].cssClass).toBe('invert');
+        expect(editor.getValue()).toContain('#invert]]');
+    });
+
+    it('lets the note width override the chosen size', async () => {
+        const { service, saved } = build({ imageSizeChoice: '600' });
+        const editor = new FakeEditor('---\nimage-width: 300\n---\n\n');
+
+        service.handleEditorPaste(bitmapEvent(), editor.asEditor(), INFO);
+        await settle();
+        expect(saved[0].size).toBe('300');
+    });
+
+    it('asks once and applies the picked size and class', async () => {
+        const prompt: PromptDouble = { response: { size: '800', cssClass: 'invertW' }, calls: [] };
+        const { service } = build({ imageSizeChoice: 'ask', imageClassChoice: 'ask', imageClassOptions: 'invert, invertW' }, false, prompt);
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(imageUrlEvent(), editor.asEditor(), INFO);
+        await settle();
+        expect(prompt.calls).toEqual([{ sizes: ['200', '400', '600'], classes: ['invert', 'invertW'] }]);
+        expect(editor.getValue()).toBe('![[image-0.png#invertW|800]]');
+    });
+
+    it('applies nothing when the dialog is dismissed', async () => {
+        const prompt: PromptDouble = { response: null, calls: [] };
+        const { service } = build({ imageSizeChoice: 'ask' }, false, prompt);
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(imageUrlEvent(), editor.asEditor(), INFO);
+        await settle();
+        expect(prompt.calls).toHaveLength(1);
+        expect(editor.getValue()).toBe('![[image-0.png]]');
+    });
+
+    it('ignores a choice whose value is no longer offered', async () => {
+        const prompt: PromptDouble = { response: { size: '999', cssClass: null }, calls: [] };
+        const { service } = build({ imageSizeChoice: '999' }, false, prompt);
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(imageUrlEvent(), editor.asEditor(), INFO);
+        await settle();
+        expect(prompt.calls).toHaveLength(0);
+        expect(editor.getValue()).toBe('![[image-0.png]]');
+    });
+
+    it('skips the size half of the dialog when the note sets the width', async () => {
+        const prompt: PromptDouble = { response: { size: null, cssClass: 'invert' }, calls: [] };
+        const { service, saved } = build({ imageSizeChoice: 'ask', imageClassChoice: 'ask', imageClassOptions: 'invert' }, false, prompt);
+        const editor = new FakeEditor('---\nimage-width: 300\n---\n\n');
+
+        service.handleEditorPaste(bitmapEvent(), editor.asEditor(), INFO);
+        await settle();
+        expect(prompt.calls).toEqual([{ sizes: null, classes: ['invert'] }]);
+        expect(saved[0].size).toBe('300');
+        expect(saved[0].cssClass).toBe('invert');
     });
 });
 

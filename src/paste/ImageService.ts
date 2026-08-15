@@ -74,7 +74,12 @@ export class ImageService {
      * Replaces every downloadable image reference in `text` with a vault embed.
      * References that fail to download are left untouched so nothing is lost.
      */
-    async materializeImages(text: string, sourcePath: string, size: string | null = null): Promise<ImageMaterializeResult> {
+    async materializeImages(
+        text: string,
+        sourcePath: string,
+        size: string | null = null,
+        cssClass: string | null = null
+    ): Promise<ImageMaterializeResult> {
         if (this.disposed) return { text, downloaded: 0, failed: 0 };
         const settings = this.getSettings();
         if (!settings.imageEnabled) return { text, downloaded: 0, failed: 0 };
@@ -89,7 +94,7 @@ export class ImageService {
         const queue = [...references];
         const workers = Array.from({ length: Math.min(MAX_CONCURRENT_DOWNLOADS, queue.length) }, async () => {
             for (let reference = queue.shift(); !this.disposed && reference !== undefined; reference = queue.shift()) {
-                const embed = await this.materializeOne(reference, sourcePath, settings, size);
+                const embed = await this.materializeOne(reference, sourcePath, settings, size, cssClass);
                 if (embed === null) failed += 1;
                 else embeds.set(reference.index, embed);
             }
@@ -106,10 +111,16 @@ export class ImageService {
      * when one is known, so the saved file can be named after the picture
      * rather than Safari's generic "image.png".
      */
-    async saveClipboardImage(file: File, source: string, sourcePath: string, size: string | null = null): Promise<string | null> {
+    async saveClipboardImage(
+        file: File,
+        source: string,
+        sourcePath: string,
+        size: string | null = null,
+        cssClass: string | null = null
+    ): Promise<string | null> {
         if (this.disposed) return null;
         const settings = this.getSettings();
-        return this.storeClipboardImage(file, source, sourcePath, settings, size);
+        return this.storeClipboardImage(file, source, sourcePath, settings, size, cssClass);
     }
 
     /** Stores one clipboard bitmap and returns its embed, or null when it cannot be saved. */
@@ -118,7 +129,8 @@ export class ImageService {
         source: string,
         sourcePath: string,
         settings: BetterPasteSettings,
-        size: string | null
+        size: string | null,
+        cssClass: string | null
     ): Promise<string | null> {
         try {
             // The clipboard bitmap is authoritative for the format: Safari re-encodes a
@@ -146,7 +158,7 @@ export class ImageService {
             const saved = await this.saveImage(source, data, extension, sourcePath, settings, file.name);
             if (!saved) return null;
 
-            return this.embedFor(saved, sourcePath, size);
+            return this.embedFor(saved, sourcePath, size, '', cssClass);
         } catch (error) {
             logWarning('Failed to save a pasted image', error);
             return null;
@@ -158,7 +170,8 @@ export class ImageService {
         reference: ImageReference,
         sourcePath: string,
         settings: BetterPasteSettings,
-        size: string | null
+        size: string | null,
+        cssClass: string | null
     ): Promise<string | null> {
         try {
             const fetched = await this.fetchImage(reference.url);
@@ -178,7 +191,7 @@ export class ImageService {
             const file = await this.saveImage(reference.url, fetched.data, extension, sourcePath, settings);
             if (!file) return null;
 
-            return this.embedFor(file, sourcePath, size, reference.alt);
+            return this.embedFor(file, sourcePath, size, reference.alt, cssClass);
         } catch (error) {
             logWarning(`Failed to download ${reference.url}`, error);
             return null;
@@ -187,11 +200,14 @@ export class ImageService {
 
     /**
      * Builds the embed for a saved image. Obsidian reads the size out of the link's alias
-     * slot in both link styles: `![[picture.png|400]]` and `![400](picture.png)`.
+     * slot in both link styles: `![[picture.png|400]]` and `![400](picture.png)`. The CSS
+     * class travels as a subpath, `![[picture.png#invert]]`, which Obsidian copies onto the
+     * rendered embed's src attribute in both styles, where themes and snippets match it.
      */
-    private embedFor(file: TFile, sourcePath: string, size: string | null, alt = ''): string {
+    private embedFor(file: TFile, sourcePath: string, size: string | null, alt = '', cssClass: string | null = null): string {
         const label = size ? (alt ? `${alt}|${size}` : size) : alt || undefined;
-        return `!${this.app.fileManager.generateMarkdownLink(file, sourcePath, undefined, label)}`;
+        const subpath = cssClass ? `#${cssClass}` : undefined;
+        return `!${this.app.fileManager.generateMarkdownLink(file, sourcePath, subpath, label)}`;
     }
 
     /** Retrieves image bytes from an http(s) URL or decodes them from a data: URI. */

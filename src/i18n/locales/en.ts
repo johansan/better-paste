@@ -102,6 +102,20 @@ export const STRINGS_EN = {
                 'width',
                 'size'
             ],
+            sizeChoiceName: 'Apply size on paste',
+            sizeChoiceDesc:
+                "Adds a width to every saved image embed, such as ![[photo.jpg|400]]. A note's own width property overrides this.",
+            sizeChoiceAliases: ['size', 'width', 'image size', 'resize', 'embed', '400'],
+            sizeOptionsName: 'Size options',
+            sizeOptionsDesc: 'The widths offered above and in the paste dialog, separated by commas.',
+            classChoiceName: 'Apply CSS class on paste',
+            classChoiceDesc:
+                'Adds a class to every saved image embed, such as ![[photo.jpg#invert]]. Themes and CSS snippets decide what a class does.',
+            classChoiceAliases: ['css', 'class', 'snippet', 'invert', 'theme', 'filter', 'embed'],
+            classOptionsName: 'Class options',
+            classOptionsDesc: 'The classes offered above and in the paste dialog, separated by commas.',
+            choiceNone: 'Do nothing',
+            choiceAsk: 'Ask on every paste',
             nameFormatName: 'File names',
             nameFormatDesc: 'How saved images are named.',
             nameFormatSource: 'Name from source',
@@ -239,6 +253,15 @@ export const STRINGS_EN = {
             commasExampleSource: 'He called it "finished," then left.',
             commasExampleOutside: 'He called it "finished", then left.'
         }
+    },
+
+    imageModal: {
+        title: 'Image options',
+        sizeName: 'Size',
+        className: 'CSS class',
+        none: 'Do nothing',
+        apply: 'Apply',
+        cancel: 'Cancel'
     },
 
     welcome: {

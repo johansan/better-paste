@@ -75,6 +75,20 @@ export const STRINGS_ID: TranslationStrings = {
             savingDesc:
                 'Menyimpan gambar yang ditempel ke folder lampiran Anda dan menaut ke berkas lokal alih-alih alamat web. Mencakup "Salin gambar" di Safari, gambar di dalam konten web yang disalin, dan alamat gambar yang ditempel. Secara baku nama berkas diambil dari alamatnya:',
             savingAliases: ['unduh', 'lampiran', 'safari', 'tangkapan layar', 'gambar', 'folder', 'nama berkas', 'lebar', 'ukuran'],
+            sizeChoiceName: 'Terapkan ukuran saat menempel',
+            sizeChoiceDesc:
+                'Menambahkan lebar ke setiap sematan gambar yang disimpan, misalnya ![[photo.jpg|400]]. Properti lebar milik catatan lebih diutamakan.',
+            sizeChoiceAliases: ['ukuran', 'lebar', 'ukuran gambar', 'ubah ukuran', 'sematan', '400'],
+            sizeOptionsName: 'Opsi ukuran',
+            sizeOptionsDesc: 'Lebar yang ditawarkan di atas dan di dialog saat menempel, dipisahkan dengan koma.',
+            classChoiceName: 'Terapkan kelas CSS saat menempel',
+            classChoiceDesc:
+                'Menambahkan kelas ke setiap sematan gambar yang disimpan, misalnya ![[photo.jpg#invert]]. Tema dan cuplikan CSS menentukan fungsi sebuah kelas.',
+            classChoiceAliases: ['css', 'kelas', 'cuplikan', 'invert', 'tema', 'filter', 'sematan'],
+            classOptionsName: 'Opsi kelas',
+            classOptionsDesc: 'Kelas yang ditawarkan di atas dan di dialog saat menempel, dipisahkan dengan koma.',
+            choiceNone: 'Jangan lakukan apa-apa',
+            choiceAsk: 'Tanyakan setiap kali menempel',
             nameFormatName: 'Nama berkas',
             nameFormatDesc: 'Cara penamaan gambar yang disimpan.',
             nameFormatSource: 'Nama dari sumber',
@@ -202,6 +216,15 @@ export const STRINGS_ID: TranslationStrings = {
             dashesEmSpaced: 'Tanda pisah em dengan spasi',
             dashesExample: 'Hasilnya - di luar dugaan — bagus.'
         }
+    },
+
+    imageModal: {
+        title: 'Opsi gambar',
+        sizeName: 'Ukuran',
+        className: 'Kelas CSS',
+        none: 'Jangan lakukan apa-apa',
+        apply: 'Terapkan',
+        cancel: 'Batal'
     },
 
     welcome: {

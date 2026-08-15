@@ -85,6 +85,19 @@ export const STRINGS_JA: TranslationStrings = {
                 '幅',
                 'サイズ'
             ],
+            sizeChoiceName: '貼り付け時にサイズを適用',
+            sizeChoiceDesc: '保存した画像の埋め込みに幅を付けます。例: ![[photo.jpg|400]]。ノート自身の幅プロパティが優先されます。',
+            sizeChoiceAliases: ['サイズ', '幅', '画像サイズ', 'リサイズ', '埋め込み', '400'],
+            sizeOptionsName: 'サイズの選択肢',
+            sizeOptionsDesc: '上の設定と貼り付け時のダイアログに表示される幅。カンマ区切りで指定します。',
+            classChoiceName: '貼り付け時に CSS クラスを適用',
+            classChoiceDesc:
+                '保存した画像の埋め込みにクラスを付けます。例: ![[photo.jpg#invert]]。クラスの効果はテーマや CSS スニペットによって決まります。',
+            classChoiceAliases: ['css', 'クラス', 'スニペット', 'invert', 'テーマ', 'フィルター', '埋め込み'],
+            classOptionsName: 'クラスの選択肢',
+            classOptionsDesc: '上の設定と貼り付け時のダイアログに表示されるクラス。カンマ区切りで指定します。',
+            choiceNone: '何もしない',
+            choiceAsk: '毎回確認する',
             nameFormatName: 'ファイル名',
             nameFormatDesc: '保存する画像の名前の付け方。',
             nameFormatSource: '元の名前を使う',
@@ -203,6 +216,15 @@ export const STRINGS_JA: TranslationStrings = {
             dashesEmSpaced: 'スペース付き em ダッシュ',
             dashesExample: 'その結果は - 予想に反して — 良かった。'
         }
+    },
+
+    imageModal: {
+        title: '画像オプション',
+        sizeName: 'サイズ',
+        className: 'CSS クラス',
+        none: '何もしない',
+        apply: '適用',
+        cancel: 'キャンセル'
     },
 
     welcome: {

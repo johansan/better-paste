@@ -75,6 +75,19 @@ export const STRINGS_KO: TranslationStrings = {
             savingDesc:
                 '붙여넣은 이미지를 첨부 파일 폴더에 저장하고 웹 주소 대신 로컬 파일을 링크합니다. Safari의 "이미지 복사", 복사한 웹 콘텐츠 속 이미지, 붙여넣은 이미지 주소가 여기에 해당합니다. 파일 이름은 기본적으로 주소에서 가져옵니다:',
             savingAliases: ['다운로드', '첨부 파일', 'safari', '스크린샷', '이미지', '폴더', '파일 이름', '너비', '크기'],
+            sizeChoiceName: '붙여넣을 때 크기 적용',
+            sizeChoiceDesc: '저장되는 모든 이미지 임베드에 너비를 추가합니다. 예: ![[photo.jpg|400]]. 노트 자체의 너비 속성이 우선합니다.',
+            sizeChoiceAliases: ['크기', '너비', '이미지 크기', '크기 조절', '임베드', '400'],
+            sizeOptionsName: '크기 옵션',
+            sizeOptionsDesc: '위 설정과 붙여넣기 대화상자에 표시할 너비를 쉼표로 구분해 입력합니다.',
+            classChoiceName: '붙여넣을 때 CSS 클래스 적용',
+            classChoiceDesc:
+                '저장되는 모든 이미지 임베드에 클래스를 추가합니다. 예: ![[photo.jpg#invert]]. 클래스의 효과는 테마와 CSS 스니펫에 따라 달라집니다.',
+            classChoiceAliases: ['css', '클래스', '스니펫', 'invert', '테마', '필터', '임베드'],
+            classOptionsName: '클래스 옵션',
+            classOptionsDesc: '위 설정과 붙여넣기 대화상자에 표시할 클래스를 쉼표로 구분해 입력합니다.',
+            choiceNone: '아무것도 안 함',
+            choiceAsk: '붙여넣을 때마다 묻기',
             nameFormatName: '파일 이름',
             nameFormatDesc: '저장한 이미지의 이름을 정하는 방식.',
             nameFormatSource: '원본 이름 사용',
@@ -192,6 +205,15 @@ export const STRINGS_KO: TranslationStrings = {
             dashesEmSpaced: '공백 있는 엠 대시',
             dashesExample: '그 결과는 - 모든 예상을 깨고 — 좋았다.'
         }
+    },
+
+    imageModal: {
+        title: '이미지 옵션',
+        sizeName: '크기',
+        className: 'CSS 클래스',
+        none: '아무것도 안 함',
+        apply: '적용',
+        cancel: '취소'
     },
 
     welcome: {

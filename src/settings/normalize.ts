@@ -47,6 +47,21 @@ function asEnum<T extends string>(value: unknown, allowed: readonly T[], fallbac
 }
 
 const STRIP_MODES: readonly LinkStripMode[] = ['all', 'tracking'];
+
+/** Splits a comma-separated options field into trimmed values, dropping blank ones. */
+export function parseCommaList(value: string): string[] {
+    return value
+        .split(',')
+        .map(entry => entry.trim())
+        .filter(entry => entry.length > 0);
+}
+
+/** Keeps an embed choice only while its value is still one of the offered options. */
+function asEmbedChoice(value: unknown, options: string): string {
+    if (typeof value !== 'string') return '';
+    if (value === '' || value === 'ask') return value;
+    return parseCommaList(options).includes(value) ? value : '';
+}
 const BULLET_MODES: readonly TerminalBulletMode[] = ['preserve', 'markdown'];
 const REJOIN_MODES: readonly TerminalRejoinMode[] = ['indented', 'any', 'never'];
 const NAME_FORMATS: readonly ImageNameFormat[] = ['source', 'custom'];
@@ -69,6 +84,12 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
         imageEnabled: asBoolean(data.imageEnabled, defaults.imageEnabled),
         imageNameFormat: asEnum(data.imageNameFormat, NAME_FORMATS, defaults.imageNameFormat),
         imageNameTemplate: asString(data.imageNameTemplate, defaults.imageNameTemplate).trim() || defaults.imageNameTemplate,
+        imageSizeOptions: asString(data.imageSizeOptions, defaults.imageSizeOptions),
+        imageSizeChoice: asEmbedChoice(data.imageSizeChoice, asString(data.imageSizeOptions, defaults.imageSizeOptions)),
+        imageClassOptions: asString(data.imageClassOptions, defaults.imageClassOptions),
+        imageClassChoice: asEmbedChoice(data.imageClassChoice, asString(data.imageClassOptions, defaults.imageClassOptions)),
+        imageLastSize: asString(data.imageLastSize, ''),
+        imageLastClass: asString(data.imageLastClass, ''),
         noteProperty: asString(data.noteProperty, defaults.noteProperty).trim(),
         imageSizeProperty: asString(data.imageSizeProperty, defaults.imageSizeProperty).trim(),
 

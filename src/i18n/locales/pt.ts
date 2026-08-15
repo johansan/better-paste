@@ -88,6 +88,20 @@ export const STRINGS_PT: TranslationStrings = {
                 'largura',
                 'tamanho'
             ],
+            sizeChoiceName: 'Aplicar tamanho ao colar',
+            sizeChoiceDesc:
+                'Adiciona uma largura a cada imagem guardada, como ![[photo.jpg|400]]. A propriedade de largura da nota tem prioridade.',
+            sizeChoiceAliases: ['tamanho', 'largura', 'tamanho da imagem', 'redimensionar', 'incorporar', '400'],
+            sizeOptionsName: 'Opções de tamanho',
+            sizeOptionsDesc: 'As larguras oferecidas acima e no diálogo ao colar, separadas por vírgulas.',
+            classChoiceName: 'Aplicar classe CSS ao colar',
+            classChoiceDesc:
+                'Adiciona uma classe a cada imagem guardada, como ![[photo.jpg#invert]]. Temas e fragmentos CSS decidem o que uma classe faz.',
+            classChoiceAliases: ['css', 'classe', 'fragmento', 'invert', 'tema', 'filtro', 'incorporar'],
+            classOptionsName: 'Opções de classe',
+            classOptionsDesc: 'As classes oferecidas acima e no diálogo ao colar, separadas por vírgulas.',
+            choiceNone: 'Não fazer nada',
+            choiceAsk: 'Perguntar em cada colagem',
             nameFormatName: 'Nomes de ficheiro',
             nameFormatDesc: 'Como são nomeadas as imagens guardadas.',
             nameFormatSource: 'Nome a partir da origem',
@@ -206,6 +220,15 @@ export const STRINGS_PT: TranslationStrings = {
             dashesEmSpaced: 'Travessões com espaços',
             dashesExample: 'O resultado - contra todas as expectativas — ficou bom.'
         }
+    },
+
+    imageModal: {
+        title: 'Opções de imagem',
+        sizeName: 'Tamanho',
+        className: 'Classe CSS',
+        none: 'Não fazer nada',
+        apply: 'Aplicar',
+        cancel: 'Cancelar'
     },
 
     welcome: {

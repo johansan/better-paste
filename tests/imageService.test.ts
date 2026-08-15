@@ -36,8 +36,8 @@ function build(overrides: Partial<BetterPasteSettings> = {}) {
                 for (let suffix = 1; existing.has(path); suffix++) path = `Attachments/${base} ${suffix}${extension}`;
                 return path;
             },
-            generateMarkdownLink: (file: TFile, _sourcePath: string, _subpath?: string, alias?: string) =>
-                `[[${file.path}${alias ? `|${alias}` : ''}]]`
+            generateMarkdownLink: (file: TFile, _sourcePath: string, subpath?: string, alias?: string) =>
+                `[[${file.path}${subpath ?? ''}${alias ? `|${alias}` : ''}]]`
         },
         vault: {
             createBinary: async (path: string, data: ArrayBuffer) => {
@@ -85,6 +85,14 @@ describe('ImageService', () => {
         const result = await service.materializeImages('![a cat](data:image/png;base64,AA==)', 'Notes/Test.md', '400');
 
         expect(result.text).toBe('![[Attachments/pasted-image.png|a cat|400]]');
+    });
+
+    it('adds the CSS class as a subpath, before the size', async () => {
+        const { service } = build();
+
+        const result = await service.materializeImages('![](data:image/png;base64,AA==)', 'Notes/Test.md', '400', 'invert');
+
+        expect(result.text).toBe('![[Attachments/pasted-image.png#invert|400]]');
     });
 
     it('gives concurrent images with the same source name separate files', async () => {

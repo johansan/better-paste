@@ -70,6 +70,21 @@ export interface BetterPasteSettings {
     imageNameFormat: ImageNameFormat;
     /** Custom source-name and Moment date format for saved image filenames. */
     imageNameTemplate: string;
+    /** Comma-separated widths offered for saved image embeds, such as "400, 600, 800". */
+    imageSizeOptions: string;
+    /**
+     * Width applied to every saved image embed: '' for none, 'ask' for a dialog on each
+     * paste, otherwise one of the values in `imageSizeOptions`. A note's own width
+     * property overrides this.
+     */
+    imageSizeChoice: string;
+    /** Comma-separated CSS classes offered for saved image embeds, such as "invert, invertW". */
+    imageClassOptions: string;
+    /**
+     * Class applied to every saved image embed: '' for none, 'ask' for a dialog on each
+     * paste, otherwise one of the values in `imageClassOptions`.
+     */
+    imageClassChoice: string;
 
     /* Frontmatter */
 
@@ -127,4 +142,8 @@ export interface BetterPasteSettings {
      * vault-local storage so a stale synced data.json cannot reopen the dialog.
      */
     lastShownVersion: string;
+    /** The size picked in the last image paste dialog, preselected in the next one. */
+    imageLastSize: string;
+    /** The class picked in the last image paste dialog, preselected in the next one. */
+    imageLastClass: string;
 }

@@ -88,6 +88,20 @@ export const STRINGS_FR: TranslationStrings = {
                 'largeur',
                 'taille'
             ],
+            sizeChoiceName: 'Appliquer une taille au collage',
+            sizeChoiceDesc:
+                'Ajoute une largeur à chaque image enregistrée, par exemple ![[photo.jpg|400]]. La propriété de largeur de la note est prioritaire.',
+            sizeChoiceAliases: ['taille', 'largeur', "taille d'image", 'redimensionner', 'intégration', '400'],
+            sizeOptionsName: 'Options de taille',
+            sizeOptionsDesc: 'Les largeurs proposées ci-dessus et dans la boîte de dialogue au collage, séparées par des virgules.',
+            classChoiceName: 'Appliquer une classe CSS au collage',
+            classChoiceDesc:
+                'Ajoute une classe à chaque image enregistrée, par exemple ![[photo.jpg#invert]]. Les thèmes et les extraits CSS décident de l’effet d’une classe.',
+            classChoiceAliases: ['css', 'classe', 'extrait', 'invert', 'thème', 'filtre', 'intégration'],
+            classOptionsName: 'Options de classe',
+            classOptionsDesc: 'Les classes proposées ci-dessus et dans la boîte de dialogue au collage, séparées par des virgules.',
+            choiceNone: 'Ne rien faire',
+            choiceAsk: 'Demander à chaque collage',
             nameFormatName: 'Noms de fichiers',
             nameFormatDesc: 'Comment les images enregistrées sont nommées.',
             nameFormatSource: 'Nom d’après la source',
@@ -206,6 +220,15 @@ export const STRINGS_FR: TranslationStrings = {
             dashesEmSpaced: 'Tirets cadratins avec espaces',
             dashesExample: 'Le résultat - contre toute attente — était bon.'
         }
+    },
+
+    imageModal: {
+        title: 'Options d’image',
+        sizeName: 'Taille',
+        className: 'Classe CSS',
+        none: 'Ne rien faire',
+        apply: 'Appliquer',
+        cancel: 'Annuler'
     },
 
     welcome: {
