@@ -38,11 +38,11 @@ function appendLink(parent: HTMLElement, url: string, label: string): void {
 }
 
 /**
- * Renders the inline formatting release notes may use. The pattern is built per call
- * because `exec` advances `lastIndex` on the object it is called with, and an ==emphasis==
- * span recurses into this same function.
+ * Renders the inline formatting release notes and the welcome dialog may use. The pattern
+ * is built per call because `exec` advances `lastIndex` on the object it is called with,
+ * and an ==emphasis== span recurses into this same function.
  */
-function renderInline(container: HTMLElement, text: string): void {
+export function renderInline(container: HTMLElement, text: string): void {
     const pattern = /==([\s\S]*?)==|\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|`([^`]+)`|\*\*([^*]+)\*\*|(https?:\/\/\S+)/g;
     let lastIndex = 0;
     let match: RegExpExecArray | null;

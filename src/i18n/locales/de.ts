@@ -232,10 +232,9 @@ export const STRINGS_DE: TranslationStrings = {
     welcome: {
         title: 'Willkommen bei Better Paste',
         intro: [
-            'Better Paste verändert Inhalte der Zwischenablage, während sie in eine Notiz eingefügt werden.',
-            'Es speichert verlinkte Bilder als Anhänge im Tresor, entfernt Tracking-Parameter aus Links, fügt umbrochene Zeilen in Terminalausgaben wieder zusammen und ersetzt typografische Anführungszeichen und unsichtbare Zeichen durch einfache Entsprechungen.',
-            'Jede Regel lässt sich einzeln abschalten.',
-            'Eine einzelne Notiz kann sich mit der Eigenschaft "bp: false" vollständig ausnehmen. Die Einstellungen findest du unter Einstellungen, Better Paste.'
+            'Kopiere Bilder aus Safari direkt in deinen Tresor, füge Links ohne Tracking-Parameter ein, repariere umbrochene Terminalausgaben und räume KI-Text auf. Einfach einfügen, den Rest erledigt Better Paste.',
+            'Ein Tipp vorab: Lege **Ohne Verarbeitung einfügen** auf `Cmd+Shift+V` (`Ctrl+Shift+V` unter Windows). So kannst du jederzeit genau das einfügen, was in der Zwischenablage liegt.',
+            'Jede Regel hat ihren eigenen Schalter unter Einstellungen, Better Paste, und mit der Eigenschaft `bp: false` schaltest du das Plugin für eine einzelne Notiz ab.'
         ],
         startButton: 'Los geht’s'
     },

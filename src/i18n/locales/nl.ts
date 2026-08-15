@@ -232,10 +232,9 @@ export const STRINGS_NL: TranslationStrings = {
     welcome: {
         title: 'Welkom bij Better Paste',
         intro: [
-            'Better Paste past klembordinhoud aan terwijl die in een notitie wordt geplakt.',
-            'Het slaat gelinkte afbeeldingen als bijlagen in de kluis op, verwijdert trackingparameters uit links, voegt afgebroken regels in terminaluitvoer weer samen en vervangt gekrulde aanhalingstekens en onzichtbare tekens door gewone equivalenten.',
-            'Elke regel kan afzonderlijk worden uitgezet.',
-            'Een losse notitie kan zichzelf volledig uitsluiten met de eigenschap "bp: false". De instellingen staan onder Instellingen, Better Paste.'
+            'Kopieer afbeeldingen uit Safari rechtstreeks naar je kluis, plak links zonder trackingparameters, herstel afgebroken terminalregels en ruim AI-tekst op. Gewoon plakken, Better Paste doet de rest.',
+            'Eén tip vooraf: wijs **Plakken zonder bewerking** toe aan `Cmd+Shift+V` (`Ctrl+Shift+V` op Windows), zodat je altijd precies kunt plakken wat er op het klembord staat.',
+            'Elke regel heeft zijn eigen schakelaar onder Instellingen, Better Paste, en met de eigenschap `bp: false` zet je de plugin voor die notitie uit.'
         ],
         startButton: 'Aan de slag'
     },

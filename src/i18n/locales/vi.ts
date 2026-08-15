@@ -239,10 +239,9 @@ export const STRINGS_VI: TranslationStrings = {
     welcome: {
         title: 'Chào mừng đến với Better Paste',
         intro: [
-            'Better Paste thay đổi nội dung bảng nhớ tạm ngay khi nó được dán vào một ghi chú.',
-            'Tiện ích này lưu ảnh được liên kết thành tệp đính kèm trong kho, loại bỏ tham số theo dõi khỏi liên kết, nối lại những dòng bị ngắt trong đầu ra dòng lệnh, và thay dấu nháy cong cùng ký tự vô hình bằng ký tự thường.',
-            'Mỗi quy tắc có thể tắt riêng.',
-            'Một ghi chú riêng lẻ có thể tự loại trừ hoàn toàn bằng thuộc tính "bp: false". Thiết lập nằm ở Cài đặt, Better Paste.'
+            'Sao chép ảnh từ Safari thẳng vào kho, dán liên kết không kèm tham số theo dõi, sửa những dòng bị ngắt trong đầu ra dòng lệnh, và dọn sạch văn bản AI. Chỉ cần dán, phần còn lại Better Paste lo.',
+            'Một mẹo trước khi bắt đầu: gán **Dán không xử lý** vào `Cmd+Shift+V` (`Ctrl+Shift+V` trên Windows) để lúc nào cũng dán được đúng nội dung trong bảng nhớ tạm.',
+            'Mỗi quy tắc có công tắc riêng trong Cài đặt, Better Paste, và thuộc tính `bp: false` sẽ tắt tiện ích cho ghi chú đó.'
         ],
         startButton: 'Bắt đầu'
     },

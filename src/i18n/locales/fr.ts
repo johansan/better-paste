@@ -233,10 +233,9 @@ export const STRINGS_FR: TranslationStrings = {
     welcome: {
         title: 'Bienvenue dans Better Paste',
         intro: [
-            'Better Paste modifie le contenu du presse-papiers au moment où il est collé dans une note.',
-            'Il enregistre les images liées comme pièces jointes du coffre, supprime les paramètres de suivi des liens, rassemble les lignes coupées de la sortie de terminal et remplace les guillemets courbes et les caractères invisibles par leurs équivalents simples.',
-            'Chaque règle peut être désactivée séparément.',
-            'Une note peut s’exclure entièrement avec la propriété "bp: false". Les réglages se trouvent dans Paramètres, Better Paste.'
+            'Copiez des images de Safari directement dans votre coffre, collez des liens sans paramètres de suivi, réparez les sorties de terminal aux lignes coupées et nettoyez le texte d’IA. Collez, Better Paste s’occupe du reste.',
+            'Un conseil avant de commencer : associez **Coller sans traitement** à `Cmd+Shift+V` (`Ctrl+Shift+V` sous Windows) pour pouvoir toujours coller exactement le contenu du presse-papiers.',
+            'Chaque règle a son propre interrupteur dans Paramètres, Better Paste, et la propriété `bp: false` désactive le plugin pour cette note.'
         ],
         startButton: 'Commencer'
     },

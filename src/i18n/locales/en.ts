@@ -258,10 +258,9 @@ export const STRINGS_EN = {
     welcome: {
         title: 'Welcome to Better Paste',
         intro: [
-            'Better Paste alters clipboard content as it is pasted into a note.',
-            'It saves linked images into the vault as attachments, removes tracking parameters from links, rejoins wrapped lines in terminal output, and replaces curly quotes and invisible characters with plain equivalents.',
-            'Every rule can be turned off on its own.',
-            'A single note can opt out entirely with the "bp: false" property. Settings are under Settings, Better Paste.'
+            'Copy images from Safari straight into your vault, paste links without tracking junk, fix broken terminal output, and clean up AI text. Just paste, and Better Paste handles the rest.',
+            'One tip before you start: bind **Paste without processing** to `Cmd+Shift+V` (`Ctrl+Shift+V` on Windows), so you can always paste exactly what is on the clipboard.',
+            'Every rule has its own toggle under Settings, Better Paste, and the `bp: false` property turns the plugin off for a single note.'
         ],
         startButton: 'Get started'
     },

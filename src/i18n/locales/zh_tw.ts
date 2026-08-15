@@ -210,10 +210,9 @@ export const STRINGS_ZH_TW: TranslationStrings = {
     welcome: {
         title: '歡迎使用 Better Paste',
         intro: [
-            'Better Paste 會在剪貼簿內容被貼進筆記時加以處理。',
-            '它把連結的圖片儲存成儲存庫附件，移除連結中的追蹤參數，把終端機輸出中被折斷的行重新接起來，並把彎引號與不可見字元換成樸素的等價字元。',
-            '每條規則都可以單獨關閉。',
-            '單篇筆記可以用 "bp: false" 屬性完全排除自己。設定位於 設定、Better Paste。'
+            '把 Safari 中的圖片直接複製進儲存庫、貼上不帶追蹤參數的連結、修復終端機輸出中被折斷的行，並清理 AI 文字。只管貼上，剩下的交給 Better Paste。',
+            '開始前的小提示：把**不做處理直接貼上**綁定到 `Cmd+Shift+V`（Windows 上為 `Ctrl+Shift+V`），隨時都能原樣貼上剪貼簿內容。',
+            '每條規則都可以在 設定、Better Paste 中單獨開關，筆記中加入 `bp: false` 屬性後，該筆記就不再被處理。'
         ],
         startButton: '開始使用'
     },

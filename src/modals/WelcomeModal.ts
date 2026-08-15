@@ -19,6 +19,7 @@
 import { Modal } from 'obsidian';
 import { strings } from '../i18n';
 import { WELCOME_IMAGE_URL } from '../urls';
+import { renderInline } from './WhatsNewModal';
 
 /** Shown once, the first time the plugin runs in a vault. */
 export class WelcomeModal extends Modal {
@@ -36,7 +37,7 @@ export class WelcomeModal extends Modal {
         image.src = WELCOME_IMAGE_URL;
 
         const body = this.contentEl.createDiv({ cls: 'better-paste-welcome-body' });
-        for (const paragraph of strings.welcome.intro) body.createEl('p', { text: paragraph });
+        for (const paragraph of strings.welcome.intro) renderInline(body.createEl('p'), paragraph);
 
         const buttons = this.contentEl.createDiv({ cls: 'better-paste-modal-buttons' });
         this.startButton = buttons.createEl('button', { cls: 'mod-cta', text: strings.welcome.startButton, attr: { type: 'button' } });

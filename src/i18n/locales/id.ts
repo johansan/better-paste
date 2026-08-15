@@ -219,10 +219,9 @@ export const STRINGS_ID: TranslationStrings = {
     welcome: {
         title: 'Selamat datang di Better Paste',
         intro: [
-            'Better Paste mengubah isi papan klip saat isi itu ditempel ke sebuah catatan.',
-            'Menyimpan gambar tertaut sebagai lampiran brankas, menghapus parameter pelacakan dari tautan, menyambung kembali baris yang terpotong pada keluaran terminal, dan mengganti tanda kutip melengkung serta karakter tak terlihat dengan padanan yang sederhana.',
-            'Setiap aturan dapat dimatikan sendiri-sendiri.',
-            'Satu catatan dapat mengecualikan diri sepenuhnya dengan properti "bp: false". Pengaturannya ada di Pengaturan, Better Paste.'
+            'Salin gambar dari Safari langsung ke brankas, tempel tautan tanpa parameter pelacakan, perbaiki keluaran terminal yang barisnya terpotong, dan bersihkan teks AI. Cukup tempel, sisanya diurus Better Paste.',
+            'Satu kiat sebelum mulai: pasang **Tempel tanpa pemrosesan** ke `Cmd+Shift+V` (`Ctrl+Shift+V` di Windows) agar isi papan klip selalu bisa ditempel apa adanya.',
+            'Setiap aturan punya sakelar sendiri di Pengaturan, Better Paste, dan properti `bp: false` mematikan plugin untuk catatan itu.'
         ],
         startButton: 'Mulai'
     },

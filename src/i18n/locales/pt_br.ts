@@ -213,10 +213,9 @@ export const STRINGS_PT_BR: TranslationStrings = {
     welcome: {
         title: 'Boas-vindas ao Better Paste',
         intro: [
-            'O Better Paste altera o conteúdo da área de transferência enquanto ele é colado em uma nota.',
-            'Ele salva as imagens vinculadas como anexos do cofre, remove parâmetros de rastreamento dos links, junta de novo as linhas quebradas na saída do terminal e substitui aspas curvas e caracteres invisíveis por equivalentes simples.',
-            'Cada regra pode ser desligada separadamente.',
-            'Uma nota específica pode ficar totalmente de fora com a propriedade "bp: false". As configurações estão em Configurações, Better Paste.'
+            'Copie imagens do Safari direto para o cofre, cole links sem parâmetros de rastreamento, conserte linhas quebradas na saída do terminal e limpe texto de IA. É só colar, o Better Paste cuida do resto.',
+            'Uma dica antes de começar: vincule **Colar sem processamento** a `Cmd+Shift+V` (`Ctrl+Shift+V` no Windows) para sempre poder colar exatamente o que está na área de transferência.',
+            'Cada regra tem seu próprio interruptor em Configurações, Better Paste, e a propriedade `bp: false` desativa o plugin naquela nota.'
         ],
         startButton: 'Começar'
     },

@@ -222,10 +222,9 @@ export const STRINGS_IT: TranslationStrings = {
     welcome: {
         title: 'Benvenuto in Better Paste',
         intro: [
-            'Better Paste modifica il contenuto degli appunti mentre viene incollato in una nota.',
-            'Salva le immagini collegate come allegati nel vault, rimuove i parametri di tracciamento dai collegamenti, riunisce le righe spezzate nell’output del terminale e sostituisce virgolette curve e caratteri invisibili con equivalenti semplici.',
-            'Ogni regola può essere disattivata singolarmente.',
-            'Una singola nota può escludersi del tutto con la proprietà "bp: false". Le impostazioni si trovano in Impostazioni, Better Paste.'
+            'Copia le immagini da Safari direttamente nel vault, incolla link senza parametri di tracciamento, sistema l’output del terminale con le righe spezzate e ripulisci il testo dell’IA. Incolla e basta: al resto ci pensa Better Paste.',
+            'Un consiglio prima di iniziare: assegna **Incolla senza elaborazione** a `Cmd+Shift+V` (`Ctrl+Shift+V` su Windows), così puoi sempre incollare esattamente ciò che è negli appunti.',
+            'Ogni regola ha il suo interruttore in Impostazioni, Better Paste, e la proprietà `bp: false` disattiva il plugin per quella nota.'
         ],
         startButton: 'Inizia'
     },

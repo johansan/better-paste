@@ -223,10 +223,9 @@ export const STRINGS_TR: TranslationStrings = {
     welcome: {
         title: 'Better Paste’e hoş geldiniz',
         intro: [
-            'Better Paste, pano içeriğini bir nota yapıştırılırken değiştirir.',
-            'Bağlantılı görselleri kasaya ek olarak kaydeder, bağlantılardan izleme parametrelerini kaldırır, uçbirim çıktısındaki bölünmüş satırları yeniden birleştirir ve kıvrık tırnaklarla görünmez karakterleri yalın karşılıklarıyla değiştirir.',
-            'Her kural tek tek kapatılabilir.',
-            'Tek bir not "bp: false" özelliğiyle kendini tamamen dışarıda bırakabilir. Ayarlara Ayarlar, Better Paste bölümünden ulaşabilirsiniz.'
+            'Görselleri Safari’den doğrudan kasaya kopyalayın, bağlantıları izleme parametreleri olmadan yapıştırın, uçbirim çıktısındaki bölünmüş satırları düzeltin ve yapay zekâ metnini temizleyin. Sadece yapıştırın, gerisini Better Paste halleder.',
+            'Başlamadan önce bir ipucu: **İşlemeden yapıştır** komutunu `Cmd+Shift+V` (Windows’ta `Ctrl+Shift+V`) kısayoluna atayın; böylece panodakini her zaman olduğu gibi yapıştırabilirsiniz.',
+            'Her kuralın Ayarlar, Better Paste altında kendi düğmesi vardır ve `bp: false` özelliği eklentiyi o not için kapatır.'
         ],
         startButton: 'Başla'
     },

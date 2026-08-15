@@ -210,10 +210,9 @@ export const STRINGS_ZH_CN: TranslationStrings = {
     welcome: {
         title: '欢迎使用 Better Paste',
         intro: [
-            'Better Paste 会在剪贴板内容被粘贴进笔记时对其进行处理。',
-            '它把链接的图片保存为仓库附件，移除链接中的跟踪参数，把终端输出中被折断的行重新接起来，并把弯引号和不可见字符替换成朴素的等价字符。',
-            '每条规则都可以单独关闭。',
-            '单篇笔记可以用 "bp: false" 属性完全排除自己。设置位于 设置、Better Paste。'
+            '把 Safari 中的图片直接复制进仓库，粘贴不带跟踪参数的链接，修复终端输出中被折断的行，并清理 AI 文本。只管粘贴，剩下的交给 Better Paste。',
+            '开始前的一个小提示：把**不做处理直接粘贴**绑定到 `Cmd+Shift+V`（Windows 上为 `Ctrl+Shift+V`），随时都能原样粘贴剪贴板内容。',
+            '每条规则都可以在 设置、Better Paste 中单独开关，笔记中加入 `bp: false` 属性后，该笔记就不再被处理。'
         ],
         startButton: '开始使用'
     },

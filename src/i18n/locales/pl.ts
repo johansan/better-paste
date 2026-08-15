@@ -246,10 +246,9 @@ export const STRINGS_PL: TranslationStrings = {
     welcome: {
         title: 'Witamy w Better Paste',
         intro: [
-            'Better Paste zmienia zawartość schowka w chwili wklejania jej do notatki.',
-            'Zapisuje powiązane obrazy jako załączniki sejfu, usuwa parametry śledzące z odnośników, ponownie łączy zawinięte wiersze wyniku terminala oraz zamienia cudzysłowy drukarskie i niewidoczne znaki na proste odpowiedniki.',
-            'Każdą regułę można wyłączyć osobno.',
-            'Pojedyncza notatka może wyłączyć się całkowicie właściwością "bp: false". Ustawienia znajdują się w Ustawienia, Better Paste.'
+            'Kopiuj obrazy z Safari prosto do sejfu, wklejaj odnośniki bez parametrów śledzących, naprawiaj połamane wiersze z terminala i porządkuj tekst z AI. Po prostu wklej, resztą zajmie się Better Paste.',
+            'Jedna wskazówka na start: przypisz **Wklej bez przetwarzania** do `Cmd+Shift+V` (`Ctrl+Shift+V` w Windows), aby zawsze móc wkleić dokładnie to, co jest w schowku.',
+            'Każda reguła ma własny przełącznik w Ustawienia, Better Paste, a właściwość `bp: false` wyłącza wtyczkę w danej notatce.'
         ],
         startButton: 'Zaczynajmy'
     },

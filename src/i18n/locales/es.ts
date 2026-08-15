@@ -234,10 +234,9 @@ export const STRINGS_ES: TranslationStrings = {
     welcome: {
         title: 'Te damos la bienvenida a Better Paste',
         intro: [
-            'Better Paste modifica el contenido del portapapeles mientras se pega en una nota.',
-            'Guarda como adjuntos en la bóveda las imágenes enlazadas, elimina los parámetros de seguimiento de los enlaces, vuelve a unir las líneas partidas de la salida de terminal y sustituye las comillas tipográficas y los caracteres invisibles por sus equivalentes simples.',
-            'Cada regla se puede desactivar por separado.',
-            'Una nota concreta puede quedar excluida por completo con la propiedad "bp: false". Los ajustes están en Ajustes, Better Paste.'
+            'Copia imágenes de Safari directamente a tu bóveda, pega enlaces sin parámetros de seguimiento, arregla la salida de terminal con líneas partidas y limpia el texto de IA. Solo pega, y Better Paste se encarga del resto.',
+            'Un consejo antes de empezar: asigna **Pegar sin procesar** a `Cmd+Shift+V` (`Ctrl+Shift+V` en Windows) para poder pegar siempre exactamente lo que hay en el portapapeles.',
+            'Cada regla tiene su propio interruptor en Ajustes, Better Paste, y la propiedad `bp: false` desactiva el plugin en esa nota.'
         ],
         startButton: 'Empezar'
     },
