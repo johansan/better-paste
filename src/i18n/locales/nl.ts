@@ -194,6 +194,7 @@ export const STRINGS_NL: TranslationStrings = {
             quotesAliases: [
                 'aanhalingsteken',
                 'gekrulde aanhalingstekens',
+                'slimme aanhalingstekens',
                 'rechte aanhalingstekens',
                 'apostrof',
                 'interpunctie',
@@ -203,8 +204,8 @@ export const STRINGS_NL: TranslationStrings = {
             quotesNone: 'Geen wijziging',
             quotesStraight: 'Rechte aanhalingstekens',
             quotesCurly: 'Gekrulde aanhalingstekens',
-            quotesExample: '“Goed,” zei ze. Het is "af".',
-            dashesName: 'Streepjes',
+            quotesExample: '“Goed”, zei ze. "Hou \'t kort."',
+            dashesName: 'Gedachtestreepjes',
             dashesDesc: 'Zet streepjes tussen woorden om naar deze stijl.',
             dashesAliases: ['streepje', 'kastlijntje', 'gedachtestreepje', 'koppelteken', 'interpunctie', 'typografie', 'ai'],
             dashesNone: 'Geen wijziging',
@@ -212,7 +213,7 @@ export const STRINGS_NL: TranslationStrings = {
             dashesEn: 'Halve kastlijntjes',
             dashesEm: 'Kastlijntjes',
             dashesEmSpaced: 'Kastlijntjes met spaties',
-            dashesExample: 'Het resultaat - tegen alle verwachting in — was goed.'
+            dashesExample: 'Het resultaat - tegen alle verwachtingen in — was goed.'
         }
     },
 

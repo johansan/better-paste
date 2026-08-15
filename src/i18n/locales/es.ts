@@ -195,7 +195,7 @@ export const STRINGS_ES: TranslationStrings = {
             quotesNone: 'Sin cambios',
             quotesStraight: 'Comillas rectas',
             quotesCurly: 'Comillas tipográficas',
-            quotesExample: '“Bien,” dijo. Todo "listo".',
+            quotesExample: '“Bien”, dijo. Todo "listo".',
             dashesName: 'Guiones y rayas',
             dashesDesc: 'Convierte los guiones y las rayas entre palabras a este estilo.',
             dashesAliases: ['raya', 'guion largo', 'semirraya', 'guion', 'puntuación', 'tipografía', 'ia'],

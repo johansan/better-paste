@@ -195,7 +195,7 @@ export const STRINGS_PT: TranslationStrings = {
             quotesNone: 'Sem alteração',
             quotesStraight: 'Aspas direitas',
             quotesCurly: 'Aspas curvas',
-            quotesExample: '“Bem,” disse ela. Está "concluído".',
+            quotesExample: '“Bem”, disse ela. Está "concluído".',
             dashesName: 'Travessões',
             dashesDesc: 'Converte os travessões e hífenes entre palavras para este estilo.',
             dashesAliases: ['travessão', 'meia-risca', 'hífen', 'pontuação', 'tipografia', 'ia'],

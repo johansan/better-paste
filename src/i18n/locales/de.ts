@@ -192,6 +192,7 @@ export const STRINGS_DE: TranslationStrings = {
             quotesDesc: 'Wandelt Anführungszeichen und Apostrophe in diesen Stil um.',
             quotesAliases: [
                 'anführungszeichen',
+                'gänsefüßchen',
                 'typografische anführungszeichen',
                 'gerade anführungszeichen',
                 'apostroph',
@@ -202,7 +203,7 @@ export const STRINGS_DE: TranslationStrings = {
             quotesNone: 'Keine Änderung',
             quotesStraight: 'Gerade Anführungszeichen',
             quotesCurly: 'Typografische Anführungszeichen',
-            quotesExample: '„Gut,“ sagte sie. "Jetzt geht\'s los."',
+            quotesExample: '„Gut“, sagte sie. "Jetzt geht\'s los."',
             dashesName: 'Gedankenstriche',
             dashesDesc: 'Wandelt Striche zwischen Wörtern in diesen Stil um.',
             dashesAliases: [

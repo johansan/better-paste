@@ -185,7 +185,7 @@ export const STRINGS_IT: TranslationStrings = {
             quotesNone: 'Nessuna modifica',
             quotesStraight: 'Virgolette dritte',
             quotesCurly: 'Virgolette curve',
-            quotesExample: '“Bene,” disse. L\'idea è "pronta".',
+            quotesExample: '“Bene”, disse. L\'idea è "pronta".',
             dashesName: 'Trattini',
             dashesDesc: 'Converte i trattini e le lineette tra le parole in questo stile.',
             dashesAliases: ['lineetta', 'trattino lungo', 'trattino', 'punteggiatura', 'tipografia', 'ia'],
