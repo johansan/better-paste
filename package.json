@@ -1,6 +1,6 @@
 {
   "name": "better-paste",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Clean up what you paste. Save images into the vault, strip tracking from links, unwrap terminal output, and normalize AI typography.",
   "main": "main.js",
   "type": "module",
