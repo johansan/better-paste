@@ -50,10 +50,10 @@ function fakeImages(settings: BetterPasteSettings, failing = false, saved?: Save
         hasWork: (text: string) => settings.imageEnabled && findImageReferences(text).length > 0,
         materializeImages: async (text: string, _sourcePath: string, size: string | null = null, cssClass: string | null = null) => {
             const references = findImageReferences(text);
-            if (failing) return { text, downloaded: 0, failed: references.length };
+            if (failing) return { text, downloaded: 0, failed: references.length, files: [] };
             const suffix = embedSuffix(size, cssClass);
             const embeds = new Map(references.map((reference, index) => [reference.index, `![[image-${index}.png${suffix}]]`]));
-            return { text: replaceImageReferences(text, references, embeds), downloaded: embeds.size, failed: 0 };
+            return { text: replaceImageReferences(text, references, embeds), downloaded: embeds.size, failed: 0, files: [] };
         },
         saveClipboardImage: async (
             file: File,
@@ -66,8 +66,9 @@ function fakeImages(settings: BetterPasteSettings, failing = false, saved?: Save
             if (failing) return null;
             // Name the saved file after the source picture, as the real service does
             const base = source ? (source.split('/').pop() ?? file.name).replace(/\.[a-z0-9]+$/i, '') : file.name;
-            return `![[${base}.png${embedSuffix(size, cssClass)}]]`;
+            return { embed: `![[${base}.png${embedSuffix(size, cssClass)}]]`, file: { path: `${base}.png` } };
         },
+        discardFiles: async () => undefined,
         dispose: () => undefined
     } as unknown as ImageService;
 }
@@ -257,7 +258,8 @@ describe('handleEditorPaste: Safari copy image', () => {
         expect(saved).toHaveLength(1);
         expect(saved[0].file.type).toBe('image/png');
         expect(saved[0].source).toBe('https://www.tokentek.ai/_astro/gaia-2026-talk.J2oaR4rx_sdIoa.webp');
-        expect(saved[0].sourcePath).toBe('Notes/Test.md');
+        const sourcePath = saved[0].sourcePath;
+        expect(typeof sourcePath === 'function' ? sourcePath() : sourcePath).toBe('Notes/Test.md');
     });
 
     it('ignores srcset so only the real source is used', async () => {

@@ -60,7 +60,10 @@ describe('ImageService', () => {
 
         const result = await service.materializeImages('![a cat](data:image/png;base64,AA==)', 'Notes/Test.md');
 
-        expect(result).toEqual({ text: '![[Attachments/pasted-image.png|a cat]]', downloaded: 1, failed: 0 });
+        expect(result.text).toBe('![[Attachments/pasted-image.png|a cat]]');
+        expect(result.downloaded).toBe(1);
+        expect(result.failed).toBe(0);
+        expect(result.files).toHaveLength(1);
         expect(writes).toHaveLength(1);
         expect(writes[0].data.byteLength).toBe(1);
     });

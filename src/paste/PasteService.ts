@@ -30,7 +30,7 @@ import type { ImageEmbedChoice } from '../modals/ImageEmbedModal';
 import { extractFrontmatterBlock, isInsideVerbatimContext, notePasteOverride, resolveImageSize } from './noteOptions';
 import { format, plural, strings } from '../i18n';
 import type { ImageService } from './ImageService';
-import { escapeLinkTitle } from './LinkTitleService';
+import { escapeLinkDestination, escapeLinkTitle } from './LinkTitleService';
 import type { LinkTitleService } from './LinkTitleService';
 import { logError } from '../utils/logger';
 import { showNotice } from '../utils/notices';
@@ -75,7 +75,7 @@ function asyncPasteRange(startOffset: number, inserted: string, valueBefore: str
 /** Builds a link from selected text, unless the selection is the pasted address itself. */
 function linkFromSelection(selection: string, clipboardText: string, url: string): string | null {
     if (!selection.trim() || selection === clipboardText || selection === url) return null;
-    return `[${escapeLinkTitle(selection)}](${url})`;
+    return `[${escapeLinkTitle(selection)}](${escapeLinkDestination(url)})`;
 }
 
 /** True when the clipboard carries exactly one image file. */
@@ -207,7 +207,6 @@ export class PasteService {
         if (!result.changed && !needsImages && !needsTitle) return false;
 
         const targetFile = info.file;
-        const targetPath = targetFile?.path ?? '';
         const valueBefore = editor.getValue();
         const startOffset = editor.posToOffset(editor.getCursor('from'));
         const selectedLink = needsTitle ? linkFromSelection(editor.getSelection(), plain, result.text) : null;
@@ -219,7 +218,7 @@ export class PasteService {
         this.realignPendingRanges(null, startOffset, valueBefore.slice(startOffset, endOffset), inserted);
         const range = asyncPasteRange(startOffset, inserted, valueBefore, editor.getValue());
 
-        if (needsImages) void this.runImagePass(editor, info, targetFile, targetPath, range);
+        if (needsImages) void this.runImagePass(editor, info, targetFile, () => targetFile?.path ?? '', range);
         else if (needsTitle && selectedLink === null) void this.runTitlePass(editor, info, targetFile, range);
 
         return true;
@@ -237,7 +236,6 @@ export class PasteService {
         html: string
     ): Promise<void> {
         const targetFile = info.file;
-        const targetPath = targetFile?.path ?? '';
         const fromOffset = editor.posToOffset(editor.getCursor('from'));
         const toOffset = editor.posToOffset(editor.getCursor('to'));
         // The document is untouched at this point, because the default paste was
@@ -248,20 +246,26 @@ export class PasteService {
         const sources = imageSourcesFromHtml(html);
 
         const { size, cssClass } = await this.resolveEmbedOptions(editor);
-        let embed: string | null = null;
+        let stored: { embed: string; file: TFile } | null = null;
 
         try {
-            embed = await this.images.saveClipboardImage(file, sources[0] ?? '', targetPath, size, cssClass);
+            stored = await this.images.saveClipboardImage(file, sources[0] ?? '', () => targetFile?.path ?? '', size, cssClass);
         } catch (error) {
             logError('Could not save a pasted image', error);
         }
+        const embed = stored?.embed ?? null;
 
         // Nothing was saved, so fall back to linking the original picture rather than
         // swallowing the paste entirely.
         const source = sources[0] ?? '';
         const text = embed ?? (source ? `![${size ?? ''}](${source})` : '');
 
-        if (!this.canEdit(info, targetFile)) return;
+        if (!this.canEdit(info, targetFile)) {
+            // The view moved on, so the embed has no note to land in and the saved
+            // file would survive as an unreferenced attachment
+            if (stored) void this.images.discardFiles([stored.file]);
+            return;
+        }
 
         if (!text) {
             // Nothing to insert and the default paste was already suppressed, so this is
@@ -275,12 +279,30 @@ export class PasteService {
             editor.setCursor(editor.offsetToPos(fromOffset + text.length));
             this.realignPendingRanges(null, fromOffset, valueBefore.slice(fromOffset, toOffset), text);
         } else {
-            // The document changed while the image was being written, so the recorded range
-            // is stale. Insert at the head without deleting the user's current selection.
-            const cursor = editor.getCursor();
-            const offset = editor.posToOffset(cursor);
-            editor.replaceRange(text, cursor, cursor);
-            this.realignPendingRanges(null, offset, '', text);
+            // The document changed while the image was being written, so the recorded
+            // offsets are stale. When the paste spot with its surroundings still exists
+            // exactly once, the embed goes there, so typing elsewhere in the note does
+            // not pull the image away from where it was pasted. Otherwise it follows
+            // the cursor, which is where the user is typing.
+            const value = editor.getValue();
+            const selection = valueBefore.slice(fromOffset, toOffset);
+            const needle =
+                valueBefore.slice(Math.max(0, fromOffset - RANGE_CONTEXT), fromOffset) +
+                selection +
+                valueBefore.slice(toOffset, toOffset + RANGE_CONTEXT);
+            const first = needle.length > 0 ? value.indexOf(needle) : -1;
+            const unique = first >= 0 && value.indexOf(needle, first + 1) < 0;
+
+            if (unique) {
+                const start = first + Math.min(fromOffset, RANGE_CONTEXT);
+                editor.replaceRange(text, editor.offsetToPos(start), editor.offsetToPos(start + selection.length));
+                this.realignPendingRanges(null, start, selection, text);
+            } else {
+                const cursor = editor.getCursor();
+                const offset = editor.posToOffset(cursor);
+                editor.replaceRange(text, cursor, cursor);
+                this.realignPendingRanges(null, offset, '', text);
+            }
         }
 
         if (embed === null) this.reportImageFailures(1);
@@ -289,7 +311,6 @@ export class PasteService {
     /** Command handler: pastes the clipboard's plain text through the full rule pipeline. */
     async pasteProcessed(editor: Editor, info: MarkdownView | MarkdownFileInfo): Promise<void> {
         const targetFile = info.file;
-        const targetPath = targetFile?.path ?? '';
         const valueAtInvocation = editor.getValue();
         const fromOffset = editor.posToOffset(editor.getCursor('from'));
         const toOffset = editor.posToOffset(editor.getCursor('to'));
@@ -308,7 +329,7 @@ export class PasteService {
         const range = asyncPasteRange(startOffset, inserted, valueBefore, editor.getValue());
 
         if (needsImages) {
-            await this.runImagePass(editor, info, targetFile, targetPath, range);
+            await this.runImagePass(editor, info, targetFile, () => targetFile?.path ?? '', range);
             return;
         }
 
@@ -375,7 +396,6 @@ export class PasteService {
             return;
 
         const targetFile = info.file;
-        const targetPath = targetFile?.path ?? '';
         const startOffset = editor.posToOffset(editor.getCursor('from'));
         const valueBefore = editor.getValue();
         const lengthBefore = valueBefore.length;
@@ -394,7 +414,7 @@ export class PasteService {
 
             const inserted = valueAfter.slice(startOffset, startOffset + insertedLength);
             const range = asyncPasteRange(startOffset, inserted, valueBefore, valueAfter);
-            void this.processRichRange(editor, info, targetFile, targetPath, range);
+            void this.processRichRange(editor, info, targetFile, () => targetFile?.path ?? '', range);
         }, 0);
     }
 
@@ -403,7 +423,7 @@ export class PasteService {
         editor: Editor,
         info: MarkdownView | MarkdownFileInfo,
         targetFile: TFile | null,
-        targetPath: string,
+        targetPath: () => string,
         range: AsyncPasteRange
     ): Promise<void> {
         this.pendingRanges.add(range);
@@ -425,20 +445,29 @@ export class PasteService {
             text = cleanUrlsInText(text, buildUrlCleanupOptions(settings), protect).text;
         }
 
+        let downloadedFiles: TFile[] = [];
         if (this.images.hasWork(text)) {
             try {
                 const embedOptions = await this.resolveEmbedOptions(editor);
                 const result = await this.images.materializeImages(text, targetPath, embedOptions.size, embedOptions.cssClass);
                 text = result.text;
                 imagesFailed = result.failed;
+                downloadedFiles = result.files;
             } catch (error) {
                 logError('Image download failed', error);
             }
         }
 
         try {
-            if (!this.canEdit(info, targetFile)) return;
-            if (text !== range.inserted) this.replaceRange(editor, range, text);
+            if (!this.canEdit(info, targetFile)) {
+                void this.images.discardFiles(downloadedFiles);
+                return;
+            }
+            if (text !== range.inserted && !this.replaceRange(editor, range, text)) {
+                // The pasted range is gone or was edited, so nothing references the
+                // downloads and they must not linger as orphaned attachments
+                void this.images.discardFiles(downloadedFiles);
+            }
             this.reportImageFailures(imagesFailed);
         } finally {
             this.pendingRanges.delete(range);
@@ -450,7 +479,7 @@ export class PasteService {
         editor: Editor,
         info: MarkdownView | MarkdownFileInfo,
         targetFile: TFile | null,
-        targetPath: string,
+        targetPath: () => string,
         range: AsyncPasteRange
     ): Promise<void> {
         this.pendingRanges.add(range);
@@ -459,9 +488,16 @@ export class PasteService {
             try {
                 const embedOptions = await this.resolveEmbedOptions(editor);
                 const result = await this.images.materializeImages(range.inserted, targetPath, embedOptions.size, embedOptions.cssClass);
-                if (!this.canEdit(info, targetFile)) return;
+                if (!this.canEdit(info, targetFile)) {
+                    void this.images.discardFiles(result.files);
+                    return;
+                }
                 failed = result.failed;
-                if (result.text !== range.inserted) this.replaceRange(editor, range, result.text);
+                if (result.text !== range.inserted && !this.replaceRange(editor, range, result.text)) {
+                    // The pasted range is gone or was edited, so nothing references the
+                    // downloads and they must not linger as orphaned attachments
+                    void this.images.discardFiles(result.files);
+                }
             } catch (error) {
                 logError('Image download failed', error);
             }
@@ -489,7 +525,15 @@ export class PasteService {
             if (link === null) {
                 this.hideTitleProgress(progress);
                 showNotice(format(strings.notices.prefix, { message: strings.notices.titleFailed }), { variant: 'warning' });
-            } else this.replaceRange(editor, range, link);
+            } else {
+                // The address must still stand alone: a character that would extend a
+                // URL on either side means the user reshaped it during the fetch, and
+                // linking only the pasted half would tear their address apart
+                const extendsUrl = (char: string | undefined): boolean => char !== undefined && !/[\s<>"`\\\u201C\u201D]/.test(char);
+                const standalone = (value: string, offset: number): boolean =>
+                    !extendsUrl(value[offset - 1]) && !extendsUrl(value[offset + range.inserted.length]);
+                this.replaceRange(editor, range, link, standalone);
+            }
         } finally {
             this.hideTitleProgress(progress);
             this.pendingRanges.delete(range);
@@ -520,7 +564,12 @@ export class PasteService {
      * Replaces inserted text after awaited work. The recorded offset is used while everything
      * before it is unchanged. Otherwise nearby context distinguishes it from older copies.
      */
-    private replaceRange(editor: Editor, range: AsyncPasteRange, next: string): boolean {
+    private replaceRange(
+        editor: Editor,
+        range: AsyncPasteRange,
+        next: string,
+        boundary?: (value: string, offset: number) => boolean
+    ): boolean {
         const value = editor.getValue();
         const { startOffset, inserted, beforeContext, afterContext } = range;
 
@@ -536,18 +585,22 @@ export class PasteService {
                 candidate = value.indexOf(inserted, candidate + inserted.length);
             }
 
+            // Every recorded context must match. Accepting one side alone would let an
+            // older duplicate of the pasted text qualify after the paste was undone,
+            // and the pending rewrite would then land on content the user never pasted.
             const contextual = candidates.filter(candidate => {
                 const beforeMatches =
-                    beforeContext.length > 0 && value.slice(Math.max(0, candidate - beforeContext.length), candidate) === beforeContext;
+                    beforeContext.length === 0 || value.slice(Math.max(0, candidate - beforeContext.length), candidate) === beforeContext;
                 const afterMatches =
-                    afterContext.length > 0 &&
+                    afterContext.length === 0 ||
                     value.slice(candidate + inserted.length, candidate + inserted.length + afterContext.length) === afterContext;
-                return beforeMatches || afterMatches;
+                return beforeMatches && afterMatches;
             });
             const safe = range.valueBefore.includes(inserted) ? contextual : candidates;
             if (safe.length === 1) offset = safe[0];
         }
         if (offset < 0) return false;
+        if (boundary && !boundary(value, offset)) return false;
 
         const cursorOffset = editor.posToOffset(editor.getCursor());
         const cursorWasInRange = cursorOffset >= offset && cursorOffset <= offset + inserted.length;

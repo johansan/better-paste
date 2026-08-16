@@ -27,6 +27,7 @@ import { WelcomeModal } from './modals/WelcomeModal';
 import { WhatsNewModal } from './modals/WhatsNewModal';
 import { BetterPasteSettingTab } from './settings/SettingTab';
 import { format, strings } from './i18n';
+import { logError } from './utils/logger';
 import { DEFAULT_SETTINGS } from './settings/defaults';
 import { normalizeSettings } from './settings/normalize';
 import {
@@ -52,6 +53,9 @@ export default class BetterPastePlugin extends Plugin {
     private pasteService!: PasteService;
     /** The image options dialog while it is open, closed on unload so it cannot outlive the plugin. */
     private imageModal: ImageEmbedModal | null = null;
+    private startupModal: WelcomeModal | WhatsNewModal | null = null;
+    /** Set on unload, so deferred callbacks and dialog closes stop touching the plugin. */
+    private unloaded = false;
 
     async onload(): Promise<void> {
         await this.loadSettings();
@@ -136,12 +140,15 @@ export default class BetterPastePlugin extends Plugin {
 
         // Deferred so a dialog never opens over a workspace that is still being restored
         this.app.workspace.onLayoutReady(() => {
-            void this.showStartupDialog();
+            if (this.unloaded) return;
+            this.showStartupDialog().catch(error => logError('Could not show the startup dialog', error));
         });
     }
 
     onunload(): void {
+        this.unloaded = true;
         this.imageModal?.close();
+        this.startupModal?.close();
         // An image write may still be in flight; this stops it editing a note that the
         // plugin no longer owns
         this.pasteService.dispose();
@@ -200,7 +207,8 @@ export default class BetterPastePlugin extends Plugin {
 
         // No marker at all means the plugin has not run in this vault before
         if (!lastShownVersion) {
-            new WelcomeModal(this.app).open();
+            this.startupModal = new WelcomeModal(this.app);
+            this.startupModal.open();
             await this.advanceLastShownVersion(currentVersion);
             return;
         }
@@ -214,9 +222,14 @@ export default class BetterPastePlugin extends Plugin {
     }
 
     private openWhatsNew(releaseNotes: ReleaseNote[]): void {
-        new WhatsNewModal(this.app, releaseNotes, () => {
-            void this.advanceLastShownVersion(this.manifest.version);
-        }).open();
+        this.startupModal = new WhatsNewModal(this.app, releaseNotes, () => {
+            // Closed by unload rather than by the user: leaving the marker alone means
+            // the dialog simply shows again next time, while advancing it here would
+            // write through a plugin instance that no longer owns its settings
+            if (this.unloaded) return;
+            this.advanceLastShownVersion(this.manifest.version).catch(error => logError('Could not record the shown release notes', error));
+        });
+        this.startupModal.open();
     }
 
     /** The newer of the two markers, discarding anything that is not a version. */
@@ -242,6 +255,11 @@ export default class BetterPastePlugin extends Plugin {
         // dialog if the settings write fails or is later overwritten by a stale device
         this.app.saveLocalStorage(LAST_SHOWN_VERSION_KEY, candidate);
         this.settings.lastShownVersion = candidate;
-        await this.saveSettings();
+        // Merged over what is on disk right now rather than saving the whole in-memory
+        // object: another device may have synced newer settings while the dialog stood
+        // open, and this marker write must not roll them back
+        const stored: unknown = await this.loadData();
+        const base = stored && typeof stored === 'object' ? (stored as Record<string, unknown>) : {};
+        await this.saveData({ ...base, lastShownVersion: candidate });
     }
 }

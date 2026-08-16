@@ -36,12 +36,25 @@ interface FetchedImage {
     contentType?: string;
 }
 
+/**
+ * The note the paste targets, given as a path or as a getter that reads the path when it
+ * is needed. The getter form keeps an attachment beside a note that was moved while its
+ * image was still downloading.
+ */
+export type SourcePath = string | (() => string);
+
+function resolveSourcePath(source: SourcePath): string {
+    return typeof source === 'function' ? source() : source;
+}
+
 export interface ImageMaterializeResult {
     text: string;
     /** Images that were saved into the vault. */
     downloaded: number;
     /** Images that were left as their original reference because the download failed. */
     failed: number;
+    /** The saved files, so a caller whose editor rewrite is declined can discard them. */
+    files: TFile[];
 }
 
 /** Downloads images referenced by pasted content and stores them in the vault. */
@@ -76,33 +89,37 @@ export class ImageService {
      */
     async materializeImages(
         text: string,
-        sourcePath: string,
+        sourcePath: SourcePath,
         size: string | null = null,
         cssClass: string | null = null
     ): Promise<ImageMaterializeResult> {
-        if (this.disposed) return { text, downloaded: 0, failed: 0 };
+        if (this.disposed) return { text, downloaded: 0, failed: 0, files: [] };
         const settings = this.getSettings();
-        if (!settings.imageEnabled) return { text, downloaded: 0, failed: 0 };
+        if (!settings.imageEnabled) return { text, downloaded: 0, failed: 0, files: [] };
 
         const references = findImageReferences(text);
-        if (references.length === 0) return { text, downloaded: 0, failed: 0 };
+        if (references.length === 0) return { text, downloaded: 0, failed: 0, files: [] };
 
         const embeds = new Map<number, string>();
+        const files: TFile[] = [];
         let failed = 0;
 
         // A small worker pool keeps a page full of images from opening dozens of sockets
         const queue = [...references];
         const workers = Array.from({ length: Math.min(MAX_CONCURRENT_DOWNLOADS, queue.length) }, async () => {
             for (let reference = queue.shift(); !this.disposed && reference !== undefined; reference = queue.shift()) {
-                const embed = await this.materializeOne(reference, sourcePath, settings, size, cssClass);
-                if (embed === null) failed += 1;
-                else embeds.set(reference.index, embed);
+                const saved = await this.materializeOne(reference, sourcePath, settings, size, cssClass);
+                if (saved === null) failed += 1;
+                else {
+                    embeds.set(reference.index, saved.embed);
+                    files.push(saved.file);
+                }
             }
         });
 
         await Promise.all(workers);
 
-        return { text: replaceImageReferences(text, references, embeds), downloaded: embeds.size, failed };
+        return { text: replaceImageReferences(text, references, embeds), downloaded: embeds.size, failed, files };
     }
 
     /**
@@ -114,10 +131,10 @@ export class ImageService {
     async saveClipboardImage(
         file: File,
         source: string,
-        sourcePath: string,
+        sourcePath: SourcePath,
         size: string | null = null,
         cssClass: string | null = null
-    ): Promise<string | null> {
+    ): Promise<{ embed: string; file: TFile } | null> {
         if (this.disposed) return null;
         const settings = this.getSettings();
         return this.storeClipboardImage(file, source, sourcePath, settings, size, cssClass);
@@ -127,11 +144,11 @@ export class ImageService {
     private async storeClipboardImage(
         file: File,
         source: string,
-        sourcePath: string,
+        sourcePath: SourcePath,
         settings: BetterPasteSettings,
         size: string | null,
         cssClass: string | null
-    ): Promise<string | null> {
+    ): Promise<{ embed: string; file: TFile } | null> {
         try {
             // The clipboard bitmap is authoritative for the format: Safari re-encodes a
             // page's .webp as PNG, so the file's own type and name decide the extension.
@@ -158,7 +175,7 @@ export class ImageService {
             const saved = await this.saveImage(source, data, extension, sourcePath, settings, file.name);
             if (!saved) return null;
 
-            return this.embedFor(saved, sourcePath, size, '', cssClass);
+            return { embed: this.embedFor(saved, sourcePath, size, '', cssClass), file: saved };
         } catch (error) {
             logWarning('Failed to save a pasted image', error);
             return null;
@@ -168,11 +185,11 @@ export class ImageService {
     /** Downloads one image and returns the embed that should replace it, or null on failure. */
     private async materializeOne(
         reference: ImageReference,
-        sourcePath: string,
+        sourcePath: SourcePath,
         settings: BetterPasteSettings,
         size: string | null,
         cssClass: string | null
-    ): Promise<string | null> {
+    ): Promise<{ embed: string; file: TFile } | null> {
         try {
             const fetched = await this.fetchImage(reference.url);
             if (this.disposed || !fetched) return null;
@@ -191,7 +208,7 @@ export class ImageService {
             const file = await this.saveImage(reference.url, fetched.data, extension, sourcePath, settings);
             if (!file) return null;
 
-            return this.embedFor(file, sourcePath, size, reference.alt, cssClass);
+            return { embed: this.embedFor(file, sourcePath, size, reference.alt, cssClass), file };
         } catch (error) {
             logWarning(`Failed to download ${reference.url}`, error);
             return null;
@@ -204,10 +221,10 @@ export class ImageService {
      * class travels as a subpath, `![[picture.png#invert]]`, which Obsidian copies onto the
      * rendered embed's src attribute in both styles, where themes and snippets match it.
      */
-    private embedFor(file: TFile, sourcePath: string, size: string | null, alt = '', cssClass: string | null = null): string {
+    private embedFor(file: TFile, sourcePath: SourcePath, size: string | null, alt = '', cssClass: string | null = null): string {
         const label = size ? (alt ? `${alt}|${size}` : size) : alt || undefined;
         const subpath = cssClass ? `#${cssClass}` : undefined;
-        return `!${this.app.fileManager.generateMarkdownLink(file, sourcePath, subpath, label)}`;
+        return `!${this.app.fileManager.generateMarkdownLink(file, resolveSourcePath(sourcePath), subpath, label)}`;
     }
 
     /** Retrieves image bytes from an http(s) URL or decodes them from a data: URI. */
@@ -216,14 +233,26 @@ export class ImageService {
         if (!isHttpUrl(url)) return null;
 
         const timeoutMs = IMAGE_TIMEOUT_SECONDS * 1000;
+        const deadline = Date.now() + timeoutMs;
         let timer: ReturnType<typeof setTimeout> | undefined;
 
         try {
+            // requestUrl buffers the whole response before the size check below can run,
+            // and it cannot stream or abort. Asking for the declared length first keeps
+            // an oversized file from being buffered at all; a server that answers with
+            // no length, or lies about it, is caught only by the check after download.
+            // The HEAD spends from the same time budget as the GET.
+            if (MAX_IMAGE_BYTES > 0 && (await this.declaredLength(url, timeoutMs)) > MAX_IMAGE_BYTES) {
+                logWarning(`Skipped ${url}: the server declares more than ${MAX_IMAGE_SIZE_MB} MB`);
+                return null;
+            }
+            if (this.disposed) return null;
+
             // requestUrl has no abort signal, so the race caps how long a paste can hang
             const response = await Promise.race([
                 requestUrl({ url, method: 'GET', throw: false }),
                 new Promise<null>(resolve => {
-                    timer = window.setTimeout(() => resolve(null), timeoutMs);
+                    timer = window.setTimeout(() => resolve(null), Math.max(1000, deadline - Date.now()));
                 })
             ]);
 
@@ -243,12 +272,50 @@ export class ImageService {
         }
     }
 
+    /**
+     * Moves files whose embeds never reached the note into the trash, following the
+     * user's trash preference. Used when the editor rewrite was declined, so a download
+     * does not survive as an unreferenced attachment.
+     */
+    async discardFiles(files: readonly TFile[]): Promise<void> {
+        for (const file of files) {
+            try {
+                await this.app.fileManager.trashFile(file);
+            } catch (error) {
+                logWarning(`Could not remove the unused attachment ${file.path}`, error);
+            }
+        }
+    }
+
+    /**
+     * The Content-Length a HEAD request declares for the URL, or 0 when the server does
+     * not say. Failures count as 0 so a server without HEAD support still gets its GET.
+     */
+    private async declaredLength(url: string, timeoutMs: number): Promise<number> {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        try {
+            const response = await Promise.race([
+                requestUrl({ url, method: 'HEAD', throw: false }),
+                new Promise<null>(resolve => {
+                    timer = window.setTimeout(() => resolve(null), timeoutMs);
+                })
+            ]);
+            if (!response || response.status < 200 || response.status >= 300) return 0;
+            const length = Number(response.headers['content-length'] ?? response.headers['Content-Length'] ?? 0);
+            return Number.isFinite(length) && length > 0 ? length : 0;
+        } catch {
+            return 0;
+        } finally {
+            if (timer !== undefined) window.clearTimeout(timer);
+        }
+    }
+
     /** Writes the image into the vault, following the configured attachment location. */
     private async saveImage(
         url: string,
         data: ArrayBuffer,
         extension: string,
-        sourcePath: string,
+        sourcePath: SourcePath,
         settings: BetterPasteSettings,
         fallbackName?: string
     ): Promise<TFile | null> {
@@ -261,9 +328,16 @@ export class ImageService {
             // The availability check and create are one operation from this service's point
             // of view, otherwise two concurrent downloads with the same name can race.
             if (this.disposed) return null;
-            const path = await this.app.fileManager.getAvailablePathForAttachment(fileName, sourcePath);
+            const path = await this.app.fileManager.getAvailablePathForAttachment(fileName, resolveSourcePath(sourcePath));
             if (this.disposed) return null;
-            return this.app.vault.createBinary(path, data);
+            const created = await this.app.vault.createBinary(path, data);
+            if (this.disposed) {
+                // The plugin unloaded while the write was in flight; nothing will insert
+                // the embed, so the file must not survive as an unreferenced attachment
+                await this.app.fileManager.trashFile(created);
+                return null;
+            }
+            return created;
         });
         this.saveQueue = save.then(
             () => undefined,

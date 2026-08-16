@@ -20,6 +20,12 @@ import { requestUrl } from 'obsidian';
 import type { RequestUrlParam, RequestUrlResponse } from 'obsidian';
 import { extensionOfUrl } from './imageReferences';
 import { IMAGE_EXTENSIONS, LINK_TITLE_TIMEOUT_SECONDS } from '../settings/constants';
+
+/** Pages declaring more than this are skipped: no title is worth buffering them. */
+const MAX_PAGE_BYTES = 2 * 1024 * 1024;
+
+/** The title sits in the head, so only this much of the body is ever parsed. */
+const PARSE_SLICE_BYTES = 512 * 1024;
 import { logWarning } from '../utils/logger';
 import type { BetterPasteSettings } from '../settings/types';
 
@@ -57,6 +63,15 @@ export function escapeLinkTitle(title: string): string {
     return title.replace(/[\\`*_[\]<>~|]/g, '\\$&');
 }
 
+/**
+ * Percent-encodes the characters that would let a URL break out of a Markdown link
+ * destination. A crafted address ending in a parenthesis could otherwise close the link
+ * early and turn the rest of itself into active Markdown, such as a remote image.
+ */
+export function escapeLinkDestination(url: string): string {
+    return url.replace(/[\\()<>]/g, char => `%${char.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')}`);
+}
+
 /** True when a page-specific URL returned only a brand name found in its hostname. */
 function isGenericSiteTitle(title: string, url: URL): boolean {
     if (url.pathname === '/' && !url.search && !url.hash) return false;
@@ -83,6 +98,30 @@ export class LinkTitleService {
         this.disposed = true;
     }
 
+    /**
+     * The Content-Length a HEAD request declares, or 0 when the server does not say.
+     * Failures count as 0 so a server without HEAD support still gets its GET.
+     */
+    private async declaredLength(url: string, timeoutMs: number): Promise<number> {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        try {
+            const response = await Promise.race([
+                this.requestPage({ url, method: 'HEAD', throw: false }),
+                new Promise<null>(resolve => {
+                    timer = window.setTimeout(() => resolve(null), timeoutMs);
+                })
+            ]);
+            if (!response || response.status < 200 || response.status >= 300) return 0;
+            const header = Object.entries(response.headers).find(([name]) => name.toLowerCase() === 'content-length')?.[1];
+            const length = Number(header ?? 0);
+            return Number.isFinite(length) && length > 0 ? length : 0;
+        } catch {
+            return 0;
+        } finally {
+            if (timer !== undefined) window.clearTimeout(timer);
+        }
+    }
+
     /** True when this paste is exactly one non-image web address and title fetching is on. */
     hasWork(text: string): boolean {
         if (this.disposed || !this.getSettings().linkTitles) return false;
@@ -100,6 +139,12 @@ export class LinkTitleService {
         let timer: ReturnType<typeof setTimeout> | undefined;
 
         try {
+            // requestUrl buffers the whole response and cannot stream or abort, so a page
+            // that declares an oversized body is refused before any of it is downloaded.
+            // A server that answers without a length is bounded only by the parse slice.
+            if ((await this.declaredLength(url, timeoutMs)) > MAX_PAGE_BYTES) return null;
+            if (this.disposed) return null;
+
             const response = await Promise.race([
                 this.requestPage({ url, method: 'GET', throw: false }),
                 new Promise<null>(resolve => {
@@ -113,8 +158,10 @@ export class LinkTitleService {
             const contentType = Object.entries(response.headers).find(([name]) => name.toLowerCase() === 'content-type')?.[1];
             if (contentType && !/^(?:text\/html|application\/xhtml\+xml)\b/i.test(contentType.trim())) return null;
 
-            const title = this.parseTitle(response.text);
-            return title && !isGenericSiteTitle(title, new URL(url)) ? `[${escapeLinkTitle(title)}](${url})` : null;
+            // The title lives in the head, so parsing stops after the first slice even
+            // when a server streams an enormous page
+            const title = this.parseTitle(response.text.slice(0, PARSE_SLICE_BYTES));
+            return title && !isGenericSiteTitle(title, new URL(url)) ? `[${escapeLinkTitle(title)}](${escapeLinkDestination(url)})` : null;
         } catch (error) {
             logWarning(`Failed to fetch the title for ${url}`, error);
             return null;
