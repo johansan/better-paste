@@ -45,31 +45,17 @@ describe('normalizeSettings', () => {
         expect(normalizeSettings({ imageClassOptions: '', imageClassChoice: 'ask' }).imageClassChoice).toBe('');
     });
 
-    it('converts terminal bullets to Markdown by default', () => {
-        expect(normalizeSettings({}).terminalBullets).toBe('markdown');
-    });
-
-    it('leaves comma placement unchanged by default', () => {
-        expect(normalizeSettings({}).textComma).toBe('none');
-    });
-
     it('keeps valid stored values', () => {
         const result = normalizeSettings({
             linkStrip: 'tracking',
             linkTitles: false,
-            terminalRejoin: 'any',
-            terminalBullets: 'preserve',
             imageNameFormat: 'custom',
-            imageNameTemplate: '{{name}}-YYYY-MM-DD',
-            textComma: 'inside'
+            imageNameTemplate: '{{name}}-YYYY-MM-DD'
         });
         expect(result.linkStrip).toBe('tracking');
         expect(result.linkTitles).toBe(false);
-        expect(result.terminalRejoin).toBe('any');
-        expect(result.terminalBullets).toBe('preserve');
         expect(result.imageNameFormat).toBe('custom');
         expect(result.imageNameTemplate).toBe('{{name}}-YYYY-MM-DD');
-        expect(result.textComma).toBe('inside');
     });
 
     it('replaces values of the wrong type', () => {
@@ -105,7 +91,6 @@ describe('normalizeSettings', () => {
     it('rejects an unknown enum value', () => {
         expect(normalizeSettings({ linkStrip: 'sometimes' }).linkStrip).toBe(DEFAULT_SETTINGS.linkStrip);
         expect(normalizeSettings({ imageNameFormat: 'fancy' }).imageNameFormat).toBe(DEFAULT_SETTINGS.imageNameFormat);
-        expect(normalizeSettings({ textComma: 'sometimes' }).textComma).toBe(DEFAULT_SETTINGS.textComma);
     });
 });
 
@@ -185,7 +170,7 @@ describe('isSingleImageFile', () => {
 });
 
 describe('runTextPipeline', () => {
-    it('cleans up terminal text and its URLs in one pass', () => {
+    it('cleans URLs without touching the line structure', () => {
         const input = [
             '\u2022 Read the announcement at https://support.claude.com/en/articles/16266773-how-claude-marks-ai?utm_source=news and then',
             '  decide whether the change matters for us.'
@@ -193,8 +178,13 @@ describe('runTextPipeline', () => {
 
         const result = runTextPipeline(input, DEFAULT_SETTINGS);
 
+        // Terminal rejoining and bullet conversion moved to commands, so the lines and
+        // the bullet stay as pasted while the URL still loses its tracking parameter
         expect(result.text).toBe(
-            '- Read the announcement at https://support.claude.com/en/articles/16266773-how-claude-marks-ai and then decide whether the change matters for us.'
+            [
+                '\u2022 Read the announcement at https://support.claude.com/en/articles/16266773-how-claude-marks-ai and then',
+                '  decide whether the change matters for us.'
+            ].join('\n')
         );
         expect(result.changed).toBe(true);
     });
@@ -224,40 +214,6 @@ describe('runTextPipeline', () => {
 
     it('leaves comma placement alone by default', () => {
         expect(runTextPipeline('He called it "finished," then left.', DEFAULT_SETTINGS).text).toBe('He called it "finished," then left.');
-    });
-
-    it('moves commas outside quotation marks when enabled', () => {
-        const settings = { ...DEFAULT_SETTINGS, textComma: 'outside' as const };
-        const result = runTextPipeline('He called it "finished," then left.', settings);
-
-        expect(result.text).toBe('He called it "finished", then left.');
-    });
-
-    it('moves commas inside quotation marks when selected', () => {
-        const settings = { ...DEFAULT_SETTINGS, textComma: 'inside' as const };
-        expect(runTextPipeline('He called it "finished", then left.', settings).text).toBe('He called it "finished," then left.');
-    });
-
-    it('replaces dashes after the terminal rule, not before it', () => {
-        // A hyphen is a list marker. Converting the dash first would make the terminal rule
-        // read this as a bullet, refuse to rejoin the paragraph, and render it as a list.
-        const input = [
-            '\u2014 he said, in a line that runs comfortably past the wrap column of this terminal window',
-            '  and then continued on the following line.'
-        ].join('\n');
-
-        expect(runTextPipeline(input, DEFAULT_SETTINGS).text).toBe(
-            '\\- he said, in a line that runs comfortably past the wrap column of this terminal window and then continued on the following line.'
-        );
-    });
-
-    it('strips a no-break space before the terminal rule needs to see whitespace', () => {
-        const input = ['A line long enough to reach the wrap column of a fairly ordinary terminal window', '\u00A0 continued here.'].join(
-            '\n'
-        );
-        expect(runTextPipeline(input, DEFAULT_SETTINGS).text).toBe(
-            'A line long enough to reach the wrap column of a fairly ordinary terminal window continued here.'
-        );
     });
 
     it('trims blank space from the ends of the paste', () => {

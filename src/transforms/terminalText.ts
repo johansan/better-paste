@@ -20,10 +20,14 @@ import { stripAnsi } from './ansi';
 import { frontmatterRanges } from './typography';
 import { markdownCodeRanges, overlapsRange } from './markdownRanges';
 import { LIST_MARKERS, MIN_WRAP_WIDTH, WRAP_TOLERANCE } from '../settings/constants';
-import type { BetterPasteSettings } from '../settings/types';
 
-/** Subset of settings this rule reads, so tests can build one without a full settings object. */
-export type TerminalCleanupOptions = Pick<BetterPasteSettings, 'terminalRejoin' | 'terminalBullets'>;
+/** How the cleanup treats line breaks and bullet characters. */
+export interface TerminalCleanupOptions {
+    /** 'indented' joins a line only when it is indented further than the paragraph start. */
+    terminalRejoin: 'indented' | 'any' | 'never';
+    /** 'markdown' rewrites bullets such as \u2022 into Markdown list items. */
+    terminalBullets: 'preserve' | 'markdown';
+}
 
 /** Markdown constructs that always begin their own block and never continue the previous paragraph. */
 const NUMBERED_LIST = /^\s*\d{1,9}[.)]\s/;

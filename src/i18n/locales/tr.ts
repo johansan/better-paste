@@ -24,6 +24,9 @@ export const STRINGS_TR: TranslationStrings = {
         paste: 'Yapıştır',
         pasteRaw: 'İşlemeden yapıştır',
         cleanSelection: 'Seçimi temizle',
+        cleanTerminal: 'Se\u00E7imdeki terminal \u00E7\u0131kt\u0131s\u0131n\u0131 temizle',
+        commasInside: 'Virg\u00FClleri t\u0131rnak i\u00E7ine ta\u015F\u0131',
+        commasOutside: 'Virg\u00FClleri t\u0131rnak d\u0131\u015F\u0131na ta\u015F\u0131',
         toggleCleanup: 'Otomatik temizlemeyi aç veya kapat'
     },
 
@@ -144,48 +147,11 @@ export const STRINGS_TR: TranslationStrings = {
             testerEmpty: 'Temizlenmiş bağlantı burada görünür.'
         },
 
-        terminal: {
-            heading: 'Uçbirim metni',
-            cleanupName: 'Uçbirim çıktısını temizle',
-            cleanupDesc:
-                'Uçbirimin böldüğü satırları yeniden birleştirir, renk kodlarını ve baştaki girintiyi kaldırır. Kod blokları, tablolar ve listeler olduğu gibi kalır.',
-            cleanupAliases: ['satır kaydırma', 'birleştir', 'ansi', 'konsol', 'kabuk', 'girinti', 'madde imi', 'liste', 'markdown'],
-            pageName: 'Uçbirim metni işleme',
-            pageDesc: 'Satır birleştirme ve madde imi karakterleri.',
-            rejoinName: 'Bölünmüş satır ne zaman birleştirilsin',
-            rejoinDesc: 'Bir satır, yalnızca üstündeki satır dolu göründüğünde ona eklenir.',
-            rejoinAliases: ['girinti', 'satır kaydırma', 'agresif', 'güvenli', 'git log'],
-            rejoinIndented: 'Yalnızca satır girintiliyse',
-            rejoinAny: 'Satır girintili olsun ya da olmasın',
-            rejoinNever: 'Asla, yalnızca kodları ve girintiyi kaldır',
-            bulletsName: 'Madde imi karakterleri',
-            bulletsDesc: 'Uçbirim çıktısındaki • gibi madde imi karakterleriyle ne yapılacağı.',
-            bulletsAliases: ['liste', 'markdown', 'tire'],
-            bulletsMarkdown: 'Markdown liste öğelerine dönüştür',
-            bulletsPreserve: 'Olduğu gibi bırak',
-            testerName: 'Deneyin',
-            testerDesc: 'Nasıl temizlendiğini görmek için uçbirim çıktısı yapıştırın.',
-            testerLabel: 'Temizlenecek uçbirim metni',
-            testerEmpty: 'Temizlenmiş metin burada görünür.',
-            testerSample: [
-                '• Ek adım yalnızca listenin Enter işleyicisiyle sınırlı, bu yüzden asıl değişiklik sade kalıyor. Komşu akışları izlerken bulduğum',
-                '  doğrulanmaya değer iki sürtünme noktası var: yenilemeden sonra seçim yerinden oynayabilir.'
-            ]
-        },
-
         text: {
             heading: 'Metin işleme',
             trimName: 'Çevredeki boşlukları kırp',
             trimDesc: 'Yapıştırılan metnin başındaki ve sonundaki boş satırları ve boşlukları kaldırır.',
             trimAliases: ['boşluk', 'boş satır', 'yeni satır', 'kırp'],
-            commasName: 'Virgüller',
-            commasDesc: 'Kapanan çift tırnağın yanındaki virgülün yeri.',
-            commasAliases: ['virgül', 'tırnak', 'alıntı', 'noktalama', 'biçem'],
-            commasNone: 'Değişiklik yok',
-            commasInside: 'Virgül tırnağın içinde',
-            commasOutside: 'Virgül tırnağın dışında',
-            commasExampleSource: 'Ona "bitti," dedi ve gitti.',
-            commasExampleOutside: 'Ona "bitti", dedi ve gitti.',
             invisibleName: 'Görünmez karakterler',
             invisibleDesc: 'Sıfır genişlikli boşlukları kaldırır ve bölünmez boşlukları normal boşluğa çevirir.',
             invisibleAliases: ['yapay zeka', 'chatgpt', 'claude', 'llm', 'unicode', 'görünmez', 'nbsp', 'boşluk'],

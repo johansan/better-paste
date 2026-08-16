@@ -24,6 +24,9 @@ export const STRINGS_ID: TranslationStrings = {
         paste: 'Tempel',
         pasteRaw: 'Tempel tanpa pemrosesan',
         cleanSelection: 'Bersihkan pilihan',
+        cleanTerminal: 'Bersihkan keluaran terminal pada seleksi',
+        commasInside: 'Pindahkan koma ke dalam tanda kutip',
+        commasOutside: 'Pindahkan koma ke luar tanda kutip',
         toggleCleanup: 'Alihkan pembersihan otomatis'
     },
 
@@ -141,48 +144,11 @@ export const STRINGS_ID: TranslationStrings = {
             testerEmpty: 'Tautan yang sudah dibersihkan muncul di sini.'
         },
 
-        terminal: {
-            heading: 'Teks terminal',
-            cleanupName: 'Bersihkan keluaran terminal',
-            cleanupDesc:
-                'Menyambung kembali baris yang dipotong terminal serta menghapus kode warna dan indentasi awal. Blok kode, tabel, dan daftar tidak disentuh.',
-            cleanupAliases: ['pemenggalan baris', 'sambung', 'ansi', 'konsol', 'shell', 'indentasi', 'butir', 'daftar', 'markdown'],
-            pageName: 'Penanganan teks terminal',
-            pageDesc: 'Penyambungan baris dan karakter butir.',
-            rejoinName: 'Kapan baris terpotong disambung kembali',
-            rejoinDesc: 'Sebuah baris hanya disambung ke baris di atasnya bila baris itu tampak penuh.',
-            rejoinAliases: ['indentasi', 'pemenggalan baris', 'agresif', 'aman', 'git log'],
-            rejoinIndented: 'Hanya bila baris berindentasi',
-            rejoinAny: 'Berindentasi atau tidak',
-            rejoinNever: 'Jangan pernah, hanya buang kode dan indentasi',
-            bulletsName: 'Karakter butir',
-            bulletsDesc: 'Apa yang dilakukan pada karakter butir seperti • di keluaran terminal.',
-            bulletsAliases: ['daftar', 'markdown', 'tanda hubung'],
-            bulletsMarkdown: 'Ubah menjadi butir daftar Markdown',
-            bulletsPreserve: 'Biarkan apa adanya',
-            testerName: 'Coba',
-            testerDesc: 'Tempel keluaran terminal untuk melihat bagaimana hasil pembersihannya.',
-            testerLabel: 'Teks terminal yang akan dibersihkan',
-            testerEmpty: 'Teks yang sudah dibersihkan muncul di sini.',
-            testerSample: [
-                '• Langkah tambahan ini terbatas pada penanganan Enter di daftar, jadi perubahan intinya sederhana. Saat menelusuri alur di sekitarnya saya menemukan',
-                '  dua titik gesekan yang layak diperiksa: pilihan bisa melompat setelah penyegaran.'
-            ]
-        },
-
         text: {
             heading: 'Pemrosesan teks',
             trimName: 'Pangkas spasi di sekelilingnya',
             trimDesc: 'Menghapus baris kosong dan spasi di awal dan akhir teks yang ditempel.',
             trimAliases: ['spasi', 'baris kosong', 'baris baru', 'pangkas'],
-            commasName: 'Koma',
-            commasDesc: 'Di mana koma diletakkan di sebelah tanda kutip ganda penutup.',
-            commasAliases: ['koma', 'tanda kutip', 'kutipan', 'tanda baca', 'gaya'],
-            commasNone: 'Tanpa perubahan',
-            commasInside: 'Koma di dalam tanda kutip',
-            commasOutside: 'Koma di luar tanda kutip',
-            commasExampleSource: 'Dia menyebutnya "selesai," lalu pergi.',
-            commasExampleOutside: 'Dia menyebutnya "selesai", lalu pergi.',
             invisibleName: 'Karakter tak terlihat',
             invisibleDesc: 'Menghapus spasi lebar nol dan mengubah spasi tanpa pemenggalan menjadi spasi biasa.',
             invisibleAliases: ['ai', 'chatgpt', 'claude', 'llm', 'unicode', 'tak terlihat', 'nbsp', 'spasi'],

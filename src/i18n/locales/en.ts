@@ -38,6 +38,9 @@ export const STRINGS_EN = {
         paste: 'Paste',
         pasteRaw: 'Paste without processing',
         cleanSelection: 'Clean up selection',
+        cleanTerminal: 'Clean up terminal output in selection',
+        commasInside: 'Move commas inside quotes',
+        commasOutside: 'Move commas outside quotes',
         toggleCleanup: 'Toggle automatic cleanup'
     },
 
@@ -169,37 +172,6 @@ export const STRINGS_EN = {
             testerEmpty: 'The cleaned link appears here.'
         },
 
-        terminal: {
-            heading: 'Terminal text',
-            cleanupName: 'Clean up terminal output',
-            cleanupDesc:
-                'Rejoins lines that the terminal wrapped, and removes color codes and leading indentation. Code fences, tables and lists are left alone.',
-            cleanupAliases: ['wrap', 'unwrap', 'rejoin', 'ansi', 'console', 'shell', 'indent', 'bullet', 'list', 'markdown'],
-            pageName: 'Terminal text handling',
-            pageDesc: 'Line rejoining and bullet characters.',
-            rejoinName: 'When to rejoin a broken line',
-            rejoinDesc: 'A line is joined to the one above only when that line looks full.',
-            rejoinAliases: ['indent', 'wrap', 'aggressive', 'safe', 'git log'],
-            rejoinIndented: 'Only when the line is indented',
-            rejoinAny: 'Whether or not the line is indented',
-            rejoinNever: 'Never, only remove codes and indentation',
-            bulletsName: 'Bullet characters',
-            bulletsDesc: 'What to do with bullet characters such as • in terminal output.',
-            bulletsAliases: ['list', 'markdown', 'dash'],
-            bulletsMarkdown: 'Convert to Markdown list items',
-            bulletsPreserve: 'Leave them as they are',
-            testerName: 'Try it',
-            testerDesc: 'Paste terminal output to see how it is cleaned up.',
-            testerLabel: 'Terminal text to clean',
-            testerEmpty: 'The cleaned text appears here.',
-            // The two lines of the sample are a wrapped sentence, so the second has to read
-            // as the continuation of the first for the preview to show anything
-            testerSample: [
-                '• The extra step is isolated to the list Enter handler, so the core change is straightforward. While tracing adjacent flows, I found',
-                '  two likely friction points worth validating: selection can jump after the refresh.'
-            ]
-        },
-
         text: {
             heading: 'Text processing',
             trimName: 'Trim surrounding whitespace',
@@ -231,17 +203,7 @@ export const STRINGS_EN = {
             dashesName: 'Dashes',
             dashesDesc: 'Converts en and em dashes into hyphens.',
             dashesAliases: ['dash', 'em dash', 'en dash', 'hyphen', 'punctuation', 'typography', 'ai'],
-            dashesExample: 'The result — against all odds — was fine.',
-            commasName: 'Commas',
-            commasDesc: 'Where a comma goes next to a closing double quotation mark.',
-            commasAliases: ['comma', 'quote', 'quotation', 'punctuation', 'style'],
-            commasNone: 'No change',
-            commasInside: 'Comma inside quotes',
-            commasOutside: 'Comma outside quotes',
-            // The two halves of the comma example. The source has the comma inside the
-            // closing quotation mark, so only the outside setting changes it.
-            commasExampleSource: 'He called it "finished," then left.',
-            commasExampleOutside: 'He called it "finished", then left.'
+            dashesExample: 'The result — against all odds — was fine.'
         }
     },
 

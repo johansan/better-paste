@@ -24,6 +24,9 @@ export const STRINGS_PL: TranslationStrings = {
         paste: 'Wklej',
         pasteRaw: 'Wklej bez przetwarzania',
         cleanSelection: 'Wyczyść zaznaczenie',
+        cleanTerminal: 'Wyczy\u015B\u0107 tekst z terminala w zaznaczeniu',
+        commasInside: 'Przenie\u015B przecinki do wn\u0119trza cudzys\u0142ow\u00F3w',
+        commasOutside: 'Przenie\u015B przecinki poza cudzys\u0142owy',
         toggleCleanup: 'Przełącz automatyczne czyszczenie'
     },
 
@@ -156,48 +159,11 @@ export const STRINGS_PL: TranslationStrings = {
             testerEmpty: 'Wyczyszczony odnośnik pojawi się tutaj.'
         },
 
-        terminal: {
-            heading: 'Tekst terminala',
-            cleanupName: 'Czyść wynik terminala',
-            cleanupDesc:
-                'Ponownie łączy wiersze zawinięte przez terminal oraz usuwa kody kolorów i początkowe wcięcia. Bloki kodu, tabele i listy pozostają nietknięte.',
-            cleanupAliases: ['zawijanie', 'łączenie', 'ansi', 'konsola', 'powłoka', 'wcięcie', 'punktor', 'lista', 'markdown'],
-            pageName: 'Obsługa tekstu terminala',
-            pageDesc: 'Łączenie wierszy i znaki punktorów.',
-            rejoinName: 'Kiedy łączyć przerwany wiersz',
-            rejoinDesc: 'Wiersz jest dołączany do poprzedniego tylko wtedy, gdy tamten wygląda na pełny.',
-            rejoinAliases: ['wcięcie', 'zawijanie', 'agresywnie', 'bezpiecznie', 'git log'],
-            rejoinIndented: 'Tylko gdy wiersz ma wcięcie',
-            rejoinAny: 'Niezależnie od wcięcia',
-            rejoinNever: 'Nigdy, usuwaj tylko kody i wcięcia',
-            bulletsName: 'Znaki punktorów',
-            bulletsDesc: 'Co robić ze znakami punktorów, takimi jak •, w wyniku terminala.',
-            bulletsAliases: ['lista', 'markdown', 'myślnik'],
-            bulletsMarkdown: 'Zamień na elementy listy Markdown',
-            bulletsPreserve: 'Zostaw bez zmian',
-            testerName: 'Wypróbuj',
-            testerDesc: 'Wklej wynik terminala, aby zobaczyć, jak zostaje wyczyszczony.',
-            testerLabel: 'Tekst terminala do wyczyszczenia',
-            testerEmpty: 'Wyczyszczony tekst pojawi się tutaj.',
-            testerSample: [
-                '• Dodatkowy krok dotyczy wyłącznie obsługi Enter na liście, więc główna zmiana jest prosta. Przeglądając sąsiednie przepływy, znalazłem',
-                '  dwa prawdopodobne punkty tarcia warte sprawdzenia: zaznaczenie może przeskoczyć po odświeżeniu.'
-            ]
-        },
-
         text: {
             heading: 'Przetwarzanie tekstu',
             trimName: 'Usuwaj otaczające odstępy',
             trimDesc: 'Usuwa puste wiersze i spacje z początku i końca wklejanego tekstu.',
             trimAliases: ['odstęp', 'pusty wiersz', 'spacja', 'nowy wiersz', 'przycinanie'],
-            commasName: 'Przecinki',
-            commasDesc: 'Gdzie stoi przecinek obok zamykającego cudzysłowu.',
-            commasAliases: ['przecinek', 'cudzysłów', 'cytat', 'interpunkcja', 'styl'],
-            commasNone: 'Bez zmian',
-            commasInside: 'Przecinek wewnątrz cudzysłowu',
-            commasOutside: 'Przecinek poza cudzysłowem',
-            commasExampleSource: 'Nazwał to "skończonym," po czym wyszedł.',
-            commasExampleOutside: 'Nazwał to "skończonym", po czym wyszedł.',
             invisibleName: 'Niewidoczne znaki',
             invisibleDesc: 'Usuwa spacje o zerowej szerokości i zamienia spacje nierozdzielające na zwykłe.',
             invisibleAliases: ['si', 'ai', 'chatgpt', 'claude', 'llm', 'unicode', 'niewidoczne', 'nbsp', 'odstęp'],

@@ -42,12 +42,7 @@ export const DEFAULT_SETTINGS: BetterPasteSettings = {
     // Empty means "use the shipped rules unchanged"; entries here are merged over them
     linkRules: [],
 
-    terminalEnabled: true,
-    terminalRejoin: 'indented',
-    terminalBullets: 'markdown',
-
     textTrim: true,
-    textComma: 'none',
     textInvisible: true,
     textQuotes: true,
     textDashes: true,

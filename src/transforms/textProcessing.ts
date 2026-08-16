@@ -18,7 +18,9 @@
 
 import { markdownCodeRanges, overlapsRange } from './markdownRanges';
 import { markdownSyntaxRanges } from './typography';
-import type { TextCommaPlacement } from '../settings/types';
+
+/** Placement of a comma next to a closing double quotation mark. */
+export type TextCommaPlacement = 'inside' | 'outside';
 
 export interface TextProcessingResult {
     text: string;
@@ -27,8 +29,6 @@ export interface TextProcessingResult {
 
 /** Places commas consistently next to closing straight or curly double quotes. */
 export function applyCommaPlacement(input: string, placement: TextCommaPlacement): TextProcessingResult {
-    if (placement === 'none') return { text: input, changed: false };
-
     // A comma next to a quote inside frontmatter, a wikilink or other syntax is data
     // punctuation, not prose style
     const protectedRanges = [...markdownCodeRanges(input), ...markdownSyntaxRanges(input)];

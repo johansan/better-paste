@@ -20,7 +20,6 @@ import { describe, expect, it } from 'vitest';
 import { aliases, format, LOCALES, plural, strings } from '../src/i18n';
 import { STRINGS_EN } from '../src/i18n/locales/en';
 import { normalizeInvisibleCharacters, straightenDashes, straightenQuotes } from '../src/transforms/typography';
-import { applyCommaPlacement } from '../src/transforms/textProcessing';
 
 /** The two invisible characters the invisible-characters example puts between its fragments. */
 const NO_BREAK_SPACE = '\u00A0';
@@ -162,14 +161,6 @@ describe('translations', () => {
                 expect(format(forms[category], { count }), `${path} drops the number for ${count}`).toContain(String(count));
             }
         });
-    });
-
-    it.each(Object.entries(LOCALES))('%s writes a comma example the rule really produces', (_code, locale) => {
-        const source = locale.strings.settings.text.commasExampleSource;
-
-        expect(applyCommaPlacement(source, 'outside').text).toBe(locale.strings.settings.text.commasExampleOutside);
-        // The comma already sits inside the quotation mark, so this setting leaves it alone
-        expect(applyCommaPlacement(source, 'inside').text).toBe(source);
     });
 
     it.each(Object.entries(LOCALES))('%s writes text cleanup examples the rules really produce', (_code, locale) => {

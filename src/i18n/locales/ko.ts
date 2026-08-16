@@ -24,6 +24,9 @@ export const STRINGS_KO: TranslationStrings = {
         paste: '붙여넣기',
         pasteRaw: '처리 없이 붙여넣기',
         cleanSelection: '선택 영역 정리',
+        cleanTerminal: '\uC120\uD0DD \uC601\uC5ED\uC758 \uD130\uBBF8\uB110 \uCD9C\uB825 \uC815\uB9AC',
+        commasInside: '\uC27C\uD45C\uB97C \uB530\uC634\uD45C \uC548\uC73C\uB85C \uC774\uB3D9',
+        commasOutside: '\uC27C\uD45C\uB97C \uB530\uC634\uD45C \uBC16\uC73C\uB85C \uC774\uB3D9',
         toggleCleanup: '자동 정리 전환'
     },
 
@@ -140,47 +143,11 @@ export const STRINGS_KO: TranslationStrings = {
             testerEmpty: '정리된 링크가 여기에 표시됩니다.'
         },
 
-        terminal: {
-            heading: '터미널 텍스트',
-            cleanupName: '터미널 출력 정리',
-            cleanupDesc: '터미널이 줄바꿈한 행을 다시 잇고 색상 코드와 앞쪽 들여쓰기를 없앱니다. 코드 블록, 표, 목록은 그대로 둡니다.',
-            cleanupAliases: ['줄바꿈', '잇기', 'ansi', '콘솔', '셸', '들여쓰기', '글머리 기호', '목록', 'markdown'],
-            pageName: '터미널 텍스트 처리',
-            pageDesc: '줄 잇기와 글머리 기호 문자.',
-            rejoinName: '끊어진 줄을 다시 잇는 시점',
-            rejoinDesc: '윗줄이 가득 차 보일 때만 그 줄에 이어 붙입니다.',
-            rejoinAliases: ['들여쓰기', '줄바꿈', '적극적', '안전', 'git log'],
-            rejoinIndented: '그 줄이 들여쓰기된 경우에만',
-            rejoinAny: '들여쓰기 여부와 상관없이',
-            rejoinNever: '절대 잇지 않고 코드와 들여쓰기만 제거',
-            bulletsName: '글머리 기호 문자',
-            bulletsDesc: '터미널 출력의 • 같은 글머리 기호를 어떻게 처리할지.',
-            bulletsAliases: ['목록', 'markdown', '대시'],
-            bulletsMarkdown: 'Markdown 목록 항목으로 변환',
-            bulletsPreserve: '그대로 두기',
-            testerName: '시험해 보기',
-            testerDesc: '터미널 출력을 붙여넣어 어떻게 정리되는지 확인하세요.',
-            testerLabel: '정리할 터미널 텍스트',
-            testerEmpty: '정리된 텍스트가 여기에 표시됩니다.',
-            testerSample: [
-                '• 추가 단계는 목록의 Enter 처리기에만 한정되므로 핵심 변경은 간단합니다. 인접한 흐름을 따라가다가 찾은 것은',
-                '  확인해 볼 만한 마찰 지점 두 곳으로, 새로 고침 뒤 선택이 튈 수 있습니다.'
-            ]
-        },
-
         text: {
             heading: '텍스트 처리',
             trimName: '앞뒤 공백 제거',
             trimDesc: '붙여넣은 텍스트의 처음과 끝에서 빈 줄과 공백을 제거합니다.',
             trimAliases: ['공백', '빈 줄', '스페이스', '줄바꿈', '다듬기'],
-            commasName: '쉼표',
-            commasDesc: '닫는 큰따옴표 옆에 쉼표를 두는 위치.',
-            commasAliases: ['쉼표', '따옴표', '인용', '문장 부호', '스타일'],
-            commasNone: '변경 없음',
-            commasInside: '쉼표를 따옴표 안쪽에',
-            commasOutside: '쉼표를 따옴표 바깥쪽에',
-            commasExampleSource: '상태는 "완료," 다음은 "대기"였다.',
-            commasExampleOutside: '상태는 "완료", 다음은 "대기"였다.',
             invisibleName: '보이지 않는 문자',
             invisibleDesc: '너비가 0인 공백을 제거하고 줄바꿈 없는 공백을 일반 공백으로 바꿉니다.',
             invisibleAliases: ['ai', 'chatgpt', 'claude', 'llm', '유니코드', '보이지 않는', 'nbsp', '공백'],

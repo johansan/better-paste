@@ -24,6 +24,9 @@ export const STRINGS_PT_BR: TranslationStrings = {
         paste: 'Colar',
         pasteRaw: 'Colar sem processamento',
         cleanSelection: 'Limpar a seleção',
+        cleanTerminal: 'Limpar sa\u00EDda de terminal na sele\u00E7\u00E3o',
+        commasInside: 'Colocar v\u00EDrgulas dentro das aspas',
+        commasOutside: 'Colocar v\u00EDrgulas fora das aspas',
         toggleCleanup: 'Alternar a limpeza automática'
     },
 
@@ -144,48 +147,11 @@ export const STRINGS_PT_BR: TranslationStrings = {
             testerEmpty: 'O link limpo aparece aqui.'
         },
 
-        terminal: {
-            heading: 'Texto do terminal',
-            cleanupName: 'Limpar a saída do terminal',
-            cleanupDesc:
-                'Junta de novo as linhas que o terminal quebrou e remove os códigos de cor e a indentação inicial. Blocos de código, tabelas e listas ficam intactos.',
-            cleanupAliases: ['quebra de linha', 'juntar', 'ansi', 'console', 'shell', 'indentação', 'marcador', 'lista', 'markdown'],
-            pageName: 'Tratamento do texto do terminal',
-            pageDesc: 'Junção de linhas e caracteres de marcador.',
-            rejoinName: 'Quando juntar uma linha quebrada',
-            rejoinDesc: 'Uma linha só é juntada à de cima quando essa linha parece cheia.',
-            rejoinAliases: ['indentação', 'quebra de linha', 'agressivo', 'seguro', 'git log'],
-            rejoinIndented: 'Somente quando a linha está indentada',
-            rejoinAny: 'Esteja indentada ou não',
-            rejoinNever: 'Nunca, apenas retirar códigos e indentação',
-            bulletsName: 'Caracteres de marcador',
-            bulletsDesc: 'O que fazer com os caracteres de marcador como • na saída do terminal.',
-            bulletsAliases: ['lista', 'markdown', 'traço'],
-            bulletsMarkdown: 'Converter em itens de lista Markdown',
-            bulletsPreserve: 'Deixar como estão',
-            testerName: 'Experimente',
-            testerDesc: 'Cole uma saída de terminal para ver como ela fica limpa.',
-            testerLabel: 'Texto do terminal a limpar',
-            testerEmpty: 'O texto limpo aparece aqui.',
-            testerSample: [
-                '• O passo extra está isolado no tratador do Enter da lista, então a mudança principal é simples. Ao percorrer fluxos vizinhos, encontrei',
-                '  dois prováveis pontos de atrito que vale a pena validar: a seleção pode saltar após a atualização.'
-            ]
-        },
-
         text: {
             heading: 'Processamento de texto',
             trimName: 'Remover os espaços ao redor',
             trimDesc: 'Remove linhas em branco e espaços do início e do fim do texto colado.',
             trimAliases: ['espaço', 'linha em branco', 'nova linha', 'aparar'],
-            commasName: 'Vírgulas',
-            commasDesc: 'Onde fica a vírgula ao lado de uma aspa dupla de fechamento.',
-            commasAliases: ['vírgula', 'aspas', 'citação', 'pontuação', 'estilo'],
-            commasNone: 'Sem alteração',
-            commasInside: 'Vírgula dentro das aspas',
-            commasOutside: 'Vírgula fora das aspas',
-            commasExampleSource: 'Ele o chamou de "pronto," depois foi embora.',
-            commasExampleOutside: 'Ele o chamou de "pronto", depois foi embora.',
             invisibleName: 'Caracteres invisíveis',
             invisibleDesc: 'Remove os espaços de largura zero e transforma os espaços inquebráveis em espaços normais.',
             invisibleAliases: ['ia', 'chatgpt', 'claude', 'llm', 'unicode', 'invisível', 'nbsp', 'espaço'],

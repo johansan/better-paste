@@ -157,15 +157,7 @@ describe('settings tree', () => {
             .getSettingDefinitions()
             .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
 
-        expect(groups.map(group => group.heading)).toEqual([
-            undefined,
-            'Images',
-            'Links',
-            'Terminal text',
-            'Text processing',
-            'Frontmatter',
-            'About'
-        ]);
+        expect(groups.map(group => group.heading)).toEqual([undefined, 'Images', 'Links', 'Text processing', 'Frontmatter', 'About']);
     });
 
     it('puts both per-note property names under Frontmatter', () => {
@@ -190,19 +182,12 @@ describe('settings tree', () => {
         const names = flatten([...(textProcessing?.items ?? [])]).map(row => row.name);
 
         expect(flatten([...(behavior?.items ?? [])]).map(row => row.name)).not.toContain('Trim surrounding whitespace');
-        expect(names).toEqual(['Trim surrounding whitespace', 'Invisible characters', 'Quotes', 'Dashes', 'Commas']);
+        expect(names).toEqual(['Trim surrounding whitespace', 'Invisible characters', 'Quotes', 'Dashes']);
     });
 
     it('puts title fetching above link cleaning', () => {
         const names = flatten(tab.getSettingDefinitions()).map(row => row.name);
         expect(names.indexOf('Fetch titles for pasted links')).toBeLessThan(names.indexOf('Clean pasted links'));
-    });
-
-    it('puts Markdown conversion first in the bullet dropdown', () => {
-        const row = controlRows(tab).find(candidate => candidate.control.key === 'terminalBullets');
-        expect(row?.control.type).toBe('dropdown');
-        if (row?.control.type !== 'dropdown') throw new Error('Bullet characters is not a dropdown');
-        expect(Object.keys(row.control.options)[0]).toBe('markdown');
     });
 
     it('offers source and custom image filename formats', () => {
@@ -212,37 +197,11 @@ describe('settings tree', () => {
         expect(row.control.options).toEqual({ source: 'Name from source', custom: 'Custom format' });
     });
 
-    it('offers all comma placement choices', () => {
-        const row = controlRows(tab).find(candidate => candidate.control.key === 'textComma');
-        expect(row?.control.type).toBe('dropdown');
-        if (row?.control.type !== 'dropdown') throw new Error('Commas is not a dropdown');
-        expect(row.control.options).toEqual({
-            none: 'No change',
-            inside: 'Comma inside quotes',
-            outside: 'Comma outside quotes'
-        });
-    });
-
     it('offers quotes and dashes as plain toggles', () => {
         const quotesRow = controlRows(tab).find(candidate => candidate.control.key === 'textQuotes');
         const dashesRow = controlRows(tab).find(candidate => candidate.control.key === 'textDashes');
         expect(quotesRow?.control.type).toBe('toggle');
         expect(dashesRow?.control.type).toBe('toggle');
-    });
-
-    it('updates the comma example for the selected placement', () => {
-        const descriptionFor = (placement: BetterPasteSettings['textComma']): string => {
-            const row = flatten(makeTab(fakePlugin({ textComma: placement })).getSettingDefinitions()).find(
-                candidate => candidate.name === 'Commas'
-            );
-            if (typeof row?.desc !== 'string') throw new Error('Commas has no text fallback');
-            return row.desc;
-        };
-
-        const source = 'He called it "finished," then left.';
-        expect(descriptionFor('none')).toContain(`${source} \u2192 ${source}`);
-        expect(descriptionFor('inside')).toContain(`${source} \u2192 ${source}`);
-        expect(descriptionFor('outside')).toContain(`${source} \u2192 He called it "finished", then left.`);
     });
 
     it('shows an example for each character cleanup setting', () => {
@@ -262,7 +221,7 @@ describe('settings tree', () => {
 
     it('puts the detail on sub-pages, declared so search can still reach it', () => {
         const found = pages(tab.getSettingDefinitions());
-        expect(found.map(page => page.name)).toEqual(['Site rules', 'Terminal text handling']);
+        expect(found.map(page => page.name)).toEqual(['Site rules']);
         // `items` keeps a page in the searchable tree; the imperative `page` form does not
         for (const page of found) {
             expect(page.items, `"${page.name}" has no items`).toBeDefined();
@@ -279,7 +238,7 @@ describe('settings tree', () => {
 
     it('gives every master toggle search terms for what it hides', () => {
         // A rule that is off hides its own settings, and a hidden row is dropped from search
-        const masters = ['imageEnabled', 'linkEnabled', 'terminalEnabled', 'textInvisible'];
+        const masters = ['imageEnabled', 'linkEnabled', 'textInvisible'];
         for (const key of masters) {
             const row = controlRows(tab).find(candidate => candidate.control.key === key);
             expect(row?.aliases?.length, `"${key}" has no aliases`).toBeGreaterThan(0);
@@ -297,8 +256,8 @@ describe('settings values', () => {
     });
 
     it('writes a plain setting through and persists it', async () => {
-        await tab.setControlValue('terminalRejoin', 'any');
-        expect(plugin.settings.terminalRejoin).toBe('any');
+        await tab.setControlValue('linkStrip', 'tracking');
+        expect(plugin.settings.linkStrip).toBe('tracking');
         expect(plugin.saveCount()).toBe(1);
     });
 
@@ -393,11 +352,6 @@ describe('dependent settings', () => {
         expect(isVisible(pageFor('Site rules', { linkEnabled: false }))).toBe(false);
     });
 
-    it('hides the terminal page when the rule is off', () => {
-        expect(isVisible(pageFor('Terminal text handling', { terminalEnabled: false }))).toBe(false);
-        expect(isVisible(pageFor('Terminal text handling', { terminalEnabled: true }))).toBe(true);
-    });
-
     it('keeps the quote and dash choices independent of invisible characters', () => {
         expect(isVisible(rowFor('textQuotes', { textInvisible: false }))).toBeUndefined();
         expect(isVisible(rowFor('textDashes', { textInvisible: false }))).toBeUndefined();
@@ -408,25 +362,5 @@ describe('dependent settings', () => {
         const before = (tab as unknown as { refreshCount: number }).refreshCount;
         await tab.setControlValue('imageEnabled', false);
         expect((tab as unknown as { refreshCount: number }).refreshCount).toBe(before + 1);
-    });
-
-    it('updates the rendered comma example after its selection changes', async () => {
-        const tab = makeTab(fakePlugin());
-        const rendered: string[] = [];
-        Object.assign(tab, {
-            containerEl: {
-                querySelectorAll: () => [{ setText: (value: string) => rendered.push(value) }]
-            }
-        });
-
-        await tab.setControlValue('textComma', 'outside');
-        expect(rendered).toEqual(['He called it "finished," then left. \u2192 He called it "finished", then left.']);
-    });
-
-    it('does not rebuild the terminal tester when its mode changes', async () => {
-        const tab = makeTab(fakePlugin());
-        const before = (tab as unknown as { updateCount: number }).updateCount;
-        await tab.setControlValue('terminalRejoin', 'any');
-        expect((tab as unknown as { updateCount: number }).updateCount).toBe(before);
     });
 });

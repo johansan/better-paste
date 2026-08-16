@@ -24,6 +24,9 @@ export const STRINGS_IT: TranslationStrings = {
         paste: 'Incolla',
         pasteRaw: 'Incolla senza elaborazione',
         cleanSelection: 'Pulisci la selezione',
+        cleanTerminal: 'Pulisci l\u2019output del terminale nella selezione',
+        commasInside: 'Sposta le virgole dentro le virgolette',
+        commasOutside: 'Sposta le virgole fuori dalle virgolette',
         toggleCleanup: 'Attiva o disattiva la pulizia automatica'
     },
 
@@ -144,48 +147,11 @@ export const STRINGS_IT: TranslationStrings = {
             testerEmpty: 'Il collegamento pulito compare qui.'
         },
 
-        terminal: {
-            heading: 'Testo del terminale',
-            cleanupName: 'Pulisci l’output del terminale',
-            cleanupDesc:
-                'Riunisce le righe spezzate dal terminale e rimuove i codici colore e il rientro iniziale. Blocchi di codice, tabelle ed elenchi restano intatti.',
-            cleanupAliases: ['a capo', 'riunisci', 'ansi', 'console', 'shell', 'rientro', 'punto elenco', 'elenco', 'markdown'],
-            pageName: 'Gestione del testo del terminale',
-            pageDesc: 'Riunione delle righe e caratteri dei punti elenco.',
-            rejoinName: 'Quando riunire una riga spezzata',
-            rejoinDesc: 'Una riga viene unita a quella sopra solo quando la riga superiore sembra piena.',
-            rejoinAliases: ['rientro', 'a capo', 'aggressivo', 'sicuro', 'git log'],
-            rejoinIndented: 'Solo quando la riga è rientrata',
-            rejoinAny: 'Che la riga sia rientrata o no',
-            rejoinNever: 'Mai, rimuovi solo codici e rientri',
-            bulletsName: 'Caratteri dei punti elenco',
-            bulletsDesc: 'Cosa fare con i caratteri dei punti elenco come • nell’output del terminale.',
-            bulletsAliases: ['elenco', 'markdown', 'trattino'],
-            bulletsMarkdown: 'Converti in elementi di elenco Markdown',
-            bulletsPreserve: 'Lasciali come sono',
-            testerName: 'Provalo',
-            testerDesc: 'Incolla dell’output del terminale per vedere come viene pulito.',
-            testerLabel: 'Testo del terminale da pulire',
-            testerEmpty: 'Il testo pulito compare qui.',
-            testerSample: [
-                '• Il passaggio aggiuntivo riguarda solo il gestore Invio dell’elenco, quindi la modifica principale resta semplice. Scorrendo i flussi vicini ho trovato',
-                '  due probabili punti critici da verificare: la selezione può spostarsi dopo l’aggiornamento.'
-            ]
-        },
-
         text: {
             heading: 'Elaborazione del testo',
             trimName: 'Rimuovi gli spazi circostanti',
             trimDesc: 'Rimuove righe vuote e spazi all’inizio e alla fine del testo incollato.',
             trimAliases: ['spazio', 'riga vuota', 'a capo', 'ritaglia'],
-            commasName: 'Virgole',
-            commasDesc: 'Dove va una virgola accanto a una virgoletta doppia di chiusura.',
-            commasAliases: ['virgola', 'virgolette', 'citazione', 'punteggiatura', 'stile'],
-            commasNone: 'Nessuna modifica',
-            commasInside: 'Virgola dentro le virgolette',
-            commasOutside: 'Virgola fuori dalle virgolette',
-            commasExampleSource: 'Lo definì "finito," poi se ne andò.',
-            commasExampleOutside: 'Lo definì "finito", poi se ne andò.',
             invisibleName: 'Caratteri invisibili',
             invisibleDesc: 'Rimuove gli spazi a larghezza zero e trasforma gli spazi unificatori in spazi normali.',
             invisibleAliases: ['ia', 'chatgpt', 'claude', 'llm', 'unicode', 'invisibile', 'nbsp', 'spazio'],

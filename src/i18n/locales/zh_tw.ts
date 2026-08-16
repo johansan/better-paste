@@ -24,6 +24,9 @@ export const STRINGS_ZH_TW: TranslationStrings = {
         paste: '貼上',
         pasteRaw: '不做處理直接貼上',
         cleanSelection: '整理選取內容',
+        cleanTerminal: '\u6E05\u7406\u6240\u9078\u5167\u5BB9\u4E2D\u7684\u7D42\u7AEF\u6A5F\u8F38\u51FA',
+        commasInside: '\u5C07\u9017\u865F\u79FB\u5230\u5F15\u865F\u5167',
+        commasOutside: '\u5C07\u9017\u865F\u79FB\u5230\u5F15\u865F\u5916',
         toggleCleanup: '切換自動整理'
     },
 
@@ -139,47 +142,11 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             testerEmpty: '整理後的連結會顯示在這裡。'
         },
 
-        terminal: {
-            heading: '終端機文字',
-            cleanupName: '整理終端機輸出',
-            cleanupDesc: '把終端機折斷的行重新接起來，並去掉顏色代碼與行首縮排。程式碼區塊、表格和清單維持原狀。',
-            cleanupAliases: ['換行', '接行', 'ansi', '主控台', 'shell', '縮排', '項目符號', '清單', 'markdown'],
-            pageName: '終端機文字處理',
-            pageDesc: '接行與項目符號字元。',
-            rejoinName: '何時接回被折斷的行',
-            rejoinDesc: '只有上一行看起來是滿的，才會把這一行接到它後面。',
-            rejoinAliases: ['縮排', '換行', '積極', '保守', 'git log'],
-            rejoinIndented: '只有該行有縮排時',
-            rejoinAny: '不論該行是否有縮排',
-            rejoinNever: '從不接行，只去掉顏色代碼與縮排',
-            bulletsName: '項目符號字元',
-            bulletsDesc: '如何處理終端機輸出中的 • 等項目符號。',
-            bulletsAliases: ['清單', 'markdown', '短破折號'],
-            bulletsMarkdown: '轉換成 Markdown 清單項目',
-            bulletsPreserve: '維持原狀',
-            testerName: '試試看',
-            testerDesc: '貼上終端機輸出，看看整理後的樣子。',
-            testerLabel: '要整理的終端機文字',
-            testerEmpty: '整理後的文字會顯示在這裡。',
-            testerSample: [
-                '• 這個額外步驟只牽涉清單的 Enter 處理邏輯，所以核心改動很簡單。在梳理鄰近流程時我發現了',
-                '  兩處值得驗證的可能問題：重新整理之後選取項目可能會跳動。'
-            ]
-        },
-
         text: {
             heading: '文字處理',
             trimName: '去掉前後空白',
             trimDesc: '去掉貼上文字開頭與結尾的空行與空格。',
             trimAliases: ['空白', '空行', '空格', '換行', '修剪'],
-            commasName: '逗號',
-            commasDesc: '逗號放在右雙引號的哪一側。',
-            commasAliases: ['逗號', '引號', '引用', '標點', '樣式'],
-            commasNone: '不做變動',
-            commasInside: '逗號放在引號內',
-            commasOutside: '逗號放在引號外',
-            commasExampleSource: '標籤是 "完成," 下一個是 "待辦"。',
-            commasExampleOutside: '標籤是 "完成", 下一個是 "待辦"。',
             invisibleName: '不可見字元',
             invisibleDesc: '移除零寬空格，並把不換行空格變成一般空格。',
             invisibleAliases: ['ai', 'chatgpt', 'claude', 'llm', 'unicode', '不可見', '零寬', 'nbsp', '空白'],

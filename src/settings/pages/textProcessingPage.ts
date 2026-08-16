@@ -21,24 +21,12 @@ import { DEFAULT_SETTINGS } from '../defaults';
 import { aliases, format, strings } from '../../i18n';
 import { straightenDashes, straightenQuotes } from '../../transforms/typography';
 import { toggle } from './context';
-import type { SettingsPageContext } from './context';
-import type { TextCommaPlacement } from '../types';
 
 /** The Unicode code points the example draws in place of the characters they stand for. */
 const NO_BREAK_SPACE_CODE = '[U+00A0]';
 const ZERO_WIDTH_SPACE_CODE = '[U+200B]';
 
 /** The source already has the comma inside the quotation mark, so only "outside" moves it. */
-const COMMA_EXAMPLE_RESULTS: Record<TextCommaPlacement, string> = {
-    none: strings.settings.text.commasExampleSource,
-    inside: strings.settings.text.commasExampleSource,
-    outside: strings.settings.text.commasExampleOutside
-};
-
-/** Comma example text, also used to update the rendered row after a dropdown change. */
-export function commaPlacementExample(placement: TextCommaPlacement): string {
-    return `${strings.settings.text.commasExampleSource} \u2192 ${COMMA_EXAMPLE_RESULTS[placement]}`;
-}
 
 /** A before and after produced by the real rule, so it always matches what a paste does. */
 function ruleExample(source: string, apply: (input: string) => { text: string }): string {
@@ -76,7 +64,7 @@ function invisibleCharactersDescription(): string | DocumentFragment {
 }
 
 /** Rows shown under the Text processing heading. */
-export function createTextProcessingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
+export function createTextProcessingDefinitions(): SettingGroupItem[] {
     const text = strings.settings.text;
 
     return [
@@ -103,21 +91,6 @@ export function createTextProcessingDefinitions(context: SettingsPageContext): S
             text.dashesName,
             withStyleExample(text.dashesDesc, ruleExample(text.dashesExample, straightenDashes)),
             aliases(source => source.settings.text.dashesAliases)
-        ),
-        {
-            name: text.commasName,
-            desc: withStyleExample(text.commasDesc, commaPlacementExample(context.settings().textComma), 'better-paste-comma-example'),
-            aliases: aliases(source => source.settings.text.commasAliases),
-            control: {
-                type: 'dropdown',
-                key: 'textComma',
-                defaultValue: DEFAULT_SETTINGS.textComma,
-                options: {
-                    none: text.commasNone,
-                    inside: text.commasInside,
-                    outside: text.commasOutside
-                }
-            }
-        }
+        )
     ];
 }

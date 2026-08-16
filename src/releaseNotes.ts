@@ -52,8 +52,11 @@ export interface ReleaseNote {
 const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.3',
-        date: '2026-08-15',
-        new: ['You can now define image sizes and CSS classes to assign to images on paste. Either automatic or through a picker.']
+        date: '2026-08-16',
+        new: [
+            'You can now define image sizes and CSS classes to assign to images on paste. Either automatic or through a picker.',
+            'Terminal cleanup and comma styling are now commands you run on a selection. Pasting no longer guesses whether your text came from a terminal.'
+        ]
     },
     {
         version: '1.0.2',

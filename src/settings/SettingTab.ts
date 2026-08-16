@@ -26,8 +26,7 @@ import { LIST_KEY_SUFFIX, SETTINGS_CLASS, toggle } from './pages/context';
 import type { SettingsPageContext } from './pages/context';
 import { createImageLandingDefinitions } from './pages/imagesPage';
 import { createLinkLandingDefinitions } from './pages/linksPage';
-import { createTerminalLandingDefinitions } from './pages/terminalPage';
-import { commaPlacementExample, createTextProcessingDefinitions } from './pages/textProcessingPage';
+import { createTextProcessingDefinitions } from './pages/textProcessingPage';
 import { createStartDefinitions } from './pages/startPage';
 import { createFrontmatterDefinitions } from './pages/frontmatterPage';
 
@@ -93,13 +92,7 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             },
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.images.heading, items: createImageLandingDefinitions(context) },
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.links.heading, items: createLinkLandingDefinitions(context) },
-            {
-                type: 'group',
-                cls: SETTINGS_CLASS,
-                heading: strings.settings.terminal.heading,
-                items: createTerminalLandingDefinitions(context)
-            },
-            { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.text.heading, items: createTextProcessingDefinitions(context) },
+            { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.text.heading, items: createTextProcessingDefinitions() },
             // Below the rules, because these name the per-note properties rather than changing a rule
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.frontmatter.heading, items: createFrontmatterDefinitions() },
             // Last, because release notes, support links and the other plugins are not settings
@@ -134,16 +127,7 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             await super.setControlValue(key, value);
         }
 
-        if (key === 'textComma') this.updateCommaExample(value);
-
         this.afterChange();
-    }
-
-    /** Updates the comma example in place so it always reflects the dropdown value. */
-    private updateCommaExample(value: unknown): void {
-        if (value !== 'none' && value !== 'inside' && value !== 'outside') return;
-        const examples = this.containerEl?.querySelectorAll<HTMLElement>('.better-paste-comma-example') ?? [];
-        for (const example of examples) example.setText(commaPlacementExample(value));
     }
 
     /** Re-evaluates visibility without rebuilding controls that hold unsaved tester input. */

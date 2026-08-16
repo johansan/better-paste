@@ -2,7 +2,7 @@
 
 Read in your language: [English](https://betterpaste.md/docs.html) • [العربية](https://betterpaste.md/ar/docs.html) • [Deutsch](https://betterpaste.md/de/docs.html) • [Español](https://betterpaste.md/es/docs.html) • [فارسی](https://betterpaste.md/fa/docs.html) • [Français](https://betterpaste.md/fr/docs.html) • [Bahasa Indonesia](https://betterpaste.md/id/docs.html) • [Italiano](https://betterpaste.md/it/docs.html) • [Nederlands](https://betterpaste.md/nl/docs.html) • [Polski](https://betterpaste.md/pl/docs.html) • [Português](https://betterpaste.md/pt/docs.html) • [Português (Brasil)](https://betterpaste.md/pt-br/docs.html) • [Русский](https://betterpaste.md/ru/docs.html) • [ไทย](https://betterpaste.md/th/docs.html) • [Türkçe](https://betterpaste.md/tr/docs.html) • [Українська](https://betterpaste.md/uk/docs.html) • [Tiếng Việt](https://betterpaste.md/vi/docs.html) • [日本語](https://betterpaste.md/ja/docs.html) • [한국어](https://betterpaste.md/ko/docs.html) • [中文简体](https://betterpaste.md/zh-cn/docs.html) • [中文繁體](https://betterpaste.md/zh-tw/docs.html)
 
-Stop fixing formatting after every paste! Better Paste finally lets you copy images from Safari to Obsidian, it strips tracking parameters from URLs, fetches page titles, rejoins broken lines in terminal output, and cleans up AI-generated text. Just paste, and the plugin handles the rest.
+Stop fixing formatting after every paste! Better Paste finally lets you copy images from Safari to Obsidian, it strips tracking parameters from URLs, fetches page titles, and cleans up AI-generated text. Just paste, and the plugin handles the rest. Broken terminal output? One command away.
 
 If you find Better Paste useful, please consider [☕️ Buying me a coffee](https://buymeacoffee.com/johansan) or [Sponsor on GitHub ❤️](https://github.com/sponsors/johansan).
 
@@ -68,7 +68,7 @@ The URL is pasted right away and updates when the title arrives, so nothing bloc
 
 ### 2.4 Terminal output
 
-Terminals break long lines at the window edge. Better Paste strips the escape codes and joins the lines back together:
+Terminals break long lines at the window edge. Escape codes are stripped on every paste, and when you select the pasted output and run **Clean up terminal output in selection**, the lines are joined back together:
 
 ```
 npm warn deprecated inflight@1.0.6: This module is not supported and leaks memory. Do
@@ -99,7 +99,7 @@ The invisible characters (zero-width spaces and friends) are removed at the same
 
 ### 2.6 Commas and quotes
 
-Prefer your commas outside the quotation marks? Better Paste can move them for you:
+Prefer your commas outside the quotation marks? Select the text and run **Move commas outside quotes**:
 
 ```
 She called it "finished," then left.
@@ -110,6 +110,8 @@ becomes
 ```
 She called it "finished", then left.
 ```
+
+**Move commas inside quotes** goes the other way.
 
 Or inside, or leave them alone. No change is the default.
 
@@ -162,20 +164,14 @@ mine.example | id                          your own rule
 
 Subdomains are covered automatically, `google.*` matches google.com and google.se alike, and only your own edits are saved, so new rules in future releases still reach you.
 
-### 3.4 Terminal text
-
-- **Clean up terminal output**: see example 2.4 above.
-- **Terminal text handling**: choose when lines are rejoined (only indented lines is the default and the safe choice), turn `•` bullets into Markdown lists, and try it all in a live tester.
-
-### 3.5 Text processing
+### 3.4 Text processing
 
 - **Trim surrounding whitespace**: removes blank lines and stray spaces around the paste. Blank lines in the middle stay.
 - **Invisible characters**: removes zero-width spaces and turns non-breaking spaces into normal ones. Emoji, Persian and Arabic joiners, and CJK spacing are left alone.
 - **Quotes**: turns curly quotes and apostrophes into straight ones, so `“don’t”` becomes `"don't"`.
 - **Dashes**: turns en and em dashes into hyphens. Quotes and dashes inside code, links and note names are left alone.
-- **Commas**: comma inside or outside closing quotes, or no change (the default).
 
-### 3.6 Frontmatter
+### 3.5 Frontmatter
 
 - **Note property** (default `bp`) and **Image width property** (default `image-width`): the two per-note properties from [section 4](#4-per-note-control). Rename them if they collide with something in your vault, or leave one blank to turn it off.
 
@@ -212,11 +208,13 @@ Images come out as `![[picture.png|400]]`, Obsidian's own size syntax. `400x300`
 
 ## 5 Commands
 
-Four commands, ready for your own hotkeys (Settings, Hotkeys):
+Seven commands, ready for your own hotkeys (Settings, Hotkeys):
 
 - **Paste**: paste through the rules, even in a note that opted out.
 - **Paste without processing**: paste exactly what is on the clipboard.
 - **Clean up selection**: run the text rules on selected text.
+- **Clean up terminal output in selection**: rejoin wrapped lines, remove leading indentation and turn `•` bullets into Markdown lists. On demand, because only you know the text came from a terminal.
+- **Move commas inside quotes** and **Move commas outside quotes**: comma style next to closing quotes, applied to the selection.
 - **Toggle automatic cleanup**: flip the master switch.
 
 <br/>

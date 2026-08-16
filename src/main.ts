@@ -98,6 +98,32 @@ export default class BetterPastePlugin extends Plugin {
             }
         });
 
+        // On-demand transforms follow the pattern "clean-<what>" and "<what>-<how>",
+        // so further processing commands slot in beside these
+        this.addCommand({
+            id: 'clean-terminal',
+            name: strings.commands.cleanTerminal,
+            editorCallback: (editor: Editor) => {
+                this.pasteService.cleanTerminalSelection(editor);
+            }
+        });
+
+        this.addCommand({
+            id: 'commas-inside',
+            name: strings.commands.commasInside,
+            editorCallback: (editor: Editor) => {
+                this.pasteService.placeCommas(editor, 'inside');
+            }
+        });
+
+        this.addCommand({
+            id: 'commas-outside',
+            name: strings.commands.commasOutside,
+            editorCallback: (editor: Editor) => {
+                this.pasteService.placeCommas(editor, 'outside');
+            }
+        });
+
         this.addCommand({
             id: 'toggle-cleanup',
             name: strings.commands.toggleCleanup,

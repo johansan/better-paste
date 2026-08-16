@@ -23,26 +23,8 @@
  */
 export type LinkStripMode = 'all' | 'tracking';
 
-/**
- * How readily a line is treated as the continuation of the one above it.
- * - 'indented': only when it is indented further than the line that started the paragraph
- * - 'any': whenever the line above looks full, which suits terminals that do not indent
- * - 'never': leave every line break alone, for column-aligned output such as `git log --graph`
- */
-export type TerminalRejoinMode = 'indented' | 'any' | 'never';
-
-/**
- * What happens to bullet characters in terminal output.
- * - 'preserve': leave the original character alone
- * - 'markdown': rewrite to a Markdown list item so Obsidian renders a real list
- */
-export type TerminalBulletMode = 'preserve' | 'markdown';
-
 /** Naming scheme for saved images. */
 export type ImageNameFormat = 'source' | 'custom';
-
-/** Placement of a comma next to a closing double quotation mark. */
-export type TextCommaPlacement = 'none' | 'inside' | 'outside';
 
 export interface BetterPasteSettings {
     /* Pasting */
@@ -100,21 +82,10 @@ export interface BetterPasteSettings {
      */
     linkRules: string[];
 
-    /* Terminal text */
-
-    /** Rejoin paragraphs a terminal broke across lines. */
-    terminalEnabled: boolean;
-    /** How readily a line is treated as a continuation. */
-    terminalRejoin: TerminalRejoinMode;
-    /** What happens to bullet characters. */
-    terminalBullets: TerminalBulletMode;
-
     /* Text processing */
 
     /** Remove blank space from the start and end of whatever was pasted. */
     textTrim: boolean;
-    /** Placement of a comma next to a closing double quotation mark. */
-    textComma: TextCommaPlacement;
     /** Remove zero-width characters and turn no-break spaces into ordinary ones. */
     textInvisible: boolean;
     /** Turn curly quotes and apostrophes into straight ones. */

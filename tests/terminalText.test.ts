@@ -19,10 +19,9 @@
 import { describe, expect, it } from 'vitest';
 import { cleanTerminalText, dedent, inferWrapWidth } from '../src/transforms/terminalText';
 import type { TerminalCleanupOptions } from '../src/transforms/terminalText';
-import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 
 function options(overrides: Partial<TerminalCleanupOptions> = {}): TerminalCleanupOptions {
-    return { ...DEFAULT_SETTINGS, ...overrides };
+    return { terminalRejoin: 'indented', terminalBullets: 'markdown', ...overrides };
 }
 
 // Written as escapes so this file stays plain ASCII

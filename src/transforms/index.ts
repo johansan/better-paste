@@ -17,8 +17,7 @@
  */
 
 import { frontmatterRanges, normalizeInvisibleCharacters, straightenDashes, straightenQuotes } from './typography';
-import { cleanTerminalText } from './terminalText';
-import { applyCommaPlacement } from './textProcessing';
+import { stripAnsi } from './ansi';
 import { buildUrlCleanupOptions, cleanUrlsInText, httpUrlRanges } from './urlCleanup';
 import { imageReferenceRanges } from '../paste/imageReferences';
 import type { BetterPasteSettings } from '../settings/types';
@@ -40,27 +39,20 @@ function trimPasteEdges(text: string): string {
 }
 
 /**
- * Runs the synchronous text rules in order.
- *
- * The character rules sit on either side of the terminal rule, and the order is
- * load-bearing in both directions:
- *
- * - Invisible characters go first. A no-break space is not whitespace to a regular
- *   expression, so leaving one in would defeat the blank-line and indentation detection
- *   that the terminal rule depends on.
- * - Dashes and quotes run after structural rules. A hyphen is a list marker, so converting
- *   a long dash early would make the terminal rule read that line as a bullet, refuse to
- *   rejoin the paragraph, and leave the sentence rendering as a list item.
- *
- * The trim comes after everything, so it also clears blank lines the other rules left
- * behind rather than only the ones that were pasted.
+ * Runs the synchronous text rules in order. Invisible characters and escape codes go
+ * first, so the structural rules see clean whitespace. The trim comes after everything,
+ * so it also clears blank lines the other rules left behind rather than only the ones
+ * that were pasted.
  */
 export function runTextPipeline(input: string, settings: BetterPasteSettings): TextPipelineResult {
     let text = input;
 
-    if (settings.textInvisible) text = normalizeInvisibleCharacters(text, httpUrlRanges(text)).text;
-
-    if (settings.terminalEnabled) text = cleanTerminalText(text, settings).text;
+    // Escape sequences are removed together with the invisible characters: color
+    // codes and cursor controls are never content a note wants to keep
+    if (settings.textInvisible) {
+        text = stripAnsi(text);
+        text = normalizeInvisibleCharacters(text, httpUrlRanges(text)).text;
+    }
 
     if (settings.linkEnabled) {
         // Image references are off limits to URL cleaning whether or not they are
@@ -74,8 +66,6 @@ export function runTextPipeline(input: string, settings: BetterPasteSettings): T
     if (settings.textDashes) text = straightenDashes(text, httpUrlRanges(text)).text;
 
     if (settings.textQuotes) text = straightenQuotes(text, httpUrlRanges(text)).text;
-
-    if (settings.textComma !== 'none') text = applyCommaPlacement(text, settings.textComma).text;
 
     // Last, so it also clears whatever the rules above left at the edges
     if (settings.textTrim) text = trimPasteEdges(text);

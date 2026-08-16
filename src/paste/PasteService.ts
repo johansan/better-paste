@@ -21,6 +21,8 @@ import type { Editor, MarkdownFileInfo, MarkdownView, TFile } from 'obsidian';
 import { runTextPipeline } from '../transforms';
 import { frontmatterRanges, normalizeInvisibleCharacters, straightenDashes, straightenQuotes } from '../transforms/typography';
 import { applyCommaPlacement } from '../transforms/textProcessing';
+import type { TextCommaPlacement } from '../transforms/textProcessing';
+import { cleanTerminalText } from '../transforms/terminalText';
 import { buildUrlCleanupOptions, cleanUrlsInText, httpUrlRanges } from '../transforms/urlCleanup';
 import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './imageReferences';
 import { parseCommaList } from '../settings/normalize';
@@ -326,13 +328,34 @@ export class PasteService {
 
     /** Command handler: applies the text rules to the current selection. */
     cleanSelection(editor: Editor): void {
+        this.applyToSelection(editor, selection => runTextPipeline(selection, this.getSettings()));
+    }
+
+    /**
+     * Command handler: cleans terminal output in the current selection. Runs on demand
+     * rather than on every paste, because rejoining and dedenting are guesses that only
+     * the user can confirm fit what was copied.
+     */
+    cleanTerminalSelection(editor: Editor): void {
+        this.applyToSelection(editor, selection =>
+            cleanTerminalText(selection, { terminalRejoin: 'indented', terminalBullets: 'markdown' })
+        );
+    }
+
+    /** Command handler: places commas next to closing quotes in the current selection. */
+    placeCommas(editor: Editor, placement: TextCommaPlacement): void {
+        this.applyToSelection(editor, selection => applyCommaPlacement(selection, placement));
+    }
+
+    /** Replaces the selection with a transform's output, with the shared notices. */
+    private applyToSelection(editor: Editor, transform: (selection: string) => { text: string; changed: boolean }): void {
         const selection = editor.getSelection();
         if (!selection) {
             new Notice(format(strings.notices.prefix, { message: strings.notices.selectTextFirst }));
             return;
         }
 
-        const result = runTextPipeline(selection, this.getSettings());
+        const result = transform(selection);
         if (!result.changed) {
             new Notice(format(strings.notices.prefix, { message: strings.notices.nothingToClean }));
             return;
@@ -348,14 +371,7 @@ export class PasteService {
      */
     private scheduleRichPostProcess(editor: Editor, info: MarkdownView | MarkdownFileInfo): void {
         const settings = this.getSettings();
-        if (
-            !settings.textInvisible &&
-            !settings.textQuotes &&
-            !settings.textDashes &&
-            settings.textComma === 'none' &&
-            !settings.linkEnabled &&
-            !settings.imageEnabled
-        )
+        if (!settings.textInvisible && !settings.textQuotes && !settings.textDashes && !settings.linkEnabled && !settings.imageEnabled)
             return;
 
         const targetFile = info.file;
@@ -400,8 +416,6 @@ export class PasteService {
         if (settings.textInvisible) text = normalizeInvisibleCharacters(text, httpUrlRanges(text)).text;
         if (settings.textDashes) text = straightenDashes(text, httpUrlRanges(text)).text;
         if (settings.textQuotes) text = straightenQuotes(text, httpUrlRanges(text)).text;
-
-        if (settings.textComma !== 'none') text = applyCommaPlacement(text, settings.textComma).text;
 
         if (settings.linkEnabled) {
             // Same protection as the plain-text pipeline: an image reference keeps its

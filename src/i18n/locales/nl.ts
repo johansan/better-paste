@@ -24,6 +24,9 @@ export const STRINGS_NL: TranslationStrings = {
         paste: 'Plakken',
         pasteRaw: 'Plakken zonder bewerking',
         cleanSelection: 'Selectie opschonen',
+        cleanTerminal: 'Terminaluitvoer in selectie opschonen',
+        commasInside: 'Komma\u2019s binnen aanhalingstekens plaatsen',
+        commasOutside: 'Komma\u2019s buiten aanhalingstekens plaatsen',
         toggleCleanup: 'Automatisch opschonen aan- of uitzetten'
     },
 
@@ -154,48 +157,11 @@ export const STRINGS_NL: TranslationStrings = {
             testerEmpty: 'De opgeschoonde link verschijnt hier.'
         },
 
-        terminal: {
-            heading: 'Terminaltekst',
-            cleanupName: 'Terminaluitvoer opschonen',
-            cleanupDesc:
-                'Voegt regels die de terminal heeft afgebroken weer samen en verwijdert kleurcodes en inspringing aan het begin. Codeblokken, tabellen en lijsten blijven ongemoeid.',
-            cleanupAliases: ['terugloop', 'samenvoegen', 'ansi', 'console', 'shell', 'inspringing', 'opsomming', 'lijst', 'markdown'],
-            pageName: 'Terminaltekst verwerken',
-            pageDesc: 'Regels samenvoegen en opsommingstekens.',
-            rejoinName: 'Wanneer een afgebroken regel wordt samengevoegd',
-            rejoinDesc: 'Een regel wordt alleen aan de regel erboven vastgemaakt als die vol lijkt.',
-            rejoinAliases: ['inspringing', 'terugloop', 'agressief', 'veilig', 'git log'],
-            rejoinIndented: 'Alleen als de regel is ingesprongen',
-            rejoinAny: 'Of de regel is ingesprongen of niet',
-            rejoinNever: 'Nooit, alleen codes en inspringing verwijderen',
-            bulletsName: 'Opsommingstekens',
-            bulletsDesc: 'Wat er met opsommingstekens zoals • in terminaluitvoer gebeurt.',
-            bulletsAliases: ['lijst', 'markdown', 'streepje'],
-            bulletsMarkdown: 'Omzetten naar Markdown-lijstitems',
-            bulletsPreserve: 'Laten zoals ze zijn',
-            testerName: 'Probeer het',
-            testerDesc: 'Plak terminaluitvoer om te zien hoe die wordt opgeschoond.',
-            testerLabel: 'Op te schonen terminaltekst',
-            testerEmpty: 'De opgeschoonde tekst verschijnt hier.',
-            testerSample: [
-                '• De extra stap blijft beperkt tot de Enter-afhandeling van de lijst, dus de kernwijziging is overzichtelijk. Bij het doorlopen van naburige stromen vond ik',
-                '  twee waarschijnlijke knelpunten die controle verdienen: de selectie kan verspringen na het verversen.'
-            ]
-        },
-
         text: {
             heading: 'Tekstverwerking',
             trimName: 'Witruimte eromheen weghalen',
             trimDesc: 'Verwijdert lege regels en spaties aan het begin en einde van geplakte tekst.',
             trimAliases: ['witruimte', 'lege regel', 'spatie', 'nieuwe regel', 'inkorten'],
-            commasName: 'Komma’s',
-            commasDesc: 'Waar een komma komt naast een sluitend dubbel aanhalingsteken.',
-            commasAliases: ['komma', 'aanhalingsteken', 'citaat', 'interpunctie', 'stijl'],
-            commasNone: 'Geen wijziging',
-            commasInside: 'Komma binnen de aanhalingstekens',
-            commasOutside: 'Komma buiten de aanhalingstekens',
-            commasExampleSource: 'Hij noemde het "af," daarna vertrok hij.',
-            commasExampleOutside: 'Hij noemde het "af", daarna vertrok hij.',
             invisibleName: 'Onzichtbare tekens',
             invisibleDesc: 'Verwijdert spaties met breedte nul en maakt van vaste spaties gewone spaties.',
             invisibleAliases: ['ai', 'chatgpt', 'claude', 'llm', 'unicode', 'onzichtbaar', 'nbsp', 'witruimte'],

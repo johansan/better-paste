@@ -24,6 +24,10 @@ export const STRINGS_JA: TranslationStrings = {
         paste: '貼り付け',
         pasteRaw: '処理せずに貼り付け',
         cleanSelection: '選択範囲を整える',
+        cleanTerminal:
+            '\u9078\u629E\u7BC4\u56F2\u306E\u30BF\u30FC\u30DF\u30CA\u30EB\u51FA\u529B\u3092\u30AF\u30EA\u30FC\u30F3\u30A2\u30C3\u30D7',
+        commasInside: '\u30B3\u30F3\u30DE\u3092\u5F15\u7528\u7B26\u306E\u5185\u5074\u306B\u79FB\u52D5',
+        commasOutside: '\u30B3\u30F3\u30DE\u3092\u5F15\u7528\u7B26\u306E\u5916\u5074\u306B\u79FB\u52D5',
         toggleCleanup: '自動整形を切り替え'
     },
 
@@ -150,48 +154,11 @@ export const STRINGS_JA: TranslationStrings = {
             testerEmpty: '整理されたリンクがここに表示されます。'
         },
 
-        terminal: {
-            heading: 'ターミナルのテキスト',
-            cleanupName: 'ターミナル出力を整える',
-            cleanupDesc:
-                'ターミナルが折り返した行をつなぎ直し、カラーコードと行頭の字下げを取り除きます。コードブロック、表、リストはそのままです。',
-            cleanupAliases: ['折り返し', 'つなぐ', 'ansi', 'コンソール', 'シェル', '字下げ', '箇条書き', 'リスト', 'markdown'],
-            pageName: 'ターミナルテキストの扱い',
-            pageDesc: '行のつなぎ直しと箇条書き記号。',
-            rejoinName: '折れた行をつなぎ直す条件',
-            rejoinDesc: '上の行が埋まって見えるときだけ、その行につなぎます。',
-            rejoinAliases: ['字下げ', '折り返し', '積極的', '安全', 'git log'],
-            rejoinIndented: 'その行が字下げされている場合のみ',
-            rejoinAny: '字下げの有無にかかわらず',
-            rejoinNever: 'つなぎ直さず、コードと字下げだけを取り除く',
-            bulletsName: '箇条書き記号',
-            bulletsDesc: 'ターミナル出力の • などの箇条書き記号をどう扱うか。',
-            bulletsAliases: ['リスト', 'markdown', 'ダッシュ'],
-            bulletsMarkdown: 'Markdown のリスト項目に変換',
-            bulletsPreserve: 'そのままにする',
-            testerName: '試す',
-            testerDesc: 'ターミナル出力を貼り付けると、どう整えられるか確認できます。',
-            testerLabel: '整えるターミナルテキスト',
-            testerEmpty: '整えられたテキストがここに表示されます。',
-            testerSample: [
-                '• 追加の手順はリストの Enter ハンドラーだけに閉じているので、中心となる変更は簡潔です。隣接する処理をたどるうちに見つけたのは',
-                '  検証しておきたい引っかかりが 2 つ、更新後に選択が飛ぶ可能性があります。'
-            ]
-        },
-
         text: {
             heading: 'テキスト処理',
             trimName: '前後の空白を取り除く',
             trimDesc: '貼り付けたテキストの先頭と末尾から空行と空白を取り除きます。',
             trimAliases: ['空白', '空行', 'スペース', '改行', 'トリム'],
-            commasName: 'カンマ',
-            commasDesc: '閉じる二重引用符の隣にカンマを置く位置。',
-            commasAliases: ['カンマ', '引用符', '引用', '句読点', 'スタイル'],
-            commasNone: '変更しない',
-            commasInside: 'カンマを引用符の内側に',
-            commasOutside: 'カンマを引用符の外側に',
-            commasExampleSource: 'ラベルは "完了," 次は "保留" だった。',
-            commasExampleOutside: 'ラベルは "完了", 次は "保留" だった。',
             invisibleName: '不可視文字',
             invisibleDesc: 'ゼロ幅スペースを取り除き、ノーブレークスペースを通常のスペースに変えます。',
             invisibleAliases: ['ai', 'chatgpt', 'claude', 'llm', 'unicode', '不可視', 'ゼロ幅', 'nbsp', '空白'],

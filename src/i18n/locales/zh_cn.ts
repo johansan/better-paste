@@ -24,6 +24,9 @@ export const STRINGS_ZH_CN: TranslationStrings = {
         paste: '粘贴',
         pasteRaw: '不做处理直接粘贴',
         cleanSelection: '清理选中内容',
+        cleanTerminal: '\u6E05\u7406\u6240\u9009\u5185\u5BB9\u4E2D\u7684\u7EC8\u7AEF\u8F93\u51FA',
+        commasInside: '\u5C06\u9017\u53F7\u79FB\u5230\u5F15\u53F7\u5185',
+        commasOutside: '\u5C06\u9017\u53F7\u79FB\u5230\u5F15\u53F7\u5916',
         toggleCleanup: '切换自动清理'
     },
 
@@ -139,47 +142,11 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             testerEmpty: '清理后的链接会显示在这里。'
         },
 
-        terminal: {
-            heading: '终端文本',
-            cleanupName: '清理终端输出',
-            cleanupDesc: '把终端折断的行重新接起来，并去掉颜色代码和行首缩进。代码块、表格和列表保持不变。',
-            cleanupAliases: ['折行', '接行', 'ansi', '控制台', 'shell', '缩进', '项目符号', '列表', 'markdown'],
-            pageName: '终端文本处理',
-            pageDesc: '接行与项目符号字符。',
-            rejoinName: '何时接回被折断的行',
-            rejoinDesc: '只有上一行看起来是满的，才会把本行接到它后面。',
-            rejoinAliases: ['缩进', '折行', '激进', '保守', 'git log'],
-            rejoinIndented: '仅当该行有缩进时',
-            rejoinAny: '无论该行是否有缩进',
-            rejoinNever: '从不接行，只去掉颜色代码和缩进',
-            bulletsName: '项目符号字符',
-            bulletsDesc: '如何处理终端输出中的 • 等项目符号。',
-            bulletsAliases: ['列表', 'markdown', '短横线'],
-            bulletsMarkdown: '转换成 Markdown 列表项',
-            bulletsPreserve: '保持原样',
-            testerName: '试一试',
-            testerDesc: '粘贴终端输出，看看清理后的样子。',
-            testerLabel: '要清理的终端文本',
-            testerEmpty: '清理后的文本会显示在这里。',
-            testerSample: [
-                '• 这个额外步骤只涉及列表的 Enter 处理逻辑，所以核心改动很简单。在梳理相邻流程时我发现了',
-                '  两处值得验证的可能问题：刷新之后选中项可能会跳动。'
-            ]
-        },
-
         text: {
             heading: '文本处理',
             trimName: '去掉首尾空白',
             trimDesc: '去掉粘贴文本开头和结尾的空行与空格。',
             trimAliases: ['空白', '空行', '空格', '换行', '修剪'],
-            commasName: '逗号',
-            commasDesc: '逗号放在右双引号的哪一侧。',
-            commasAliases: ['逗号', '引号', '引用', '标点', '样式'],
-            commasNone: '不做改动',
-            commasInside: '逗号放在引号内',
-            commasOutside: '逗号放在引号外',
-            commasExampleSource: '标签是 "完成," 下一个是 "待办"。',
-            commasExampleOutside: '标签是 "完成", 下一个是 "待办"。',
             invisibleName: '不可见字符',
             invisibleDesc: '移除零宽空格，并把不换行空格变成普通空格。',
             invisibleAliases: ['ai', 'chatgpt', 'claude', 'llm', 'unicode', '不可见', '零宽', 'nbsp', '空白'],

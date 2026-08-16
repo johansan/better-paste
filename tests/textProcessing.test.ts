@@ -124,11 +124,6 @@ describe('applyCommaPlacement', () => {
         expect(applyCommaPlacement(input, 'outside').text).toBe(input);
     });
 
-    it('does nothing in the default mode', () => {
-        const input = 'He called it "finished," then left.';
-        expect(applyCommaPlacement(input, 'none')).toEqual({ text: input, changed: false });
-    });
-
     it('leaves frontmatter values alone, being data rather than prose', () => {
         expect(applyCommaPlacement('---\ntags: ["a", "b"]\n---\n"x", done', 'inside').text).toBe('---\ntags: ["a", "b"]\n---\n"x," done');
     });

@@ -24,6 +24,9 @@ export const STRINGS_DE: TranslationStrings = {
         paste: 'Einfügen',
         pasteRaw: 'Ohne Verarbeitung einfügen',
         cleanSelection: 'Auswahl bereinigen',
+        cleanTerminal: 'Terminalausgabe in Auswahl bereinigen',
+        commasInside: 'Kommas innerhalb der Anf\u00FChrungszeichen platzieren',
+        commasOutside: 'Kommas au\u00DFerhalb der Anf\u00FChrungszeichen platzieren',
         toggleCleanup: 'Automatische Bereinigung umschalten'
     },
 
@@ -153,48 +156,11 @@ export const STRINGS_DE: TranslationStrings = {
             testerEmpty: 'Der bereinigte Link erscheint hier.'
         },
 
-        terminal: {
-            heading: 'Terminaltext',
-            cleanupName: 'Terminalausgabe bereinigen',
-            cleanupDesc:
-                'Fügt vom Terminal umbrochene Zeilen wieder zusammen und entfernt Farbcodes und führende Einrückungen. Codeblöcke, Tabellen und Listen bleiben unberührt.',
-            cleanupAliases: ['umbruch', 'zusammenfügen', 'ansi', 'konsole', 'shell', 'einrückung', 'aufzählung', 'liste', 'markdown'],
-            pageName: 'Behandlung von Terminaltext',
-            pageDesc: 'Zeilen zusammenfügen und Aufzählungszeichen.',
-            rejoinName: 'Wann eine umbrochene Zeile zusammengefügt wird',
-            rejoinDesc: 'Eine Zeile wird nur an die darüber angefügt, wenn diese voll wirkt.',
-            rejoinAliases: ['einrückung', 'umbruch', 'aggressiv', 'sicher', 'git log'],
-            rejoinIndented: 'Nur wenn die Zeile eingerückt ist',
-            rejoinAny: 'Ob die Zeile eingerückt ist oder nicht',
-            rejoinNever: 'Nie, nur Codes und Einrückungen entfernen',
-            bulletsName: 'Aufzählungszeichen',
-            bulletsDesc: 'Was mit Aufzählungszeichen wie • in Terminalausgaben passiert.',
-            bulletsAliases: ['liste', 'markdown', 'strich'],
-            bulletsMarkdown: 'In Markdown-Listeneinträge umwandeln',
-            bulletsPreserve: 'Unverändert lassen',
-            testerName: 'Ausprobieren',
-            testerDesc: 'Füge Terminalausgabe ein, um zu sehen, wie sie bereinigt wird.',
-            testerLabel: 'Zu bereinigender Terminaltext',
-            testerEmpty: 'Der bereinigte Text erscheint hier.',
-            testerSample: [
-                '• Der zusätzliche Schritt betrifft nur den Enter-Handler der Liste, daher bleibt die eigentliche Änderung überschaubar. Beim Durchsehen benachbarter Abläufe fand ich',
-                '  zwei mögliche Reibungspunkte, die eine Prüfung verdienen: die Auswahl kann nach dem Neuaufbau springen.'
-            ]
-        },
-
         text: {
             heading: 'Textverarbeitung',
             trimName: 'Umgebende Leerzeichen entfernen',
             trimDesc: 'Entfernt leere Zeilen und Leerzeichen am Anfang und Ende des eingefügten Textes.',
             trimAliases: ['leerzeichen', 'leerzeile', 'zeilenumbruch', 'kürzen'],
-            commasName: 'Kommas',
-            commasDesc: 'Wo ein Komma neben einem schließenden Anführungszeichen steht.',
-            commasAliases: ['komma', 'anführungszeichen', 'zitat', 'zeichensetzung', 'stil'],
-            commasNone: 'Keine Änderung',
-            commasInside: 'Komma innerhalb der Anführungszeichen',
-            commasOutside: 'Komma außerhalb der Anführungszeichen',
-            commasExampleSource: 'Er nannte es "fertig," dann ging er.',
-            commasExampleOutside: 'Er nannte es "fertig", dann ging er.',
             invisibleName: 'Unsichtbare Zeichen',
             invisibleDesc: 'Entfernt Zeichen der Breite null und wandelt geschützte Leerzeichen in normale Leerzeichen um.',
             invisibleAliases: ['ki', 'chatgpt', 'claude', 'llm', 'unicode', 'unsichtbar', 'nbsp', 'leerzeichen'],

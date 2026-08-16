@@ -24,6 +24,9 @@ export const STRINGS_VI: TranslationStrings = {
         paste: 'Dán',
         pasteRaw: 'Dán không xử lý',
         cleanSelection: 'Dọn phần đã chọn',
+        cleanTerminal: 'D\u1ECDn d\u1EB9p \u0111\u1EA7u ra terminal trong v\u00F9ng ch\u1ECDn',
+        commasInside: 'Chuy\u1EC3n d\u1EA5u ph\u1EA9y v\u00E0o trong d\u1EA5u ngo\u1EB7c k\u00E9p',
+        commasOutside: 'Chuy\u1EC3n d\u1EA5u ph\u1EA9y ra ngo\u00E0i d\u1EA5u ngo\u1EB7c k\u00E9p',
         toggleCleanup: 'Bật tắt dọn dẹp tự động'
     },
 
@@ -151,58 +154,11 @@ export const STRINGS_VI: TranslationStrings = {
             testerEmpty: 'Liên kết đã dọn sẽ hiện ở đây.'
         },
 
-        terminal: {
-            heading: 'Văn bản dòng lệnh',
-            cleanupName: 'Dọn đầu ra dòng lệnh',
-            cleanupDesc:
-                'Nối lại các dòng bị tự động xuống dòng trong đầu ra dòng lệnh, đồng thời bỏ mã màu và thụt lề ở đầu dòng. Khối mã, bảng và danh sách được giữ nguyên.',
-            cleanupAliases: [
-                'ngắt dòng',
-                'nối dòng',
-                'ansi',
-                'bảng điều khiển',
-                'shell',
-                'thụt lề',
-                'dấu đầu dòng',
-                'danh sách',
-                'markdown'
-            ],
-            pageName: 'Xử lý văn bản dòng lệnh',
-            pageDesc: 'Nối dòng và ký tự đầu dòng.',
-            rejoinName: 'Khi nào nối lại một dòng bị ngắt',
-            rejoinDesc: 'Một dòng chỉ được nối vào dòng trên khi dòng đó trông đã đầy.',
-            rejoinAliases: ['thụt lề', 'ngắt dòng', 'mạnh tay', 'an toàn', 'git log'],
-            rejoinIndented: 'Chỉ khi dòng có thụt lề',
-            rejoinAny: 'Dù dòng có thụt lề hay không',
-            rejoinNever: 'Không bao giờ, chỉ bỏ mã màu và thụt lề',
-            bulletsName: 'Ký tự đầu dòng',
-            bulletsDesc: 'Xử lý thế nào với ký tự đầu dòng như • trong đầu ra dòng lệnh.',
-            bulletsAliases: ['danh sách', 'markdown', 'gạch ngang'],
-            bulletsMarkdown: 'Chuyển thành mục danh sách Markdown',
-            bulletsPreserve: 'Giữ nguyên như cũ',
-            testerName: 'Thử xem',
-            testerDesc: 'Dán đầu ra dòng lệnh để xem nó được dọn như thế nào.',
-            testerLabel: 'Văn bản dòng lệnh cần dọn',
-            testerEmpty: 'Văn bản đã dọn sẽ hiện ở đây.',
-            testerSample: [
-                '• Bước bổ sung chỉ gói trong phần xử lý phím Enter của danh sách, nên thay đổi cốt lõi khá đơn giản. Khi lần theo các luồng lân cận, tôi thấy',
-                '  hai điểm vướng đáng kiểm chứng: vùng chọn có thể nhảy sau khi làm mới.'
-            ]
-        },
-
         text: {
             heading: 'Xử lý văn bản',
             trimName: 'Cắt khoảng trắng xung quanh',
             trimDesc: 'Bỏ dòng trống và khoảng trắng ở đầu và cuối văn bản đã dán.',
             trimAliases: ['khoảng trắng', 'dòng trống', 'dấu cách', 'xuống dòng', 'cắt'],
-            commasName: 'Dấu phẩy',
-            commasDesc: 'Vị trí dấu phẩy bên cạnh dấu nháy kép đóng.',
-            commasAliases: ['dấu phẩy', 'dấu nháy', 'trích dẫn', 'dấu câu', 'kiểu'],
-            commasNone: 'Không thay đổi',
-            commasInside: 'Dấu phẩy bên trong dấu nháy',
-            commasOutside: 'Dấu phẩy bên ngoài dấu nháy',
-            commasExampleSource: 'Anh ấy gọi đó là "xong," rồi bỏ đi.',
-            commasExampleOutside: 'Anh ấy gọi đó là "xong", rồi bỏ đi.',
             invisibleName: 'Ký tự vô hình',
             invisibleDesc: 'Bỏ khoảng trắng rộng bằng không và biến khoảng trắng không ngắt thành khoảng trắng thường.',
             invisibleAliases: ['ai', 'chatgpt', 'claude', 'llm', 'unicode', 'vô hình', 'nbsp', 'khoảng trắng'],

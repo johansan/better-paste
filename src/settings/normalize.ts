@@ -18,14 +18,7 @@
 
 import { DEFAULT_SETTINGS } from './defaults';
 import { normalizeVersion } from '../releaseNotes';
-import type {
-    BetterPasteSettings,
-    ImageNameFormat,
-    TerminalBulletMode,
-    TerminalRejoinMode,
-    TextCommaPlacement,
-    LinkStripMode
-} from './types';
+import type { BetterPasteSettings, ImageNameFormat, LinkStripMode } from './types';
 
 function asBoolean(value: unknown, fallback: boolean): boolean {
     return typeof value === 'boolean' ? value : fallback;
@@ -62,10 +55,7 @@ function asEmbedChoice(value: unknown, options: string): string {
     if (value === '') return value;
     return parseCommaList(options).includes(value) ? value : '';
 }
-const BULLET_MODES: readonly TerminalBulletMode[] = ['preserve', 'markdown'];
-const REJOIN_MODES: readonly TerminalRejoinMode[] = ['indented', 'any', 'never'];
 const NAME_FORMATS: readonly ImageNameFormat[] = ['source', 'custom'];
-const COMMA_PLACEMENTS: readonly TextCommaPlacement[] = ['none', 'inside', 'outside'];
 
 /**
  * Builds a complete settings object from whatever was stored on disk. Every field is
@@ -97,12 +87,7 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
         // Only the user's own rules are stored; the shipped list is merged in at read time
         linkRules: asStringArray(data.linkRules),
 
-        terminalEnabled: asBoolean(data.terminalEnabled, defaults.terminalEnabled),
-        terminalRejoin: asEnum(data.terminalRejoin, REJOIN_MODES, defaults.terminalRejoin),
-        terminalBullets: asEnum(data.terminalBullets, BULLET_MODES, defaults.terminalBullets),
-
         textTrim: asBoolean(data.textTrim, defaults.textTrim),
-        textComma: asEnum(data.textComma, COMMA_PLACEMENTS, defaults.textComma),
         textInvisible: asBoolean(data.textInvisible, defaults.textInvisible),
         textQuotes: asBoolean(data.textQuotes, defaults.textQuotes),
         textDashes: asBoolean(data.textDashes, defaults.textDashes),

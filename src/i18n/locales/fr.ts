@@ -24,6 +24,9 @@ export const STRINGS_FR: TranslationStrings = {
         paste: 'Coller',
         pasteRaw: 'Coller sans traitement',
         cleanSelection: 'Nettoyer la sélection',
+        cleanTerminal: 'Nettoyer la sortie de terminal dans la s\u00E9lection',
+        commasInside: 'Placer les virgules \u00E0 l\u2019int\u00E9rieur des guillemets',
+        commasOutside: 'Placer les virgules \u00E0 l\u2019ext\u00E9rieur des guillemets',
         toggleCleanup: 'Activer ou désactiver le nettoyage automatique'
     },
 
@@ -154,48 +157,11 @@ export const STRINGS_FR: TranslationStrings = {
             testerEmpty: 'Le lien nettoyé apparaît ici.'
         },
 
-        terminal: {
-            heading: 'Texte de terminal',
-            cleanupName: 'Nettoyer la sortie de terminal',
-            cleanupDesc:
-                'Rassemble les lignes coupées par le terminal et retire les codes de couleur et l’indentation de début. Les blocs de code, les tableaux et les listes ne sont pas touchés.',
-            cleanupAliases: ['retour à la ligne', 'rassembler', 'ansi', 'console', 'shell', 'indentation', 'puce', 'liste', 'markdown'],
-            pageName: 'Traitement du texte de terminal',
-            pageDesc: 'Rassemblement des lignes et caractères de puce.',
-            rejoinName: 'Quand rassembler une ligne coupée',
-            rejoinDesc: 'Une ligne n’est rattachée à celle du dessus que si celle-ci semble pleine.',
-            rejoinAliases: ['indentation', 'retour à la ligne', 'agressif', 'sûr', 'git log'],
-            rejoinIndented: 'Seulement si la ligne est indentée',
-            rejoinAny: 'Que la ligne soit indentée ou non',
-            rejoinNever: 'Jamais, retirer seulement les codes et l’indentation',
-            bulletsName: 'Caractères de puce',
-            bulletsDesc: 'Que faire des caractères de puce comme • dans la sortie de terminal.',
-            bulletsAliases: ['liste', 'markdown', 'tiret'],
-            bulletsMarkdown: 'Convertir en éléments de liste Markdown',
-            bulletsPreserve: 'Les laisser tels quels',
-            testerName: 'Essayer',
-            testerDesc: 'Collez une sortie de terminal pour voir comment elle est nettoyée.',
-            testerLabel: 'Texte de terminal à nettoyer',
-            testerEmpty: 'Le texte nettoyé apparaît ici.',
-            testerSample: [
-                '• L’étape supplémentaire se limite au gestionnaire Entrée de la liste, donc la modification principale reste simple. En parcourant les flux voisins, j’ai trouvé',
-                '  deux points de friction probables à vérifier : la sélection peut sauter après le rafraîchissement.'
-            ]
-        },
-
         text: {
             heading: 'Traitement du texte',
             trimName: 'Supprimer les espaces autour',
             trimDesc: 'Supprime les lignes vides et les espaces au début et à la fin du texte collé.',
             trimAliases: ['espace', 'ligne vide', 'saut de ligne', 'rogner'],
-            commasName: 'Virgules',
-            commasDesc: 'Où placer une virgule à côté d’un guillemet double fermant.',
-            commasAliases: ['virgule', 'guillemet', 'citation', 'ponctuation', 'style'],
-            commasNone: 'Aucun changement',
-            commasInside: 'Virgule à l’intérieur des guillemets',
-            commasOutside: 'Virgule à l’extérieur des guillemets',
-            commasExampleSource: 'Il a dit "terminé," puis il est parti.',
-            commasExampleOutside: 'Il a dit "terminé", puis il est parti.',
             invisibleName: 'Caractères invisibles',
             invisibleDesc: 'Supprime les espaces de largeur nulle et transforme les espaces insécables en espaces normaux.',
             invisibleAliases: ['ia', 'chatgpt', 'claude', 'llm', 'unicode', 'invisible', 'nbsp', 'espace'],

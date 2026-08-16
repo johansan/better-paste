@@ -24,6 +24,9 @@ export const STRINGS_ES: TranslationStrings = {
         paste: 'Pegar',
         pasteRaw: 'Pegar sin procesar',
         cleanSelection: 'Limpiar la selección',
+        cleanTerminal: 'Limpiar salida de terminal en la selecci\u00F3n',
+        commasInside: 'Colocar comas dentro de las comillas',
+        commasOutside: 'Colocar comas fuera de las comillas',
         toggleCleanup: 'Alternar la limpieza automática'
     },
 
@@ -154,48 +157,11 @@ export const STRINGS_ES: TranslationStrings = {
             testerEmpty: 'El enlace limpio aparece aquí.'
         },
 
-        terminal: {
-            heading: 'Texto de terminal',
-            cleanupName: 'Limpiar la salida de terminal',
-            cleanupDesc:
-                'Vuelve a unir las líneas que la terminal partió y quita los códigos de color y la sangría inicial. Los bloques de código, las tablas y las listas no se tocan.',
-            cleanupAliases: ['ajuste', 'unir', 'ansi', 'consola', 'shell', 'sangría', 'viñeta', 'lista', 'markdown'],
-            pageName: 'Tratamiento del texto de terminal',
-            pageDesc: 'Unión de líneas y caracteres de viñeta.',
-            rejoinName: 'Cuándo volver a unir una línea partida',
-            rejoinDesc: 'Una línea solo se une a la de arriba cuando esa línea parece llena.',
-            rejoinAliases: ['sangría', 'ajuste', 'agresivo', 'seguro', 'git log'],
-            rejoinIndented: 'Solo cuando la línea está sangrada',
-            rejoinAny: 'Esté sangrada o no',
-            rejoinNever: 'Nunca, solo quitar códigos y sangría',
-            bulletsName: 'Caracteres de viñeta',
-            bulletsDesc: 'Qué hacer con los caracteres de viñeta como • en la salida de terminal.',
-            bulletsAliases: ['lista', 'markdown', 'guion'],
-            bulletsMarkdown: 'Convertir en elementos de lista de Markdown',
-            bulletsPreserve: 'Dejarlos como están',
-            testerName: 'Pruébalo',
-            testerDesc: 'Pega salida de terminal para ver cómo se limpia.',
-            testerLabel: 'Texto de terminal para limpiar',
-            testerEmpty: 'El texto limpio aparece aquí.',
-            testerSample: [
-                '• El paso adicional queda aislado en el gestor de Enter de la lista, así que el cambio principal es sencillo. Al recorrer flujos cercanos encontré',
-                '  dos puntos de fricción que conviene comprobar: la selección puede saltar tras la actualización.'
-            ]
-        },
-
         text: {
             heading: 'Procesamiento de texto',
             trimName: 'Recortar los espacios de alrededor',
             trimDesc: 'Elimina las líneas en blanco y los espacios del principio y del final del texto pegado.',
             trimAliases: ['espacio', 'línea en blanco', 'salto de línea', 'recortar'],
-            commasName: 'Comas',
-            commasDesc: 'Dónde va una coma junto a una comilla doble de cierre.',
-            commasAliases: ['coma', 'comilla', 'cita', 'puntuación', 'estilo'],
-            commasNone: 'Sin cambios',
-            commasInside: 'Coma dentro de las comillas',
-            commasOutside: 'Coma fuera de las comillas',
-            commasExampleSource: 'Lo llamó "terminado," luego se fue.',
-            commasExampleOutside: 'Lo llamó "terminado", luego se fue.',
             invisibleName: 'Caracteres invisibles',
             invisibleDesc: 'Elimina los espacios de ancho cero y convierte los espacios duros en espacios normales.',
             invisibleAliases: ['ia', 'chatgpt', 'claude', 'llm', 'unicode', 'invisible', 'nbsp', 'espacio'],

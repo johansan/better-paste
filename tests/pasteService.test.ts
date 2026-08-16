@@ -164,7 +164,7 @@ describe('handleEditorPaste: plain text', () => {
         expect(editor.getValue()).toBe('first\nsecond');
     });
 
-    it('unwraps terminal output on paste', () => {
+    it('cleans terminal output only through its command, not on paste', () => {
         const { service } = build();
         const editor = new FakeEditor('');
         const plain = [
@@ -172,8 +172,13 @@ describe('handleEditorPaste: plain text', () => {
             '  continues on the next line.'
         ].join('\n');
 
-        service.handleEditorPaste(fakeClipboardEvent({ plain }), editor.asEditor(), INFO);
-        expect(editor.getValue()).toBe(
+        // The paste needs no rule, so the service leaves it to the default handler
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain }), editor.asEditor(), INFO)).toBe(false);
+
+        const pasted = new FakeEditor(plain);
+        pasted.setSelection(0, plain.length);
+        service.cleanTerminalSelection(pasted.asEditor());
+        expect(pasted.getValue()).toBe(
             '- A bullet line that is comfortably past the sixty character wrap threshold and continues on the next line.'
         );
     });
@@ -799,14 +804,13 @@ describe('handleEditorPaste: rich content', () => {
         const { service } = build({
             textInvisible: false,
             linkEnabled: false,
-            imageEnabled: false,
-            textComma: 'outside'
+            imageEnabled: false
         });
         const editor = new FakeEditor('');
 
-        await pasteRich(service, editor, '<p>quoted</p>', 'He called it "finished," then left.');
+        await pasteRich(service, editor, '<p>curly</p>', 'He called it “finished” then left.');
 
-        expect(editor.getValue()).toBe('He called it "finished", then left.');
+        expect(editor.getValue()).toBe('He called it "finished" then left.');
     });
 });
 
