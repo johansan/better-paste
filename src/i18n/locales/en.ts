@@ -133,7 +133,7 @@ export const STRINGS_EN = {
             customAliases: ['name', 'filename', 'date', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Image width property',
             sizePropertyDesc:
-                'Frontmatter property that sets the width of images pasted into a note. With "image-width: 400" in the note, a pasted image becomes ![[photo.png|400]]. Leave blank to add no width.',
+                'Frontmatter property that sets the width of images pasted into a note. With "{property}: 400" in the note, a pasted image becomes ![[photo.png|400]]. Leave blank to add no width.',
             sizePropertyAliases: ['size', 'frontmatter', 'property', 'resize', 'width', 'image']
         },
 

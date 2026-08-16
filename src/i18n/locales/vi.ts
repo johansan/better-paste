@@ -116,7 +116,7 @@ export const STRINGS_VI: TranslationStrings = {
             customAliases: ['tên', 'tên tệp', 'ngày', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Thuộc tính chiều rộng ảnh',
             sizePropertyDesc:
-                'Thuộc tính frontmatter xác định chiều rộng của ảnh dán vào một ghi chú. Với "image-width: 400" trong ghi chú, ảnh dán vào sẽ thành ![[photo.png|400]]. Để trống để không thêm chiều rộng.',
+                'Thuộc tính frontmatter xác định chiều rộng của ảnh dán vào một ghi chú. Với "{property}: 400" trong ghi chú, ảnh dán vào sẽ thành ![[photo.png|400]]. Để trống để không thêm chiều rộng.',
             sizePropertyAliases: ['kích thước', 'frontmatter', 'thuộc tính', 'đổi cỡ']
         },
 

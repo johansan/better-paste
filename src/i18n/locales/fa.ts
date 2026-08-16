@@ -109,7 +109,7 @@ export const STRINGS_FA: TranslationStrings = {
             customAliases: ['نام', 'پرونده', 'تاریخ', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'ویژگی عرض تصویر',
             sizePropertyDesc:
-                'ویژگی frontmatter که عرض تصاویر چسبانده‌شده در یک یادداشت را تعیین می‌کند. با "image-width: 400" در یادداشت، تصویر چسبانده‌شده به ![[photo.png|400]] تبدیل می‌شود. برای نیفزودن عرض، خالی بگذارید.',
+                'ویژگی frontmatter که عرض تصاویر چسبانده‌شده در یک یادداشت را تعیین می‌کند. با "{property}: 400" در یادداشت، تصویر چسبانده‌شده به ![[photo.png|400]] تبدیل می‌شود. برای نیفزودن عرض، خالی بگذارید.',
             sizePropertyAliases: ['اندازه', 'frontmatter', 'ویژگی', 'تغییر اندازه']
         },
 

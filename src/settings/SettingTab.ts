@@ -23,8 +23,8 @@ import { parseLines } from './normalize';
 import { DEFAULT_SETTINGS } from './defaults';
 import { aliases, format, strings } from '../i18n';
 import { diffDomainRules, renderDomainRules } from '../transforms/urlCleanup';
-import { LIST_KEY_SUFFIX, SETTINGS_CLASS, toggle } from './pages/context';
-import type { SettingsPageContext } from './pages/context';
+import { DYNAMIC_DESCRIPTION_KEYS, LIST_KEY_SUFFIX, SETTINGS_CLASS, toggle } from './pages/context';
+import type { DynamicDescriptionKey, SettingsPageContext } from './pages/context';
 import { createImageLandingDefinitions } from './pages/imagesPage';
 import { createLinkLandingDefinitions } from './pages/linksPage';
 import { createTextProcessingDefinitions } from './pages/textProcessingPage';
@@ -44,6 +44,10 @@ function isListControlKey(key: string): boolean {
 
 function listKeyOf(controlKey: string): ListSettingKey {
     return controlKey.slice(0, -LIST_KEY_SUFFIX.length) as ListSettingKey;
+}
+
+function isDynamicDescriptionKey(key: string): key is DynamicDescriptionKey {
+    return (DYNAMIC_DESCRIPTION_KEYS as readonly string[]).includes(key);
 }
 
 /**
@@ -69,7 +73,8 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             settings: () => this.plugin.settings,
             version: this.plugin.manifest.version,
             showWhatsNew: () => this.plugin.showWhatsNew(),
-            saveSettings: () => this.plugin.saveSettings()
+            saveSettings: () => this.plugin.saveSettings(),
+            dynamicDescription: key => this.dynamicDescription(key)
         };
     }
 
@@ -85,7 +90,7 @@ export class BetterPasteSettingTab extends PluginSettingTab {
                     toggle(
                         'autoClean',
                         strings.settings.behavior.autoCleanName,
-                        this.autoCleanDescription(),
+                        this.dynamicDescription('noteProperty'),
                         aliases(source => source.settings.behavior.autoCleanAliases)
                     ),
                     // A setting rather than a constant: the name has to coexist with
@@ -140,29 +145,47 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             await super.setControlValue(key, value);
         }
 
-        if (key === 'noteProperty') this.updateAutoCleanDescription();
+        if (isDynamicDescriptionKey(key)) this.updateDynamicDescription(key);
 
         this.afterChange();
     }
 
-    /** The master toggle's description names the current note property, so it follows renames. */
-    private autoCleanDescription(): string | DocumentFragment {
-        const text = this.autoCleanDescriptionText();
-        if (typeof createFragment === 'undefined') return text;
+    /**
+     * Descriptions that name another setting's current value, keyed by the setting that
+     * appears in the text. Each renders into a marked span so it can be rewritten in
+     * place when the named setting changes, without rebuilding the row.
+     */
+    private readonly dynamicDescriptions: Record<DynamicDescriptionKey, { cls: string; text: () => string }> = {
+        noteProperty: {
+            cls: 'better-paste-autoclean-desc',
+            text: () => {
+                const property = this.plugin.settings.noteProperty.trim() || DEFAULT_SETTINGS.noteProperty;
+                return format(strings.settings.behavior.autoCleanDesc, { property });
+            }
+        },
+        imageSizeProperty: {
+            cls: 'better-paste-image-width-desc',
+            text: () => {
+                const property = this.plugin.settings.imageSizeProperty.trim() || DEFAULT_SETTINGS.imageSizeProperty;
+                return format(strings.settings.images.sizePropertyDesc, { property });
+            }
+        }
+    };
+
+    /** The description for the row whose text names `key`'s current value. */
+    dynamicDescription(key: DynamicDescriptionKey): string | DocumentFragment {
+        const entry = this.dynamicDescriptions[key];
+        if (typeof createFragment === 'undefined') return entry.text();
         return createFragment(fragment => {
-            fragment.createSpan({ cls: 'better-paste-autoclean-desc', text });
+            fragment.createSpan({ cls: entry.cls, text: entry.text() });
         });
     }
 
-    private autoCleanDescriptionText(): string {
-        const property = this.plugin.settings.noteProperty.trim() || DEFAULT_SETTINGS.noteProperty;
-        return format(strings.settings.behavior.autoCleanDesc, { property });
-    }
-
-    /** Rewrites the rendered description in place after the note property changes. */
-    private updateAutoCleanDescription(): void {
-        const spans = this.containerEl?.querySelectorAll<HTMLElement>('.better-paste-autoclean-desc') ?? [];
-        for (const span of spans) span.setText(this.autoCleanDescriptionText());
+    /** Rewrites a rendered description in place after the setting it names changes. */
+    private updateDynamicDescription(key: DynamicDescriptionKey): void {
+        const entry = this.dynamicDescriptions[key];
+        const spans = this.containerEl?.querySelectorAll<HTMLElement>(`.${entry.cls}`) ?? [];
+        for (const span of spans) span.setText(entry.text());
     }
 
     /** Re-evaluates visibility without rebuilding controls that hold unsaved tester input. */

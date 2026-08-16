@@ -104,7 +104,7 @@ export const STRINGS_TH: TranslationStrings = {
             customAliases: ['ชื่อ', 'ชื่อไฟล์', 'วันที่', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'คุณสมบัติความกว้างรูปภาพ',
             sizePropertyDesc:
-                'คุณสมบัติใน frontmatter ที่กำหนดความกว้างของรูปภาพที่วางลงในโน้ต เมื่อโน้ตมี "image-width: 400" รูปภาพที่วางจะกลายเป็น ![[photo.png|400]] เว้นว่างไว้เพื่อไม่ใส่ความกว้าง',
+                'คุณสมบัติใน frontmatter ที่กำหนดความกว้างของรูปภาพที่วางลงในโน้ต เมื่อโน้ตมี "{property}: 400" รูปภาพที่วางจะกลายเป็น ![[photo.png|400]] เว้นว่างไว้เพื่อไม่ใส่ความกว้าง',
             sizePropertyAliases: ['ขนาด', 'frontmatter', 'คุณสมบัติ', 'ปรับขนาด']
         },
 

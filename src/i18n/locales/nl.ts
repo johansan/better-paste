@@ -119,7 +119,7 @@ export const STRINGS_NL: TranslationStrings = {
             customAliases: ['naam', 'bestandsnaam', 'datum', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Eigenschap voor afbeeldingsbreedte',
             sizePropertyDesc:
-                'Frontmatter-eigenschap die de breedte bepaalt van afbeeldingen die in een notitie worden geplakt. Met "image-width: 400" in de notitie wordt een geplakte afbeelding ![[photo.png|400]]. Laat leeg om geen breedte toe te voegen.',
+                'Frontmatter-eigenschap die de breedte bepaalt van afbeeldingen die in een notitie worden geplakt. Met "{property}: 400" in de notitie wordt een geplakte afbeelding ![[photo.png|400]]. Laat leeg om geen breedte toe te voegen.',
             sizePropertyAliases: ['grootte', 'frontmatter', 'eigenschap', 'schalen']
         },
 

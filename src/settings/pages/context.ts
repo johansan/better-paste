@@ -33,7 +33,13 @@ export interface SettingsPageContext {
     showWhatsNew: () => void;
     /** Persists a value changed by a custom-rendered setting row. */
     saveSettings: () => Promise<void>;
+    /** Description whose text names `key`'s current value and follows its renames. */
+    dynamicDescription: (key: DynamicDescriptionKey) => string | DocumentFragment;
 }
+
+/** Settings whose current value is named inside another row's description text. */
+export const DYNAMIC_DESCRIPTION_KEYS = ['noteProperty', 'imageSizeProperty'] as const;
+export type DynamicDescriptionKey = (typeof DYNAMIC_DESCRIPTION_KEYS)[number];
 
 /** Suffix marking a control key whose stored value is a list but is edited as text. */
 export const LIST_KEY_SUFFIX = '.text';

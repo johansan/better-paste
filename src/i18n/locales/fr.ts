@@ -119,7 +119,7 @@ export const STRINGS_FR: TranslationStrings = {
             customAliases: ['nom', 'fichier', 'date', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Propriété de largeur d’image',
             sizePropertyDesc:
-                'Propriété du frontmatter qui fixe la largeur des images collées dans une note. Avec "image-width: 400" dans la note, une image collée devient ![[photo.png|400]]. Laissez vide pour n’ajouter aucune largeur.',
+                'Propriété du frontmatter qui fixe la largeur des images collées dans une note. Avec "{property}: 400" dans la note, une image collée devient ![[photo.png|400]]. Laissez vide pour n’ajouter aucune largeur.',
             sizePropertyAliases: ['taille', 'frontmatter', 'propriété', 'redimensionner']
         },
 

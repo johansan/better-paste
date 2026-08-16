@@ -104,7 +104,7 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             customAliases: ['名稱', '檔案名稱', '日期', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: '圖片寬度屬性',
             sizePropertyDesc:
-                '決定貼進筆記的圖片寬度的 frontmatter 屬性。筆記中寫有 "image-width: 400" 時，貼上的圖片會變成 ![[photo.png|400]]。留空則不加上寬度。',
+                '決定貼進筆記的圖片寬度的 frontmatter 屬性。筆記中寫有 "{property}: 400" 時，貼上的圖片會變成 ![[photo.png|400]]。留空則不加上寬度。',
             sizePropertyAliases: ['尺寸', 'frontmatter', '屬性', '縮放']
         },
 

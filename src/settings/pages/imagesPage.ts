@@ -191,7 +191,7 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
         // fixed name would leave no way out. Blank switches the property off.
         {
             name: text.sizePropertyName,
-            desc: text.sizePropertyDesc,
+            desc: context.dynamicDescription('imageSizeProperty'),
             aliases: aliases(source => source.settings.images.sizePropertyAliases),
             visible: enabled,
             control: {

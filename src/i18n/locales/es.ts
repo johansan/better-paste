@@ -119,7 +119,7 @@ export const STRINGS_ES: TranslationStrings = {
             customAliases: ['nombre', 'archivo', 'fecha', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Propiedad de ancho de imagen',
             sizePropertyDesc:
-                'Propiedad del frontmatter que fija el ancho de las imágenes pegadas en una nota. Con "image-width: 400" en la nota, una imagen pegada queda como ![[photo.png|400]]. Déjala en blanco para no añadir ancho.',
+                'Propiedad del frontmatter que fija el ancho de las imágenes pegadas en una nota. Con "{property}: 400" en la nota, una imagen pegada queda como ![[photo.png|400]]. Déjala en blanco para no añadir ancho.',
             sizePropertyAliases: ['tamaño', 'frontmatter', 'propiedad', 'redimensionar']
         },
 

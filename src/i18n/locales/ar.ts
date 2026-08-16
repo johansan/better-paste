@@ -111,7 +111,7 @@ export const STRINGS_AR: TranslationStrings = {
             customAliases: ['اسم', 'ملف', 'تاريخ', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'خاصية عرض الصورة',
             sizePropertyDesc:
-                'خاصية frontmatter التي تحدّد عرض الصور الملصقة في ملاحظة. مع "image-width: 400" في الملاحظة تصبح الصورة الملصقة ![[photo.png|400]]. اتركها فارغة لعدم إضافة عرض.',
+                'خاصية frontmatter التي تحدّد عرض الصور الملصقة في ملاحظة. مع "{property}: 400" في الملاحظة تصبح الصورة الملصقة ![[photo.png|400]]. اتركها فارغة لعدم إضافة عرض.',
             sizePropertyAliases: ['حجم', 'frontmatter', 'خاصية', 'تغيير الحجم']
         },
 

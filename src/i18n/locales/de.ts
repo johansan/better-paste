@@ -118,7 +118,7 @@ export const STRINGS_DE: TranslationStrings = {
             customAliases: ['name', 'dateiname', 'datum', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Eigenschaft für Bildbreite',
             sizePropertyDesc:
-                'Frontmatter-Eigenschaft, die die Breite der in eine Notiz eingefügten Bilder festlegt. Mit "image-width: 400" in der Notiz wird ein eingefügtes Bild zu ![[photo.png|400]]. Leer lassen, um keine Breite zu setzen.',
+                'Frontmatter-Eigenschaft, die die Breite der in eine Notiz eingefügten Bilder festlegt. Mit "{property}: 400" in der Notiz wird ein eingefügtes Bild zu ![[photo.png|400]]. Leer lassen, um keine Breite zu setzen.',
             sizePropertyAliases: ['größe', 'frontmatter', 'eigenschaft', 'skalieren']
         },
 

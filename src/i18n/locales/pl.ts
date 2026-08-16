@@ -111,7 +111,7 @@ export const STRINGS_PL: TranslationStrings = {
             customAliases: ['nazwa', 'plik', 'data', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Właściwość szerokości obrazu',
             sizePropertyDesc:
-                'Właściwość frontmatter określająca szerokość obrazów wklejanych do notatki. Przy "image-width: 400" w notatce wklejony obraz przybiera postać ![[photo.png|400]]. Pozostaw puste, aby nie dodawać szerokości.',
+                'Właściwość frontmatter określająca szerokość obrazów wklejanych do notatki. Przy "{property}: 400" w notatce wklejony obraz przybiera postać ![[photo.png|400]]. Pozostaw puste, aby nie dodawać szerokości.',
             sizePropertyAliases: ['rozmiar', 'frontmatter', 'właściwość', 'skalowanie']
         },
 

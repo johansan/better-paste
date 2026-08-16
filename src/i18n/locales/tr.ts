@@ -109,7 +109,7 @@ export const STRINGS_TR: TranslationStrings = {
             customAliases: ['ad', 'dosya adı', 'tarih', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Görsel genişliği özelliği',
             sizePropertyDesc:
-                'Bir nota yapıştırılan görsellerin genişliğini belirleyen frontmatter özelliği. Notta "image-width: 400" varsa, yapıştırılan görsel ![[photo.png|400]] biçimine girer. Genişlik eklenmemesi için boş bırakın.',
+                'Bir nota yapıştırılan görsellerin genişliğini belirleyen frontmatter özelliği. Notta "{property}: 400" varsa, yapıştırılan görsel ![[photo.png|400]] biçimine girer. Genişlik eklenmemesi için boş bırakın.',
             sizePropertyAliases: ['boyut', 'frontmatter', 'özellik', 'yeniden boyutlandır']
         },
 

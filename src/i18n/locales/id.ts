@@ -106,7 +106,7 @@ export const STRINGS_ID: TranslationStrings = {
             customAliases: ['nama', 'berkas', 'tanggal', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Properti lebar gambar',
             sizePropertyDesc:
-                'Properti frontmatter yang menentukan lebar gambar yang ditempel ke sebuah catatan. Dengan "image-width: 400" di catatan, gambar yang ditempel menjadi ![[photo.png|400]]. Biarkan kosong agar tidak ada lebar yang ditambahkan.',
+                'Properti frontmatter yang menentukan lebar gambar yang ditempel ke sebuah catatan. Dengan "{property}: 400" di catatan, gambar yang ditempel menjadi ![[photo.png|400]]. Biarkan kosong agar tidak ada lebar yang ditambahkan.',
             sizePropertyAliases: ['ukuran', 'frontmatter', 'properti', 'ubah ukuran']
         },
 

@@ -105,7 +105,7 @@ export const STRINGS_KO: TranslationStrings = {
             customAliases: ['이름', '파일 이름', '날짜', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: '이미지 너비 속성',
             sizePropertyDesc:
-                '노트에 붙여넣는 이미지의 너비를 정하는 프론트매터 속성입니다. 노트에 "image-width: 400"이 있으면 붙여넣은 이미지가 ![[photo.png|400]]이 됩니다. 비워 두면 너비를 넣지 않습니다.',
+                '노트에 붙여넣는 이미지의 너비를 정하는 프론트매터 속성입니다. 노트에 "{property}: 400"이 있으면 붙여넣은 이미지가 ![[photo.png|400]]이 됩니다. 비워 두면 너비를 넣지 않습니다.',
             sizePropertyAliases: ['크기', '프론트매터', 'frontmatter', '속성', '크기 조정']
         },
 
