@@ -215,7 +215,7 @@ export const STRINGS_EN = {
             invisibleExampleEnd: ' was fine.',
             invisibleExampleAfter: 'The result was fine.',
             quotesName: 'Quotes',
-            quotesDesc: 'Converts quotation marks and apostrophes to this style.',
+            quotesDesc: 'Converts curly quotes and apostrophes into straight quotes.',
             quotesAliases: [
                 'quote',
                 'quotes',
@@ -227,21 +227,11 @@ export const STRINGS_EN = {
                 'typography',
                 'ai'
             ],
-            quotesNone: 'No change',
-            quotesStraight: 'Straight quotes',
-            quotesCurly: 'Curly quotes',
-            // Holds a curly pair and a straight pair, so both styles change it
-            quotesExample: '“Fine,” she said. "Don\'t stop."',
+            quotesExample: '“Fine,” she said.',
             dashesName: 'Dashes',
-            dashesDesc: 'Converts dashes between words to this style.',
+            dashesDesc: 'Converts en and em dashes into hyphens.',
             dashesAliases: ['dash', 'em dash', 'en dash', 'hyphen', 'punctuation', 'typography', 'ai'],
-            dashesNone: 'No change',
-            dashesHyphen: 'Hyphens',
-            dashesEn: 'En dashes',
-            dashesEm: 'Em dashes',
-            dashesEmSpaced: 'Em dashes with spaces',
-            // Holds a spaced hyphen and an em dash, so every style changes it
-            dashesExample: 'The result - against all odds — was fine.',
+            dashesExample: 'The result — against all odds — was fine.',
             commasName: 'Commas',
             commasDesc: 'Where a comma goes next to a closing double quotation mark.',
             commasAliases: ['comma', 'quote', 'quotation', 'punctuation', 'style'],

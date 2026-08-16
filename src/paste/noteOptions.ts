@@ -39,10 +39,9 @@ const SIZE_PATTERN = /^(\d+)(?:\s*[x×]\s*(\d+))?$/i;
 const FALSEY = new Set(['false', 'off', 'no', '0', 'disabled']);
 const TRUTHY = new Set(['true', 'on', 'yes', '1', 'enabled']);
 
-/** True when a line closes a frontmatter block. */
+/** True when a line closes a frontmatter block. Obsidian accepts only ---, not YAML's ... */
 function isFrontmatterEnd(line: string): boolean {
-    const trimmed = line.trimEnd();
-    return trimmed === '---' || trimmed === '...';
+    return line.trimEnd() === '---';
 }
 
 /**

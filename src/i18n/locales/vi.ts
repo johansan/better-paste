@@ -211,21 +211,13 @@ export const STRINGS_VI: TranslationStrings = {
             invisibleExampleEnd: ' rất tốt.',
             invisibleExampleAfter: 'Kết quả rất tốt.',
             quotesName: 'Dấu nháy',
-            quotesDesc: 'Chuyển dấu nháy và dấu lược sang kiểu này.',
+            quotesDesc: 'Chuyển dấu nháy cong và dấu lược thành dấu nháy thẳng.',
             quotesAliases: ['dấu nháy', 'dấu ngoặc kép', 'dấu nháy cong', 'dấu nháy thẳng', 'dấu lược', 'dấu câu', 'kiểu chữ', 'ai'],
-            quotesNone: 'Không thay đổi',
-            quotesStraight: 'Dấu nháy thẳng',
-            quotesCurly: 'Dấu nháy cong',
-            quotesExample: '“Xong rồi”, anh ấy nói. "Đừng dừng lại".',
+            quotesExample: '“Xong rồi”, anh ấy nói.',
             dashesName: 'Gạch ngang',
-            dashesDesc: 'Chuyển gạch ngang giữa các từ sang kiểu này.',
+            dashesDesc: 'Chuyển gạch ngang en và em thành gạch nối.',
             dashesAliases: ['gạch ngang', 'gạch ngang dài', 'gạch nối', 'dấu câu', 'kiểu chữ', 'ai'],
-            dashesNone: 'Không thay đổi',
-            dashesHyphen: 'Gạch nối',
-            dashesEn: 'Gạch ngang en',
-            dashesEm: 'Gạch ngang em',
-            dashesEmSpaced: 'Gạch ngang em có khoảng trắng',
-            dashesExample: 'Kết quả - bất chấp mọi thứ — rất tốt.'
+            dashesExample: 'Kết quả — bất chấp mọi thứ — rất tốt.'
         }
     },
 

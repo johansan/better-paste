@@ -200,21 +200,13 @@ export const STRINGS_JA: TranslationStrings = {
             invisibleExampleEnd: ' だった。',
             invisibleExampleAfter: '結果は OK だった。',
             quotesName: '引用符',
-            quotesDesc: '引用符とアポストロフィをこのスタイルに変えます。',
+            quotesDesc: '曲線引用符とアポストロフィをまっすぐな引用符に変えます。',
             quotesAliases: ['引用符', 'スマート引用符', 'クォーテーション', 'アポストロフィ', '句読点', 'タイポグラフィ', 'ai'],
-            quotesNone: '変更しない',
-            quotesStraight: 'まっすぐな引用符',
-            quotesCurly: '曲線引用符',
-            quotesExample: '“完了”と表示された。次は "保留" だ。',
+            quotesExample: '“完了” と表示された。',
             dashesName: 'ダッシュ',
-            dashesDesc: '語の間のダッシュをこのスタイルに変えます。',
+            dashesDesc: 'en ダッシュと em ダッシュをハイフンに変えます。',
             dashesAliases: ['ダッシュ', 'em ダッシュ', 'en ダッシュ', '全角ダッシュ', 'ハイフン', '句読点', 'タイポグラフィ', 'ai'],
-            dashesNone: '変更しない',
-            dashesHyphen: 'ハイフン',
-            dashesEn: 'en ダッシュ',
-            dashesEm: 'em ダッシュ',
-            dashesEmSpaced: 'スペース付き em ダッシュ',
-            dashesExample: 'その結果は - 予想に反して — 良かった。'
+            dashesExample: 'その結果は — 予想に反して — 良かった。'
         }
     },
 

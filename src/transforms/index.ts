@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { applyDashStyle, applyQuoteStyle, normalizeInvisibleCharacters } from './typography';
+import { frontmatterRanges, normalizeInvisibleCharacters, straightenDashes, straightenQuotes } from './typography';
 import { cleanTerminalText } from './terminalText';
 import { applyCommaPlacement } from './textProcessing';
 import { buildUrlCleanupOptions, cleanUrlsInText, httpUrlRanges } from './urlCleanup';
@@ -32,7 +32,10 @@ export interface TextPipelineResult {
 /** Trims surrounding paste noise while preserving indentation that makes the first line code. */
 function trimPasteEdges(text: string): string {
     let trimmed = text.replace(/^(?:[ \t]*\r?\n)+/, '').replace(/(?:\r?\n[ \t]*)+$/, '');
-    if (!/^(?: {4}|\t)/.test(trimmed)) trimmed = trimmed.replace(/^[ \t]+/, '');
+    // An indented list item keeps its indent, because stripping it from the first line
+    // only would turn two siblings into a parent and a nested child
+    const listItem = /^[ \t]+(?:[-*+][ \t]|\d{1,9}[.)][ \t])/.test(trimmed);
+    if (!listItem && !/^(?: {4}|\t)/.test(trimmed)) trimmed = trimmed.replace(/^[ \t]+/, '');
     return trimmed.replace(/[ \t]+$/, '');
 }
 
@@ -60,15 +63,17 @@ export function runTextPipeline(input: string, settings: BetterPasteSettings): T
     if (settings.terminalEnabled) text = cleanTerminalText(text, settings).text;
 
     if (settings.linkEnabled) {
-        // Anything that is about to be downloaded as an image is off limits to URL
-        // cleaning, which would otherwise strip the token out of a signed link
-        const protect = settings.imageEnabled ? imageReferenceRanges(text) : [];
+        // Image references are off limits to URL cleaning whether or not they are
+        // downloaded: stripping the token out of a signed link breaks the download,
+        // and breaks the remote embed even more permanently when the link stays in
+        // the note. A URL in a frontmatter value is data and keeps its parameters too.
+        const protect = [...imageReferenceRanges(text), ...frontmatterRanges(text)];
         text = cleanUrlsInText(text, buildUrlCleanupOptions(settings), protect).text;
     }
 
-    if (settings.textDashes !== 'none') text = applyDashStyle(text, settings.textDashes, httpUrlRanges(text)).text;
+    if (settings.textDashes) text = straightenDashes(text, httpUrlRanges(text)).text;
 
-    if (settings.textQuotes !== 'none') text = applyQuoteStyle(text, settings.textQuotes, httpUrlRanges(text)).text;
+    if (settings.textQuotes) text = straightenQuotes(text, httpUrlRanges(text)).text;
 
     if (settings.textComma !== 'none') text = applyCommaPlacement(text, settings.textComma).text;
 

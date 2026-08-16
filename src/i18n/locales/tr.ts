@@ -194,7 +194,7 @@ export const STRINGS_TR: TranslationStrings = {
             invisibleExampleEnd: ' iyiydi.',
             invisibleExampleAfter: 'Sonuç gayet iyiydi.',
             quotesName: 'Tırnak işaretleri',
-            quotesDesc: 'Tırnak ve kesme işaretlerini bu stile dönüştürür.',
+            quotesDesc: 'Kıvrık tırnakları ve kesme işaretlerini düz tırnağa dönüştürür.',
             quotesAliases: [
                 'tırnak',
                 'kıvrık tırnak',
@@ -205,19 +205,11 @@ export const STRINGS_TR: TranslationStrings = {
                 'tipografi',
                 'yapay zeka'
             ],
-            quotesNone: 'Değişiklik yok',
-            quotesStraight: 'Düz tırnaklar',
-            quotesCurly: 'Kıvrık tırnaklar',
-            quotesExample: '“Bitti,” dedi. Her şey "hazır".',
+            quotesExample: '“Bitti” dedi.',
             dashesName: 'Tireler',
-            dashesDesc: 'Sözcükler arasındaki tireleri bu stile dönüştürür.',
+            dashesDesc: 'Orta ve uzun çizgileri kısa çizgiye dönüştürür.',
             dashesAliases: ['tire', 'çizgi', 'kısa çizgi', 'orta çizgi', 'uzun çizgi', 'uzun tire', 'noktalama', 'tipografi', 'yapay zeka'],
-            dashesNone: 'Değişiklik yok',
-            dashesHyphen: 'Kısa çizgiler',
-            dashesEn: 'Orta çizgiler',
-            dashesEm: 'Uzun çizgiler',
-            dashesEmSpaced: 'Boşluklu uzun çizgiler',
-            dashesExample: 'Sonuç - her şeye rağmen — iyiydi.'
+            dashesExample: 'Sonuç — her şeye rağmen — iyiydi.'
         }
     },
 

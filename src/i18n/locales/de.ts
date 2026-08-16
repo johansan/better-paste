@@ -203,7 +203,7 @@ export const STRINGS_DE: TranslationStrings = {
             invisibleExampleEnd: ' war gut.',
             invisibleExampleAfter: 'Das Ergebnis war gut.',
             quotesName: 'Anführungszeichen',
-            quotesDesc: 'Wandelt Anführungszeichen und Apostrophe in diesen Stil um.',
+            quotesDesc: 'Wandelt typografische Anführungszeichen und Apostrophe in gerade um.',
             quotesAliases: [
                 'anführungszeichen',
                 'gänsefüßchen',
@@ -214,12 +214,9 @@ export const STRINGS_DE: TranslationStrings = {
                 'typografie',
                 'ki'
             ],
-            quotesNone: 'Keine Änderung',
-            quotesStraight: 'Gerade Anführungszeichen',
-            quotesCurly: 'Typografische Anführungszeichen',
-            quotesExample: '„Gut“, sagte sie. "Jetzt geht\'s los."',
+            quotesExample: '„Gut“, sagte sie.',
             dashesName: 'Gedankenstriche',
-            dashesDesc: 'Wandelt Striche zwischen Wörtern in diesen Stil um.',
+            dashesDesc: 'Wandelt Halbgeviert- und Geviertstriche in Bindestriche um.',
             dashesAliases: [
                 'strich',
                 'gedankenstrich',
@@ -230,12 +227,7 @@ export const STRINGS_DE: TranslationStrings = {
                 'typografie',
                 'ki'
             ],
-            dashesNone: 'Keine Änderung',
-            dashesHyphen: 'Bindestriche',
-            dashesEn: 'Halbgeviertstriche',
-            dashesEm: 'Geviertstriche',
-            dashesEmSpaced: 'Geviertstriche mit Leerzeichen',
-            dashesExample: 'Das Ergebnis - allen Widerständen zum Trotz — war gut.'
+            dashesExample: 'Das Ergebnis — allen Widerständen zum Trotz — war gut.'
         }
     },
 

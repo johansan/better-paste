@@ -194,21 +194,13 @@ export const STRINGS_FA: TranslationStrings = {
             invisibleExampleEnd: ' خوب بود.',
             invisibleExampleAfter: 'آن نتیجه خوب بود.',
             quotesName: 'گیومه',
-            quotesDesc: 'گیومه‌ها و آپاستروف‌ها را به این سبک تبدیل می‌کند.',
+            quotesDesc: 'گیومه‌های خمیده و آپاستروف‌ها را به گیومه ساده تبدیل می‌کند.',
             quotesAliases: ['گیومه', 'نقل قول', 'گیومه خمیده', 'گیومه ساده', 'آپاستروف', 'نشانه‌گذاری', 'تایپوگرافی', 'هوش مصنوعی'],
-            quotesNone: 'بدون تغییر',
-            quotesStraight: 'گیومه ساده',
-            quotesCurly: 'گیومه خمیده',
-            quotesExample: 'گفت: “تمام شد”. بعد افزود: "ادامه بده".',
+            quotesExample: 'گفت: “تمام شد”.',
             dashesName: 'خط تیره',
-            dashesDesc: 'خط تیره‌های میان واژه‌ها را به این سبک تبدیل می‌کند.',
+            dashesDesc: 'نیم‌خط و خط تیره بلند را به خط پیوند تبدیل می‌کند.',
             dashesAliases: ['خط تیره', 'خط تیره بلند', 'نیم‌خط', 'خط پیوند', 'هایفن', 'نشانه‌گذاری', 'تایپوگرافی', 'هوش مصنوعی'],
-            dashesNone: 'بدون تغییر',
-            dashesHyphen: 'خط پیوند',
-            dashesEn: 'خط تیره کوتاه',
-            dashesEm: 'خط تیره بلند',
-            dashesEmSpaced: 'خط تیره بلند با فاصله',
-            dashesExample: 'نتیجه - برخلاف پیش‌بینی‌ها — خوب بود.'
+            dashesExample: 'نتیجه — برخلاف پیش‌بینی‌ها — خوب بود.'
         }
     },
 

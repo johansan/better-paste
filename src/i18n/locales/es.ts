@@ -204,21 +204,13 @@ export const STRINGS_ES: TranslationStrings = {
             invisibleExampleEnd: ' fue bueno.',
             invisibleExampleAfter: 'El resultado fue bueno.',
             quotesName: 'Comillas',
-            quotesDesc: 'Convierte las comillas y los apóstrofos a este estilo.',
+            quotesDesc: 'Convierte las comillas tipográficas y los apóstrofos en comillas rectas.',
             quotesAliases: ['comillas', 'comillas tipográficas', 'comillas rectas', 'apóstrofo', 'puntuación', 'tipografía', 'ia'],
-            quotesNone: 'Sin cambios',
-            quotesStraight: 'Comillas rectas',
-            quotesCurly: 'Comillas tipográficas',
-            quotesExample: '“Bien”, dijo. Todo "listo".',
+            quotesExample: '“Bien”, dijo.',
             dashesName: 'Guiones y rayas',
-            dashesDesc: 'Convierte los guiones y las rayas entre palabras a este estilo.',
+            dashesDesc: 'Convierte las semirrayas y las rayas en guiones.',
             dashesAliases: ['raya', 'guion largo', 'semirraya', 'guion', 'puntuación', 'tipografía', 'ia'],
-            dashesNone: 'Sin cambios',
-            dashesHyphen: 'Guiones',
-            dashesEn: 'Semirrayas',
-            dashesEm: 'Rayas',
-            dashesEmSpaced: 'Rayas con espacios',
-            dashesExample: 'El resultado - contra todo pronóstico — fue bueno.'
+            dashesExample: 'El resultado — contra todo pronóstico — fue bueno.'
         }
     },
 

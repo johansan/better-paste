@@ -191,7 +191,7 @@ export const STRINGS_ID: TranslationStrings = {
             invisibleExampleEnd: ' bagus.',
             invisibleExampleAfter: 'Hasil itu bagus.',
             quotesName: 'Tanda kutip',
-            quotesDesc: 'Mengubah tanda kutip dan apostrof menjadi gaya ini.',
+            quotesDesc: 'Mengubah tanda kutip melengkung dan apostrof menjadi tanda kutip lurus.',
             quotesAliases: [
                 'tanda kutip',
                 'tanda petik',
@@ -202,19 +202,11 @@ export const STRINGS_ID: TranslationStrings = {
                 'tipografi',
                 'ai'
             ],
-            quotesNone: 'Tanpa perubahan',
-            quotesStraight: 'Tanda kutip lurus',
-            quotesCurly: 'Tanda kutip melengkung',
-            quotesExample: '“Selesai,” katanya. Semua "beres".',
+            quotesExample: '“Selesai”, katanya.',
             dashesName: 'Tanda pisah',
-            dashesDesc: 'Mengubah tanda pisah di antara kata menjadi gaya ini.',
+            dashesDesc: 'Mengubah tanda pisah en dan em menjadi tanda hubung.',
             dashesAliases: ['tanda pisah', 'tanda pisah panjang', 'tanda hubung', 'strip', 'tanda baca', 'tipografi', 'ai'],
-            dashesNone: 'Tanpa perubahan',
-            dashesHyphen: 'Tanda hubung',
-            dashesEn: 'Tanda pisah en',
-            dashesEm: 'Tanda pisah em',
-            dashesEmSpaced: 'Tanda pisah em dengan spasi',
-            dashesExample: 'Hasilnya - di luar dugaan — bagus.'
+            dashesExample: 'Hasilnya — di luar dugaan — bagus.'
         }
     },
 

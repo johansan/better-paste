@@ -17,6 +17,7 @@
  */
 
 import { markdownCodeRanges, overlapsRange } from './markdownRanges';
+import { markdownSyntaxRanges } from './typography';
 import type { TextCommaPlacement } from '../settings/types';
 
 export interface TextProcessingResult {
@@ -28,10 +29,43 @@ export interface TextProcessingResult {
 export function applyCommaPlacement(input: string, placement: TextCommaPlacement): TextProcessingResult {
     if (placement === 'none') return { text: input, changed: false };
 
-    const protectedRanges = markdownCodeRanges(input);
+    // A comma next to a quote inside frontmatter, a wikilink or other syntax is data
+    // punctuation, not prose style
+    const protectedRanges = [...markdownCodeRanges(input), ...markdownSyntaxRanges(input)];
     const pattern = placement === 'inside' ? /["\u201D],/g : /,["\u201D]/g;
     const text = input.replace(pattern, (match, offset: number) => {
         if (overlapsRange(protectedRanges, offset, offset + match.length)) return match;
+        // The move is only safe when quoted prose ends right before the match: for
+        // inside mode the quote must close a word, for outside mode the comma must
+        // follow one. Anything else, such as a quoted separator ", ", a quoted comma
+        // "," or an empty "", is content and stays exactly where it is. Digits do not
+        // count as prose, because a straight quote after a number is usually an inch
+        // mark (the 27" model) or an attribute value (width="10"), not a quotation.
+        if (!/[\p{L}\p{M}]/u.test(input[offset - 1] ?? '')) return match;
+
+        // The move happens only when a plain space follows, which is how the
+        // quotation sits mid-sentence in prose. Anything else is data: a quote or
+        // comma means CSV fields, a tab means a TSV row, a word means a missing
+        // space in front of a new quotation, and a line end means a CSV row or a
+        // pretty-printed JSON line.
+        if (input[offset + match.length] !== ' ') return match;
+
+        // A quote or bracket behind the space reads as another value in single-line
+        // JSON, such as {"name":"Anna", "city":"Berg"}, just as well as an
+        // enumeration of quoted words, so the comma stays put
+        if (/["“”[{]/.test(input[offset + match.length + 1] ?? '')) return match;
+
+        // A straight quote is directionless, so it only closes a quotation when an
+        // earlier quote on the line opened one. Without that the match sits at a
+        // field start, as in: name," John Smith",age
+        const quote = placement === 'inside' ? match[0] : match[1];
+        if (quote === '"') {
+            let opened = false;
+            for (let i = input.lastIndexOf('\n', offset - 1) + 1; i < offset; i++) {
+                if (input[i] === '"') opened = !opened;
+            }
+            if (!opened) return match;
+        }
         return placement === 'inside' ? `,${match[0]}` : `${match[1]},`;
     });
 

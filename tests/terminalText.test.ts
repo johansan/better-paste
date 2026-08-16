@@ -82,11 +82,11 @@ describe('cleanTerminalText', () => {
             ' I will remove the extra debate confirmation, then trace the menu main keyboard flows for other small, low-risk friction points. I will',
             '  keep destructive actions explicit and verify the interaction behavior with the existing tests or a focused harness.',
             '',
-            '• The extra step is isolated to the list Enter handler, so the core change is straightforward. While tracing adjacent flows, I found',
+            '\u2022 The extra step is isolated to the list Enter handler, so the core change is straightforward. While tracing adjacent flows, I found',
             '  two likely friction points worth validating: selection can jump after the 20-second refresh, and pasted Discord items require the',
             '  uncommon Ctrl-D shortcut to save. I am checking the reference UI and current data behavior before changing either.',
             '',
-            '• I am making three contained usability changes: Enter will launch a new debate immediately, busy screens will paint before any CLI work',
+            '\u2022 I am making three contained usability changes: Enter will launch a new debate immediately, busy screens will paint before any CLI work',
             '  begins, and auto-refresh will preserve the selected issue by ID instead of merely preserving its row number. I am leaving',
             '  confirmations in place only for removing local items, since that action changes stored data.'
         ].join('\n');
@@ -187,6 +187,18 @@ describe('cleanTerminalText', () => {
         expect(cleanTerminalText(input, options()).text).toBe('red text');
     });
 
+    it('strips DCS and APC strings with their whole payload', () => {
+        expect(cleanTerminalText(`${ESC}Pq#0;2;0;0;0-${ESC}\\build ok`, options()).text).toBe('build ok');
+        expect(cleanTerminalText(`${ESC}Ptmux;${ESC}${ESC}]0;server1${BEL}${ESC}\\$ make test`, options()).text).toBe('$ make test');
+        expect(cleanTerminalText(`${ESC}_Ga=T,f=32;QUFBQQ==${ESC}\\done`, options()).text).toBe('done');
+    });
+
+    it('strips charset selection, keypad and cursor escapes without leaving litter', () => {
+        expect(cleanTerminalText(`${ESC}[1mBuild passed${ESC}(B${ESC}[m`, options()).text).toBe('Build passed');
+        expect(cleanTerminalText(`${ESC}=less output${ESC}>`, options()).text).toBe('less output');
+        expect(cleanTerminalText(`${ESC}7prompt${ESC}8`, options()).text).toBe('prompt');
+    });
+
     it('strips OSC hyperlink sequences', () => {
         const input = `${ESC}]8;;https://example.com${BEL}link${ESC}]8;;${BEL}`;
         expect(cleanTerminalText(input, options()).text).toBe('link');
@@ -198,20 +210,127 @@ describe('cleanTerminalText', () => {
         expect(cleanTerminalText('a\n\n\n\nb', options()).text).toBe('a\n\n\n\nb');
     });
 
+    it('keeps frontmatter verbatim behind leading blank lines in the any mode', () => {
+        const long = `title: ${'x'.repeat(70)}`;
+        const input = `\n---\n${long}\ntags: [a, b]\n---\n${'body '.repeat(16)}\n  continues here`;
+        const result = cleanTerminalText(input, options({ terminalRejoin: 'any' })).text;
+        expect(result).toContain(`${long}\ntags: [a, b]\n---`);
+    });
+
+    it('leaves bullets inside frontmatter alone while converting them outside', () => {
+        const input = '---\nsummary: |\n  \u2022 first point\n---\n\u2022 outside';
+        expect(cleanTerminalText(input, options()).text).toBe('---\nsummary: |\n  \u2022 first point\n---\n- outside');
+    });
+
+    it('keeps frontmatter verbatim behind an indented opener in the any mode', () => {
+        const long = `title: ${'x'.repeat(70)}`;
+        const input = ` ---\n${long}\ntags: [a, b]\n---\n${'body '.repeat(16)}\n  continues here`;
+        const result = cleanTerminalText(input, options({ terminalRejoin: 'any' })).text;
+        expect(result).toContain(`${long}\ntags: [a, b]\n---`);
+    });
+
+    it('keeps a nested heading from absorbing the indented line below it', () => {
+        const heading = `- # ${'Completed heading '.repeat(4)}end`;
+        const input = `${heading}\n  Body paragraph.\n${'body '.repeat(16)}\n  continues here`;
+        expect(cleanTerminalText(input, options()).text).toContain(`${heading}\nBody paragraph.`);
+    });
+
+    it('keeps a blockquoted heading inside a list from absorbing the indented line below it', () => {
+        const heading = `- > # ${'Long heading '.repeat(4)}end`;
+        const input = `${heading}\n  Body paragraph.\n${'body '.repeat(16)}\n  continues here`;
+        expect(cleanTerminalText(input, options()).text).toContain(`${heading}\nBody paragraph.`);
+    });
+
+    it('keeps a long heading from absorbing the indented line below it', () => {
+        const heading = `# ${'Long heading '.repeat(6)}end`;
+        const input = `${heading}\n  This is body text.\n${'body '.repeat(16)}\n  continues here`;
+        const result = cleanTerminalText(input, options()).text;
+        expect(result).toContain(`${heading}\nThis is body text.`);
+    });
+
+    it('keeps a blockquoted separator from absorbing the line below it', () => {
+        const bar = `> ${'-'.repeat(80)}`;
+        const input = `${bar}\nSection after quote\n${'body '.repeat(16)}\n  continues here`;
+        const result = cleanTerminalText(input, options({ terminalRejoin: 'any' })).text;
+        expect(result).toContain(`${bar}\nSection after quote`);
+    });
+
+    it('keeps a separator row from absorbing the line below it in the any mode', () => {
+        const bar = '-'.repeat(80);
+        const input = `${bar}\nSection title\n${bar}\n${'body '.repeat(16)}\n  continues here`;
+        const result = cleanTerminalText(input, options({ terminalRejoin: 'any' })).text;
+        expect(result).toContain(`${bar}\nSection title\n${bar}`);
+    });
+
+    it('keeps frontmatter lines apart even in the any mode', () => {
+        const long = `description: ${'x'.repeat(70)}`;
+        const input = `\u001B[0m---\n${long}\nauthor: Johan\n---\nbody`;
+        expect(cleanTerminalText(input, options({ terminalRejoin: 'any' })).text).toBe(`---\n${long}\nauthor: Johan\n---\nbody`);
+    });
+
+    it('leaves a setext underline on its own line, keeping the heading', () => {
+        const heading = 'A long heading that explains the complete terminal cleanup behavior of the plugin';
+        const input = `\u001B[0m${heading}\n ==`;
+        expect(cleanTerminalText(input, options()).text).toBe(`${heading}\n ==`);
+    });
+
+    it('keeps blank-line runs inside a fence while collapsing them outside', () => {
+        // PEP8 puts two blank lines between functions; fence content is promised verbatim
+        const input = '\u001B[32m$ cat x.py\u001B[0m\n```python\ndef a():\n    pass\n\n\ndef b():\n    pass\n```\n\n\n\ndone';
+        expect(cleanTerminalText(input, options()).text).toBe(
+            '$ cat x.py\n```python\ndef a():\n    pass\n\n\ndef b():\n    pass\n```\n\ndone'
+        );
+    });
+
     it('converts bullets to Markdown list syntax by default', () => {
-        const input = '• First item\n• Second item';
+        const input = '\u2022 First item\n\u2022 Second item';
         expect(cleanTerminalText(input, options()).text).toBe('- First item\n- Second item');
     });
 
+    it('converts nested bullets indented with tabs or four spaces', () => {
+        // A nested line without a blank above continues the list, it is not indented code
+        expect(cleanTerminalText('\u2022 Top item\n\t\u2022 Nested item', options()).text).toBe('- Top item\n\t- Nested item');
+        expect(cleanTerminalText('\u2022 Top item\n    \u2022 Nested item', options()).text).toBe('- Top item\n    - Nested item');
+    });
+
+    it('leaves an indented code block after a blank line untouched', () => {
+        const input = 'Example:\n\n    \u2022 literal output';
+        expect(cleanTerminalText(input, options()).text).toBe(input);
+    });
+
+    it('converts bullets after an unclosed indented fence ends with its list', () => {
+        const input = '- Setup:\n    ```\n    make build\n\n\u2022 first point\n\u2022 second point';
+        expect(cleanTerminalText(input, options()).text).toBe('- Setup:\n    ```\n    make build\n\n- first point\n- second point');
+    });
+
+    it('converts a bullet behind a blockquote marker', () => {
+        expect(cleanTerminalText('> \u2022 First item', options()).text).toBe('> - First item');
+    });
+
+    it('protects an indented fence under a triangular bullet item', () => {
+        const input = '\u2023 Example:\n    ```\n    \u2022 literal output\n    ```';
+        expect(cleanTerminalText(input, options()).text).toBe('- Example:\n    ```\n    \u2022 literal output\n    ```');
+    });
+
+    it('keeps a deeper indented delimiter inside a nested fence as content', () => {
+        const input = '1. Example:\n    ```text\n        ```\n    \u2022 literal bullet\n    ```';
+        expect(cleanTerminalText(input, options()).text).toBe(input);
+    });
+
+    it('leaves an indented code block untouched when the blank line carries indentation', () => {
+        const input = 'Example:\n    \n    \u2022 literal output';
+        expect(cleanTerminalText(input, options()).text).toBe(input);
+    });
+
     it('preserves bullet characters when asked', () => {
-        const input = '• First item\n• Second item';
+        const input = '\u2022 First item\n\u2022 Second item';
         expect(cleanTerminalText(input, options({ terminalBullets: 'preserve' })).text).toBe(input);
     });
 
     it('leaves bullets inside fenced code untouched', () => {
-        const input = ['```text', '• literal output', '```', '• List item'].join('\n');
+        const input = ['```text', '\u2022 literal output', '```', '\u2022 List item'].join('\n');
         expect(cleanTerminalText(input, options({ terminalBullets: 'markdown' })).text).toBe(
-            ['```text', '• literal output', '```', '- List item'].join('\n')
+            ['```text', '\u2022 literal output', '```', '- List item'].join('\n')
         );
     });
 

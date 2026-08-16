@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { TextDashStyle, TextQuoteStyle } from '../settings/types';
+import { getFrontMatterInfo } from 'obsidian';
 import { markdownCodeRanges, overlapsRange } from './markdownRanges';
 import type { ProtectedRange } from './urlCleanup';
 
@@ -24,9 +24,14 @@ import type { ProtectedRange } from './urlCleanup';
  * Every pattern and replacement is built from escape strings rather than literal
  * characters, because the whole point of these rules is that the characters are invisible
  * or easily confused in a source file.
+ *
+ * Both rules convert toward plain ASCII only. Straight quotes and hyphens are what
+ * Markdown's own syntax is made of, so this direction tends to repair pasted syntax
+ * rather than break it. The protections below cover the places where the character is
+ * part of a name or of data instead of prose.
  */
 
-/** Em dash and en dash, both replaced by a hyphen in the hyphen style. */
+/** Em dash and en dash, both replaced by a hyphen. */
 const DASHES = new RegExp('[\\u2013\\u2014]', 'g');
 
 /**
@@ -64,20 +69,94 @@ const EXOTIC_SPACE = new RegExp('[\\u00A0\\u1680\\u2000-\\u200A\\u202F\\u205F]')
 const NORMALIZED_CHARACTERS = new RegExp('[\\u00A0\\u1680\\u2000-\\u200A\\u202F\\u205F\\u00AD\\u200B\\uFEFF\\u202D\\u202E]', 'g');
 
 /**
- * A dash acting as a separator between words: a hyphen or en dash set off by single
- * spaces, or an em dash with or without them. An em dash is always a separator, but a
- * hyphen or en dash without spaces joins a compound or a range and is left alone.
+ * A Markdown link or embed destination, protected whole. One level of balanced
+ * parentheses is allowed so a folder like ](Notes/(Draft)/x.md) is covered to its end.
  */
-const DASH_SEPARATOR = new RegExp(' [-\\u2013] | ?\\u2014 ?', 'g');
+const LINK_DESTINATION = new RegExp('\\]\\([^()\\n]*(?:\\([^()\\n]*\\)[^()\\n]*)*\\)', 'g');
 
-const EM_DASH = '\u2014';
-const EN_DASH = '\u2013';
+/**
+ * Only the path part of a destination, stopping before an optional quoted title. One
+ * level of balanced parentheses is allowed, for folders such as ](Notes/(Draft)/x.md).
+ */
+const LINK_DESTINATION_PATH = new RegExp('\\]\\(\\s*(?:<[^>\\n]*>|(?:[^()\\s\\n]|\\([^()\\s\\n]*\\))*)', 'g');
 
-/** Blockquote markers and indentation, everything a line may hold before its content starts. */
-const LINE_PREFIX = new RegExp('^(?: {0,3}>[ \\t]?)* {0,3}$');
+/**
+ * A titled destination whose URL may carry one level of parentheses, the Wikipedia shape:
+ * ](https://en.wikipedia.org/wiki/Foo_(film) "Foo (film)"). The plain LINK_DESTINATION
+ * stops at the URL's inner closing paren, so both run.
+ */
+const LINK_DESTINATION_TITLED = new RegExp(
+    '\\]\\(\\s*(?:<[^<>\\n]*>|(?:[^()<\\s\\n]|\\([^()<\\s\\n]*\\))+)' + '(?:[ \\t]+(?:"[^"\\n]*"|\'[^\'\\n]*\'|\\([^)\\n]*\\)))?[ \\t]*\\)',
+    'g'
+);
 
-/** Characters after which a straight quote opens rather than closes. */
-const OPENS_AFTER = new RegExp('[\\s([{\\u2018\\u201C\\u2013\\u2014-]');
+/** A link reference or footnote definition line, with the label captured separately. */
+const LINK_DEFINITION_LINE = new RegExp('^( {0,3}\\[[^\\]\\n]+\\]):[ \\t]*[^\\n]*$', 'gm');
+
+/**
+ * The colon-to-end tail of every definition line. The [label] itself is left out so it
+ * converts exactly like its usages in the text, keeping the reference matched.
+ */
+function definitionTailRanges(input: string): ProtectedRange[] {
+    const ranges: ProtectedRange[] = [];
+    LINK_DEFINITION_LINE.lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = LINK_DEFINITION_LINE.exec(input)) !== null) {
+        ranges.push({ start: match.index + match[1].length, end: match.index + match[0].length });
+    }
+    return ranges;
+}
+
+/** An HTML tag with its attributes, whose paths and values are syntax rather than prose. */
+const HTML_TAG = new RegExp('</?[A-Za-z][^<>\\n]*>', 'g');
+
+/** A wikilink or embed. Its target, subpath and alias must survive to keep resolving. */
+const WIKILINK = new RegExp('\\[\\[[^\\[\\]\\n]+\\]\\]', 'g');
+
+/**
+ * The frontmatter block leading the pasted text, whose values are data, not prose. The
+ * boundary comes from Obsidian's own getFrontMatterInfo, so the protected block is
+ * exactly what the app would read. Leading blank lines are skipped first, because the
+ * trim rule removes them later, which turns the block into real frontmatter once it
+ * lands in a note.
+ */
+export function frontmatterRanges(input: string): ProtectedRange[] {
+    // Anything leading the block that this pipeline later removes or trims, such as a
+    // BOM, zero-width characters or blank lines, is skipped before detection, because
+    // once it is gone the block lands in the note as real frontmatter
+    const prefix = new RegExp('^[\\s\\u00AD\\u200B\\u202D\\u202E]*').exec(input)?.[0].length ?? 0;
+    const body = input.slice(prefix);
+    let info = getFrontMatterInfo(body);
+    // A closer carrying trailing whitespace at the document end fails detection, yet the
+    // trim rule strips exactly that whitespace later, promoting the block
+    if (!info.exists) info = getFrontMatterInfo(body.replace(/[ \t]+$/, ''));
+    return info.exists ? [{ start: prefix, end: prefix + info.contentStart }] : [];
+}
+
+/**
+ * The spans every text rule must leave alone: link syntax, HTML tags, definition tails
+ * and frontmatter. The character rules add their own per-rule variations on top.
+ */
+export function markdownSyntaxRanges(input: string): ProtectedRange[] {
+    return [
+        ...syntaxRanges(input, [WIKILINK, LINK_DESTINATION, LINK_DESTINATION_TITLED, HTML_TAG]),
+        ...frontmatterRanges(input),
+        ...definitionTailRanges(input)
+    ];
+}
+
+/** The spans the given patterns occupy, collected as protected ranges. */
+function syntaxRanges(input: string, patterns: readonly RegExp[]): ProtectedRange[] {
+    const ranges: ProtectedRange[] = [];
+    for (const pattern of patterns) {
+        pattern.lastIndex = 0;
+        let match: RegExpExecArray | null;
+        while ((match = pattern.exec(input)) !== null) {
+            ranges.push({ start: match.index, end: match.index + match[0].length });
+        }
+    }
+    return ranges;
+}
 
 export interface TypographyResult {
     text: string;
@@ -93,55 +172,50 @@ export interface TypographyResult {
  * and indentation detection.
  */
 export function normalizeInvisibleCharacters(input: string, protect: readonly ProtectedRange[] = []): TypographyResult {
+    // A link target or frontmatter value carries the character as part of a name or of
+    // data, so those stay untouched. The whole destination is used here because the path
+    // pattern would stop at the very no-break space this protects. Code is deliberately
+    // not protected: an invisible character in pasted code is exactly the bug this
+    // cleanup exists to remove.
+    const protectedRanges = [
+        ...protect,
+        ...syntaxRanges(input, [WIKILINK, LINK_DESTINATION, HTML_TAG]),
+        ...frontmatterRanges(input),
+        ...definitionTailRanges(input)
+    ];
     const text = input.replace(NORMALIZED_CHARACTERS, (match, offset: number) => {
-        if (overlapsRange(protect, offset, offset + match.length)) return match;
+        if (overlapsRange(protectedRanges, offset, offset + match.length)) return match;
         return EXOTIC_SPACE.test(match) ? ' ' : '';
     });
     return { text, changed: text !== input };
 }
 
 /**
- * Converts quotation marks and apostrophes to the chosen style.
+ * Turns curly quotes and apostrophes into straight ones.
  *
- * Runs after the structural rules like the dash rule, and before the comma rule, which
- * recognizes straight and curly closing quotes alike.
+ * A quote inside a wikilink target, a destination path, an HTML tag, a definition or
+ * frontmatter is part of a name or of data, so it stays. Link titles are deliberately not
+ * protected: straight quotes are their valid delimiters, so this repairs them.
  */
-export function applyQuoteStyle(input: string, style: TextQuoteStyle, protect: readonly ProtectedRange[] = []): TypographyResult {
-    if (style === 'none') return { text: input, changed: false };
-
-    const protectedRanges = [...markdownCodeRanges(input), ...protect];
+export function straightenQuotes(input: string, protect: readonly ProtectedRange[] = []): TypographyResult {
+    const protectedRanges = [
+        ...markdownCodeRanges(input),
+        ...protect,
+        ...syntaxRanges(input, [WIKILINK, LINK_DESTINATION_PATH, LINK_DESTINATION_TITLED, HTML_TAG]),
+        ...frontmatterRanges(input),
+        ...definitionTailRanges(input)
+    ];
     const outsideCode = (match: string, offset: number, replacement: string): string =>
         overlapsRange(protectedRanges, offset, offset + match.length) ? match : replacement;
 
-    if (style === 'straight') {
-        const text = input
-            .replace(DOUBLE_QUOTES, (match, offset: number) => outsideCode(match, offset, '"'))
-            .replace(SINGLE_QUOTES, (match, offset: number) => outsideCode(match, offset, "'"));
-        return { text, changed: text !== input };
-    }
-
-    // Each replacement is one UTF-16 unit for one, so every offset stays valid for the
-    // protected ranges and for the context checks of the single-quote pass below
-    let text = input.replace(/"/g, (match, offset: number) => {
-        const opening = offset === 0 || OPENS_AFTER.test(input[offset - 1]);
-        return outsideCode(match, offset, opening ? '\u201C' : '\u201D');
-    });
-
-    text = text.replace(/'/g, (match, offset: number) => {
-        const previous = text[offset - 1];
-        // An apostrophe inside or at the end of a word, and a decade such as '90s
-        if (previous !== undefined && /[\p{L}\p{N}]/u.test(previous)) return outsideCode(match, offset, '\u2019');
-        if (/^\d\ds\b/.test(text.slice(offset + 1, offset + 5))) return outsideCode(match, offset, '\u2019');
-
-        const opening = previous === undefined || OPENS_AFTER.test(previous);
-        return outsideCode(match, offset, opening ? '\u2018' : '\u2019');
-    });
-
+    const text = input
+        .replace(DOUBLE_QUOTES, (match, offset: number) => outsideCode(match, offset, '"'))
+        .replace(SINGLE_QUOTES, (match, offset: number) => outsideCode(match, offset, "'"));
     return { text, changed: text !== input };
 }
 
 /**
- * Converts dashes to the chosen style.
+ * Turns em and en dashes into hyphens, including the ones that join ranges.
  *
  * Runs after the terminal rule, not before it. A hyphen is a list marker, so converting
  * a leading long dash to a hyphen first would make the terminal rule read that line as a
@@ -149,54 +223,41 @@ export function applyQuoteStyle(input: string, style: TextQuoteStyle, protect: r
  * as a list item. Doing it last means the dash is still a dash while line structure is
  * decided.
  */
-export function applyDashStyle(input: string, style: TextDashStyle, protect: readonly ProtectedRange[] = []): TypographyResult {
-    if (style === 'none') return { text: input, changed: false };
-    if (style === 'hyphen') return replaceDashesWithHyphens(input, protect);
-
-    const protectedRanges = [...markdownCodeRanges(input), ...protect];
-    const separator = style === 'en' ? ` ${EN_DASH} ` : style === 'em' ? EM_DASH : ` ${EM_DASH} `;
-    const dash = style === 'en' ? EN_DASH : EM_DASH;
-
-    // True when the line holds nothing but blockquote markers before this offset, so a
-    // spaced hyphen that is really a list marker is never rewritten
-    const startsLine = (offset: number): boolean => {
-        const lineStart = input.lastIndexOf('\n', offset - 1) + 1;
-        return LINE_PREFIX.test(input.slice(lineStart, offset));
-    };
-
-    const text = input.replace(DASH_SEPARATOR, (match, offset: number) => {
-        if (overlapsRange(protectedRanges, offset, offset + match.length)) return match;
-
-        const before = input[offset - 1];
-        const after = input[offset + match.length];
-        const between = before !== undefined && after !== undefined && !/\s/.test(before) && !/\s/.test(after) && !startsLine(offset);
-        if (between) return separator;
-
-        // An em dash at the start or end of a line, such as a quote attribution, keeps
-        // its spacing and only swaps the character. A hyphen there is structure, not prose.
-        return match.includes(EM_DASH) ? match.replace(EM_DASH, dash) : match;
-    });
-
-    return { text, changed: text !== input };
-}
-
-/** Turns em and en dashes into hyphens, including the ones that join ranges. */
-function replaceDashesWithHyphens(input: string, protect: readonly ProtectedRange[]): TypographyResult {
-    const protectedRanges = [...markdownCodeRanges(input), ...protect];
+export function straightenDashes(input: string, protect: readonly ProtectedRange[] = []): TypographyResult {
+    // A dash inside [[2013–14 Premier League]] or a destination is part of the name, and
+    // changing it breaks the link. Frontmatter values are data.
+    const protectedRanges = [
+        ...markdownCodeRanges(input),
+        ...protect,
+        ...syntaxRanges(input, [WIKILINK, LINK_DESTINATION, LINK_DESTINATION_TITLED, HTML_TAG]),
+        ...frontmatterRanges(input),
+        ...definitionTailRanges(input)
+    ];
 
     let text = input.replace(DASHES, (match, offset: number) =>
         overlapsRange(protectedRanges, offset, offset + match.length) ? match : '-'
     );
 
     // A long dash at the start of a line is prose. Escaping the replacement keeps it from
-    // becoming a list item or thematic break when Obsidian renders the Markdown.
+    // becoming a list item, a thematic break or a setext underline when Obsidian renders
+    // the Markdown.
     const sourceLines = input.split('\n');
     text = text
         .split('\n')
         .map((line, index) => {
-            if (!/^(?: {0,3}>[ \t]?)* {0,3}[\u2013\u2014]/.test(sourceLines[index] ?? '')) return line;
-            if (!/^(?: {0,3}>[ \t]?)* {0,3}(?:-(?:[ \t]|$)|-{3,}[ \t]*$)/.test(line)) return line;
-            return line.replace(/^((?: {0,3}>[ \t]?)* {0,3})-/, '$1\\-');
+            // The prefix covers blockquote markers and an existing list marker, because a
+            // dash converted right after "- " would nest a second list inside the item.
+            // It is matched against the source line, where a converted dash cannot be
+            // mistaken for a marker.
+            const opening = new RegExp('^((?: {0,3}>[ \\t]?)* {0,3}(?:[-*+][ \\t]+|\\d{1,9}[.)][ \\t]+)?)[\\u2013\\u2014]').exec(
+                sourceLines[index] ?? ''
+            );
+            if (!opening) return line;
+            // Two hyphens already underline the paragraph above as a setext heading, and
+            // the trailing \r of a CRLF paste would defeat the $ anchors
+            const tail = line.replace(/\r$/, '').slice(opening[1].length);
+            if (!/^(?:-(?:[ \t]|$)|-{2,}[ \t]*$)/.test(tail)) return line;
+            return `${opening[1]}\\${line.slice(opening[1].length)}`;
         })
         .join('\n');
 

@@ -210,21 +210,13 @@ export const STRINGS_AR: TranslationStrings = {
             invisibleExampleEnd: ' جيدة.',
             invisibleExampleAfter: 'كانت النتيجة جيدة.',
             quotesName: 'علامات الاقتباس',
-            quotesDesc: 'يحوّل علامات الاقتباس والفواصل العليا إلى هذا النمط.',
+            quotesDesc: 'يحوّل علامات الاقتباس المنحنية والفواصل العليا إلى مستقيمة.',
             quotesAliases: ['علامة اقتباس', 'تنصيص', 'اقتباس منحني', 'اقتباس مستقيم', 'فاصلة عليا', 'ترقيم', 'طباعة', 'ذكاء اصطناعي'],
-            quotesNone: 'بدون تغيير',
-            quotesStraight: 'علامات اقتباس مستقيمة',
-            quotesCurly: 'علامات اقتباس منحنية',
-            quotesExample: 'قالت: “انتهينا”، ثم أضافت: "لا تتوقف".',
+            quotesExample: 'قالت: “انتهينا”.',
             dashesName: 'الشرطات',
-            dashesDesc: 'يحوّل الشرطات بين الكلمات إلى هذا النمط.',
+            dashesDesc: 'يحوّل الشرطات القصيرة والطويلة إلى واصلات.',
             dashesAliases: ['شرطة', 'شرطة طويلة', 'شرطة قصيرة', 'واصلة', 'ترقيم', 'طباعة', 'ذكاء اصطناعي'],
-            dashesNone: 'بدون تغيير',
-            dashesHyphen: 'واصلات',
-            dashesEn: 'شرطات قصيرة',
-            dashesEm: 'شرطات طويلة',
-            dashesEmSpaced: 'شرطات طويلة بمسافات',
-            dashesExample: 'كانت النتيجة - رغم كل الصعاب — جيدة.'
+            dashesExample: 'كانت النتيجة — رغم كل الصعاب — جيدة.'
         }
     },
 

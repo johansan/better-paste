@@ -189,7 +189,7 @@ export const STRINGS_TH: TranslationStrings = {
             invisibleExampleEnd: ' แล้ว',
             invisibleExampleAfter: 'ผลลัพธ์คือ OK แล้ว',
             quotesName: 'อัญประกาศ',
-            quotesDesc: 'เปลี่ยนอัญประกาศและอะพอสทรอฟีให้เป็นรูปแบบนี้',
+            quotesDesc: 'เปลี่ยนอัญประกาศโค้งและอะพอสทรอฟีเป็นอัญประกาศตรง',
             quotesAliases: [
                 'อัญประกาศ',
                 'เครื่องหมายคำพูด',
@@ -200,19 +200,11 @@ export const STRINGS_TH: TranslationStrings = {
                 'การพิมพ์',
                 'ai'
             ],
-            quotesNone: 'ไม่เปลี่ยนแปลง',
-            quotesStraight: 'อัญประกาศตรง',
-            quotesCurly: 'อัญประกาศโค้ง',
-            quotesExample: '“เสร็จแล้ว” เธอบอก แล้วเสริมว่า "อย่าหยุดนะ"',
+            quotesExample: '“เสร็จแล้ว” เธอบอก',
             dashesName: 'เครื่องหมายขีด',
-            dashesDesc: 'เปลี่ยนเครื่องหมายขีดระหว่างคำให้เป็นรูปแบบนี้',
+            dashesDesc: 'เปลี่ยนเอ็นแดชและเอ็มแดชเป็นยัติภังค์',
             dashesAliases: ['ขีด', 'แดช', 'ขีดยาว', 'ขีดกลาง', 'ยัติภังค์', 'เครื่องหมายวรรคตอน', 'การพิมพ์', 'ai'],
-            dashesNone: 'ไม่เปลี่ยนแปลง',
-            dashesHyphen: 'ยัติภังค์',
-            dashesEn: 'เอ็นแดช',
-            dashesEm: 'เอ็มแดช',
-            dashesEmSpaced: 'เอ็มแดชแบบเว้นวรรค',
-            dashesExample: 'ผลลัพธ์ - แม้จะมีอุปสรรค — ก็ออกมาดี'
+            dashesExample: 'ผลลัพธ์ — แม้จะมีอุปสรรค — ก็ออกมาดี'
         }
     },
 

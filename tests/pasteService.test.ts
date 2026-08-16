@@ -898,6 +898,85 @@ describe('surviving an edit during the image write', () => {
     });
 });
 
+describe('a second paste while the first is still downloading', () => {
+    /** Image service double whose downloads complete only when the test says so. */
+    function deferredImages(settings: BetterPasteSettings) {
+        const pending: Array<() => void> = [];
+        const images = {
+            hasWork: (text: string) => settings.imageEnabled && findImageReferences(text).length > 0,
+            materializeImages: (text: string) =>
+                new Promise(resolve => {
+                    pending.push(() => {
+                        const references = findImageReferences(text);
+                        const embeds = new Map(references.map((reference, index) => [reference.index, `![[image-${index}.png]]`]));
+                        resolve({ text: replaceImageReferences(text, references, embeds), downloaded: embeds.size, failed: 0 });
+                    });
+                }),
+            saveClipboardImage: async () => null,
+            dispose: () => undefined
+        } as unknown as ImageService;
+        return { images, pending };
+    }
+
+    /** Flushes microtasks only, so queued timers do not fire. */
+    async function flushMicrotasks(): Promise<void> {
+        for (let i = 0; i < 20; i++) await Promise.resolve();
+    }
+
+    const URL = 'https://example.com/cat.png';
+
+    it('rewrites both pastes when the second lands earlier in the note', async () => {
+        const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS };
+        const { images, pending } = deferredImages(settings);
+        const service = new PasteService(() => settings, images, fakeTitles(settings, []));
+        const doc = 'top\n\nbottom\n';
+        const editor = new FakeEditor(doc, doc.length);
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: URL }), editor.asEditor(), INFO);
+        await flushMicrotasks();
+        // The user clicks onto the empty line above and pastes the same URL again
+        editor.setSelection(4, 4);
+        service.handleEditorPaste(fakeClipboardEvent({ plain: URL }), editor.asEditor(), INFO);
+        await flushMicrotasks();
+
+        // The first paste's download completes first, below the newly inserted text
+        pending[0]();
+        await settle();
+        pending[1]();
+        await settle();
+
+        expect(editor.getValue()).toBe('top\n![[image-0.png]]\nbottom\n![[image-0.png]]');
+    });
+
+    it('skips the rich measurement when a pending rewrite lands inside its timer window', async () => {
+        const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS };
+        const { images, pending } = deferredImages(settings);
+        const service = new PasteService(() => settings, images, fakeTitles(settings, []));
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: URL }), editor.asEditor(), INFO);
+        await flushMicrotasks();
+        editor.replaceSelection('\n');
+
+        // A rich paste is declined to Obsidian, which inserts the converted Markdown
+        const converted = '[link](https://example.com/b?utm_source=x) text';
+        service.handleEditorPaste(
+            fakeClipboardEvent({ html: '<p>x</p><a href="https://example.com/b">link</a>' }),
+            editor.asEditor(),
+            INFO
+        );
+        editor.replaceSelection(converted);
+
+        // The first download completes before the measurement timer fires, shifting the
+        // baseline. The rich pass must skip rather than process a mis-measured range.
+        pending[0]();
+        await flushMicrotasks();
+        await settle();
+
+        expect(editor.getValue()).toBe(`![[image-0.png]]\n${converted}`);
+    });
+});
+
 describe('explicit paste commands', () => {
     it('uses the invocation selection as a URL label without fetching a title', async () => {
         const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false });

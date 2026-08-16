@@ -34,8 +34,8 @@ describe('extractFrontmatterBlock', () => {
         expect(extractFrontmatterBlock('---\ntitle: Notes\nimage-width: 400\n---\n')).toBe('title: Notes\nimage-width: 400');
     });
 
-    it('accepts the "..." terminator', () => {
-        expect(extractFrontmatterBlock('---\nimage-width: 400\n...\nBody')).toBe('image-width: 400');
+    it('rejects the "..." terminator, which Obsidian does not accept', () => {
+        expect(extractFrontmatterBlock('---\nimage-width: 400\n...\nBody')).toBeNull();
     });
 
     it('handles an empty block', () => {

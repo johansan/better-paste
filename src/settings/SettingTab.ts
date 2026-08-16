@@ -27,7 +27,7 @@ import type { SettingsPageContext } from './pages/context';
 import { createImageLandingDefinitions } from './pages/imagesPage';
 import { createLinkLandingDefinitions } from './pages/linksPage';
 import { createTerminalLandingDefinitions } from './pages/terminalPage';
-import { commaPlacementExample, createTextProcessingDefinitions, dashStyleExample, quoteStyleExample } from './pages/textProcessingPage';
+import { commaPlacementExample, createTextProcessingDefinitions } from './pages/textProcessingPage';
 import { createStartDefinitions } from './pages/startPage';
 import { createFrontmatterDefinitions } from './pages/frontmatterPage';
 
@@ -135,8 +135,6 @@ export class BetterPasteSettingTab extends PluginSettingTab {
         }
 
         if (key === 'textComma') this.updateCommaExample(value);
-        if (key === 'textQuotes') this.updateQuoteExample(value);
-        if (key === 'textDashes') this.updateDashExample(value);
 
         this.afterChange();
     }
@@ -144,24 +142,8 @@ export class BetterPasteSettingTab extends PluginSettingTab {
     /** Updates the comma example in place so it always reflects the dropdown value. */
     private updateCommaExample(value: unknown): void {
         if (value !== 'none' && value !== 'inside' && value !== 'outside') return;
-        this.setExampleText('better-paste-comma-example', commaPlacementExample(value));
-    }
-
-    /** Updates the quote example in place so it always reflects the dropdown value. */
-    private updateQuoteExample(value: unknown): void {
-        if (value !== 'none' && value !== 'straight' && value !== 'curly') return;
-        this.setExampleText('better-paste-quote-example', quoteStyleExample(value));
-    }
-
-    /** Updates the dash example in place so it always reflects the dropdown value. */
-    private updateDashExample(value: unknown): void {
-        if (value !== 'none' && value !== 'hyphen' && value !== 'en' && value !== 'em' && value !== 'em-spaced') return;
-        this.setExampleText('better-paste-dash-example', dashStyleExample(value));
-    }
-
-    private setExampleText(cls: string, text: string): void {
-        const examples = this.containerEl?.querySelectorAll<HTMLElement>(`.${cls}`) ?? [];
-        for (const example of examples) example.setText(text);
+        const examples = this.containerEl?.querySelectorAll<HTMLElement>('.better-paste-comma-example') ?? [];
+        for (const example of examples) example.setText(commaPlacementExample(value));
     }
 
     /** Re-evaluates visibility without rebuilding controls that hold unsaved tester input. */

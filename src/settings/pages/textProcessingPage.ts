@@ -19,10 +19,10 @@
 import type { SettingGroupItem } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../defaults';
 import { aliases, format, strings } from '../../i18n';
-import { applyDashStyle, applyQuoteStyle } from '../../transforms/typography';
+import { straightenDashes, straightenQuotes } from '../../transforms/typography';
 import { toggle } from './context';
 import type { SettingsPageContext } from './context';
-import type { TextCommaPlacement, TextDashStyle, TextQuoteStyle } from '../types';
+import type { TextCommaPlacement } from '../types';
 
 /** The Unicode code points the example draws in place of the characters they stand for. */
 const NO_BREAK_SPACE_CODE = '[U+00A0]';
@@ -40,25 +40,18 @@ export function commaPlacementExample(placement: TextCommaPlacement): string {
     return `${strings.settings.text.commasExampleSource} \u2192 ${COMMA_EXAMPLE_RESULTS[placement]}`;
 }
 
-/** Quote example text, produced by the real rule so it always matches what a paste does. */
-export function quoteStyleExample(style: TextQuoteStyle): string {
-    const source = strings.settings.text.quotesExample;
-    return `${source} \u2192 ${applyQuoteStyle(source, style).text}`;
+/** A before and after produced by the real rule, so it always matches what a paste does. */
+function ruleExample(source: string, apply: (input: string) => { text: string }): string {
+    return `${source} \u2192 ${apply(source).text}`;
 }
 
-/** Dash example text, produced by the real rule so it always matches what a paste does. */
-export function dashStyleExample(style: TextDashStyle): string {
-    const source = strings.settings.text.dashesExample;
-    return `${source} \u2192 ${applyDashStyle(source, style).text}`;
-}
-
-/** Shows a description with the example for the currently selected dropdown value. */
-function withStyleExample(description: string, example: string, exampleCls: string): string | DocumentFragment {
+/** Shows a description with a before and after example below it. */
+function withStyleExample(description: string, example: string, exampleCls?: string): string | DocumentFragment {
     if (typeof createFragment === 'undefined') return format(strings.settings.exampleFallback, { description, example });
 
     return createFragment(fragment => {
         fragment.appendText(description);
-        fragment.createDiv({ cls: ['better-paste-example', exampleCls], text: example });
+        fragment.createDiv({ cls: exampleCls ? ['better-paste-example', exampleCls] : 'better-paste-example', text: example });
     });
 }
 
@@ -99,38 +92,18 @@ export function createTextProcessingDefinitions(context: SettingsPageContext): S
             aliases: aliases(source => source.settings.text.invisibleAliases),
             control: { type: 'toggle', key: 'textInvisible', defaultValue: DEFAULT_SETTINGS.textInvisible }
         },
-        {
-            name: text.quotesName,
-            desc: withStyleExample(text.quotesDesc, quoteStyleExample(context.settings().textQuotes), 'better-paste-quote-example'),
-            aliases: aliases(source => source.settings.text.quotesAliases),
-            control: {
-                type: 'dropdown',
-                key: 'textQuotes',
-                defaultValue: DEFAULT_SETTINGS.textQuotes,
-                options: {
-                    none: text.quotesNone,
-                    straight: text.quotesStraight,
-                    curly: text.quotesCurly
-                }
-            }
-        },
-        {
-            name: text.dashesName,
-            desc: withStyleExample(text.dashesDesc, dashStyleExample(context.settings().textDashes), 'better-paste-dash-example'),
-            aliases: aliases(source => source.settings.text.dashesAliases),
-            control: {
-                type: 'dropdown',
-                key: 'textDashes',
-                defaultValue: DEFAULT_SETTINGS.textDashes,
-                options: {
-                    none: text.dashesNone,
-                    hyphen: text.dashesHyphen,
-                    en: text.dashesEn,
-                    em: text.dashesEm,
-                    'em-spaced': text.dashesEmSpaced
-                }
-            }
-        },
+        toggle(
+            'textQuotes',
+            text.quotesName,
+            withStyleExample(text.quotesDesc, ruleExample(text.quotesExample, straightenQuotes)),
+            aliases(source => source.settings.text.quotesAliases)
+        ),
+        toggle(
+            'textDashes',
+            text.dashesName,
+            withStyleExample(text.dashesDesc, ruleExample(text.dashesExample, straightenDashes)),
+            aliases(source => source.settings.text.dashesAliases)
+        ),
         {
             name: text.commasName,
             desc: withStyleExample(text.commasDesc, commaPlacementExample(context.settings().textComma), 'better-paste-comma-example'),

@@ -102,10 +102,12 @@ function populateChoiceDropdown(dropdown: DropdownComponent, options: string, ch
     dropdown.selectEl.empty();
     dropdown.addOption('', text.choiceNone);
     for (const value of values) dropdown.addOption(value, value);
-    dropdown.addOption('ask', text.choiceAsk);
+    // Ask is only offered while there is something to pick, because with an empty list
+    // the dialog would have nothing to show
+    if (values.length > 0) dropdown.addOption('ask', text.choiceAsk);
     // A stored choice whose value was removed from the list displays as none but is not
     // rewritten, so typing the value back restores it
-    dropdown.setValue(choice === 'ask' || values.includes(choice) ? choice : '');
+    dropdown.setValue((choice === 'ask' && values.length > 0) || values.includes(choice) ? choice : '');
 }
 
 /** Rows shown under the Images heading. Naming only applies once saving is on. */

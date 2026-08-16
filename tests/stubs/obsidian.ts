@@ -150,6 +150,39 @@ export function setIcon(): never {
  * is Obsidian's; the plugin's own frontmatter logic is tested directly against plain
  * objects, so this only needs to cover the shapes the integration tests paste in.
  */
+export interface FrontMatterInfo {
+    exists: boolean;
+    frontmatter: string;
+    from: number;
+    to: number;
+    contentStart: number;
+}
+
+/**
+ * Test stand-in for Obsidian's getFrontMatterInfo, matching the real app's behavior: the
+ * block must open with --- on the very first line, closes only with --- (never YAML's
+ * ...), and CRLF is accepted.
+ */
+export function getFrontMatterInfo(content: string): FrontMatterInfo {
+    const none = { exists: false, frontmatter: '', from: 0, to: 0, contentStart: 0 };
+    const opening = /^---\r?\n/.exec(content);
+    if (!opening) return none;
+
+    const from = opening[0].length;
+    const lines = content.split('\n');
+    let offset = lines[0].length + 1;
+    for (let index = 1; index < lines.length; index++) {
+        const line = lines[index];
+        if (/^---\r?$/.test(line)) {
+            const to = Math.max(from, offset - 1);
+            const contentStart = Math.min(content.length, offset + line.length + 1);
+            return { exists: true, frontmatter: content.slice(from, to), from, to, contentStart };
+        }
+        offset += line.length + 1;
+    }
+    return none;
+}
+
 export function parseYaml(yaml: string): Record<string, unknown> {
     const result: Record<string, unknown> = {};
 

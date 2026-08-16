@@ -206,7 +206,7 @@ export const STRINGS_RU: TranslationStrings = {
             invisibleExampleEnd: ' был хорошим.',
             invisibleExampleAfter: 'Этот результат был хорошим.',
             quotesName: 'Кавычки',
-            quotesDesc: 'Приводит кавычки и апострофы к этому стилю.',
+            quotesDesc: 'Заменяет типографские кавычки и апострофы на прямые.',
             quotesAliases: [
                 'кавычки',
                 'типографские кавычки',
@@ -218,19 +218,11 @@ export const STRINGS_RU: TranslationStrings = {
                 'типографика',
                 'ии'
             ],
-            quotesNone: 'Без изменений',
-            quotesStraight: 'Прямые кавычки',
-            quotesCurly: 'Типографские кавычки',
-            quotesExample: 'Она сказала: “Готово”. Всё "хорошо".',
+            quotesExample: 'Она сказала: “Готово”.',
             dashesName: 'Тире',
-            dashesDesc: 'Приводит тире между словами к этому стилю.',
+            dashesDesc: 'Заменяет среднее и длинное тире на дефисы.',
             dashesAliases: ['тире', 'длинное тире', 'среднее тире', 'короткое тире', 'дефис', 'пунктуация', 'типографика', 'ии'],
-            dashesNone: 'Без изменений',
-            dashesHyphen: 'Дефисы',
-            dashesEn: 'Средние тире',
-            dashesEm: 'Длинные тире',
-            dashesEmSpaced: 'Длинные тире с пробелами',
-            dashesExample: 'Результат - вопреки всему — оказался хорошим.'
+            dashesExample: 'Результат — вопреки всему — оказался хорошим.'
         }
     },
 

@@ -206,7 +206,7 @@ export const STRINGS_UK: TranslationStrings = {
             invisibleExampleEnd: ' був добрий.',
             invisibleExampleAfter: 'Цей результат був добрий.',
             quotesName: 'Лапки',
-            quotesDesc: 'Зводить лапки й апострофи до цього стилю.',
+            quotesDesc: 'Замінює друкарські лапки й апострофи на прямі.',
             quotesAliases: [
                 'лапки',
                 'друкарські лапки',
@@ -218,19 +218,11 @@ export const STRINGS_UK: TranslationStrings = {
                 'типографіка',
                 'ші'
             ],
-            quotesNone: 'Без змін',
-            quotesStraight: 'Прямі лапки',
-            quotesCurly: 'Друкарські лапки',
-            quotesExample: 'Вона сказала: “Готово”. Усе "добре".',
+            quotesExample: 'Вона сказала: “Готово”.',
             dashesName: 'Тире',
-            dashesDesc: 'Зводить тире між словами до цього стилю.',
+            dashesDesc: 'Замінює середнє та довге тире на дефіси.',
             dashesAliases: ['тире', 'довге тире', 'середнє тире', 'коротке тире', 'дефіс', 'пунктуація', 'типографіка', 'ші'],
-            dashesNone: 'Без змін',
-            dashesHyphen: 'Дефіси',
-            dashesEn: 'Середні тире',
-            dashesEm: 'Довгі тире',
-            dashesEmSpaced: 'Довгі тире з пробілами',
-            dashesExample: 'Результат - попри все — виявився добрим.'
+            dashesExample: 'Результат — попри все — виявився добрим.'
         }
     },
 

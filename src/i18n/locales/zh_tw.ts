@@ -188,21 +188,13 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             invisibleExampleEnd: '。',
             invisibleExampleAfter: '結果是 OK。',
             quotesName: '引號',
-            quotesDesc: '把引號和撇號換成這種樣式。',
+            quotesDesc: '把彎引號和撇號換成直引號。',
             quotesAliases: ['引號', '彎引號', '直引號', '智慧引號', '撇號', '標點', '排版', 'ai'],
-            quotesNone: '不做變動',
-            quotesStraight: '直引號',
-            quotesCurly: '彎引號',
-            quotesExample: '“完成”之後是 "待辦"。',
+            quotesExample: '她說：“完成了”。',
             dashesName: '破折號',
-            dashesDesc: '把詞語之間的破折號換成這種樣式。',
+            dashesDesc: '把連接號和破折號換成連字號。',
             dashesAliases: ['破折號', '連字號', '連接號', '橫線', '標點', '排版', 'ai'],
-            dashesNone: '不做變動',
-            dashesHyphen: '連字號',
-            dashesEn: '連接號',
-            dashesEm: '破折號',
-            dashesEmSpaced: '帶空格的破折號',
-            dashesExample: '這個結果 - 出乎意料 — 很好。'
+            dashesExample: '這個結果 — 出乎意料 — 很好。'
         }
     },
 

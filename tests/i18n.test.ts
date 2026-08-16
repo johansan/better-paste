@@ -19,7 +19,7 @@
 import { describe, expect, it } from 'vitest';
 import { aliases, format, LOCALES, plural, strings } from '../src/i18n';
 import { STRINGS_EN } from '../src/i18n/locales/en';
-import { applyDashStyle, applyQuoteStyle, normalizeInvisibleCharacters } from '../src/transforms/typography';
+import { normalizeInvisibleCharacters, straightenDashes, straightenQuotes } from '../src/transforms/typography';
 import { applyCommaPlacement } from '../src/transforms/textProcessing';
 
 /** The two invisible characters the invisible-characters example puts between its fragments. */
@@ -178,14 +178,11 @@ describe('translations', () => {
 
         expect(normalizeInvisibleCharacters(invisible).text).toBe(text.invisibleExampleAfter);
 
-        // Every selectable style must visibly change its example, otherwise the settings
-        // row would promise a change that never happens. Guillemets are deliberately left
-        // alone by the quote rule, so a language cannot use them as the curly pair.
-        expect(applyQuoteStyle(text.quotesExample, 'straight').changed, 'straight quotes').toBe(true);
-        expect(applyQuoteStyle(text.quotesExample, 'curly').changed, 'curly quotes').toBe(true);
-        for (const style of ['hyphen', 'en', 'em', 'em-spaced'] as const) {
-            expect(applyDashStyle(text.dashesExample, style).changed, `${style} dashes`).toBe(true);
-        }
+        // Each example must visibly change, otherwise the settings row would promise a
+        // change that never happens. Guillemets are deliberately left alone by the quote
+        // rule, so a language cannot use them as its example pair.
+        expect(straightenQuotes(text.quotesExample).changed, 'quotes').toBe(true);
+        expect(straightenDashes(text.dashesExample).changed, 'dashes').toBe(true);
     });
 });
 

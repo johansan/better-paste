@@ -17,6 +17,7 @@
  */
 
 import { stripAnsi } from './ansi';
+import { frontmatterRanges } from './typography';
 import { markdownCodeRanges, overlapsRange } from './markdownRanges';
 import { LIST_MARKERS, MIN_WRAP_WIDTH, WRAP_TOLERANCE } from '../settings/constants';
 import type { BetterPasteSettings } from '../settings/types';
@@ -31,6 +32,8 @@ const BLOCKQUOTE = /^\s{0,3}>/;
 const TABLE_ROW = /^\s*\|/;
 const THEMATIC_BREAK = /^\s{0,3}(?:-{3,}|\*{3,}|_{3,})\s*$/;
 const FRONTMATTER_DELIMITER = /^---\s*$/;
+/** A setext underline, which turns the line above it into a heading. */
+const SETEXT_UNDERLINE = /^ {0,3}(?:=+|-+)[ \t]*$/;
 
 /** Markdown treats four or more leading spaces as an indented code block. */
 const INDENTED_CODE_WIDTH = 4;
@@ -132,11 +135,26 @@ export function inferWrapWidth(lines: readonly string[]): number {
  * followed by whitespace, so "-1 degree" and "*emphasis*" are not mistaken for list items.
  */
 function listMarkerOf(line: string): string | null {
-    const body = line.slice(leadingWhitespace(line).length);
+    const body = line.slice(linePrefixOf(line).length);
     for (const marker of LIST_MARKERS) {
         if (body.startsWith(marker) && /\s/.test(body.charAt(marker.length))) return marker;
     }
     return null;
+}
+
+/** Leading whitespace and blockquote markers, kept verbatim when rewriting the line. */
+function linePrefixOf(line: string): string {
+    const match = /^(?: {0,3}>[ \t]?)*[ \t]*/.exec(line);
+    return match ? match[0] : '';
+}
+
+/**
+ * True when the line is a heading, possibly behind list or blockquote markers in any
+ * order and depth. Stripping too much only prevents a rejoin, so the prefix match stays
+ * permissive rather than modelling exact container nesting.
+ */
+function isHeadingLine(line: string): boolean {
+    return HEADING.test(line.replace(/^(?: {0,3}(?:>[ \t]?|[-*+][ \t]+|\d{1,9}[.)][ \t]+))*[ \t]*/, ''));
 }
 
 /** True when the line opens a Markdown block that must not be merged into the previous paragraph. */
@@ -149,6 +167,8 @@ function startsNewBlock(line: string): boolean {
     if (TABLE_ROW.test(line)) return true;
     if (THEMATIC_BREAK.test(line)) return true;
     if (FRONTMATTER_DELIMITER.test(line)) return true;
+    // Joining a setext underline onto the line above erases the heading it makes
+    if (SETEXT_UNDERLINE.test(line)) return true;
     if (indentWidth(line) >= INDENTED_CODE_WIDTH) return true;
     return false;
 }
@@ -181,14 +201,14 @@ function toMarkdownBullet(line: string): string {
     const marker = listMarkerOf(line);
     if (marker === null || marker === '-' || marker === '*' || marker === '+') return line;
 
-    const indent = leadingWhitespace(line);
-    const body = line.slice(indent.length + marker.length).replace(/^\s+/, '');
-    return `${indent}- ${body}`;
+    const prefix = linePrefixOf(line);
+    const body = line.slice(prefix.length + marker.length).replace(/^\s+/, '');
+    return `${prefix}- ${body}`;
 }
 
-/** Converts terminal bullets without rewriting fenced, inline, or indented Markdown code. */
+/** Converts terminal bullets without rewriting Markdown code or frontmatter values. */
 function convertMarkdownBullets(text: string): string {
-    const codeRanges = markdownCodeRanges(text);
+    const protectedRanges = [...markdownCodeRanges(text), ...frontmatterRanges(text)];
     let offset = 0;
 
     return text
@@ -196,7 +216,7 @@ function convertMarkdownBullets(text: string): string {
         .map(line => {
             const start = offset;
             offset += line.length + 1;
-            return overlapsRange(codeRanges, start, start + 1) ? line : toMarkdownBullet(line);
+            return overlapsRange(protectedRanges, start, start + 1) ? line : toMarkdownBullet(line);
         })
         .join('\n');
 }
@@ -220,10 +240,36 @@ function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptio
     let current: Paragraph | null = null;
     let fence: FenceDelimiter | null = null;
 
-    for (const line of lines) {
+    // A leading frontmatter block is data: rejoining a long value line with the key
+    // below it would silently merge two YAML entries into one. Blank lines before the
+    // block count as leading, because the trim rule removes them later, which turns the
+    // block into real frontmatter once it lands in a note.
+    let consumed = 0;
+    let opener = 0;
+    while (opener < lines.length && isBlank(lines[opener])) opener += 1;
+    // Up to three leading spaces count too, because the trim rule removes them later
+    if (lines[opener] !== undefined && /^ {0,3}---\s*$/.test(lines[opener])) {
+        while (consumed <= opener) {
+            paragraphs.push({ lines: [lines[consumed]], verbatim: true });
+            consumed += 1;
+        }
+        while (consumed < lines.length) {
+            const line = lines[consumed];
+            paragraphs.push({ lines: [line], verbatim: true });
+            consumed += 1;
+            if (FRONTMATTER_DELIMITER.test(line)) break;
+        }
+    }
+
+    for (const line of lines.slice(consumed)) {
         if (isBlank(line) && fence === null) {
             current = null;
-            paragraphs.push({ lines: [line], verbatim: true });
+            // Runs of blank lines collapse here rather than over the rendered text,
+            // because a fence's interior blank lines never reach this branch and must
+            // survive exactly as pasted
+            const last = paragraphs[paragraphs.length - 1];
+            const lastIsBlank = last !== undefined && last.verbatim && last.lines.length === 1 && isBlank(last.lines[0]);
+            if (!lastIsBlank) paragraphs.push({ lines: [line], verbatim: true });
             continue;
         }
 
@@ -250,14 +296,26 @@ function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptio
             continue;
         }
 
-        const previous = current?.lines[current.lines.length - 1];
-        const first = current?.lines[0];
+        // A separator row or setext underline is complete in itself, also inside a
+        // blockquote. Absorbing the next line would fabricate a heading out of two blocks.
+        const unquoted = line.replace(/^(?: {0,3}>[ \t]?)+/, '');
+        if (THEMATIC_BREAK.test(unquoted) || SETEXT_UNDERLINE.test(unquoted)) {
+            current = null;
+            paragraphs.push({ lines: [line], verbatim: true });
+            continue;
+        }
+
+        const previous = current ? current.lines[current.lines.length - 1] : undefined;
+        const first = current ? current.lines[0] : undefined;
 
         const continues =
             rejoin !== 'never' &&
             current !== null &&
             previous !== undefined &&
             first !== undefined &&
+            // A heading is complete in itself; absorbing an indented line would swallow
+            // a paragraph into it. Nested list or blockquote prefixes are looked through.
+            !isHeadingLine(first) &&
             !startsNewBlock(line) &&
             previous.trimEnd().length >= wrapWidth &&
             (!requireIndent || indentWidth(line) > indentWidth(first));
@@ -333,7 +391,7 @@ export function cleanTerminalText(input: string, options: TerminalCleanupOptions
 
     const rendered = paragraphs.map(paragraph => renderParagraph(paragraph, preserveIndent));
 
-    let output = rendered.join('\n').replace(/\n{3,}/g, '\n\n');
+    let output = rendered.join('\n');
 
     if (options.terminalBullets === 'markdown') output = convertMarkdownBullets(output);
 

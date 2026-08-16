@@ -24,6 +24,7 @@ import {
     findDomainRule,
     mergeDomainRules,
     formatDomainRule,
+    httpUrlRanges,
     parseDomainRules,
     trimUrlTail
 } from '../src/transforms/urlCleanup';
@@ -172,6 +173,68 @@ describe('trimUrlTail', () => {
     it('drops the extra parenthesis from a Markdown link containing parentheses', () => {
         expect(trimUrlTail('https://en.wikipedia.org/wiki/Foo_(bar))')).toBe('https://en.wikipedia.org/wiki/Foo_(bar)');
     });
+
+    it('ends the URL at an unmatched closing bracket in the middle', () => {
+        expect(trimUrlTail('https://one.com/?utm_source=x)[b](https://two.com/)')).toBe('https://one.com/?utm_source=x');
+        expect(trimUrlTail('https://one.com/?utm_source=x)[[Note]]')).toBe('https://one.com/?utm_source=x');
+        expect(trimUrlTail('https://one.com/page#:~:text=exact%20words)[source](https://two.com/)')).toBe(
+            'https://one.com/page#:~:text=exact%20words'
+        );
+    });
+
+    it('ends the URL at emphasis markers, wikilinks and Markdown link openers', () => {
+        expect(trimUrlTail('https://example.com/page?utm_source=news**')).toBe('https://example.com/page?utm_source=news');
+        expect(trimUrlTail('https://example.com/read?id=7~~')).toBe('https://example.com/read?id=7');
+        expect(trimUrlTail('https://a.example/?utm_source=1[[My')).toBe('https://a.example/?utm_source=1');
+        expect(trimUrlTail('https://a.example/?utm_source=1[next](https://b.example/)')).toBe('https://a.example/?utm_source=1');
+    });
+
+    it('ends the URL at full-width punctuation', () => {
+        expect(trimUrlTail('https://example.com/store?utm_source=line\uFF09\u3092\u898B\u308B')).toBe(
+            'https://example.com/store?utm_source=line'
+        );
+    });
+
+    it('ends the URL at CJK letters when CJK prose touches the front of it', () => {
+        expect(trimUrlTail('https://example.com/?utm_source=x\u3092\u78BA\u8A8D', '\u306F')).toBe('https://example.com/?utm_source=x');
+    });
+
+    it('ends the URL where trailing CJK letters run from the query to the end', () => {
+        expect(trimUrlTail('https://example.com/?utm_source=x\u3092\u78BA\u8A8D')).toBe('https://example.com/?utm_source=x');
+    });
+
+    it('keeps a URL whose path holds balanced full-width brackets', () => {
+        expect(trimUrlTail('https://example.com/\u6771\u4EAC\uFF08\u6625\u2013\u590F\uFF09?utm_source=x')).toBe(
+            'https://example.com/\u6771\u4EAC\uFF08\u6625\u2013\u590F\uFF09?utm_source=x'
+        );
+    });
+
+    it('keeps CJK content inside a delimited URL', () => {
+        expect(trimUrlTail('https://example.com/\u5199\u771F.png')).toBe('https://example.com/\u5199\u771F.png');
+        expect(trimUrlTail('https://example.com/search?q=\u6771\u4EAC&page=2')).toBe('https://example.com/search?q=\u6771\u4EAC&page=2');
+        expect(trimUrlTail('https://zh.wikipedia.org/wiki/\u4E0A\u6D77\u2013\u5357\u4EAC\u94C1\u8DEF')).toBe(
+            'https://zh.wikipedia.org/wiki/\u4E0A\u6D77\u2013\u5357\u4EAC\u94C1\u8DEF'
+        );
+    });
+
+    it('keeps array query parameters and IPv6 hosts', () => {
+        expect(trimUrlTail('https://example.com/?a[]=1&b[]=2')).toBe('https://example.com/?a[]=1&b[]=2');
+        expect(trimUrlTail('https://[::1]:8080/path')).toBe('https://[::1]:8080/path');
+    });
+
+    it('keeps a doubled star inside a query', () => {
+        expect(trimUrlTail('https://example.com/search?q=%22**%22')).toBe('https://example.com/search?q=%22**%22');
+    });
+
+    it('ends the URL before a link whose label nests brackets', () => {
+        expect(trimUrlTail('https://one.com/?utm_source=x[outer[inner]](https://two.com/)')).toBe('https://one.com/?utm_source=x');
+    });
+
+    it('keeps balanced parentheses that precede an unmatched closer', () => {
+        expect(trimUrlTail('https://en.wikipedia.org/wiki/Foo_(bar))[b](https://two.com/)')).toBe(
+            'https://en.wikipedia.org/wiki/Foo_(bar)'
+        );
+    });
 });
 
 describe('cleanUrl', () => {
@@ -316,6 +379,307 @@ describe('cleanUrlsInText', () => {
                 'https://example.com/prose'
             ].join('\n')
         );
+    });
+
+    it('cleans a link pasted flush against a second link without deleting it', () => {
+        const result = cleanUrlsInText('[a](https://one.com/?utm_source=x)[b](https://two.com/)', options());
+        expect(result.text).toBe('[a](https://one.com/)[b](https://two.com/)');
+        expect(result.count).toBe(1);
+    });
+
+    it('cleans a link pasted flush against a wikilink without deleting it', () => {
+        const result = cleanUrlsInText('[a](https://one.com/?utm_source=x)[[Note]]', options());
+        expect(result.text).toBe('[a](https://one.com/)[[Note]]');
+    });
+
+    it('cleans a highlight-fragment link pasted flush against a second link', () => {
+        const result = cleanUrlsInText('[quote](https://one.com/page#:~:text=exact%20words)[source](https://two.com/)', options());
+        expect(result.text).toBe('[quote](https://one.com/page)[source](https://two.com/)');
+    });
+
+    it('cleans a link pasted flush against bold text without deleting it', () => {
+        const result = cleanUrlsInText('[a](https://one.com/?utm_source=x)**important note kept**', options());
+        expect(result.text).toBe('[a](https://one.com/)**important note kept**');
+    });
+
+    it('cleans each link in a row of three flush links', () => {
+        const result = cleanUrlsInText(
+            '[a](https://one.com/?utm_source=x)[b](https://two.com/?fbclid=y)[c](https://three.com/)',
+            options()
+        );
+        expect(result.text).toBe('[a](https://one.com/)[b](https://two.com/)[c](https://three.com/)');
+        expect(result.count).toBe(2);
+    });
+
+    it('strips a tracking parameter from a flush link in tracking mode', () => {
+        const result = cleanUrlsInText('[a](https://one.com/?utm_source=x)[b](https://two.com/)', options('tracking'));
+        expect(result.text).toBe('[a](https://one.com/)[b](https://two.com/)');
+    });
+
+    it('cleans a bold or struck link without eating its closing markers', () => {
+        expect(cleanUrlsInText('Read **https://example.com/page?utm_source=news** now', options()).text).toBe(
+            'Read **https://example.com/page** now'
+        );
+        expect(cleanUrlsInText('old ~~https://example.com/read?id=7~~ gone', options()).text).toBe('old ~~https://example.com/read~~ gone');
+        expect(cleanUrlsInText('Read **https://example.com/page#:~:text=foo** now', options()).text).toBe(
+            'Read **https://example.com/page** now'
+        );
+    });
+
+    it('cleans a URL pasted flush against CJK text without deleting the text', () => {
+        expect(cleanUrlsInText('\uFF08https://example.com/store?utm_source=line\uFF09\u3092\u898B\u308B', options()).text).toBe(
+            '\uFF08https://example.com/store\uFF09\u3092\u898B\u308B'
+        );
+        expect(cleanUrlsInText('\u8A73\u7D30\u306Fhttps://example.com/?utm_source=x\u3092\u78BA\u8A8D', options()).text).toBe(
+            '\u8A73\u7D30\u306Fhttps://example.com/\u3092\u78BA\u8A8D'
+        );
+    });
+
+    it('cleans a search URL whose query contains a doubled star', () => {
+        expect(cleanUrlsInText('https://example.com/search?q=%22**%22', options()).text).toBe('https://example.com/search');
+        expect(cleanUrlsInText('https://example.com/search?q=%22**%22', options('tracking')).text).toBe(
+            'https://example.com/search?q=%22**%22'
+        );
+    });
+
+    it('keeps a nested-label link pasted flush behind a bare URL', () => {
+        expect(cleanUrlsInText('https://one.com/?utm_source=x[outer[inner]](https://two.com/?utm_source=y)', options()).text).toBe(
+            'https://one.com/[outer[inner]](https://two.com/)'
+        );
+    });
+
+    it('keeps a Markdown link pasted flush behind a bare URL', () => {
+        const result = cleanUrlsInText('https://a.example/?utm_source=1[next](https://b.example/two?utm_source=2)', options());
+        expect(result.text).toBe('https://a.example/[next](https://b.example/two)');
+        expect(result.count).toBe(2);
+    });
+
+    it('leaves a bare URL alone when double brackets follow its query', () => {
+        // [[ behind the query reads as a pasted wikilink or as a JSON array in a filter
+        // parameter equally well, so the URL is not cleaned rather than corrupted
+        const wikilink = 'https://a.example/?utm_source=1[[My note]]';
+        expect(cleanUrlsInText(wikilink, options()).text).toBe(wikilink);
+        const json = 'https://api.example.com/list?filter=[["name","=","x"]]';
+        expect(cleanUrlsInText(json, options()).text).toBe(json);
+    });
+
+    it('cleans a delimited URL with CJK query values without gluing them onto the path', () => {
+        expect(
+            cleanUrlsInText('\u8A73\u7D30\u306F https://example.com/search?q=\u6771\u4EAC&page=2 \u3092\u898B\u3066', options()).text
+        ).toBe('\u8A73\u7D30\u306F https://example.com/search \u3092\u898B\u3066');
+        expect(
+            cleanUrlsInText('https://example.com/story?utm_campaign=\u6771\u4EAC\u30BB\u30FC\u30EB&id=9', options('tracking')).text
+        ).toBe('https://example.com/story?id=9');
+    });
+
+    it('leaves flush CJK prose alone when nothing confirms it is prose', () => {
+        // A URL at line start with CJK letters riding in its query reads as a query
+        // value or as flush prose equally well, so it is not cleaned
+        const flush = 'https://example.com/?utm_source=x\u3092\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044';
+        expect(cleanUrlsInText(flush, options()).text).toBe(flush);
+        const separated = '\u8A73\u7D30\uFF1Ahttps://example.com/?utm_source=x\u3092\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044';
+        expect(cleanUrlsInText(separated, options()).text).toBe(separated);
+    });
+
+    it('cleans a URL whose path holds balanced full-width brackets without cutting it', () => {
+        expect(cleanUrlsInText('https://example.com/\u6771\u4EAC\uFF08\u6625\u2013\u590F\uFF09?utm_source=x', options()).text).toBe(
+            'https://example.com/\u6771\u4EAC\uFF08\u6625\u2013\u590F\uFF09'
+        );
+    });
+
+    it('leaves a URL nested inside an ambiguous query completely alone', () => {
+        const json = 'https://api.example.com/list?filter=[["url","=","https://b.example/?utm_source=2"]]';
+        expect(cleanUrlsInText(json, options()).text).toBe(json);
+    });
+
+    it('treats a katakana middle dot before the URL as a bullet, not prose', () => {
+        expect(
+            cleanUrlsInText('\u30FBhttps://example.com/story?utm_campaign=\u6771\u4EAC\u30BB\u30FC\u30EB&id=9', options('tracking')).text
+        ).toBe('\u30FBhttps://example.com/story?id=9');
+        const trailing = '\u30FBhttps://example.com/search?q=\u6771\u4EAC';
+        expect(cleanUrlsInText(trailing, options()).text).toBe(trailing);
+    });
+
+    it('keeps a full-width bracket annotation flush behind a cleaned query', () => {
+        expect(cleanUrlsInText('\u8A73\u7D30 https://example.com/doc?id=42\uFF08PDF\uFF09 \u3092\u53C2\u7167', options()).text).toBe(
+            '\u8A73\u7D30 https://example.com/doc\uFF08PDF\uFF09 \u3092\u53C2\u7167'
+        );
+    });
+
+    it('cleans a URL whose fragment is a CJK section anchor', () => {
+        expect(cleanUrlsInText('https://ja.wikipedia.org/wiki/Foo?utm_source=chatgpt.com#\u6B74\u53F2', options()).text).toBe(
+            'https://ja.wikipedia.org/wiki/Foo#\u6B74\u53F2'
+        );
+    });
+
+    it('leaves a fenced block indented as a list continuation untouched', () => {
+        const spaces = '1. Fetch the report:\n    ```\n    wget https://cdn.example.com/report.pdf?token=abc123\n    ```';
+        expect(cleanUrlsInText(spaces, options()).text).toBe(spaces);
+        const tabs = '- Download the installer:\n\t```\n\tcurl -O https://example.com/file?id=123\n\t```';
+        expect(cleanUrlsInText(tabs, options()).text).toBe(tabs);
+    });
+
+    it('leaves a fenced block in a blockquoted list untouched', () => {
+        const input = '> - Example:\n>     ```\n>     curl https://api.acme.io/run?token=secret&mode=fast\n>     ```';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('ends an unclosed indented fence at a less indented margin paragraph', () => {
+        const input = '10. Setup:\n    ```\n    npm install\n  Visit https://example.com/page?utm_source=news for details.';
+        expect(cleanUrlsInText(input, options()).text).toBe(
+            '10. Setup:\n    ```\n    npm install\n  Visit https://example.com/page for details.'
+        );
+    });
+
+    it('keeps same-line code after a marker with five trailing spaces', () => {
+        const input = '   10.     curl https://api.example.com/run?token=secret&mode=fast';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('keeps the indented continuation of a code-starting list item', () => {
+        const input = '-     Example:\n      Visit https://example.com/?utm_source=news';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('cleans an indented line after a bare dash under a list item', () => {
+        expect(cleanUrlsInText('- item\n--\n    see https://example.com/page?utm_source=news for details', options()).text).toBe(
+            '- item\n--\n    see https://example.com/page for details'
+        );
+    });
+
+    it('reads a trailing-space dash under a paragraph as a setext underline', () => {
+        // An empty list item cannot interrupt a paragraph, so the code below stays code
+        const input = 'Foo\n- \n    curl https://example.com/?utm_source=news';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('keeps deep indented code after a fence inside a list item', () => {
+        const input = '- Item\n  ```\n  code\n  ```\n      curl https://api.example.com/run?token=secret&mode=fast';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('keeps indented code after a margin fence that ends a list', () => {
+        const input = '- item\n```\ncode\n```\n    curl https://api.example.com/run?token=secret';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('does not mistake an empty list item for a setext underline', () => {
+        expect(cleanUrlsInText('- First\n- \n    https://example.com/?utm_source=news', options()).text).toBe(
+            '- First\n- \n    https://example.com/'
+        );
+    });
+
+    it('cleans list continuation prose after a fence inside the item', () => {
+        const input = '- Item\n  ```sh\n  echo ready\n  ```\n    See https://example.com/page?utm_source=news for details';
+        expect(cleanUrlsInText(input, options()).text).toBe(
+            '- Item\n  ```sh\n  echo ready\n  ```\n    See https://example.com/page for details'
+        );
+    });
+
+    it('keeps indented code under a setext heading whose text starts with a pipe', () => {
+        const input = '| Release notes\n===\n    curl https://api.example.com/run?token=secret&mode=fast';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('keeps indented code directly after a table', () => {
+        const input = '| Command |\n| --- |\n    curl https://api.example.com/run?token=secret&mode=fast';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('keeps indented code directly after a closed fence', () => {
+        const input = '```sh\necho ready\n```\n    curl https://api.example.com/run?token=secret&mode=fast';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('keeps indented code directly under a setext heading', () => {
+        const input = 'Install\n=======\n    curl https://api.example.com/run?token=secret&mode=fast';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('does not mistake a lone equals line for a setext underline', () => {
+        // Without a paragraph above it the equals line is itself a paragraph, so the
+        // indented line below continues it as prose and gets cleaned
+        expect(cleanUrlsInText('====\n    x = https://example.com/?utm_source=news', options()).text).toBe(
+            '====\n    x = https://example.com/'
+        );
+    });
+
+    it('keeps indented code directly under a heading or thematic break', () => {
+        const heading = '# Setup\n    curl https://example.com/?utm_source=news';
+        expect(cleanUrlsInText(heading, options()).text).toBe(heading);
+        const rule = '***\n    curl https://example.com/?utm_source=news';
+        expect(cleanUrlsInText(rule, options()).text).toBe(rule);
+    });
+
+    it('keeps a fence under a marker with five trailing spaces as code', () => {
+        const input = '-     Example:\n    ```\n  Visit https://example.com/?utm_source=news\n    ```';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('keeps an indented block below a wide-spaced list item as code', () => {
+        const input = '-    Example:\n    ```\n    Visit https://example.com/?utm_source=news\n    ```';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('ends the item where extra marker spacing sets the content indent', () => {
+        const input = '-  Example:\n    ```\n  Visit https://example.com/?utm_source=news\n    ```';
+        expect(cleanUrlsInText(input, options()).text).toBe('-  Example:\n    ```\n  Visit https://example.com/\n    ```');
+    });
+
+    it('keeps fence content indented to the list item but less than the opener', () => {
+        const input = '- Example:\n    ```\n  curl https://api.example.com/run?token=secret&mode=fast\n    ```';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('treats a margin delimiter after an unclosed indented fence as a new opener', () => {
+        const input = '- Setup:\n    ```\n    make build\n```\nThen run curl https://example.com/?utm_source=news';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('ends an unclosed indented fence when its list item ends', () => {
+        const input = '1. Do this:\n    ```\n    npm install\nThen visit https://example.com/page?utm_source=news for details.';
+        expect(cleanUrlsInText(input, options()).text).toBe(
+            '1. Do this:\n    ```\n    npm install\nThen visit https://example.com/page for details.'
+        );
+    });
+
+    it('does not open a fence from an indented prose line under a paragraph', () => {
+        const input =
+            'Instructions mention the marker.\n    ```text means a fenced block.\n```\ncurl https://api.example.com/?token=secret\n```';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('leaves backtick spans on an indented continuation line untouched', () => {
+        const input = '- Install the CLI\n    then run `curl https://api.example.com/v1?key=abc&mode=x` to verify';
+        expect(cleanUrlsInText(input, options()).text).toBe(input);
+    });
+
+    it('keeps a middle dot that opens the flush trailing prose', () => {
+        expect(
+            cleanUrlsInText(
+                '\u8A73\u7D30\u306Fhttps://example.com/?utm_source=x\u30FB\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044',
+                options()
+            ).text
+        ).toBe('\u8A73\u7D30\u306Fhttps://example.com/\u30FB\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044');
+    });
+
+    it('cleans a separate link pasted flush behind an ambiguous one', () => {
+        expect(
+            cleanUrlsInText('[data](https://api.example.com/list?ids=[[1,2]])[site](https://example.com/?utm_source=x)', options()).text
+        ).toBe('[data](https://api.example.com/list?ids=[[1,2]])[site](https://example.com/)');
+    });
+
+    it('protects a whole IRI path behind a katakana middle dot bullet', () => {
+        const url = 'https://zh.wikipedia.org/wiki/\u4E0A\u6D77\u2013\u5357\u4EAC\u94C1\u8DEF';
+        const ranges = httpUrlRanges(`\u30FB${url}`);
+        expect(ranges[0].end - ranges[0].start).toBe(url.length);
+    });
+
+    it('protects a whole IRI path so the dash rule cannot reach into it', () => {
+        const url = 'https://zh.wikipedia.org/wiki/\u4E0A\u6D77\u2013\u5357\u4EAC\u94C1\u8DEF';
+        const ranges = httpUrlRanges(`\u53C2\u8003 ${url} \u3092\u898B\u308B`);
+        expect(ranges).toHaveLength(1);
+        expect(ranges[0].end - ranges[0].start).toBe(url.length);
     });
 
     it('does not move URL-safe query characters onto the cleaned path', () => {

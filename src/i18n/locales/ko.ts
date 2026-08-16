@@ -189,21 +189,13 @@ export const STRINGS_KO: TranslationStrings = {
             invisibleExampleEnd: '는 좋았다.',
             invisibleExampleAfter: '그 결과는 좋았다.',
             quotesName: '따옴표',
-            quotesDesc: '따옴표와 아포스트로피를 이 스타일로 바꿉니다.',
+            quotesDesc: '둥근 따옴표와 아포스트로피를 곧은 따옴표로 바꿉니다.',
             quotesAliases: ['따옴표', '큰따옴표', '스마트 따옴표', '아포스트로피', '문장 부호', '타이포그래피', 'ai'],
-            quotesNone: '변경 없음',
-            quotesStraight: '곧은 따옴표',
-            quotesCurly: '둥근 따옴표',
-            quotesExample: '“완료”라고 했다. 다음은 "대기"다.',
+            quotesExample: '“완료”라고 했다.',
             dashesName: '대시',
-            dashesDesc: '단어 사이의 대시를 이 스타일로 바꿉니다.',
+            dashesDesc: '엔 대시와 엠 대시를 하이픈으로 바꿉니다.',
             dashesAliases: ['대시', '엠 대시', '엔 대시', '하이픈', '줄표', '붙임표', '문장 부호', '타이포그래피', 'ai'],
-            dashesNone: '변경 없음',
-            dashesHyphen: '하이픈',
-            dashesEn: '엔 대시',
-            dashesEm: '엠 대시',
-            dashesEmSpaced: '공백 있는 엠 대시',
-            dashesExample: '그 결과는 - 모든 예상을 깨고 — 좋았다.'
+            dashesExample: '그 결과는 — 모든 예상을 깨고 — 좋았다.'
         }
     },
 

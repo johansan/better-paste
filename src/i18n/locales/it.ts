@@ -194,21 +194,13 @@ export const STRINGS_IT: TranslationStrings = {
             invisibleExampleEnd: ' andava bene.',
             invisibleExampleAfter: 'Il risultato andava bene.',
             quotesName: 'Virgolette',
-            quotesDesc: 'Converte le virgolette e gli apostrofi in questo stile.',
+            quotesDesc: 'Converte le virgolette curve e gli apostrofi in virgolette dritte.',
             quotesAliases: ['virgolette', 'virgolette curve', 'virgolette dritte', 'apostrofo', 'punteggiatura', 'tipografia', 'ia'],
-            quotesNone: 'Nessuna modifica',
-            quotesStraight: 'Virgolette dritte',
-            quotesCurly: 'Virgolette curve',
-            quotesExample: '“Bene”, disse. L\'idea è "pronta".',
+            quotesExample: '“Bene”, disse.',
             dashesName: 'Trattini',
-            dashesDesc: 'Converte i trattini e le lineette tra le parole in questo stile.',
+            dashesDesc: 'Converte i trattini medi e lunghi in trattini brevi.',
             dashesAliases: ['lineetta', 'trattino lungo', 'trattino', 'punteggiatura', 'tipografia', 'ia'],
-            dashesNone: 'Nessuna modifica',
-            dashesHyphen: 'Trattini brevi',
-            dashesEn: 'Trattini medi',
-            dashesEm: 'Trattini lunghi',
-            dashesEmSpaced: 'Trattini lunghi con spazi',
-            dashesExample: 'Il risultato - contro ogni previsione — era buono.'
+            dashesExample: 'Il risultato — contro ogni previsione — era buono.'
         }
     },
 

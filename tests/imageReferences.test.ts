@@ -107,6 +107,34 @@ describe('findImageReferences', () => {
         expect(found[0].kind).toBe('bare');
     });
 
+    it('finds a bare image URL with a CJK filename', () => {
+        const found = findImageReferences('https://example.com/\u5199\u771F.png');
+        expect(found).toHaveLength(1);
+        expect(found[0]).toMatchObject({ url: 'https://example.com/\u5199\u771F.png', kind: 'bare' });
+    });
+
+    it('finds a bare CJK-named image behind a katakana middle dot bullet', () => {
+        const found = findImageReferences('\u30FBhttps://example.com/\u5199\u771F.png');
+        expect(found).toHaveLength(1);
+        expect(found[0].url).toBe('https://example.com/\u5199\u771F.png');
+    });
+
+    it('finds a bare image URL whose name holds balanced full-width brackets', () => {
+        const found = findImageReferences('https://example.com/\u5199\u771F\uFF08\u6625\uFF09.png');
+        expect(found).toHaveLength(1);
+        expect(found[0]).toMatchObject({ url: 'https://example.com/\u5199\u771F\uFF08\u6625\uFF09.png', kind: 'bare' });
+    });
+
+    it('finds a bare image URL after an ambiguous link with no whitespace between', () => {
+        const found = findImageReferences('[data](https://api.example.com/list?ids=[[1,2]])\u3001https://example.com/photo.png \u6B21');
+        expect(found).toHaveLength(1);
+        expect(found[0].url).toBe('https://example.com/photo.png');
+    });
+
+    it('does not rewrite an image URL nested inside an ambiguous query', () => {
+        expect(findImageReferences('https://api.example.com/list?filter=[["url","=","https://b.example/photo.png"]]')).toHaveLength(0);
+    });
+
     it('finds a bare image URL whose path contains balanced parentheses', () => {
         const found = findImageReferences('https://example.com/photo_(1).png');
         expect(found).toHaveLength(1);
@@ -121,6 +149,14 @@ describe('findImageReferences', () => {
         const found = findImageReferences('![](https://example.com/cat.png)');
         expect(found).toHaveLength(1);
         expect(found[0].kind).toBe('markdown');
+    });
+
+    it('does not treat an escaped image as an image reference', () => {
+        expect(findImageReferences('\\![Screenshot](https://example.com/screenshot.png?utm_source=news)')).toHaveLength(0);
+    });
+
+    it('treats an image behind an escaped backslash as a real image', () => {
+        expect(findImageReferences('\\\\![Screenshot](https://cdn.example.com/screenshot.png?token=secret)')).toHaveLength(1);
     });
 
     it('does not treat a normal Markdown link target as a bare image URL', () => {
@@ -171,5 +207,23 @@ describe('replaceImageReferences', () => {
             [references[1].index, '![[b.png]]']
         ]);
         expect(replaceImageReferences(text, references, embeds)).toBe('![[a.png]] ![[b.png]]');
+    });
+
+    it('leaves an image URL inside frontmatter alone, being data', () => {
+        const text = '---\ncover: https://example.com/photo.jpg\n---\nhttps://example.com/body.png';
+        const found = findImageReferences(text);
+        expect(found).toHaveLength(1);
+        expect(found[0].url).toBe('https://example.com/body.png');
+    });
+
+    it('leaves the destination of a linked thumbnail alone', () => {
+        expect(findImageReferences('[![shot](docs/shot.png)](https://example.com/screenshot.png)')).toHaveLength(0);
+        const titled = findImageReferences('[![a](https://a.com/t.png "Thumb")](https://b.com/full.jpg)');
+        expect(titled.map(reference => reference.url)).toEqual(['https://a.com/t.png']);
+        expect(findImageReferences('[[Download] the installer](https://example.com/icon.png)')).toHaveLength(0);
+    });
+
+    it('leaves an image URL inside a wikilink alone', () => {
+        expect(findImageReferences('[[https://x.com/a.png]]')).toHaveLength(0);
     });
 });

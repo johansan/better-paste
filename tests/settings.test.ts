@@ -39,8 +39,10 @@ describe('normalizeSettings', () => {
     it('keeps an embed choice only while its value is still offered', () => {
         expect(normalizeSettings({ imageSizeChoice: '600' }).imageSizeChoice).toBe('600');
         expect(normalizeSettings({ imageSizeOptions: '400', imageSizeChoice: '600' }).imageSizeChoice).toBe('');
-        expect(normalizeSettings({ imageClassChoice: 'ask' }).imageClassChoice).toBe('ask');
+        expect(normalizeSettings({ imageClassOptions: 'invert', imageClassChoice: 'ask' }).imageClassChoice).toBe('ask');
         expect(normalizeSettings({ imageClassOptions: 'invert', imageClassChoice: 'invert' }).imageClassChoice).toBe('invert');
+        // Asking with an empty list would silently do nothing, so it falls back to none
+        expect(normalizeSettings({ imageClassOptions: '', imageClassChoice: 'ask' }).imageClassChoice).toBe('');
     });
 
     it('converts terminal bullets to Markdown by default', () => {
@@ -185,7 +187,7 @@ describe('isSingleImageFile', () => {
 describe('runTextPipeline', () => {
     it('cleans up terminal text and its URLs in one pass', () => {
         const input = [
-            '• Read the announcement at https://support.claude.com/en/articles/16266773-how-claude-marks-ai?utm_source=news and then',
+            '\u2022 Read the announcement at https://support.claude.com/en/articles/16266773-how-claude-marks-ai?utm_source=news and then',
             '  decide whether the change matters for us.'
         ].join('\n');
 
@@ -206,6 +208,18 @@ describe('runTextPipeline', () => {
 
     it('reports no change for text that needs none', () => {
         expect(runTextPipeline('Just a sentence.', DEFAULT_SETTINGS).changed).toBe(false);
+    });
+
+    it('keeps a signed image URL intact when image downloading is off', () => {
+        const input = 'See ![shot](https://cdn.discordapp.com/attachments/123/456/shot.png?ex=66f&is=66e&hm=abc123)';
+        expect(runTextPipeline(input, { ...DEFAULT_SETTINGS, imageEnabled: false }).text).toBe(input);
+    });
+
+    it('cleans the destination of an escaped image, which renders as a link', () => {
+        const input = '\\![Screenshot](https://example.com/screenshot.png?utm_source=news)';
+        expect(runTextPipeline(input, { ...DEFAULT_SETTINGS, imageEnabled: false }).text).toBe(
+            '\\![Screenshot](https://example.com/screenshot.png)'
+        );
     });
 
     it('leaves comma placement alone by default', () => {
@@ -297,18 +311,23 @@ describe('runTextPipeline', () => {
         );
     });
 
+    it('keeps a URL inside frontmatter intact while cleaning body links', () => {
+        const input = '---\nsource: https://forum.example.com/thread?id=42\n---\nSee https://example.com/a?utm_source=x';
+        expect(runTextPipeline(input, DEFAULT_SETTINGS).text).toBe(
+            '---\nsource: https://forum.example.com/thread?id=42\n---\nSee https://example.com/a'
+        );
+    });
+
+    it('keeps the indent of a pasted list fragment, preserving sibling items', () => {
+        const input = '  - alpha\n  - beta';
+        expect(runTextPipeline(input, DEFAULT_SETTINGS).text).toBe(input);
+    });
+
     it('skips a rule that is turned off', () => {
         expect(runTextPipeline('https://example.com/a?utm_source=x', { ...DEFAULT_SETTINGS, linkEnabled: false }).text).toBe(
             'https://example.com/a?utm_source=x'
         );
-        expect(runTextPipeline('a \u2014 b', { ...DEFAULT_SETTINGS, textDashes: 'none' }).text).toBe('a \u2014 b');
-        expect(runTextPipeline('\u201cq\u201d', { ...DEFAULT_SETTINGS, textQuotes: 'none' }).text).toBe('\u201cq\u201d');
-    });
-
-    it('converts dashes and quotes to the typographic styles', () => {
-        const settings = { ...DEFAULT_SETTINGS, textQuotes: 'curly', textDashes: 'em' } as const;
-        expect(runTextPipeline('"It works," she said - finally.', { ...DEFAULT_SETTINGS, ...settings }).text).toBe(
-            '\u201cIt works,\u201d she said\u2014finally.'
-        );
+        expect(runTextPipeline('a \u2014 b', { ...DEFAULT_SETTINGS, textDashes: false }).text).toBe('a \u2014 b');
+        expect(runTextPipeline('\u201cq\u201d', { ...DEFAULT_SETTINGS, textQuotes: false }).text).toBe('\u201cq\u201d');
     });
 });

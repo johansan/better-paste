@@ -44,18 +44,6 @@ export type ImageNameFormat = 'source' | 'custom';
 /** Placement of a comma next to a closing double quotation mark. */
 export type TextCommaPlacement = 'none' | 'inside' | 'outside';
 
-/** The quotation mark style pasted text is converted to. */
-export type TextQuoteStyle = 'none' | 'straight' | 'curly';
-
-/**
- * The dash style pasted text is converted to.
- * - 'hyphen': en and em dashes become hyphens
- * - 'en': dashes between words become spaced en dashes, the British convention
- * - 'em': dashes between words become closed em dashes, the American convention
- * - 'em-spaced': dashes between words become em dashes with a space on each side
- */
-export type TextDashStyle = 'none' | 'hyphen' | 'en' | 'em' | 'em-spaced';
-
 export interface BetterPasteSettings {
     /* Pasting */
 
@@ -129,10 +117,10 @@ export interface BetterPasteSettings {
     textComma: TextCommaPlacement;
     /** Remove zero-width characters and turn no-break spaces into ordinary ones. */
     textInvisible: boolean;
-    /** The quotation mark style pasted text is converted to. */
-    textQuotes: TextQuoteStyle;
-    /** The dash style pasted text is converted to. */
-    textDashes: TextDashStyle;
+    /** Turn curly quotes and apostrophes into straight ones. */
+    textQuotes: boolean;
+    /** Turn en and em dashes into hyphens. */
+    textDashes: boolean;
 
     /* Stored state */
 

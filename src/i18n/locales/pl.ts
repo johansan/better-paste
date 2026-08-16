@@ -206,21 +206,13 @@ export const STRINGS_PL: TranslationStrings = {
             invisibleExampleEnd: ' był dobry.',
             invisibleExampleAfter: 'Ten wynik był dobry.',
             quotesName: 'Cudzysłowy',
-            quotesDesc: 'Zamienia cudzysłowy i apostrofy na ten styl.',
+            quotesDesc: 'Zamienia cudzysłowy drukarskie i apostrofy na proste.',
             quotesAliases: ['cudzysłów', 'cudzysłowy drukarskie', 'cudzysłowy proste', 'apostrof', 'interpunkcja', 'typografia', 'ai'],
-            quotesNone: 'Bez zmian',
-            quotesStraight: 'Cudzysłowy proste',
-            quotesCurly: 'Cudzysłowy drukarskie',
-            quotesExample: 'Powiedziała: „Dobrze”. Wszystko "gotowe".',
+            quotesExample: 'Powiedziała: „Dobrze”.',
             dashesName: 'Myślniki',
-            dashesDesc: 'Zamienia myślniki między wyrazami na ten styl.',
+            dashesDesc: 'Zamienia półpauzy i pauzy na łączniki.',
             dashesAliases: ['myślnik', 'pauza', 'półpauza', 'łącznik', 'dywiz', 'interpunkcja', 'typografia', 'ai'],
-            dashesNone: 'Bez zmian',
-            dashesHyphen: 'Łączniki',
-            dashesEn: 'Półpauzy',
-            dashesEm: 'Pauzy',
-            dashesEmSpaced: 'Pauzy ze spacjami',
-            dashesExample: 'Wynik - wbrew wszystkiemu — był dobry.'
+            dashesExample: 'Wynik — wbrew wszystkiemu — był dobry.'
         }
     },
 

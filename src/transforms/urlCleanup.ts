@@ -63,20 +63,168 @@ const URL_PATTERN = /https?:\/\/[^\s<>"`\\\u201c\u201d]+/gi;
 /** Punctuation that is almost always sentence punctuation rather than part of the URL. */
 const TRAILING_PUNCTUATION = new Set(['.', ',', ';', ':', '!', '?', '"', "'", '`', '\u2018', '\u2019', '\u201A', '\u201B']);
 
+/**
+ * Wikilink and Markdown link openers end a URL: a link pasted flush behind one otherwise
+ * rides along and is deleted when the query is cleaned. Labels may nest one bracket pair.
+ */
+const LINK_OPENER = /\[\[|\[(?:[^\][]|\[[^\][]*\])*\]\(/;
+
+/**
+ * Full-width CJK sentence punctuation never appears raw in a URL, so it always ends the
+ * match. Full-width brackets are not here: they pair, so the balance scan decides them.
+ */
+const CJK_PUNCTUATION = /[\u3000-\u3002\u301C-\u301F\uFF01-\uFF07\uFF0A-\uFF0F\uFF1A-\uFF20\uFF3B-\uFF40\uFF5B-\uFF65]/;
+
+/**
+ * CJK letters are real URL content (wiki paths, image filenames, search queries), so they
+ * end the match only when the surrounding text says they are prose: either the character
+ * in front of the match is a CJK letter, because a writer who joins prose to the front of
+ * a URL joins it to the back too, or the letters run from inside the query to the end of
+ * the match with no URL syntax after them, in which case the reading is undecidable and
+ * the URL is left uncleaned. The katakana middle dot and double hyphen are excluded:
+ * they are separators, and the middle dot in front of a URL is a Japanese list bullet,
+ * not prose joined to the link.
+ */
+const CJK_LETTER = /[\u3040-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uAC00-\uD7AF]/;
+
+/**
+ * Where flush prose starts: the letters plus the separators excluded above, so a prose
+ * run opening with a middle dot is cut in front of the dot rather than behind it.
+ */
+const CJK_PROSE = /[\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uAC00-\uD7AF]/;
+
+/** CJK letters and full-width characters, used to test that a tail is prose-only. */
+const CJK_TAIL = /^[\u3000-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uAC00-\uD7AF\uFF00-\uFFEF]*$/;
+
+/**
+ * Full-width opening brackets behind the query end the URL: a real query never carries
+ * one raw, while an annotation such as \uFF08PDF\uFF09 flush after a link is ordinary Japanese
+ * typography. Openers in the path stay with the balance scan, because wiki paths use them.
+ */
+const FULL_WIDTH_OPENER = /[\uFF08\u3008\u300A\u300C\u300E\u3010\u3014\u3016\u3018\u301A]/;
+
+/** Where a URL match really ends, and whether cleaning it is safe. */
+interface UrlBoundary {
+    url: string;
+    /** True when the cut reads as URL data just as well, so the URL must not be cleaned. */
+    ambiguous: boolean;
+    /**
+     * Offset in the match where scanning may resume after an ambiguous cut: the first
+     * unmatched closing bracket, because the query cannot extend past it. -1 when there
+     * is none, in which case the ambiguity runs to the next whitespace.
+     */
+    resume: number;
+}
+
+/** Index of the first closing bracket with no earlier opening partner, or -1. */
+function unmatchedCloserIndex(url: string): number {
+    const depths: Record<string, number> = {};
+    for (const opener of Object.values(CLOSING_BRACKETS)) depths[opener] = 0;
+    for (let i = 0; i < url.length; i++) {
+        const char = url[i];
+        if (char in depths) {
+            depths[char] += 1;
+            continue;
+        }
+        const opener = CLOSING_BRACKETS[char];
+        if (!opener) continue;
+        if (depths[opener] === 0) return i;
+        depths[opener] -= 1;
+    }
+    return -1;
+}
+
+/**
+ * Cuts a URL match down to where the URL really ends. Every caller reattaches the cut
+ * text verbatim, so a cut never loses characters. A `[[` behind the query is the one
+ * undecidable case: it reads as a pasted wikilink or as a JSON array in a filter
+ * parameter equally well, so the URL is marked ambiguous and left uncleaned rather than
+ * corrupted under either reading.
+ */
+export function urlBoundary(url: string, precedingChar: string): UrlBoundary {
+    let cut = url.length;
+    let ambiguous = false;
+
+    const closer = unmatchedCloserIndex(url);
+    if (closer !== -1) cut = closer;
+
+    const punctuation = CJK_PUNCTUATION.exec(url);
+    if (punctuation && punctuation.index < cut) cut = punctuation.index;
+
+    const queryStart = url.indexOf('?');
+    if (queryStart !== -1) {
+        const annotation = FULL_WIDTH_OPENER.exec(url.slice(queryStart));
+        if (annotation && queryStart + annotation.index < cut) cut = queryStart + annotation.index;
+    }
+
+    const opener = LINK_OPENER.exec(url);
+    if (opener && opener.index < cut) {
+        cut = opener.index;
+        ambiguous = opener[0] === '[[' && url.slice(0, cut).includes('?');
+    }
+
+    if (CJK_LETTER.test(precedingChar)) {
+        const letter = CJK_PROSE.exec(url);
+        if (letter && letter.index < cut) {
+            cut = letter.index;
+            ambiguous = false;
+        }
+    } else {
+        // Without prose at the front, trailing CJK letters are undecidable: they read as
+        // a query value (?q=...) or as flush prose equally well. When they run from
+        // inside the query to the end of the match with no URL syntax after them, the
+        // URL ends there but is not cleaned. Letters followed by more query syntax,
+        // such as ?q=...&page=2, stay URL content, and so do letters behind a #,
+        // because a fragment anchor such as a wiki section name is not prose.
+        if (queryStart !== -1) {
+            const fragment = url.indexOf('#', queryStart);
+            const letter = CJK_LETTER.exec(url.slice(queryStart));
+            if (letter) {
+                const index = queryStart + letter.index;
+                if ((fragment === -1 || index < fragment) && index < cut && CJK_TAIL.test(url.slice(index))) {
+                    cut = index;
+                    ambiguous = true;
+                }
+            }
+        }
+    }
+
+    return { url: url.slice(0, cut), ambiguous, resume: ambiguous && closer > cut ? closer : -1 };
+}
+
 /** Closing brackets that only belong to the URL when the URL also contains their opening partner. */
 const CLOSING_BRACKETS: Record<string, string> = {
     ')': '(',
     ']': '[',
     '}': '{',
-    '>': '<'
+    '>': '<',
+    // Full-width pairs balance the same way: paired inside a URL they are IRI path
+    // content, an unmatched closer marks prose wrapped around the link
+    '\uFF09': '\uFF08',
+    '\u3009': '\u3008',
+    '\u300B': '\u300A',
+    '\u300D': '\u300C',
+    '\u300F': '\u300E',
+    '\u3011': '\u3010',
+    '\u3015': '\u3014',
+    '\u3017': '\u3016',
+    '\u3019': '\u3018',
+    '\u301B': '\u301A'
 };
 
 /**
  * Trims characters that a URL regex greedily absorbed but that belong to the surrounding
  * prose or Markdown syntax. Unbalanced closing brackets are removed, balanced ones kept,
  * so both `(see https://example.com/a)` and `https://en.wikipedia.org/wiki/Foo_(bar)` work.
+ * `precedingChar` is the character in front of the match, used to tell CJK prose flush
+ * against the URL from CJK content inside it.
  */
-export function trimUrlTail(url: string): string {
+export function trimUrlTail(url: string, precedingChar = ''): string {
+    return trimTrailingNoise(urlBoundary(url, precedingChar).url);
+}
+
+/** Trims sentence punctuation, closing emphasis pairs and unbalanced closers off the tail. */
+export function trimTrailingNoise(url: string): string {
     let end = url.length;
 
     while (end > 0) {
@@ -84,6 +232,12 @@ export function trimUrlTail(url: string): string {
 
         if (TRAILING_PUNCTUATION.has(char)) {
             end -= 1;
+            continue;
+        }
+
+        // A trailing pair closes a bold or struck link wrapped around the URL
+        if ((char === '*' || char === '~') && url[end - 2] === char) {
+            end -= 2;
             continue;
         }
 
@@ -377,8 +531,10 @@ export function httpUrlRanges(text: string): ProtectedRange[] {
 
     URL_PATTERN.lastIndex = 0;
     for (let match = URL_PATTERN.exec(text); match !== null; match = URL_PATTERN.exec(text)) {
-        const url = trimUrlTail(match[0]);
+        const url = trimUrlTail(match[0], text[match.index - 1] ?? '');
         ranges.push({ start: match.index, end: match.index + url.length });
+        // Rescan what the trim gave back, so a URL pasted flush behind this one gets its own range
+        URL_PATTERN.lastIndex = match.index + url.length;
     }
 
     return ranges;
@@ -391,19 +547,45 @@ export function httpUrlRanges(text: string): ProtectedRange[] {
 export function cleanUrlsInText(text: string, options: UrlCleanupOptions, protect: readonly ProtectedRange[] = []): UrlCleanupResult {
     let count = 0;
     const protectedRanges = [...protect, ...markdownCodeRanges(text)];
+    const parts: string[] = [];
+    let cursor = 0;
 
-    const result = text.replace(URL_PATTERN, (match, offset: number) => {
+    URL_PATTERN.lastIndex = 0;
+    for (let match = URL_PATTERN.exec(text); match !== null; match = URL_PATTERN.exec(text)) {
+        const boundary = urlBoundary(match[0], text[match.index - 1] ?? '');
+        const url = trimTrailingNoise(boundary.url);
+
+        // An ambiguous match is left alone up to its first unmatched closing bracket or,
+        // when there is none, the next whitespace: a quote inside a JSON query value ends
+        // the match early, and rescanning before that point would clean a URL nested
+        // inside the very query this match declined to touch. Content past the closer is
+        // separate, such as a second Markdown link pasted flush behind this one.
+        if (boundary.ambiguous) {
+            if (boundary.resume !== -1) {
+                URL_PATTERN.lastIndex = match.index + boundary.resume;
+            } else {
+                const whitespace = /\s/.exec(text.slice(match.index + match[0].length));
+                URL_PATTERN.lastIndex = whitespace ? match.index + match[0].length + whitespace.index : text.length;
+            }
+            continue;
+        }
+
+        // Rescan what the trim gave back, so a second link pasted flush behind this one
+        // is cleaned on its own instead of travelling along as an uncleaned tail
+        URL_PATTERN.lastIndex = match.index + url.length;
+
         // A URL that is about to be fetched as an image is left exactly as it was. A
         // signed link from a CDN carries its token in the query, and stripping that
         // before the request turns a working image into a 403.
-        if (overlapsRange(protectedRanges, offset, offset + match.length)) return match;
+        if (overlapsRange(protectedRanges, match.index, match.index + url.length)) continue;
 
-        const url = trimUrlTail(match);
-        const tail = match.slice(url.length);
         const cleaned = cleanUrl(url, options);
-        if (cleaned !== url) count += 1;
-        return `${cleaned}${tail}`;
-    });
+        if (cleaned === url) continue;
+        count += 1;
+        parts.push(text.slice(cursor, match.index), cleaned);
+        cursor = match.index + url.length;
+    }
 
-    return { text: result, count };
+    parts.push(text.slice(cursor));
+    return { text: parts.join(''), count };
 }

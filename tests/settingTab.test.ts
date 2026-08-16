@@ -223,28 +223,11 @@ describe('settings tree', () => {
         });
     });
 
-    it('offers all quote styles', () => {
-        const row = controlRows(tab).find(candidate => candidate.control.key === 'textQuotes');
-        expect(row?.control.type).toBe('dropdown');
-        if (row?.control.type !== 'dropdown') throw new Error('Quotes is not a dropdown');
-        expect(row.control.options).toEqual({
-            none: 'No change',
-            straight: 'Straight quotes',
-            curly: 'Curly quotes'
-        });
-    });
-
-    it('offers all dash styles', () => {
-        const row = controlRows(tab).find(candidate => candidate.control.key === 'textDashes');
-        expect(row?.control.type).toBe('dropdown');
-        if (row?.control.type !== 'dropdown') throw new Error('Dashes is not a dropdown');
-        expect(row.control.options).toEqual({
-            none: 'No change',
-            hyphen: 'Hyphens',
-            en: 'En dashes',
-            em: 'Em dashes',
-            'em-spaced': 'Em dashes with spaces'
-        });
+    it('offers quotes and dashes as plain toggles', () => {
+        const quotesRow = controlRows(tab).find(candidate => candidate.control.key === 'textQuotes');
+        const dashesRow = controlRows(tab).find(candidate => candidate.control.key === 'textDashes');
+        expect(quotesRow?.control.type).toBe('toggle');
+        expect(dashesRow?.control.type).toBe('toggle');
     });
 
     it('updates the comma example for the selected placement', () => {
@@ -438,23 +421,6 @@ describe('dependent settings', () => {
 
         await tab.setControlValue('textComma', 'outside');
         expect(rendered).toEqual(['He called it "finished," then left. \u2192 He called it "finished", then left.']);
-    });
-
-    it('updates the rendered quote and dash examples after their selections change', async () => {
-        const tab = makeTab(fakePlugin());
-        const rendered: string[] = [];
-        Object.assign(tab, {
-            containerEl: {
-                querySelectorAll: () => [{ setText: (value: string) => rendered.push(value) }]
-            }
-        });
-
-        await tab.setControlValue('textQuotes', 'curly');
-        await tab.setControlValue('textDashes', 'em');
-        expect(rendered).toEqual([
-            '\u201cFine,\u201d she said. "Don\'t stop." \u2192 \u201cFine,\u201d she said. \u201cDon\u2019t stop.\u201d',
-            'The result - against all odds \u2014 was fine. \u2192 The result\u2014against all odds\u2014was fine.'
-        ]);
     });
 
     it('does not rebuild the terminal tester when its mode changes', async () => {

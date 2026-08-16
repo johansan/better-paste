@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { trimUrlTail } from '../transforms/urlCleanup';
+import { trimTrailingNoise, urlBoundary } from '../transforms/urlCleanup';
+import { frontmatterRanges, markdownSyntaxRanges } from '../transforms/typography';
 import { markdownCodeRanges } from '../transforms/markdownRanges';
 import { IMAGE_EXTENSIONS } from '../settings/constants';
 
@@ -121,7 +122,9 @@ function isSupportedSource(url: string): boolean {
  */
 export function findImageReferences(text: string): ImageReference[] {
     const found: ImageReference[] = [];
-    const claimed: { start: number; end: number }[] = markdownCodeRanges(text);
+    // Frontmatter is claimed up front: a cover or banner property holding an image URL is
+    // data, and rewriting it into a vault embed would break the properties block
+    const claimed: { start: number; end: number }[] = [...markdownCodeRanges(text), ...frontmatterRanges(text)];
 
     const claim = (start: number, end: number): boolean => {
         if (claimed.some(range => start < range.end && end > range.start)) return false;
@@ -131,6 +134,11 @@ export function findImageReferences(text: string): ImageReference[] {
 
     MARKDOWN_IMAGE.lastIndex = 0;
     for (let match = MARKDOWN_IMAGE.exec(text); match !== null; match = MARKDOWN_IMAGE.exec(text)) {
+        // An odd run of backslashes escapes the bang, which then renders as a literal
+        // character in front of a normal link rather than an image
+        let slashes = 0;
+        for (let i = match.index - 1; i >= 0 && text[i] === '\\'; i--) slashes += 1;
+        if (slashes % 2 === 1) continue;
         const url = match[2];
         if (!isSupportedSource(url)) continue;
         if (!claim(match.index, match.index + match[0].length)) continue;
@@ -161,9 +169,30 @@ export function findImageReferences(text: string): ImageReference[] {
         claim(match.index, match.index + match[0].length);
     }
 
+    // Everything the text rules protect is claimed label-independently before bare URLs,
+    // because a link label containing brackets, such as a linked thumbnail
+    // [![shot](thumb.png)](https://example.com/full.png), defeats the link pattern above
+    // and would leave its destination free for the bare pass to rewrite
+    for (const range of markdownSyntaxRanges(text)) claim(range.start, range.end);
+
     BARE_URL.lastIndex = 0;
     for (let match = BARE_URL.exec(text); match !== null; match = BARE_URL.exec(text)) {
-        const url = trimUrlTail(match[0]);
+        const boundary = urlBoundary(match[0], text[match.index - 1] ?? '');
+        const url = trimTrailingNoise(boundary.url);
+        // An ambiguous match is skipped up to its first unmatched closer or the next
+        // whitespace, otherwise a URL nested in its query would be rewritten. Anything
+        // else rescans what the trim gave back, so a URL pasted flush behind this one
+        // is seen too
+        if (boundary.ambiguous) {
+            if (boundary.resume !== -1) {
+                BARE_URL.lastIndex = match.index + boundary.resume;
+            } else {
+                const whitespace = /\s/.exec(text.slice(match.index + match[0].length));
+                BARE_URL.lastIndex = whitespace ? match.index + match[0].length + whitespace.index : text.length;
+            }
+            continue;
+        }
+        BARE_URL.lastIndex = match.index + url.length;
         if (!looksLikeImageUrl(url)) continue;
         if (!claim(match.index, match.index + url.length)) continue;
         found.push({ token: url, index: match.index, url, alt: '', kind: 'bare' });

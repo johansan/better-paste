@@ -19,7 +19,7 @@
 import { Notice, parseYaml } from 'obsidian';
 import type { Editor, MarkdownFileInfo, MarkdownView, TFile } from 'obsidian';
 import { runTextPipeline } from '../transforms';
-import { applyDashStyle, applyQuoteStyle, normalizeInvisibleCharacters } from '../transforms/typography';
+import { frontmatterRanges, normalizeInvisibleCharacters, straightenDashes, straightenQuotes } from '../transforms/typography';
 import { applyCommaPlacement } from '../transforms/textProcessing';
 import { buildUrlCleanupOptions, cleanUrlsInText, httpUrlRanges } from '../transforms/urlCleanup';
 import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './imageReferences';
@@ -210,7 +210,11 @@ export class PasteService {
         const startOffset = editor.posToOffset(editor.getCursor('from'));
         const selectedLink = needsTitle ? linkFromSelection(editor.getSelection(), plain, result.text) : null;
         const inserted = selectedLink ?? result.text;
+        const endOffset = editor.posToOffset(editor.getCursor('to'));
         editor.replaceSelection(inserted);
+        // An earlier paste may still be downloading; its snapshots must learn about this
+        // insert, otherwise its rewrite is abandoned as stale when it completes
+        this.realignPendingRanges(null, startOffset, valueBefore.slice(startOffset, endOffset), inserted);
         const range = asyncPasteRange(startOffset, inserted, valueBefore, editor.getValue());
 
         if (needsImages) void this.runImagePass(editor, info, targetFile, targetPath, range);
@@ -267,11 +271,14 @@ export class PasteService {
         if (editor.getValue() === valueBefore) {
             editor.replaceRange(text, editor.offsetToPos(fromOffset), editor.offsetToPos(toOffset));
             editor.setCursor(editor.offsetToPos(fromOffset + text.length));
+            this.realignPendingRanges(null, fromOffset, valueBefore.slice(fromOffset, toOffset), text);
         } else {
             // The document changed while the image was being written, so the recorded range
             // is stale. Insert at the head without deleting the user's current selection.
             const cursor = editor.getCursor();
+            const offset = editor.posToOffset(cursor);
             editor.replaceRange(text, cursor, cursor);
+            this.realignPendingRanges(null, offset, '', text);
         }
 
         if (embed === null) this.reportImageFailures(1);
@@ -343,8 +350,8 @@ export class PasteService {
         const settings = this.getSettings();
         if (
             !settings.textInvisible &&
-            settings.textQuotes === 'none' &&
-            settings.textDashes === 'none' &&
+            !settings.textQuotes &&
+            !settings.textDashes &&
             settings.textComma === 'none' &&
             !settings.linkEnabled &&
             !settings.imageEnabled
@@ -357,9 +364,15 @@ export class PasteService {
         const valueBefore = editor.getValue();
         const lengthBefore = valueBefore.length;
         const selectionLength = editor.getSelection().length;
+        const prefixBefore = valueBefore.slice(0, startOffset);
+        const suffixBefore = valueBefore.slice(startOffset + selectionLength);
 
         window.setTimeout(() => {
             const valueAfter = editor.getValue();
+            // A pending rewrite finishing inside this window would skew the length
+            // arithmetic below, so the paste is only measured against a document that
+            // changed nowhere except the replaced selection
+            if (!valueAfter.startsWith(prefixBefore) || !valueAfter.endsWith(suffixBefore)) return;
             const insertedLength = valueAfter.length - (lengthBefore - selectionLength);
             if (insertedLength <= 0 || !this.canEdit(info, targetFile)) return;
 
@@ -385,15 +398,16 @@ export class PasteService {
         // Content copied out of a browser arrives as HTML, which is how most people paste
         // an assistant's answer. Without this the character rules would never see it.
         if (settings.textInvisible) text = normalizeInvisibleCharacters(text, httpUrlRanges(text)).text;
-        if (settings.textDashes !== 'none') text = applyDashStyle(text, settings.textDashes, httpUrlRanges(text)).text;
-        if (settings.textQuotes !== 'none') text = applyQuoteStyle(text, settings.textQuotes, httpUrlRanges(text)).text;
+        if (settings.textDashes) text = straightenDashes(text, httpUrlRanges(text)).text;
+        if (settings.textQuotes) text = straightenQuotes(text, httpUrlRanges(text)).text;
 
         if (settings.textComma !== 'none') text = applyCommaPlacement(text, settings.textComma).text;
 
         if (settings.linkEnabled) {
-            // Same protection as the plain-text pipeline: an image about to be fetched
-            // keeps its query, since a signed link needs it
-            const protect = settings.imageEnabled ? imageReferenceRanges(text) : [];
+            // Same protection as the plain-text pipeline: an image reference keeps its
+            // query whether or not it is downloaded, since a signed link needs it, and
+            // frontmatter URLs are data
+            const protect = [...imageReferenceRanges(text), ...frontmatterRanges(text)];
             text = cleanUrlsInText(text, buildUrlCleanupOptions(settings), protect).text;
         }
 
@@ -531,8 +545,11 @@ export class PasteService {
         return true;
     }
 
-    /** Applies a completed rewrite to the snapshots held by other pending paste operations. */
-    private realignPendingRanges(completed: AsyncPasteRange, offset: number, previous: string, next: string): void {
+    /**
+     * Applies an edit to the snapshots held by other pending paste operations, both when a
+     * pending rewrite completes and when a new paste inserts text while others still wait.
+     */
+    private realignPendingRanges(completed: AsyncPasteRange | null, offset: number, previous: string, next: string): void {
         const delta = next.length - previous.length;
 
         for (const range of this.pendingRanges) {
@@ -559,6 +576,7 @@ export class PasteService {
         if (editor.getValue() === valueAtInvocation) {
             editor.replaceRange(text, editor.offsetToPos(fromOffset), editor.offsetToPos(toOffset));
             editor.setCursor(editor.offsetToPos(fromOffset + text.length));
+            this.realignPendingRanges(null, fromOffset, valueAtInvocation.slice(fromOffset, toOffset), text);
             return fromOffset;
         }
 
@@ -567,6 +585,7 @@ export class PasteService {
         const cursor = editor.getCursor();
         const offset = editor.posToOffset(cursor);
         editor.replaceRange(text, cursor, cursor);
+        this.realignPendingRanges(null, offset, '', text);
         return offset;
     }
 

@@ -194,21 +194,13 @@ export const STRINGS_PT_BR: TranslationStrings = {
             invisibleExampleEnd: ' ficou bom.',
             invisibleExampleAfter: 'O resultado ficou bom.',
             quotesName: 'Aspas',
-            quotesDesc: 'Converte as aspas e os apóstrofos para este estilo.',
+            quotesDesc: 'Converte as aspas curvas e os apóstrofos em aspas retas.',
             quotesAliases: ['aspas', 'aspas curvas', 'aspas retas', 'apóstrofo', 'pontuação', 'tipografia', 'ia'],
-            quotesNone: 'Sem alteração',
-            quotesStraight: 'Aspas retas',
-            quotesCurly: 'Aspas curvas',
-            quotesExample: '“Bem”, disse ela. Está "pronto".',
+            quotesExample: '“Bem”, disse ela.',
             dashesName: 'Travessões',
-            dashesDesc: 'Converte os travessões e hifens entre palavras para este estilo.',
+            dashesDesc: 'Converte as meias-riscas e os travessões em hifens.',
             dashesAliases: ['travessão', 'meia-risca', 'hífen', 'pontuação', 'tipografia', 'ia'],
-            dashesNone: 'Sem alteração',
-            dashesHyphen: 'Hifens',
-            dashesEn: 'Meias-riscas',
-            dashesEm: 'Travessões',
-            dashesEmSpaced: 'Travessões com espaços',
-            dashesExample: 'O resultado - contra todas as expectativas — ficou bom.'
+            dashesExample: 'O resultado — contra todas as expectativas — ficou bom.'
         }
     },
 

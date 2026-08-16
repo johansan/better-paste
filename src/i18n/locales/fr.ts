@@ -204,21 +204,13 @@ export const STRINGS_FR: TranslationStrings = {
             invisibleExampleEnd: ' était bon.',
             invisibleExampleAfter: 'Le résultat était bon.',
             quotesName: 'Guillemets',
-            quotesDesc: 'Convertit les guillemets et les apostrophes selon le style choisi.',
+            quotesDesc: 'Convertit les guillemets courbes et les apostrophes en guillemets droits.',
             quotesAliases: ['guillemet', 'guillemets courbes', 'guillemets droits', 'apostrophe', 'ponctuation', 'typographie', 'ia'],
-            quotesNone: 'Aucun changement',
-            quotesStraight: 'Guillemets droits',
-            quotesCurly: 'Guillemets courbes',
-            quotesExample: '“Bien”, dit-elle. C\'est "fini".',
+            quotesExample: '“Bien”, dit-elle.',
             dashesName: 'Tirets',
-            dashesDesc: 'Convertit les tirets entre les mots selon le style choisi.',
+            dashesDesc: 'Convertit les tirets cadratins et demi-cadratins en traits d’union.',
             dashesAliases: ['tiret', 'tiret cadratin', 'tiret demi-cadratin', "trait d'union", 'ponctuation', 'typographie', 'ia'],
-            dashesNone: 'Aucun changement',
-            dashesHyphen: 'Traits d’union',
-            dashesEn: 'Tirets demi-cadratins',
-            dashesEm: 'Tirets cadratins',
-            dashesEmSpaced: 'Tirets cadratins avec espaces',
-            dashesExample: 'Le résultat - contre toute attente — était bon.'
+            dashesExample: 'Le résultat — contre toute attente — était bon.'
         }
     },
 

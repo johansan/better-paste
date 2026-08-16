@@ -17,9 +17,8 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { applyDashStyle, applyQuoteStyle, normalizeInvisibleCharacters } from '../src/transforms/typography';
+import { normalizeInvisibleCharacters, straightenDashes, straightenQuotes } from '../src/transforms/typography';
 import { httpUrlRanges } from '../src/transforms/urlCleanup';
-import type { TextDashStyle, TextQuoteStyle } from '../src/settings/types';
 
 // Written as escapes so this file stays plain ASCII
 const NBSP = '\u00A0';
@@ -38,185 +37,189 @@ const EM_DASH = '\u2014';
 const EN_DASH = '\u2013';
 
 /** Applies a rule the way the pipeline does, with pasted URLs protected. */
-const quotes = (text: string, style: TextQuoteStyle): string => applyQuoteStyle(text, style, httpUrlRanges(text)).text;
-const dashes = (text: string, style: TextDashStyle): string => applyDashStyle(text, style, httpUrlRanges(text)).text;
+const quotes = (text: string): string => straightenQuotes(text, httpUrlRanges(text)).text;
+const dashes = (text: string): string => straightenDashes(text, httpUrlRanges(text)).text;
 const clean = (text: string): string => normalizeInvisibleCharacters(text, httpUrlRanges(text)).text;
 
-describe('applyDashStyle: hyphens', () => {
+describe('straightenDashes', () => {
     it('replaces an em dash with a hyphen', () => {
-        expect(dashes(`a ${EM_DASH} b`, 'hyphen')).toBe('a - b');
+        expect(dashes(`a ${EM_DASH} b`)).toBe('a - b');
     });
 
     it('replaces an en dash with a hyphen, including in a range', () => {
-        expect(dashes(`2020${EN_DASH}2024`, 'hyphen')).toBe('2020-2024');
-    });
-
-    it('leaves dashes alone when the style is no change', () => {
-        expect(dashes(`a ${EM_DASH} b`, 'none')).toBe(`a ${EM_DASH} b`);
+        expect(dashes(`2020${EN_DASH}2024`)).toBe('2020-2024');
     });
 
     it('leaves an ordinary hyphen alone', () => {
-        expect(dashes('well-known', 'hyphen')).toBe('well-known');
+        expect(dashes('well-known')).toBe('well-known');
     });
 
     it('reports that dashes were replaced', () => {
-        expect(applyDashStyle(`a ${EM_DASH} b`, 'hyphen').changed).toBe(true);
-        expect(applyDashStyle('a - b', 'hyphen').changed).toBe(false);
+        expect(straightenDashes(`a ${EM_DASH} b`).changed).toBe(true);
+        expect(straightenDashes('a - b').changed).toBe(false);
     });
 
     it('does not create Markdown blocks from line-leading long dashes', () => {
-        expect(applyDashStyle('\u2014 A sentence', 'hyphen').text).toBe('\\- A sentence');
-        expect(applyDashStyle('\u2014\u2014\u2014', 'hyphen').text).toBe('\\---');
+        expect(straightenDashes('\u2014 A sentence').text).toBe('\\- A sentence');
+        expect(straightenDashes('\u2014\u2014\u2014').text).toBe('\\---');
     });
 
     it('does not create a list item from a blockquoted attribution', () => {
-        expect(applyDashStyle('> \u2014 Author', 'hyphen').text).toBe('> \\- Author');
-    });
-});
-
-describe('applyDashStyle: en and em dashes', () => {
-    it('turns a spaced hyphen into a spaced en dash', () => {
-        expect(dashes('progress - finally', 'en')).toBe(`progress ${EN_DASH} finally`);
+        expect(straightenDashes('> \u2014 Author').text).toBe('> \\- Author');
     });
 
-    it('turns a spaced hyphen into a closed em dash', () => {
-        expect(dashes('progress - finally', 'em')).toBe(`progress${EM_DASH}finally`);
+    it('escapes the leading dash of a dash-space-dash line, not the second one', () => {
+        expect(straightenDashes('\u2013 \u2013 x').text).toBe('\\- - x');
     });
 
-    it('turns a spaced hyphen into a spaced em dash', () => {
-        expect(dashes('progress - finally', 'em-spaced')).toBe(`progress ${EM_DASH} finally`);
+    it('escapes a dash converted right after a list marker, which would nest a list', () => {
+        expect(straightenDashes('- \u2014 Author').text).toBe('- \\- Author');
+        expect(straightenDashes('1. \u2014 note').text).toBe('1. \\- note');
     });
 
-    it('converts an em dash regardless of its spacing', () => {
-        expect(dashes(`word${EM_DASH}word`, 'en')).toBe(`word ${EN_DASH} word`);
-        expect(dashes(`word ${EM_DASH} word`, 'en')).toBe(`word ${EN_DASH} word`);
-        expect(dashes(`word ${EM_DASH} word`, 'em')).toBe(`word${EM_DASH}word`);
-        expect(dashes(`word${EM_DASH}word`, 'em-spaced')).toBe(`word ${EM_DASH} word`);
+    it('escapes a two-dash line, which would underline the paragraph above', () => {
+        expect(straightenDashes('Best regards\n\u2014\u2014\nJohan').text).toBe('Best regards\n\\--\nJohan');
     });
 
-    it('converts a spaced en dash but leaves an unspaced range alone', () => {
-        expect(dashes(`a ${EN_DASH} b`, 'em')).toBe(`a${EM_DASH}b`);
-        expect(dashes(`1990${EN_DASH}1995`, 'em')).toBe(`1990${EN_DASH}1995`);
+    it('escapes across CRLF line endings', () => {
+        expect(straightenDashes('Intro\r\n\u2014\u2014\u2014\r\nOutro').text).toBe('Intro\r\n\\---\r\nOutro');
     });
 
-    it('leaves compounds, ranges and flags alone', () => {
-        expect(dashes('well-known', 'em')).toBe('well-known');
-        expect(dashes('2020-2024', 'en')).toBe('2020-2024');
-        expect(dashes('npm install --save-dev', 'em')).toBe('npm install --save-dev');
+    it('leaves link targets alone, because a changed dash is a different note', () => {
+        expect(dashes(`See [[2013${EN_DASH}14 Premier League]] now ${EN_DASH} really`)).toBe(
+            `See [[2013${EN_DASH}14 Premier League]] now - really`
+        );
+        expect(dashes(`[season](notes/2013${EN_DASH}14 season.md)`)).toBe(`[season](notes/2013${EN_DASH}14 season.md)`);
     });
 
-    it('leaves list markers alone', () => {
-        expect(dashes('- item', 'em')).toBe('- item');
-        expect(dashes(' - item', 'em')).toBe(' - item');
-        expect(dashes('> - item', 'em')).toBe('> - item');
+    it('converts a reference label on both sides, keeping the reference matched', () => {
+        expect(dashes(`See [guide][2013${EN_DASH}14].\n\n[2013${EN_DASH}14]: notes/season.md`)).toBe(
+            'See [guide][2013-14].\n\n[2013-14]: notes/season.md'
+        );
     });
 
-    it('only swaps the character in a line-leading attribution dash', () => {
-        expect(dashes(`${EM_DASH} Author`, 'en')).toBe(`${EN_DASH} Author`);
-        expect(dashes(`> ${EM_DASH} Author`, 'em')).toBe(`> ${EM_DASH} Author`);
+    it('leaves the destination of a definition alone', () => {
+        expect(dashes(`[foo]: notes/2013${EN_DASH}14.md "t"`)).toBe(`[foo]: notes/2013${EN_DASH}14.md "t"`);
+    });
+
+    it('repairs a long dash in math, which a hyphen makes a valid minus again', () => {
+        expect(dashes(`$x ${EN_DASH} y$`)).toBe('$x - y$');
+    });
+
+    it('leaves a leading frontmatter block alone', () => {
+        expect(dashes(`---\ntitle: 2013${EN_DASH}14\n---\na ${EN_DASH} b`)).toBe(`---\ntitle: 2013${EN_DASH}14\n---\na - b`);
+        // Obsidian does not accept YAML's three-dot closer, so such a block is body text
+        expect(dashes(`---\ntitle: 2013${EN_DASH}14\n...\na ${EN_DASH} b`)).toBe('---\ntitle: 2013-14\n...\na - b');
+    });
+
+    it('covers a destination past a balanced parenthesis', () => {
+        expect(dashes(`[x](Notes/(Draft)/2013${EN_DASH}14.md)`)).toBe(`[x](Notes/(Draft)/2013${EN_DASH}14.md)`);
     });
 
     it('leaves dashes inside Markdown code alone', () => {
-        const input = ['```text', 'a - b', '```', 'c - d'].join('\n');
-        expect(dashes(input, 'em')).toBe(['```text', 'a - b', '```', `c${EM_DASH}d`].join('\n'));
-        expect(dashes('`a - b`', 'en')).toBe('`a - b`');
+        const input = ['`a ${EM} b`'.replace('${EM}', EM_DASH), '```text', `x ${EM_DASH} y`, '```', `c ${EM_DASH} d`].join('\n');
+        expect(dashes(input)).toBe(['`a ${EM} b`'.replace('${EM}', EM_DASH), '```text', `x ${EM_DASH} y`, '```', 'c - d'].join('\n'));
     });
 
     it('leaves dashes inside URLs alone', () => {
         const input = `![photo](https://example.com/Foo${EM_DASH}Bar.png)`;
-        expect(dashes(input, 'hyphen')).toBe(input);
-        expect(dashes(input, 'en')).toBe(input);
+        expect(dashes(input)).toBe(input);
     });
 
-    it('reports that dashes were converted', () => {
-        expect(applyDashStyle('a - b', 'em').changed).toBe(true);
-        expect(applyDashStyle(`a${EM_DASH}b`, 'em').changed).toBe(false);
+    it('leaves dashes inside HTML attributes alone', () => {
+        expect(dashes(`<img src="a${EM_DASH}b.png"> then ${EM_DASH} prose`)).toBe(`<img src="a${EM_DASH}b.png"> then - prose`);
     });
 });
 
-describe('applyQuoteStyle: straight', () => {
+describe('straightenQuotes', () => {
     it('straightens curly double quotes', () => {
-        expect(quotes('\u201Chello\u201D', 'straight')).toBe('"hello"');
-        expect(quotes('\u201Elow\u201C', 'straight')).toBe('"low"');
+        expect(quotes('\u201Chello\u201D')).toBe('"hello"');
+        expect(quotes('\u201Elow\u201C')).toBe('"low"');
     });
 
     it('straightens curly single quotes and the curly apostrophe', () => {
-        expect(quotes('\u2018hi\u2019', 'straight')).toBe("'hi'");
-        expect(quotes('don\u2019t', 'straight')).toBe("don't");
+        expect(quotes('\u2018hi\u2019')).toBe("'hi'");
+        expect(quotes('don\u2019t')).toBe("don't");
     });
 
     it('leaves guillemets alone, being real quotation marks in several languages', () => {
-        expect(quotes('\u00ABbonjour\u00BB', 'straight')).toBe('\u00ABbonjour\u00BB');
+        expect(quotes('\u00ABbonjour\u00BB')).toBe('\u00ABbonjour\u00BB');
     });
 
     it('leaves straight quotes alone', () => {
-        expect(quotes(`a "b" 'c'`, 'straight')).toBe(`a "b" 'c'`);
+        expect(quotes(`a "b" 'c'`)).toBe(`a "b" 'c'`);
     });
 
-    it('leaves quotes alone when the style is no change', () => {
-        expect(quotes('\u201Chello\u201D', 'none')).toBe('\u201Chello\u201D');
+    it('reports that quotes were straightened', () => {
+        expect(straightenQuotes('\u201Cq\u201D').changed).toBe(true);
+        expect(straightenQuotes('"q"').changed).toBe(false);
     });
 
     it('leaves quotes inside Markdown code alone', () => {
         const input = ['`\u201Cinline\u201D`', '```text', '\u201Cquoted\u201D value', '```', '\u201Cprose\u201D'].join('\n');
-        expect(quotes(input, 'straight')).toBe(
-            ['`\u201Cinline\u201D`', '```text', '\u201Cquoted\u201D value', '```', '"prose"'].join('\n')
-        );
+        expect(quotes(input)).toBe(['`\u201Cinline\u201D`', '```text', '\u201Cquoted\u201D value', '```', '"prose"'].join('\n'));
     });
 
     it('leaves quotes inside a callout code fence alone', () => {
         const input = ['> [!note]', '> ```text', '> \u201Cquoted\u201D text', '> ```'].join('\n');
-        expect(quotes(input, 'straight')).toBe(input);
+        expect(quotes(input)).toBe(input);
     });
 
     it('leaves quotes inside URLs alone', () => {
         const input = '![photo](https://example.com/Don\u2019t.png)';
-        expect(quotes(input, 'straight')).toBe(input);
-    });
-});
-
-describe('applyQuoteStyle: curly', () => {
-    it('curls a double-quoted phrase', () => {
-        expect(quotes('"Fine," she said.', 'curly')).toBe('\u201CFine,\u201D she said.');
+        expect(quotes(input)).toBe(input);
     });
 
-    it('curls the apostrophe', () => {
-        expect(quotes("Don't stop.", 'curly')).toBe('Don\u2019t stop.');
-        expect(quotes("the dogs' bones", 'curly')).toBe('the dogs\u2019 bones');
+    it('leaves a wikilink target alone, because a changed quote is a different note', () => {
+        expect(quotes('[[Don\u2019t Panic]] and don\u2019t stop')).toBe("[[Don\u2019t Panic]] and don't stop");
     });
 
-    it('curls a single-quoted phrase', () => {
-        expect(quotes("'hi there'", 'curly')).toBe('\u2018hi there\u2019');
+    it('leaves a local destination path alone while repairing its title', () => {
+        expect(quotes('![cover](Attachments/O\u2019Reilly.png) and don\u2019t')).toBe("![cover](Attachments/O\u2019Reilly.png) and don't");
+        expect(quotes('[a](O\u2019Reilly.png \u201Ctitle\u201D)')).toBe('[a](O\u2019Reilly.png "title")');
+        expect(quotes('[Book](Notes/(Draft)/O\u2019Reilly.md)')).toBe('[Book](Notes/(Draft)/O\u2019Reilly.md)');
     });
 
-    it('uses the closing form for a decade', () => {
-        expect(quotes("the '90s", 'curly')).toBe('the \u201990s');
+    it('converts a reference label on both sides, keeping the reference matched', () => {
+        expect(quotes('See [guide][Don\u2019t].\n\n[Don\u2019t]: Notes/Guide.md')).toBe("See [guide][Don't].\n\n[Don't]: Notes/Guide.md");
     });
 
-    it('opens after a bracket, a newline and a nested quote', () => {
-        expect(quotes('("yes")', 'curly')).toBe('(\u201Cyes\u201D)');
-        expect(quotes('"a"\n"b"', 'curly')).toBe('\u201Ca\u201D\n\u201Cb\u201D');
-        expect(quotes(`"'nested'"`, 'curly')).toBe('\u201C\u2018nested\u2019\u201D');
+    it('leaves the destination of a definition alone', () => {
+        expect(quotes('[foo]: Notes/O\u2019Reilly.md')).toBe('[foo]: Notes/O\u2019Reilly.md');
     });
 
-    it('leaves quotes that are already curly alone', () => {
-        expect(quotes('\u201CFine,\u201D she said.', 'curly')).toBe('\u201CFine,\u201D she said.');
+    it('repairs a curly-quoted link title, which straight quotes make valid again', () => {
+        expect(quotes('[Docs](https://example.com \u201CRead more\u201D)')).toBe('[Docs](https://example.com "Read more")');
     });
 
-    it('leaves quotes inside Markdown code alone', () => {
-        expect(quotes('`"code"`', 'curly')).toBe('`"code"`');
-        const fenced = ['```json', '{"key": "value"}', '```'].join('\n');
-        expect(quotes(fenced, 'curly')).toBe(fenced);
+    it('repairs a curled prime in math', () => {
+        expect(quotes('$f\u2019(x)$')).toBe("$f'(x)$");
     });
 
-    it('leaves an apostrophe inside a URL alone', () => {
-        const input = "See https://example.com/Don't.png now";
-        expect(quotes(input, 'curly')).toBe(input);
+    it('leaves a leading frontmatter block alone', () => {
+        expect(quotes('---\ntitle: Don\u2019t\n---\nDon\u2019t')).toBe("---\ntitle: Don\u2019t\n---\nDon't");
+        expect(quotes('---\ntitle: Don\u2019t\n...\nDon\u2019t')).toBe("---\ntitle: Don't\n...\nDon't");
     });
 
-    it('reports that quotes were curled', () => {
-        expect(applyQuoteStyle('"q"', 'curly').changed).toBe(true);
-        expect(applyQuoteStyle('plain', 'curly').changed).toBe(false);
+    it('leaves an HTML attribute value alone, being part of a path', () => {
+        expect(quotes('<img src="Attachments/O\u2019Reilly.png"> and \u201chi\u201d')).toBe(
+            '<img src="Attachments/O\u2019Reilly.png"> and "hi"'
+        );
+    });
+
+    it('leaves a curly quote nested inside a straight-quoted title alone', () => {
+        const single = "[g](https://example.com/g 'It\u2019s here') now";
+        expect(quotes(single)).toBe(single);
+        const double = '[art](https://example.com/a "He said \u201Chi\u201D there") now';
+        expect(quotes(double)).toBe(double);
+    });
+
+    it('protects a frontmatter-only paste whose closer carries trailing whitespace', () => {
+        expect(quotes('---\ntitle: Don\u2019t\n--- ')).toBe('---\ntitle: Don\u2019t\n--- ');
+    });
+
+    it('protects frontmatter behind a leading blank line, which trim later removes', () => {
+        expect(quotes('\n---\ntitle: Don\u2019t\n---\nDon\u2019t')).toBe("\n---\ntitle: Don\u2019t\n---\nDon't");
     });
 });
 
@@ -265,6 +268,21 @@ describe('normalizeInvisibleCharacters', () => {
         expect(clean(input)).toBe(input);
     });
 
+    it('leaves a no-break space inside a link target alone, being part of the name', () => {
+        expect(clean(`[[Project${NBSP}Alpha]] and 10${NBSP}MB`)).toBe(`[[Project${NBSP}Alpha]] and 10 MB`);
+        expect(clean(`[Project](Notes/Project${NBSP}Alpha.md)`)).toBe(`[Project](Notes/Project${NBSP}Alpha.md)`);
+        expect(clean(`[Book](Notes/(Draft)/Project${NBSP}Alpha.md)`)).toBe(`[Book](Notes/(Draft)/Project${NBSP}Alpha.md)`);
+        expect(clean(`<img src="Project${NBSP}Alpha.png"> and 10${NBSP}MB`)).toBe(`<img src="Project${NBSP}Alpha.png"> and 10 MB`);
+    });
+
+    it('protects frontmatter behind a leading BOM, which this pass itself removes', () => {
+        expect(clean(`${BOM}---\naliases: Project${NBSP}Alpha\n---\nBody`)).toBe(`---\naliases: Project${NBSP}Alpha\n---\nBody`);
+    });
+
+    it('still cleans inside code, where an invisible character is the classic pasted bug', () => {
+        expect(clean('```js\nconst a${ZWSP} = 1;\n```'.replace('${ZWSP}', ZWSP))).toBe('```js\nconst a = 1;\n```');
+    });
+
     it('reports that characters were removed', () => {
         expect(normalizeInvisibleCharacters(`a${ZWSP}b`).changed).toBe(true);
         expect(normalizeInvisibleCharacters('ab').changed).toBe(false);
@@ -282,6 +300,6 @@ describe('normalizeInvisibleCharacters', () => {
 
     it('handles a realistic assistant paragraph', () => {
         const input = `The result${NBSP}${EM_DASH}${NBSP}which nobody expected${NBSP}${EM_DASH}${NBSP}was fine.${ZWSP}`;
-        expect(dashes(clean(input), 'hyphen')).toBe('The result - which nobody expected - was fine.');
+        expect(dashes(clean(input))).toBe('The result - which nobody expected - was fine.');
     });
 });
