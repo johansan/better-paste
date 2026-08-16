@@ -202,6 +202,7 @@ export const STRINGS_ES: TranslationStrings = {
             other: 'Ahora mismo tienes {count} plugins instalados que hacen más o menos lo mismo, así que desactiva o desinstala:'
         },
         outro: 'Se desactivan en Ajustes > Complementos comunitarios.',
+        dontRemind: 'No volver a mostrar este mensaje',
         button: 'Entendido'
     },
 

@@ -192,6 +192,7 @@ export const STRINGS_PT_BR: TranslationStrings = {
             other: 'No momento você tem {count} plugins instalados que fazem mais ou menos a mesma coisa, então desative ou desinstale:'
         },
         outro: 'Desative em Configurações > Plugins não oficiais.',
+        dontRemind: 'Não mostrar esta mensagem novamente',
         button: 'Entendi'
     },
 

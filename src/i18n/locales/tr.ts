@@ -201,6 +201,7 @@ export const STRINGS_TR: TranslationStrings = {
             other: 'Şu anda aşağı yukarı aynı işi yapan {count} eklentiniz kurulu, bu yüzden aşağıdakileri devre dışı bırakın veya kaldırın:'
         },
         outro: 'Ayarlar > Topluluk eklentileri bölümünden devre dışı bırakabilirsiniz.',
+        dontRemind: 'Bir daha hatırlatmayın',
         button: 'Anladım'
     },
 

@@ -206,6 +206,7 @@ export const STRINGS_PL: TranslationStrings = {
             other: 'Masz teraz {count} wtyczki, które robią mniej więcej to samo, więc wyłącz lub odinstaluj:'
         },
         outro: 'Wyłączysz je w sekcji Ustawienia > Wtyczki społeczności.',
+        dontRemind: 'Nie przypominaj mi więcej',
         button: 'Rozumiem'
     },
 

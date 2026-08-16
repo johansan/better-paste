@@ -202,6 +202,7 @@ export const STRINGS_FR: TranslationStrings = {
             other: 'Vous avez actuellement {count} plugins installés qui font plus ou moins la même chose, alors désactivez ou désinstallez :'
         },
         outro: 'À désactiver dans Paramètres > Modules complémentaires.',
+        dontRemind: 'Ne plus afficher ce message',
         button: 'Compris'
     },
 

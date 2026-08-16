@@ -192,6 +192,7 @@ export const STRINGS_IT: TranslationStrings = {
             other: 'Al momento hai {count} plugin installati che fanno più o meno la stessa cosa, quindi disattiva o disinstalla:'
         },
         outro: 'Si disattivano in Impostazioni > Plugin di terze parti.',
+        dontRemind: 'Non mostrare più questo messaggio',
         button: 'Capito'
     },
 

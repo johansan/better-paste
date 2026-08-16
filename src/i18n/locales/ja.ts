@@ -197,6 +197,7 @@ export const STRINGS_JA: TranslationStrings = {
             other: '現在、ほぼ同じ機能のプラグインが {count} 個インストールされています。次のプラグインを無効化するか、アンインストールしてください：'
         },
         outro: '設定 > コミュニティプラグインで無効化できます。',
+        dontRemind: '今後表示しない',
         button: 'わかりました'
     },
 

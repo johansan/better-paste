@@ -187,6 +187,7 @@ export const STRINGS_KO: TranslationStrings = {
             other: '기능이 거의 같은 플러그인이 {count}개 설치되어 있습니다. 다음 플러그인을 비활성화하거나 삭제해 주세요:'
         },
         outro: '설정 > 커뮤니티 플러그인에서 비활성화할 수 있습니다.',
+        dontRemind: '다시 보지 않기',
         button: '확인'
     },
 

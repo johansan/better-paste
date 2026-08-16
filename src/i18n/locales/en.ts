@@ -229,6 +229,7 @@ export const STRINGS_EN = {
             other: 'Right now you have {count} plugins installed that do more or less the same thing, so disable or uninstall:'
         } as PluralForms,
         outro: 'Disable in Settings > Community plugins.',
+        dontRemind: "Don't remind me again",
         button: 'Got it'
     },
 

@@ -50,6 +50,12 @@ import type { BetterPasteSettings } from './settings/types';
  */
 const LAST_SHOWN_VERSION_KEY = 'better-paste-last-shown-version';
 
+/**
+ * Device-local marker set when the user ticks "Don't remind me again" in the overlapping
+ * plugins dialog. Kept out of data.json so one device's choice does not silence another.
+ */
+const OVERLAP_DISMISSED_KEY = 'better-paste-overlap-dismissed';
+
 export default class BetterPastePlugin extends Plugin {
     settings: BetterPasteSettings = DEFAULT_SETTINGS;
     private pasteService!: PasteService;
@@ -161,12 +167,19 @@ export default class BetterPastePlugin extends Plugin {
 
     /**
      * Warns while a plugin Better Paste replaces is still enabled. Shown on every start,
-     * because the overlap makes each paste run through two handlers until it is removed.
+     * because the overlap makes each paste run through two handlers until it is removed,
+     * unless the user has ticked "Don't remind me again" on this device.
      */
     private showOverlapWarning(): void {
+        const dismissed: unknown = this.app.loadLocalStorage(OVERLAP_DISMISSED_KEY);
+        if (dismissed === true) return;
         const overlaps = findOverlappingPlugins(this.app);
         if (overlaps.length === 0) return;
-        this.overlapModal = new PluginOverlapModal(this.app, overlaps);
+        this.overlapModal = new PluginOverlapModal(this.app, overlaps, dontRemind => {
+            // Closed by unload rather than by the user, so no choice was made
+            if (this.unloaded) return;
+            if (dontRemind) this.app.saveLocalStorage(OVERLAP_DISMISSED_KEY, true);
+        });
         this.overlapModal.open();
     }
 

@@ -186,6 +186,7 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             other: '你目前安裝了 {count} 個功能大致相同的外掛。請停用或移除以下外掛：'
         },
         outro: '可在 設定 > 第三方外掛程式 中停用。',
+        dontRemind: '不再提醒',
         button: '知道了'
     },
 

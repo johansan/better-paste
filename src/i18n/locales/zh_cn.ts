@@ -186,6 +186,7 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             other: '你目前安装了 {count} 个功能大致相同的插件。请禁用或卸载以下插件：'
         },
         outro: '可在 设置 > 第三方插件 中禁用。',
+        dontRemind: '不再提醒',
         button: '知道了'
     },
 

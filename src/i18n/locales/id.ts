@@ -197,6 +197,7 @@ export const STRINGS_ID: TranslationStrings = {
             other: 'Saat ini ada {count} plugin terpasang yang fungsinya kurang lebih sama, jadi nonaktifkan atau hapus plugin berikut:'
         },
         outro: 'Nonaktifkan di Pengaturan > Plugin komunitas.',
+        dontRemind: 'Jangan tampilkan lagi',
         button: 'Mengerti'
     },
 

@@ -219,6 +219,7 @@ export const STRINGS_DE: TranslationStrings = {
             other: 'Du hast aktuell {count} Plugins installiert, die mehr oder weniger dasselbe tun, also deaktiviere oder deinstalliere Folgendes:'
         },
         outro: 'Deaktivieren unter Einstellungen > Externe Erweiterungen.',
+        dontRemind: 'Nicht mehr anzeigen',
         button: 'Verstanden'
     },
 

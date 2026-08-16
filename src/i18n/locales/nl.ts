@@ -211,6 +211,7 @@ export const STRINGS_NL: TranslationStrings = {
             other: 'Je hebt nu {count} plugins geïnstalleerd die min of meer hetzelfde doen, dus schakel de volgende plugins uit of verwijder ze:'
         },
         outro: 'Uitschakelen kan onder Instellingen > Community-plugins.',
+        dontRemind: 'Niet meer tonen',
         button: 'Begrepen'
     },
 

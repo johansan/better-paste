@@ -24,11 +24,14 @@ import type { OverlappingPlugin } from '../pluginOverlap';
 /** Shown on startup while a plugin Better Paste replaces is still enabled. */
 export class PluginOverlapModal extends Modal {
     private readonly overlaps: readonly OverlappingPlugin[];
+    private readonly onDismiss: (dontRemind: boolean) => void;
     private button: HTMLButtonElement | null = null;
+    private checkbox: HTMLInputElement | null = null;
 
-    constructor(app: App, overlaps: readonly OverlappingPlugin[]) {
+    constructor(app: App, overlaps: readonly OverlappingPlugin[], onDismiss: (dontRemind: boolean) => void) {
         super(app);
         this.overlaps = overlaps;
+        this.onDismiss = onDismiss;
     }
 
     onOpen(): void {
@@ -44,6 +47,10 @@ export class PluginOverlapModal extends Modal {
         for (const plugin of this.overlaps) list.createEl('li', { text: plugin.name });
         body.createEl('p', { text: strings.overlap.outro });
 
+        const remind = this.contentEl.createEl('label', { cls: 'better-paste-overlap-remind' });
+        this.checkbox = remind.createEl('input', { type: 'checkbox' });
+        remind.appendText(strings.overlap.dontRemind);
+
         const buttons = this.contentEl.createDiv({ cls: 'better-paste-modal-buttons' });
         this.button = buttons.createEl('button', { cls: 'mod-cta', text: strings.overlap.button, attr: { type: 'button' } });
         this.button.addEventListener('click', () => {
@@ -57,8 +64,10 @@ export class PluginOverlapModal extends Modal {
     }
 
     onClose(): void {
+        this.onDismiss(this.checkbox?.checked === true);
         this.contentEl.empty();
         this.modalEl.removeClass('better-paste-modal');
         this.button = null;
+        this.checkbox = null;
     }
 }
