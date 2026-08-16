@@ -24,12 +24,9 @@ export const STRINGS_AR: TranslationStrings = {
         paste: 'لصق',
         pasteRaw: 'لصق بدون معالجة',
         cleanSelection: 'تنظيف التحديد',
-        cleanTerminal:
-            '\u062A\u0646\u0638\u064A\u0641 \u0645\u062E\u0631\u062C\u0627\u062A \u0627\u0644\u0637\u0631\u0641\u064A\u0629 \u0641\u064A \u0627\u0644\u062A\u062D\u062F\u064A\u062F',
-        commasInside:
-            '\u0646\u0642\u0644 \u0627\u0644\u0641\u0648\u0627\u0635\u0644 \u062F\u0627\u062E\u0644 \u0639\u0644\u0627\u0645\u0627\u062A \u0627\u0644\u0627\u0642\u062A\u0628\u0627\u0633',
-        commasOutside:
-            '\u0646\u0642\u0644 \u0627\u0644\u0641\u0648\u0627\u0635\u0644 \u062E\u0627\u0631\u062C \u0639\u0644\u0627\u0645\u0627\u062A \u0627\u0644\u0627\u0642\u062A\u0628\u0627\u0633',
+        cleanTerminal: 'تنظيف مخرجات الطرفية',
+        commasInside: 'نقل الفواصل إلى داخل علامات الاقتباس',
+        commasOutside: 'نقل الفواصل إلى خارج علامات الاقتباس',
         toggleCleanup: 'تبديل التنظيف التلقائي'
     },
 

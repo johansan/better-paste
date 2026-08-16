@@ -24,7 +24,7 @@ export const STRINGS_ID: TranslationStrings = {
         paste: 'Tempel',
         pasteRaw: 'Tempel tanpa pemrosesan',
         cleanSelection: 'Bersihkan pilihan',
-        cleanTerminal: 'Bersihkan keluaran terminal pada seleksi',
+        cleanTerminal: 'Bersihkan keluaran terminal',
         commasInside: 'Pindahkan koma ke dalam tanda kutip',
         commasOutside: 'Pindahkan koma ke luar tanda kutip',
         toggleCleanup: 'Alihkan pembersihan otomatis'

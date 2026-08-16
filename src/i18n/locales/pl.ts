@@ -24,9 +24,9 @@ export const STRINGS_PL: TranslationStrings = {
         paste: 'Wklej',
         pasteRaw: 'Wklej bez przetwarzania',
         cleanSelection: 'Wyczyść zaznaczenie',
-        cleanTerminal: 'Wyczy\u015B\u0107 tekst z terminala w zaznaczeniu',
-        commasInside: 'Przenie\u015B przecinki do wn\u0119trza cudzys\u0142ow\u00F3w',
-        commasOutside: 'Przenie\u015B przecinki poza cudzys\u0142owy',
+        cleanTerminal: 'Wyczyść tekst z terminala',
+        commasInside: 'Przenieś przecinki do cudzysłowów',
+        commasOutside: 'Przenieś przecinki poza cudzysłowy',
         toggleCleanup: 'Przełącz automatyczne czyszczenie'
     },
 

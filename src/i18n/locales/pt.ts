@@ -24,9 +24,9 @@ export const STRINGS_PT: TranslationStrings = {
         paste: 'Colar',
         pasteRaw: 'Colar sem processamento',
         cleanSelection: 'Limpar a seleção',
-        cleanTerminal: 'Limpar sa\u00EDda de terminal na sele\u00E7\u00E3o',
-        commasInside: 'Colocar v\u00EDrgulas dentro das aspas',
-        commasOutside: 'Colocar v\u00EDrgulas fora das aspas',
+        cleanTerminal: 'Limpar a saída do terminal',
+        commasInside: 'Colocar vírgulas dentro das aspas',
+        commasOutside: 'Colocar vírgulas fora das aspas',
         toggleCleanup: 'Alternar a limpeza automática'
     },
 

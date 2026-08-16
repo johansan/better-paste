@@ -24,12 +24,9 @@ export const STRINGS_TH: TranslationStrings = {
         paste: 'วาง',
         pasteRaw: 'วางโดยไม่ประมวลผล',
         cleanSelection: 'จัดระเบียบข้อความที่เลือก',
-        cleanTerminal:
-            '\u0E25\u0E49\u0E32\u0E07\u0E40\u0E2D\u0E32\u0E15\u0E4C\u0E1E\u0E38\u0E15\u0E40\u0E17\u0E2D\u0E23\u0E4C\u0E21\u0E34\u0E19\u0E31\u0E25\u0E43\u0E19\u0E2A\u0E48\u0E27\u0E19\u0E17\u0E35\u0E48\u0E40\u0E25\u0E37\u0E2D\u0E01',
-        commasInside:
-            '\u0E22\u0E49\u0E32\u0E22\u0E08\u0E38\u0E25\u0E20\u0E32\u0E04\u0E40\u0E02\u0E49\u0E32\u0E43\u0E19\u0E40\u0E04\u0E23\u0E37\u0E48\u0E2D\u0E07\u0E2B\u0E21\u0E32\u0E22\u0E04\u0E33\u0E1E\u0E39\u0E14',
-        commasOutside:
-            '\u0E22\u0E49\u0E32\u0E22\u0E08\u0E38\u0E25\u0E20\u0E32\u0E04\u0E2D\u0E2D\u0E01\u0E19\u0E2D\u0E01\u0E40\u0E04\u0E23\u0E37\u0E48\u0E2D\u0E07\u0E2B\u0E21\u0E32\u0E22\u0E04\u0E33\u0E1E\u0E39\u0E14',
+        cleanTerminal: 'จัดระเบียบผลลัพธ์เทอร์มินัล',
+        commasInside: 'ย้ายจุลภาคเข้าไปในอัญประกาศ',
+        commasOutside: 'ย้ายจุลภาคออกนอกอัญประกาศ',
         toggleCleanup: 'สลับการจัดระเบียบอัตโนมัติ'
     },
 

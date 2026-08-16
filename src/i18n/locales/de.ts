@@ -24,9 +24,9 @@ export const STRINGS_DE: TranslationStrings = {
         paste: 'Einfügen',
         pasteRaw: 'Ohne Verarbeitung einfügen',
         cleanSelection: 'Auswahl bereinigen',
-        cleanTerminal: 'Terminalausgabe in Auswahl bereinigen',
-        commasInside: 'Kommas innerhalb der Anf\u00FChrungszeichen platzieren',
-        commasOutside: 'Kommas au\u00DFerhalb der Anf\u00FChrungszeichen platzieren',
+        cleanTerminal: 'Terminalausgabe bereinigen',
+        commasInside: 'Kommas innerhalb der Anführungszeichen setzen',
+        commasOutside: 'Kommas außerhalb der Anführungszeichen setzen',
         toggleCleanup: 'Automatische Bereinigung umschalten'
     },
 

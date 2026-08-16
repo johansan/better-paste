@@ -24,9 +24,9 @@ export const STRINGS_TR: TranslationStrings = {
         paste: 'Yapıştır',
         pasteRaw: 'İşlemeden yapıştır',
         cleanSelection: 'Seçimi temizle',
-        cleanTerminal: 'Se\u00E7imdeki terminal \u00E7\u0131kt\u0131s\u0131n\u0131 temizle',
-        commasInside: 'Virg\u00FClleri t\u0131rnak i\u00E7ine ta\u015F\u0131',
-        commasOutside: 'Virg\u00FClleri t\u0131rnak d\u0131\u015F\u0131na ta\u015F\u0131',
+        cleanTerminal: 'Terminal çıktısını temizle',
+        commasInside: 'Virgülleri tırnak içine taşı',
+        commasOutside: 'Virgülleri tırnak dışına taşı',
         toggleCleanup: 'Otomatik temizlemeyi aç veya kapat'
     },
 
@@ -191,7 +191,7 @@ export const STRINGS_TR: TranslationStrings = {
     welcome: {
         title: 'Better Paste’e hoş geldiniz',
         intro: [
-            'Görselleri Safari’den doğrudan kasaya kopyalayın, bağlantıları izleme parametreleri olmadan yapıştırın, uçbirim çıktısındaki bölünmüş satırları düzeltin ve yapay zekâ metnini temizleyin. Sadece yapıştırın, gerisini Better Paste halleder.',
+            'Görselleri Safari’den doğrudan kasaya kopyalayın, bağlantıları izleme parametreleri olmadan yapıştırın, terminal çıktısındaki bölünmüş satırları düzeltin ve yapay zekâ metnini temizleyin. Sadece yapıştırın, gerisini Better Paste halleder.',
             'Başlamadan önce bir ipucu: **İşlemeden yapıştır** komutunu `Cmd+Shift+V` (Windows’ta `Ctrl+Shift+V`) kısayoluna atayın; böylece panodakini her zaman olduğu gibi yapıştırabilirsiniz.',
             'Her kuralın Ayarlar, Better Paste altında kendi düğmesi vardır ve `bp: false` özelliği eklentiyi o not için kapatır.'
         ],

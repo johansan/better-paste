@@ -24,9 +24,9 @@ export const STRINGS_VI: TranslationStrings = {
         paste: 'Dán',
         pasteRaw: 'Dán không xử lý',
         cleanSelection: 'Dọn phần đã chọn',
-        cleanTerminal: 'D\u1ECDn d\u1EB9p \u0111\u1EA7u ra terminal trong v\u00F9ng ch\u1ECDn',
-        commasInside: 'Chuy\u1EC3n d\u1EA5u ph\u1EA9y v\u00E0o trong d\u1EA5u ngo\u1EB7c k\u00E9p',
-        commasOutside: 'Chuy\u1EC3n d\u1EA5u ph\u1EA9y ra ngo\u00E0i d\u1EA5u ngo\u1EB7c k\u00E9p',
+        cleanTerminal: 'Dọn đầu ra terminal',
+        commasInside: 'Chuyển dấu phẩy vào trong dấu ngoặc kép',
+        commasOutside: 'Chuyển dấu phẩy ra ngoài dấu ngoặc kép',
         toggleCleanup: 'Bật tắt dọn dẹp tự động'
     },
 

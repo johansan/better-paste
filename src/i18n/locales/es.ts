@@ -24,7 +24,7 @@ export const STRINGS_ES: TranslationStrings = {
         paste: 'Pegar',
         pasteRaw: 'Pegar sin procesar',
         cleanSelection: 'Limpiar la selección',
-        cleanTerminal: 'Limpiar salida de terminal en la selecci\u00F3n',
+        cleanTerminal: 'Limpiar la salida de terminal',
         commasInside: 'Colocar comas dentro de las comillas',
         commasOutside: 'Colocar comas fuera de las comillas',
         toggleCleanup: 'Alternar la limpieza automática'

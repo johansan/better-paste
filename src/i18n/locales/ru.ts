@@ -24,12 +24,9 @@ export const STRINGS_RU: TranslationStrings = {
         paste: 'Вставить',
         pasteRaw: 'Вставить без обработки',
         cleanSelection: 'Очистить выделение',
-        cleanTerminal:
-            '\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C \u0432\u044B\u0432\u043E\u0434 \u0442\u0435\u0440\u043C\u0438\u043D\u0430\u043B\u0430 \u0432 \u0432\u044B\u0434\u0435\u043B\u0435\u043D\u0438\u0438',
-        commasInside:
-            '\u041F\u0435\u0440\u0435\u043D\u0435\u0441\u0442\u0438 \u0437\u0430\u043F\u044F\u0442\u044B\u0435 \u0432\u043D\u0443\u0442\u0440\u044C \u043A\u0430\u0432\u044B\u0447\u0435\u043A',
-        commasOutside:
-            '\u041F\u0435\u0440\u0435\u043D\u0435\u0441\u0442\u0438 \u0437\u0430\u043F\u044F\u0442\u044B\u0435 \u0437\u0430 \u043A\u0430\u0432\u044B\u0447\u043A\u0438',
+        cleanTerminal: 'Очистить вывод терминала',
+        commasInside: 'Перенести запятые внутрь кавычек',
+        commasOutside: 'Перенести запятые за кавычки',
         toggleCleanup: 'Переключить автоматическую очистку'
     },
 

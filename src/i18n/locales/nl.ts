@@ -24,9 +24,9 @@ export const STRINGS_NL: TranslationStrings = {
         paste: 'Plakken',
         pasteRaw: 'Plakken zonder bewerking',
         cleanSelection: 'Selectie opschonen',
-        cleanTerminal: 'Terminaluitvoer in selectie opschonen',
-        commasInside: 'Komma\u2019s binnen aanhalingstekens plaatsen',
-        commasOutside: 'Komma\u2019s buiten aanhalingstekens plaatsen',
+        cleanTerminal: 'Terminaluitvoer opschonen',
+        commasInside: 'Komma’s binnen de aanhalingstekens zetten',
+        commasOutside: 'Komma’s buiten de aanhalingstekens zetten',
         toggleCleanup: 'Automatisch opschonen aan- of uitzetten'
     },
 

@@ -68,7 +68,7 @@ The URL is pasted right away and updates when the title arrives, so nothing bloc
 
 ### 2.4 Terminal output
 
-Terminals break long lines at the window edge. Escape codes are stripped on every paste, and when you select the pasted output and run **Clean up terminal output in selection**, the lines are joined back together:
+Terminals break long lines at the window edge. Escape codes are stripped on every paste, and when you select the pasted output and run **Clean up terminal output**, the lines are joined back together:
 
 ```
 npm warn deprecated inflight@1.0.6: This module is not supported and leaks memory. Do
@@ -213,7 +213,7 @@ Seven commands, ready for your own hotkeys (Settings, Hotkeys):
 - **Paste**: paste through the rules, even in a note that opted out.
 - **Paste without processing**: paste exactly what is on the clipboard.
 - **Clean up selection**: run the text rules on selected text.
-- **Clean up terminal output in selection**: rejoin wrapped lines, remove leading indentation and turn `•` bullets into Markdown lists. On demand, because only you know the text came from a terminal.
+- **Clean up terminal output**: rejoin wrapped lines, remove leading indentation and turn `•` bullets into Markdown lists in the selection. On demand, because only you know the text came from a terminal.
 - **Move commas inside quotes** and **Move commas outside quotes**: comma style next to closing quotes, applied to the selection.
 - **Toggle automatic cleanup**: flip the master switch.
 

@@ -24,9 +24,9 @@ export const STRINGS_FR: TranslationStrings = {
         paste: 'Coller',
         pasteRaw: 'Coller sans traitement',
         cleanSelection: 'Nettoyer la sélection',
-        cleanTerminal: 'Nettoyer la sortie de terminal dans la s\u00E9lection',
-        commasInside: 'Placer les virgules \u00E0 l\u2019int\u00E9rieur des guillemets',
-        commasOutside: 'Placer les virgules \u00E0 l\u2019ext\u00E9rieur des guillemets',
+        cleanTerminal: 'Nettoyer la sortie de terminal',
+        commasInside: 'Placer les virgules à l’intérieur des guillemets',
+        commasOutside: 'Placer les virgules à l’extérieur des guillemets',
         toggleCleanup: 'Activer ou désactiver le nettoyage automatique'
     },
 

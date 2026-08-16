@@ -24,7 +24,7 @@ export const STRINGS_IT: TranslationStrings = {
         paste: 'Incolla',
         pasteRaw: 'Incolla senza elaborazione',
         cleanSelection: 'Pulisci la selezione',
-        cleanTerminal: 'Pulisci l\u2019output del terminale nella selezione',
+        cleanTerminal: 'Pulisci l’output del terminale',
         commasInside: 'Sposta le virgole dentro le virgolette',
         commasOutside: 'Sposta le virgole fuori dalle virgolette',
         toggleCleanup: 'Attiva o disattiva la pulizia automatica'

@@ -24,10 +24,9 @@ export const STRINGS_JA: TranslationStrings = {
         paste: '貼り付け',
         pasteRaw: '処理せずに貼り付け',
         cleanSelection: '選択範囲を整える',
-        cleanTerminal:
-            '\u9078\u629E\u7BC4\u56F2\u306E\u30BF\u30FC\u30DF\u30CA\u30EB\u51FA\u529B\u3092\u30AF\u30EA\u30FC\u30F3\u30A2\u30C3\u30D7',
-        commasInside: '\u30B3\u30F3\u30DE\u3092\u5F15\u7528\u7B26\u306E\u5185\u5074\u306B\u79FB\u52D5',
-        commasOutside: '\u30B3\u30F3\u30DE\u3092\u5F15\u7528\u7B26\u306E\u5916\u5074\u306B\u79FB\u52D5',
+        cleanTerminal: 'ターミナル出力を整える',
+        commasInside: 'カンマを引用符の内側に移動',
+        commasOutside: 'カンマを引用符の外側に移動',
         toggleCleanup: '自動整形を切り替え'
     },
 

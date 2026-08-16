@@ -24,9 +24,9 @@ export const STRINGS_KO: TranslationStrings = {
         paste: '붙여넣기',
         pasteRaw: '처리 없이 붙여넣기',
         cleanSelection: '선택 영역 정리',
-        cleanTerminal: '\uC120\uD0DD \uC601\uC5ED\uC758 \uD130\uBBF8\uB110 \uCD9C\uB825 \uC815\uB9AC',
-        commasInside: '\uC27C\uD45C\uB97C \uB530\uC634\uD45C \uC548\uC73C\uB85C \uC774\uB3D9',
-        commasOutside: '\uC27C\uD45C\uB97C \uB530\uC634\uD45C \uBC16\uC73C\uB85C \uC774\uB3D9',
+        cleanTerminal: '터미널 출력 정리',
+        commasInside: '쉼표를 따옴표 안으로 이동',
+        commasOutside: '쉼표를 따옴표 밖으로 이동',
         toggleCleanup: '자동 정리 전환'
     },
 

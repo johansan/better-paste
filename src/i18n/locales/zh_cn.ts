@@ -24,9 +24,9 @@ export const STRINGS_ZH_CN: TranslationStrings = {
         paste: '粘贴',
         pasteRaw: '不做处理直接粘贴',
         cleanSelection: '清理选中内容',
-        cleanTerminal: '\u6E05\u7406\u6240\u9009\u5185\u5BB9\u4E2D\u7684\u7EC8\u7AEF\u8F93\u51FA',
-        commasInside: '\u5C06\u9017\u53F7\u79FB\u5230\u5F15\u53F7\u5185',
-        commasOutside: '\u5C06\u9017\u53F7\u79FB\u5230\u5F15\u53F7\u5916',
+        cleanTerminal: '清理终端输出',
+        commasInside: '将逗号移到引号内',
+        commasOutside: '将逗号移到引号外',
         toggleCleanup: '切换自动清理'
     },
 

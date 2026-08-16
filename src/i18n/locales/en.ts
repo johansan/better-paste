@@ -38,7 +38,7 @@ export const STRINGS_EN = {
         paste: 'Paste',
         pasteRaw: 'Paste without processing',
         cleanSelection: 'Clean up selection',
-        cleanTerminal: 'Clean up terminal output in selection',
+        cleanTerminal: 'Clean up terminal output',
         commasInside: 'Move commas inside quotes',
         commasOutside: 'Move commas outside quotes',
         toggleCleanup: 'Toggle automatic cleanup'
