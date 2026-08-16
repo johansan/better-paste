@@ -157,20 +157,21 @@ describe('settings tree', () => {
             .getSettingDefinitions()
             .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
 
-        expect(groups.map(group => group.heading)).toEqual([undefined, 'Images', 'Links', 'Text processing', 'Frontmatter', 'About']);
+        expect(groups.map(group => group.heading)).toEqual([undefined, 'Images', 'Links', 'Text processing', 'About']);
     });
 
-    it('puts both per-note property names under Frontmatter', () => {
+    it('puts the note property under the master toggle and the width property under Images', () => {
         const groups = tab
             .getSettingDefinitions()
             .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
-        const frontmatter = groups.find(group => group.heading === 'Frontmatter');
+        const top = groups.find(group => group.heading === undefined);
         const images = groups.find(group => group.heading === 'Images');
 
-        // The two properties are one family, so they are configured together rather than
-        // one being a constant and the other buried under Images
-        expect(flatten([...(frontmatter?.items ?? [])]).map(row => row.name)).toEqual(['Note property', 'Image width property']);
-        expect(flatten([...(images?.items ?? [])]).map(row => row.name)).not.toContain('Image width property');
+        const topNames = flatten([...(top?.items ?? [])]).map(row => row.name);
+        expect(topNames).toEqual(['Clean up every paste', 'Note property']);
+
+        const imageNames = flatten([...(images?.items ?? [])]).map(row => row.name);
+        expect(imageNames.indexOf('Image width property')).toBeGreaterThan(imageNames.indexOf('Size options'));
     });
 
     it('puts the text preferences under Text processing', () => {

@@ -68,8 +68,11 @@ export const STRINGS_ID: TranslationStrings = {
         behavior: {
             autoCleanName: 'Bersihkan setiap tempelan',
             autoCleanDesc:
-                'Menerapkan aturan pada setiap tempelan. Saat mati, aturan hanya dijalankan melalui perintah Better Paste. Satu catatan dapat mengecualikan diri dengan properti "bp: false", atau ikut dibersihkan dengan "bp: true".',
-            autoCleanAliases: ['otomatis', 'aktifkan', 'nonaktifkan', 'catatan', 'kecualikan', 'properti', 'frontmatter']
+                'Menerapkan aturan pada setiap tempelan. Saat mati, aturan hanya dijalankan melalui perintah Better Paste. Satu catatan dapat mengecualikan diri dengan properti "{property}: false", atau ikut dibersihkan dengan "{property}: true".',
+            autoCleanAliases: ['otomatis', 'aktifkan', 'nonaktifkan', 'catatan', 'kecualikan', 'properti', 'frontmatter'],
+            notePropertyName: 'Properti catatan',
+            notePropertyDesc: 'Properti yang mengaktifkan atau menonaktifkan Better Paste untuk satu catatan.',
+            notePropertyAliases: ['catatan', 'properti', 'frontmatter', 'kecualikan', 'nonaktifkan', 'aktifkan', 'bp']
         },
 
         images: {
@@ -100,15 +103,7 @@ export const STRINGS_ID: TranslationStrings = {
             customDesc: 'Gunakan {{name}} untuk nama sumber dan format tanggal Moment seperti YYYY-MM-DD.',
             customMomentLink: 'Format Moment',
             customExample: 'Contoh: {value}',
-            customAliases: ['nama', 'berkas', 'tanggal', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: 'Properti catatan',
-            notePropertyDesc:
-                'Properti yang mengaktifkan atau menonaktifkan Better Paste untuk satu catatan. Dengan "bp: false", catatan dibiarkan apa adanya, dan dengan "bp: true", catatan tetap dibersihkan meski "Bersihkan setiap tempelan" mati. Biarkan kosong untuk mengabaikan properti ini.',
-            notePropertyAliases: ['catatan', 'properti', 'frontmatter', 'kecualikan', 'nonaktifkan', 'aktifkan', 'bp'],
+            customAliases: ['nama', 'berkas', 'tanggal', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Properti lebar gambar',
             sizePropertyDesc:
                 'Properti frontmatter yang menentukan lebar gambar yang ditempel ke sebuah catatan. Dengan "image-width: 400" di catatan, gambar yang ditempel menjadi ![[photo.png|400]]. Biarkan kosong agar tidak ada lebar yang ditambahkan.',
@@ -190,7 +185,7 @@ export const STRINGS_ID: TranslationStrings = {
         intro: [
             'Salin gambar dari Safari langsung ke brankas, tempel tautan tanpa parameter pelacakan, perbaiki keluaran terminal yang barisnya terpotong, dan bersihkan teks AI. Cukup tempel, sisanya diurus Better Paste.',
             'Satu kiat sebelum mulai: pasang **Tempel tanpa pemrosesan** ke `Cmd+Shift+V` (`Ctrl+Shift+V` di Windows) agar isi papan klip selalu bisa ditempel apa adanya.',
-            'Setiap aturan punya sakelar sendiri di Pengaturan, Better Paste, dan properti `bp: false` mematikan plugin untuk catatan itu.'
+            'Setiap aturan punya sakelar sendiri di Pengaturan, Better Paste, dan properti `{property}: false` mematikan plugin untuk catatan itu.'
         ],
         startButton: 'Mulai'
     },

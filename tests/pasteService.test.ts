@@ -792,7 +792,7 @@ describe('handleEditorPaste: rich content', () => {
     });
 
     it('still cleans AI typography when the other rich-content rules are off', async () => {
-        const { service } = build({ linkEnabled: false, imageEnabled: false });
+        const { service } = build({ linkEnabled: false, imageEnabled: false, textQuotes: true });
         const editor = new FakeEditor('');
 
         await pasteRich(service, editor, '<p>quoted</p>', '“quoted”');
@@ -804,7 +804,8 @@ describe('handleEditorPaste: rich content', () => {
         const { service } = build({
             textInvisible: false,
             linkEnabled: false,
-            imageEnabled: false
+            imageEnabled: false,
+            textQuotes: true
         });
         const editor = new FakeEditor('');
 

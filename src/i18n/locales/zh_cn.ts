@@ -68,8 +68,11 @@ export const STRINGS_ZH_CN: TranslationStrings = {
         behavior: {
             autoCleanName: '每次粘贴都清理',
             autoCleanDesc:
-                '每次粘贴都会应用规则。关闭后规则只在 Better Paste 命令中生效。单篇笔记可以用 "bp: false" 属性排除自己，也可以用 "bp: true" 属性单独启用。',
-            autoCleanAliases: ['自动', '启用', '禁用', '笔记', '排除', '属性', 'frontmatter']
+                '每次粘贴都会应用规则。关闭后规则只在 Better Paste 命令中生效。单篇笔记可以用 "{property}: false" 属性排除自己，也可以用 "{property}: true" 属性单独启用。',
+            autoCleanAliases: ['自动', '启用', '禁用', '笔记', '排除', '属性', 'frontmatter'],
+            notePropertyName: '笔记属性',
+            notePropertyDesc: '为单篇笔记开启或关闭 Better Paste 的属性。',
+            notePropertyAliases: ['笔记', '属性', 'frontmatter', '排除', '禁用', '启用', 'bp']
         },
 
         images: {
@@ -98,15 +101,7 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             customDesc: '用 {{name}} 表示来源名称，日期可用 YYYY-MM-DD 这类 Moment 格式。',
             customMomentLink: 'Moment 格式',
             customExample: '示例：{value}',
-            customAliases: ['名称', '文件名', '日期', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: '笔记属性',
-            notePropertyDesc:
-                '为单篇笔记开启或关闭 Better Paste 的属性。笔记中写有 "bp: false" 时该笔记不会被改动，写有 "bp: true" 时即使“每次粘贴都清理”已关闭也会清理。留空则忽略该属性。',
-            notePropertyAliases: ['笔记', '属性', 'frontmatter', '排除', '禁用', '启用', 'bp'],
+            customAliases: ['名称', '文件名', '日期', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: '图片宽度属性',
             sizePropertyDesc:
                 '决定粘贴进笔记的图片宽度的 frontmatter 属性。笔记中写有 "image-width: 400" 时，粘贴的图片会变成 ![[photo.png|400]]。留空则不添加宽度。',
@@ -179,7 +174,7 @@ export const STRINGS_ZH_CN: TranslationStrings = {
         intro: [
             '把 Safari 中的图片直接复制进仓库，粘贴不带跟踪参数的链接，修复终端输出中被折断的行，并清理 AI 文本。只管粘贴，剩下的交给 Better Paste。',
             '开始前的一个小提示：把**不做处理直接粘贴**绑定到 `Cmd+Shift+V`（Windows 上为 `Ctrl+Shift+V`），随时都能原样粘贴剪贴板内容。',
-            '每条规则都可以在 设置、Better Paste 中单独开关，笔记中加入 `bp: false` 属性后，该笔记就不再被处理。'
+            '每条规则都可以在 设置、Better Paste 中单独开关，笔记中加入 `{property}: false` 属性后，该笔记就不再被处理。'
         ],
         startButton: '开始使用'
     },

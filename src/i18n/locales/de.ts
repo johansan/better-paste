@@ -71,7 +71,7 @@ export const STRINGS_DE: TranslationStrings = {
         behavior: {
             autoCleanName: 'Jeden Einfügevorgang bereinigen',
             autoCleanDesc:
-                'Wendet die Regeln bei jedem Einfügen an. Ist dies aus, greifen die Regeln nur über die Better-Paste-Befehle. Eine einzelne Notiz kann sich mit der Eigenschaft "bp: false" ausnehmen oder sich mit "bp: true" immer bereinigen lassen.',
+                'Wendet die Regeln bei jedem Einfügen an. Ist dies aus, greifen die Regeln nur über die Better-Paste-Befehle. Eine einzelne Notiz kann sich mit der Eigenschaft "{property}: false" ausnehmen oder sich mit "{property}: true" immer bereinigen lassen.',
             autoCleanAliases: [
                 'automatisch',
                 'aktivieren',
@@ -81,7 +81,10 @@ export const STRINGS_DE: TranslationStrings = {
                 'eigenschaft',
                 'frontmatter',
                 'ausnehmen'
-            ]
+            ],
+            notePropertyName: 'Notizeigenschaft',
+            notePropertyDesc: 'Eigenschaft, die Better Paste für eine einzelne Notiz ein- oder ausschaltet.',
+            notePropertyAliases: ['notiz', 'eigenschaft', 'frontmatter', 'ausnehmen', 'deaktivieren', 'aktivieren', 'bp']
         },
 
         images: {
@@ -112,15 +115,7 @@ export const STRINGS_DE: TranslationStrings = {
             customDesc: 'Verwende {{name}} für den Quellnamen und Moment-Datumsformate wie YYYY-MM-DD.',
             customMomentLink: 'Moment-Format',
             customExample: 'Beispiel: {value}',
-            customAliases: ['name', 'dateiname', 'datum', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: 'Notizeigenschaft',
-            notePropertyDesc:
-                'Eigenschaft, die Better Paste für eine einzelne Notiz ein- oder ausschaltet. Mit "bp: false" bleibt die Notiz unverändert, mit "bp: true" wird sie auch dann bereinigt, wenn "Jeden Einfügevorgang bereinigen" aus ist. Leer lassen, um die Eigenschaft zu ignorieren.',
-            notePropertyAliases: ['notiz', 'eigenschaft', 'frontmatter', 'ausnehmen', 'deaktivieren', 'aktivieren', 'bp'],
+            customAliases: ['name', 'dateiname', 'datum', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Eigenschaft für Bildbreite',
             sizePropertyDesc:
                 'Frontmatter-Eigenschaft, die die Breite der in eine Notiz eingefügten Bilder festlegt. Mit "image-width: 400" in der Notiz wird ein eingefügtes Bild zu ![[photo.png|400]]. Leer lassen, um keine Breite zu setzen.',
@@ -211,7 +206,7 @@ export const STRINGS_DE: TranslationStrings = {
         intro: [
             'Kopiere Bilder aus Safari direkt in deinen Tresor, füge Links ohne Tracking-Parameter ein, repariere umbrochene Terminalausgaben und räume KI-Text auf. Einfach einfügen, den Rest erledigt Better Paste.',
             'Ein Tipp vorab: Lege **Ohne Verarbeitung einfügen** auf `Cmd+Shift+V` (`Ctrl+Shift+V` unter Windows). So kannst du jederzeit genau das einfügen, was in der Zwischenablage liegt.',
-            'Jede Regel hat ihren eigenen Schalter unter Einstellungen, Better Paste, und mit der Eigenschaft `bp: false` schaltest du das Plugin für eine einzelne Notiz ab.'
+            'Jede Regel hat ihren eigenen Schalter unter Einstellungen, Better Paste, und mit der Eigenschaft `{property}: false` schaltest du das Plugin für eine einzelne Notiz ab.'
         ],
         startButton: 'Los geht’s'
     },

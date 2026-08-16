@@ -20,7 +20,8 @@ import { PluginSettingTab } from 'obsidian';
 import type { App, SettingDefinitionItem } from 'obsidian';
 import type BetterPastePlugin from '../main';
 import { parseLines } from './normalize';
-import { aliases, strings } from '../i18n';
+import { DEFAULT_SETTINGS } from './defaults';
+import { aliases, format, strings } from '../i18n';
 import { diffDomainRules, renderDomainRules } from '../transforms/urlCleanup';
 import { LIST_KEY_SUFFIX, SETTINGS_CLASS, toggle } from './pages/context';
 import type { SettingsPageContext } from './pages/context';
@@ -28,7 +29,6 @@ import { createImageLandingDefinitions } from './pages/imagesPage';
 import { createLinkLandingDefinitions } from './pages/linksPage';
 import { createTextProcessingDefinitions } from './pages/textProcessingPage';
 import { createStartDefinitions } from './pages/startPage';
-import { createFrontmatterDefinitions } from './pages/frontmatterPage';
 
 /**
  * Settings stored as a list of lines but edited as one text field. The control key carries
@@ -85,16 +85,29 @@ export class BetterPasteSettingTab extends PluginSettingTab {
                     toggle(
                         'autoClean',
                         strings.settings.behavior.autoCleanName,
-                        strings.settings.behavior.autoCleanDesc,
+                        this.autoCleanDescription(),
                         aliases(source => source.settings.behavior.autoCleanAliases)
-                    )
+                    ),
+                    // A setting rather than a constant: the name has to coexist with
+                    // whatever the vault already puts in frontmatter, and the plugin
+                    // ships as a bundle, so a fixed name would leave no way out. Blank
+                    // switches the property off.
+                    {
+                        name: strings.settings.behavior.notePropertyName,
+                        desc: strings.settings.behavior.notePropertyDesc,
+                        aliases: aliases(source => source.settings.behavior.notePropertyAliases),
+                        control: {
+                            type: 'text',
+                            key: 'noteProperty',
+                            placeholder: DEFAULT_SETTINGS.noteProperty,
+                            defaultValue: DEFAULT_SETTINGS.noteProperty
+                        }
+                    }
                 ]
             },
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.images.heading, items: createImageLandingDefinitions(context) },
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.links.heading, items: createLinkLandingDefinitions(context) },
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.text.heading, items: createTextProcessingDefinitions() },
-            // Below the rules, because these name the per-note properties rather than changing a rule
-            { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.frontmatter.heading, items: createFrontmatterDefinitions() },
             // Last, because release notes, support links and the other plugins are not settings
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.start.heading, items: createStartDefinitions(context) }
         ];
@@ -127,7 +140,29 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             await super.setControlValue(key, value);
         }
 
+        if (key === 'noteProperty') this.updateAutoCleanDescription();
+
         this.afterChange();
+    }
+
+    /** The master toggle's description names the current note property, so it follows renames. */
+    private autoCleanDescription(): string | DocumentFragment {
+        const text = this.autoCleanDescriptionText();
+        if (typeof createFragment === 'undefined') return text;
+        return createFragment(fragment => {
+            fragment.createSpan({ cls: 'better-paste-autoclean-desc', text });
+        });
+    }
+
+    private autoCleanDescriptionText(): string {
+        const property = this.plugin.settings.noteProperty.trim() || DEFAULT_SETTINGS.noteProperty;
+        return format(strings.settings.behavior.autoCleanDesc, { property });
+    }
+
+    /** Rewrites the rendered description in place after the note property changes. */
+    private updateAutoCleanDescription(): void {
+        const spans = this.containerEl?.querySelectorAll<HTMLElement>('.better-paste-autoclean-desc') ?? [];
+        for (const span of spans) span.setText(this.autoCleanDescriptionText());
     }
 
     /** Re-evaluates visibility without rebuilding controls that hold unsaved tester input. */

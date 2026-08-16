@@ -55,7 +55,9 @@ const RELEASE_NOTES: ReleaseNote[] = [
         date: '2026-08-16',
         new: [
             'You can now define image sizes and CSS classes to assign to images on paste. Either automatic or through a picker.',
-            'Terminal cleanup and comma styling are now commands you run on a selection. Pasting no longer guesses whether your text came from a terminal.'
+            'Terminal cleanup and comma styling are now commands you run on a selection. Pasting no longer guesses whether your text came from a terminal.',
+            'Quotes and Dashes now start switched off, so pasted typography is kept until you opt in.',
+            'Reorganized the settings pane.'
         ]
     },
     {

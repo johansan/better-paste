@@ -68,8 +68,11 @@ export const STRINGS_KO: TranslationStrings = {
         behavior: {
             autoCleanName: '붙여넣을 때마다 정리',
             autoCleanDesc:
-                '붙여넣을 때마다 규칙을 적용합니다. 꺼 두면 Better Paste 명령에서만 규칙이 적용됩니다. 개별 노트는 "bp: false" 속성으로 제외하거나 "bp: true" 속성으로 포함할 수 있습니다.',
-            autoCleanAliases: ['자동', '켜기', '끄기', '노트', '제외', '속성', '프론트매터', 'frontmatter']
+                '붙여넣을 때마다 규칙을 적용합니다. 꺼 두면 Better Paste 명령에서만 규칙이 적용됩니다. 개별 노트는 "{property}: false" 속성으로 제외하거나 "{property}: true" 속성으로 포함할 수 있습니다.',
+            autoCleanAliases: ['자동', '켜기', '끄기', '노트', '제외', '속성', '프론트매터', 'frontmatter'],
+            notePropertyName: '노트 속성',
+            notePropertyDesc: '개별 노트에서 Better Paste를 켜거나 끄는 속성입니다.',
+            notePropertyAliases: ['노트', '속성', '프론트매터', 'frontmatter', '제외', '끄기', '켜기', 'bp']
         },
 
         images: {
@@ -99,15 +102,7 @@ export const STRINGS_KO: TranslationStrings = {
             customDesc: '원본 이름에는 {{name}}을, 날짜에는 YYYY-MM-DD 같은 Moment 형식을 사용하세요.',
             customMomentLink: 'Moment 형식',
             customExample: '예: {value}',
-            customAliases: ['이름', '파일 이름', '날짜', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: '프론트매터',
-            notePropertyName: '노트 속성',
-            notePropertyDesc:
-                '개별 노트에서 Better Paste를 켜거나 끄는 속성입니다. "bp: false"이면 노트를 그대로 두고, "bp: true"면 "붙여넣을 때마다 정리"가 꺼져 있어도 정리합니다. 비워 두면 이 속성을 무시합니다.',
-            notePropertyAliases: ['노트', '속성', '프론트매터', 'frontmatter', '제외', '끄기', '켜기', 'bp'],
+            customAliases: ['이름', '파일 이름', '날짜', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: '이미지 너비 속성',
             sizePropertyDesc:
                 '노트에 붙여넣는 이미지의 너비를 정하는 프론트매터 속성입니다. 노트에 "image-width: 400"이 있으면 붙여넣은 이미지가 ![[photo.png|400]]이 됩니다. 비워 두면 너비를 넣지 않습니다.',
@@ -180,7 +175,7 @@ export const STRINGS_KO: TranslationStrings = {
         intro: [
             'Safari에서 복사한 이미지를 보관함에 바로 저장하고, 링크에서 추적 매개변수를 제거하고, 줄이 끊긴 터미널 출력을 이어 붙이고, AI 텍스트를 정리합니다. 그냥 붙여넣기만 하세요.',
             '시작하기 전에 한 가지 팁: **처리 없이 붙여넣기**를 `Cmd+Shift+V`(Windows에서는 `Ctrl+Shift+V`)에 지정해 두면 언제든지 클립보드 내용을 그대로 붙여넣을 수 있습니다.',
-            '규칙은 설정, Better Paste에서 각각 따로 켜고 끌 수 있고, `bp: false` 속성을 추가하면 해당 노트에서 플러그인이 꺼집니다.'
+            '규칙은 설정, Better Paste에서 각각 따로 켜고 끌 수 있고, `{property}: false` 속성을 추가하면 해당 노트에서 플러그인이 꺼집니다.'
         ],
         startButton: '시작하기'
     },

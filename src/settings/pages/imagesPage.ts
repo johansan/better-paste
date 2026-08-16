@@ -186,6 +186,21 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
                 });
             }
         },
+        // A setting rather than a constant: the name has to coexist with whatever the
+        // vault already puts in frontmatter, and the plugin ships as a bundle, so a
+        // fixed name would leave no way out. Blank switches the property off.
+        {
+            name: text.sizePropertyName,
+            desc: text.sizePropertyDesc,
+            aliases: aliases(source => source.settings.images.sizePropertyAliases),
+            visible: enabled,
+            control: {
+                type: 'text',
+                key: 'imageSizeProperty',
+                placeholder: DEFAULT_SETTINGS.imageSizeProperty,
+                defaultValue: DEFAULT_SETTINGS.imageSizeProperty
+            }
+        },
         {
             name: text.classChoiceName,
             aliases: aliases(source => source.settings.images.classChoiceAliases),

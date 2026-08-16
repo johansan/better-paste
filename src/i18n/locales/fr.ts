@@ -71,8 +71,11 @@ export const STRINGS_FR: TranslationStrings = {
         behavior: {
             autoCleanName: 'Nettoyer chaque collage',
             autoCleanDesc:
-                'Applique les règles à chaque collage. Si cette option est désactivée, les règles ne s’appliquent que via les commandes Better Paste. Une note peut s’en exclure avec la propriété "bp: false", ou s’y inclure avec "bp: true".',
-            autoCleanAliases: ['automatique', 'activer', 'désactiver', 'note', 'exclure', 'propriété', 'frontmatter', 'exception']
+                'Applique les règles à chaque collage. Si cette option est désactivée, les règles ne s’appliquent que via les commandes Better Paste. Une note peut s’en exclure avec la propriété "{property}: false", ou s’y inclure avec "{property}: true".',
+            autoCleanAliases: ['automatique', 'activer', 'désactiver', 'note', 'exclure', 'propriété', 'frontmatter', 'exception'],
+            notePropertyName: 'Propriété de note',
+            notePropertyDesc: 'Propriété qui active ou désactive Better Paste pour une seule note.',
+            notePropertyAliases: ['note', 'propriété', 'frontmatter', 'exclure', 'désactiver', 'activer', 'bp']
         },
 
         images: {
@@ -113,15 +116,7 @@ export const STRINGS_FR: TranslationStrings = {
             customDesc: 'Utilisez {{name}} pour le nom de la source et les formats de date Moment comme YYYY-MM-DD.',
             customMomentLink: 'Format Moment',
             customExample: 'Exemple : {value}',
-            customAliases: ['nom', 'fichier', 'date', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: 'Propriété de note',
-            notePropertyDesc:
-                'Propriété qui active ou désactive Better Paste pour une seule note. Avec "bp: false" la note reste intacte, et avec "bp: true" elle est nettoyée même si « Nettoyer chaque collage » est désactivé. Laissez vide pour ignorer la propriété.',
-            notePropertyAliases: ['note', 'propriété', 'frontmatter', 'exclure', 'désactiver', 'activer', 'bp'],
+            customAliases: ['nom', 'fichier', 'date', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Propriété de largeur d’image',
             sizePropertyDesc:
                 'Propriété du frontmatter qui fixe la largeur des images collées dans une note. Avec "image-width: 400" dans la note, une image collée devient ![[photo.png|400]]. Laissez vide pour n’ajouter aucune largeur.',
@@ -194,7 +189,7 @@ export const STRINGS_FR: TranslationStrings = {
         intro: [
             'Copiez des images de Safari directement dans votre coffre, collez des liens sans paramètres de suivi, réparez les sorties de terminal aux lignes coupées et nettoyez le texte d’IA. Collez, Better Paste s’occupe du reste.',
             'Un conseil avant de commencer : associez **Coller sans traitement** à `Cmd+Shift+V` (`Ctrl+Shift+V` sous Windows) pour pouvoir toujours coller exactement le contenu du presse-papiers.',
-            'Chaque règle a son propre interrupteur dans Paramètres, Better Paste, et la propriété `bp: false` désactive le plugin pour cette note.'
+            'Chaque règle a son propre interrupteur dans Paramètres, Better Paste, et la propriété `{property}: false` désactive le plugin pour cette note.'
         ],
         startButton: 'Commencer'
     },

@@ -83,7 +83,7 @@ npm warn deprecated inflight@1.0.6: This module is not supported and leaks memor
 
 ### 2.5 Cleanup of AI-generated text
 
-Chatbot text comes with curly quotes, long dashes and invisible characters. Better Paste turns it into plain text:
+Chatbot text comes with curly quotes, long dashes and invisible characters. The invisible ones are removed on every paste, and with **Quotes** and **Dashes** turned on the rest becomes plain text too:
 
 ```
 “It works,” she said — finally.
@@ -94,8 +94,6 @@ becomes
 ```
 "It works," she said - finally.
 ```
-
-The invisible characters (zero-width spaces and friends) are removed at the same time.
 
 ### 2.6 Commas and quotes
 
@@ -124,12 +122,14 @@ Seventeen settings. Here are the ones you will actually look for.
 ### 3.1 Behavior
 
 - **Clean up every paste**: the master switch. Turn it off to use only the commands, or to clean only notes marked with `bp: true` (see [section 4](#4-per-note-control)).
+- **Note property** (default `bp`): the per-note switch from [section 4](#4-per-note-control). Rename it if it collides with something in your vault, or leave it blank to turn it off.
 
 ### 3.2 Images
 
 - **Save pasted images into the vault**: covers Safari's "Copy image", pictures inside copied web content, and pasted image URLs. Images land wherever your attachment settings point, named after the source file, so no more `image.png`.
 - **Apply size on paste** and **Apply CSS class on paste**: give every saved image a width, a class, or both, so a paste comes out as `![[photo.jpg#invert|400]]`. Define your own comma-separated lists like `200, 400, 600` and `invert, invertW`, then apply one value everywhere or pick **Ask on every paste** to choose in a small dialog each time (Enter applies, and your last pick is preselected). Classes like `#invert` are defined by themes and CSS snippets, for example to invert an image in dark mode.
 - **File names**: add your own format, like `{{name}}-YYYY-MM-DD`.
+- **Image width property** (default `image-width`): the per-note width from [section 4](#4-per-note-control). Rename it if it collides with something in your vault, or leave it blank to turn it off.
 
 Alt text survives the download, and if a download fails the original link stays in your note. Images over 50 MB or slower than 30 seconds are left as links. A note with its own `image-width` property (see [section 4](#4-per-note-control)) overrides the size setting.
 
@@ -168,12 +168,8 @@ Subdomains are covered automatically, `google.*` matches google.com and google.s
 
 - **Trim surrounding whitespace**: removes blank lines and stray spaces around the paste. Blank lines in the middle stay.
 - **Invisible characters**: removes zero-width spaces and turns non-breaking spaces into normal ones. Emoji, Persian and Arabic joiners, and CJK spacing are left alone.
-- **Quotes**: turns curly quotes and apostrophes into straight ones, so `“don’t”` becomes `"don't"`.
-- **Dashes**: turns en and em dashes into hyphens. Quotes and dashes inside code, links and note names are left alone.
-
-### 3.5 Frontmatter
-
-- **Note property** (default `bp`) and **Image width property** (default `image-width`): the two per-note properties from [section 4](#4-per-note-control). Rename them if they collide with something in your vault, or leave one blank to turn it off.
+- **Quotes**: turns curly quotes and apostrophes into straight ones, so `“don’t”` becomes `"don't"`. Off by default, so your typography is kept until you opt in.
+- **Dashes**: turns en and em dashes into hyphens. Also off by default. Quotes and dashes inside code, links and note names are left alone.
 
 <br/>
 

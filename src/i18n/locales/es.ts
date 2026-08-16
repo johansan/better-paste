@@ -71,8 +71,11 @@ export const STRINGS_ES: TranslationStrings = {
         behavior: {
             autoCleanName: 'Limpiar cada pegado',
             autoCleanDesc:
-                'Aplica las reglas en cada pegado. Si se desactiva, las reglas solo se aplican mediante los comandos de Better Paste. Una nota concreta puede quedar excluida con la propiedad "bp: false", o incluida con "bp: true".',
-            autoCleanAliases: ['automático', 'activar', 'desactivar', 'nota', 'excluir', 'propiedad', 'frontmatter', 'excepción']
+                'Aplica las reglas en cada pegado. Si se desactiva, las reglas solo se aplican mediante los comandos de Better Paste. Una nota concreta puede quedar excluida con la propiedad "{property}: false", o incluida con "{property}: true".',
+            autoCleanAliases: ['automático', 'activar', 'desactivar', 'nota', 'excluir', 'propiedad', 'frontmatter', 'excepción'],
+            notePropertyName: 'Propiedad de la nota',
+            notePropertyDesc: 'Propiedad que activa o desactiva Better Paste en una sola nota.',
+            notePropertyAliases: ['nota', 'propiedad', 'frontmatter', 'excluir', 'desactivar', 'activar', 'bp']
         },
 
         images: {
@@ -113,15 +116,7 @@ export const STRINGS_ES: TranslationStrings = {
             customDesc: 'Usa {{name}} para el nombre de origen y formatos de fecha de Moment como YYYY-MM-DD.',
             customMomentLink: 'Formato de Moment',
             customExample: 'Ejemplo: {value}',
-            customAliases: ['nombre', 'archivo', 'fecha', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: 'Propiedad de la nota',
-            notePropertyDesc:
-                'Propiedad que activa o desactiva Better Paste en una sola nota. Con "bp: false" la nota queda intacta, y con "bp: true" se limpia aunque "Limpiar cada pegado" esté desactivado. Déjala en blanco para ignorar la propiedad.',
-            notePropertyAliases: ['nota', 'propiedad', 'frontmatter', 'excluir', 'desactivar', 'activar', 'bp'],
+            customAliases: ['nombre', 'archivo', 'fecha', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Propiedad de ancho de imagen',
             sizePropertyDesc:
                 'Propiedad del frontmatter que fija el ancho de las imágenes pegadas en una nota. Con "image-width: 400" en la nota, una imagen pegada queda como ![[photo.png|400]]. Déjala en blanco para no añadir ancho.',
@@ -194,7 +189,7 @@ export const STRINGS_ES: TranslationStrings = {
         intro: [
             'Copia imágenes de Safari directamente a tu bóveda, pega enlaces sin parámetros de seguimiento, arregla la salida de terminal con líneas partidas y limpia el texto de IA. Solo pega, y Better Paste se encarga del resto.',
             'Un consejo antes de empezar: asigna **Pegar sin procesar** a `Cmd+Shift+V` (`Ctrl+Shift+V` en Windows) para poder pegar siempre exactamente lo que hay en el portapapeles.',
-            'Cada regla tiene su propio interruptor en Ajustes, Better Paste, y la propiedad `bp: false` desactiva el plugin en esa nota.'
+            'Cada regla tiene su propio interruptor en Ajustes, Better Paste, y la propiedad `{property}: false` desactiva el plugin en esa nota.'
         ],
         startButton: 'Empezar'
     },

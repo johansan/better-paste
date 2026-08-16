@@ -192,7 +192,7 @@ describe('runTextPipeline', () => {
     it('normalises AI typography before the other rules see it', () => {
         // A no-break space is not whitespace to a regular expression, so if the AI rule did
         // not run first the terminal rule would treat this line as non-blank
-        const result = runTextPipeline('a\u00a0\u2014\u00a0b', DEFAULT_SETTINGS);
+        const result = runTextPipeline('a\u00a0\u2014\u00a0b', { ...DEFAULT_SETTINGS, textDashes: true });
         expect(result.text).toBe('a - b');
     });
 
@@ -249,22 +249,21 @@ describe('runTextPipeline', () => {
     });
 
     it('straightens quotes as part of the pipeline', () => {
-        expect(runTextPipeline('\u201CIt\u2019s fine\u201D', DEFAULT_SETTINGS).text).toBe('"It\'s fine"');
+        expect(runTextPipeline('\u201CIt\u2019s fine\u201D', { ...DEFAULT_SETTINGS, textQuotes: true }).text).toBe('"It\'s fine"');
     });
 
     it('keeps curly quotes around a URL while cleaning it', () => {
-        expect(runTextPipeline('See \u201Chttps://example.com/page?utm_source=news\u201D now.', DEFAULT_SETTINGS).text).toBe(
-            'See "https://example.com/page" now.'
-        );
+        expect(
+            runTextPipeline('See \u201Chttps://example.com/page?utm_source=news\u201D now.', { ...DEFAULT_SETTINGS, textQuotes: true }).text
+        ).toBe('See "https://example.com/page" now.');
     });
 
     it('straightens curly single quotes around a URL without losing the closing quote', () => {
-        expect(runTextPipeline('See \u2018https://example.com/page?utm_source=news\u2019 now.', DEFAULT_SETTINGS).text).toBe(
+        const styled = { ...DEFAULT_SETTINGS, textQuotes: true };
+        expect(runTextPipeline('See \u2018https://example.com/page?utm_source=news\u2019 now.', styled).text).toBe(
             "See 'https://example.com/page' now."
         );
-        expect(runTextPipeline('See \u2018https://example.com/page\u2019 now.', DEFAULT_SETTINGS).text).toBe(
-            "See 'https://example.com/page' now."
-        );
+        expect(runTextPipeline('See \u2018https://example.com/page\u2019 now.', styled).text).toBe("See 'https://example.com/page' now.");
     });
 
     it('keeps a URL inside frontmatter intact while cleaning body links', () => {

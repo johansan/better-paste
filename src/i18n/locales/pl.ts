@@ -73,8 +73,11 @@ export const STRINGS_PL: TranslationStrings = {
         behavior: {
             autoCleanName: 'Czyść każde wklejenie',
             autoCleanDesc:
-                'Stosuje reguły przy każdym wklejeniu. Gdy jest wyłączone, reguły działają tylko po użyciu poleceń Better Paste. Pojedyncza notatka może się wyłączyć właściwością "bp: false" lub włączyć właściwością "bp: true".',
-            autoCleanAliases: ['automatycznie', 'włącz', 'wyłącz', 'notatka', 'wyklucz', 'właściwość', 'frontmatter']
+                'Stosuje reguły przy każdym wklejeniu. Gdy jest wyłączone, reguły działają tylko po użyciu poleceń Better Paste. Pojedyncza notatka może się wyłączyć właściwością "{property}: false" lub włączyć właściwością "{property}: true".',
+            autoCleanAliases: ['automatycznie', 'włącz', 'wyłącz', 'notatka', 'wyklucz', 'właściwość', 'frontmatter'],
+            notePropertyName: 'Właściwość notatki',
+            notePropertyDesc: 'Właściwość włączająca lub wyłączająca Better Paste dla jednej notatki.',
+            notePropertyAliases: ['notatka', 'właściwość', 'frontmatter', 'wyklucz', 'wyłącz', 'włącz', 'bp']
         },
 
         images: {
@@ -105,15 +108,7 @@ export const STRINGS_PL: TranslationStrings = {
             customDesc: 'Użyj {{name}} dla nazwy źródła oraz formatów daty Moment, takich jak YYYY-MM-DD.',
             customMomentLink: 'Format Moment',
             customExample: 'Przykład: {value}',
-            customAliases: ['nazwa', 'plik', 'data', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: 'Właściwość notatki',
-            notePropertyDesc:
-                'Właściwość włączająca lub wyłączająca Better Paste dla jednej notatki. Przy "bp: false" notatka pozostaje bez zmian, a przy "bp: true" jest czyszczona nawet wtedy, gdy „Czyść każde wklejenie” jest wyłączone. Pozostaw puste, aby zignorować tę właściwość.',
-            notePropertyAliases: ['notatka', 'właściwość', 'frontmatter', 'wyklucz', 'wyłącz', 'włącz', 'bp'],
+            customAliases: ['nazwa', 'plik', 'data', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Właściwość szerokości obrazu',
             sizePropertyDesc:
                 'Właściwość frontmatter określająca szerokość obrazów wklejanych do notatki. Przy "image-width: 400" w notatce wklejony obraz przybiera postać ![[photo.png|400]]. Pozostaw puste, aby nie dodawać szerokości.',
@@ -196,7 +191,7 @@ export const STRINGS_PL: TranslationStrings = {
         intro: [
             'Kopiuj obrazy z Safari prosto do sejfu, wklejaj odnośniki bez parametrów śledzących, naprawiaj połamane wiersze z terminala i porządkuj tekst z AI. Po prostu wklej, resztą zajmie się Better Paste.',
             'Jedna wskazówka na start: przypisz **Wklej bez przetwarzania** do `Cmd+Shift+V` (`Ctrl+Shift+V` w Windows), aby zawsze móc wkleić dokładnie to, co jest w schowku.',
-            'Każda reguła ma własny przełącznik w Ustawienia, Better Paste, a właściwość `bp: false` wyłącza wtyczkę w danej notatce.'
+            'Każda reguła ma własny przełącznik w Ustawienia, Better Paste, a właściwość `{property}: false` wyłącza wtyczkę w danej notatce.'
         ],
         startButton: 'Zaczynajmy'
     },

@@ -71,8 +71,11 @@ export const STRINGS_NL: TranslationStrings = {
         behavior: {
             autoCleanName: 'Elke plakactie opschonen',
             autoCleanDesc:
-                'Past de regels toe bij elke plakactie. Staat dit uit, dan werken de regels alleen via de Better Paste-opdrachten. Een losse notitie kan zichzelf uitsluiten met de eigenschap "bp: false" of zich altijd laten opschonen met "bp: true".',
-            autoCleanAliases: ['automatisch', 'inschakelen', 'uitschakelen', 'notitie', 'uitsluiten', 'eigenschap', 'frontmatter']
+                'Past de regels toe bij elke plakactie. Staat dit uit, dan werken de regels alleen via de Better Paste-opdrachten. Een losse notitie kan zichzelf uitsluiten met de eigenschap "{property}: false" of zich altijd laten opschonen met "{property}: true".',
+            autoCleanAliases: ['automatisch', 'inschakelen', 'uitschakelen', 'notitie', 'uitsluiten', 'eigenschap', 'frontmatter'],
+            notePropertyName: 'Notitie-eigenschap',
+            notePropertyDesc: 'Eigenschap die Better Paste voor één notitie in- of uitschakelt.',
+            notePropertyAliases: ['notitie', 'eigenschap', 'frontmatter', 'uitsluiten', 'uitschakelen', 'inschakelen', 'bp']
         },
 
         images: {
@@ -113,15 +116,7 @@ export const STRINGS_NL: TranslationStrings = {
             customDesc: 'Gebruik {{name}} voor de bronnaam en Moment-datumnotaties zoals YYYY-MM-DD.',
             customMomentLink: 'Moment-notatie',
             customExample: 'Voorbeeld: {value}',
-            customAliases: ['naam', 'bestandsnaam', 'datum', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: 'Notitie-eigenschap',
-            notePropertyDesc:
-                'Eigenschap die Better Paste voor één notitie in- of uitschakelt. Met "bp: false" blijft de notitie ongewijzigd, en met "bp: true" wordt ze opgeschoond, zelfs als "Elke plakactie opschonen" uit staat. Laat leeg om de eigenschap te negeren.',
-            notePropertyAliases: ['notitie', 'eigenschap', 'frontmatter', 'uitsluiten', 'uitschakelen', 'inschakelen', 'bp'],
+            customAliases: ['naam', 'bestandsnaam', 'datum', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Eigenschap voor afbeeldingsbreedte',
             sizePropertyDesc:
                 'Frontmatter-eigenschap die de breedte bepaalt van afbeeldingen die in een notitie worden geplakt. Met "image-width: 400" in de notitie wordt een geplakte afbeelding ![[photo.png|400]]. Laat leeg om geen breedte toe te voegen.',
@@ -203,7 +198,7 @@ export const STRINGS_NL: TranslationStrings = {
         intro: [
             'Kopieer afbeeldingen uit Safari rechtstreeks naar je kluis, plak links zonder trackingparameters, herstel afgebroken terminalregels en ruim AI-tekst op. Gewoon plakken, Better Paste doet de rest.',
             'Eén tip vooraf: wijs **Plakken zonder bewerking** toe aan `Cmd+Shift+V` (`Ctrl+Shift+V` op Windows), zodat je altijd precies kunt plakken wat er op het klembord staat.',
-            'Elke regel heeft zijn eigen schakelaar onder Instellingen, Better Paste, en met de eigenschap `bp: false` zet je de plugin voor die notitie uit.'
+            'Elke regel heeft zijn eigen schakelaar onder Instellingen, Better Paste, en met de eigenschap `{property}: false` zet je de plugin voor die notitie uit.'
         ],
         startButton: 'Aan de slag'
     },

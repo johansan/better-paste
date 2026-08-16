@@ -68,8 +68,11 @@ export const STRINGS_VI: TranslationStrings = {
         behavior: {
             autoCleanName: 'Dọn mọi lần dán',
             autoCleanDesc:
-                'Áp dụng các quy tắc cho mọi lần dán. Khi tắt, các quy tắc chỉ được áp dụng khi dùng các lệnh của Better Paste. Một ghi chú riêng lẻ có thể tự loại trừ bằng thuộc tính "bp: false", hoặc tự bật lại bằng "bp: true".',
-            autoCleanAliases: ['tự động', 'bật', 'tắt', 'ghi chú', 'loại trừ', 'thuộc tính', 'frontmatter']
+                'Áp dụng các quy tắc cho mọi lần dán. Khi tắt, các quy tắc chỉ được áp dụng khi dùng các lệnh của Better Paste. Một ghi chú riêng lẻ có thể tự loại trừ bằng thuộc tính "{property}: false", hoặc tự bật lại bằng "{property}: true".',
+            autoCleanAliases: ['tự động', 'bật', 'tắt', 'ghi chú', 'loại trừ', 'thuộc tính', 'frontmatter'],
+            notePropertyName: 'Thuộc tính ghi chú',
+            notePropertyDesc: 'Thuộc tính bật hoặc tắt Better Paste cho một ghi chú.',
+            notePropertyAliases: ['ghi chú', 'thuộc tính', 'frontmatter', 'loại trừ', 'tắt', 'bật', 'bp']
         },
 
         images: {
@@ -110,15 +113,7 @@ export const STRINGS_VI: TranslationStrings = {
             customDesc: 'Dùng {{name}} cho tên nguồn và các định dạng ngày của Moment như YYYY-MM-DD.',
             customMomentLink: 'Định dạng Moment',
             customExample: 'Ví dụ: {value}',
-            customAliases: ['tên', 'tên tệp', 'ngày', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: 'Thuộc tính ghi chú',
-            notePropertyDesc:
-                'Thuộc tính bật hoặc tắt Better Paste cho một ghi chú. Với "bp: false", ghi chú được giữ nguyên, còn với "bp: true", ghi chú vẫn được dọn dù "Dọn mọi lần dán" đang tắt. Để trống để bỏ qua thuộc tính này.',
-            notePropertyAliases: ['ghi chú', 'thuộc tính', 'frontmatter', 'loại trừ', 'tắt', 'bật', 'bp'],
+            customAliases: ['tên', 'tên tệp', 'ngày', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Thuộc tính chiều rộng ảnh',
             sizePropertyDesc:
                 'Thuộc tính frontmatter xác định chiều rộng của ảnh dán vào một ghi chú. Với "image-width: 400" trong ghi chú, ảnh dán vào sẽ thành ![[photo.png|400]]. Để trống để không thêm chiều rộng.',
@@ -191,7 +186,7 @@ export const STRINGS_VI: TranslationStrings = {
         intro: [
             'Sao chép ảnh từ Safari thẳng vào kho, dán liên kết không kèm tham số theo dõi, sửa những dòng bị ngắt trong đầu ra dòng lệnh, và dọn sạch văn bản AI. Chỉ cần dán, phần còn lại Better Paste lo.',
             'Một mẹo trước khi bắt đầu: gán **Dán không xử lý** vào `Cmd+Shift+V` (`Ctrl+Shift+V` trên Windows) để lúc nào cũng dán được đúng nội dung trong bảng nhớ tạm.',
-            'Mỗi quy tắc có công tắc riêng trong Cài đặt, Better Paste, và thuộc tính `bp: false` sẽ tắt tiện ích cho ghi chú đó.'
+            'Mỗi quy tắc có công tắc riêng trong Cài đặt, Better Paste, và thuộc tính `{property}: false` sẽ tắt tiện ích cho ghi chú đó.'
         ],
         startButton: 'Bắt đầu'
     },

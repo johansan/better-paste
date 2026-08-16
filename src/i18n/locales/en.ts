@@ -84,8 +84,11 @@ export const STRINGS_EN = {
         behavior: {
             autoCleanName: 'Clean up every paste',
             autoCleanDesc:
-                'Applies the rules to every paste. When off, the rules run only from the Better Paste commands. A single note can opt out with the "bp: false" property, or opt in with "bp: true".',
-            autoCleanAliases: ['automatic', 'enable', 'disable', 'note', 'exclude', 'property', 'frontmatter', 'opt out', 'opt in', 'bp']
+                'Applies the rules to every paste. When off, the rules run only from the Better Paste commands. A single note can opt out with the "{property}: false" property, or opt in with "{property}: true".',
+            autoCleanAliases: ['automatic', 'enable', 'disable', 'note', 'exclude', 'property', 'frontmatter', 'opt out', 'opt in', 'bp'],
+            notePropertyName: 'Note property',
+            notePropertyDesc: 'Property that switches Better Paste on or off for one note.',
+            notePropertyAliases: ['note', 'property', 'frontmatter', 'exclude', 'opt out', 'opt in', 'disable', 'enable', 'bp', 'verbatim']
         },
 
         images: {
@@ -127,15 +130,7 @@ export const STRINGS_EN = {
             customDesc: 'Use {{name}} for the source name and Moment date formats such as YYYY-MM-DD.',
             customMomentLink: 'Moment format',
             customExample: 'Example: {value}',
-            customAliases: ['name', 'filename', 'date', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: 'Note property',
-            notePropertyDesc:
-                'Property that switches Better Paste on or off for one note. With "bp: false" the note is left alone, and with "bp: true" it is cleaned even when Clean up every paste is off. Leave blank to ignore the property.',
-            notePropertyAliases: ['note', 'property', 'frontmatter', 'exclude', 'opt out', 'opt in', 'disable', 'enable', 'bp', 'verbatim'],
+            customAliases: ['name', 'filename', 'date', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Image width property',
             sizePropertyDesc:
                 'Frontmatter property that sets the width of images pasted into a note. With "image-width: 400" in the note, a pasted image becomes ![[photo.png|400]]. Leave blank to add no width.',
@@ -221,7 +216,7 @@ export const STRINGS_EN = {
         intro: [
             'Copy images from Safari straight into your vault, paste links without tracking junk, fix broken terminal output, and clean up AI text. Just paste, and Better Paste handles the rest.',
             'One tip before you start: bind **Paste without processing** to `Cmd+Shift+V` (`Ctrl+Shift+V` on Windows), so you can always paste exactly what is on the clipboard.',
-            'Every rule has its own toggle under Settings, Better Paste, and the `bp: false` property turns the plugin off for a single note.'
+            'Every rule has its own toggle under Settings, Better Paste, and the `{property}: false` property turns the plugin off for a single note.'
         ],
         startButton: 'Get started'
     },

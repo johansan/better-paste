@@ -71,8 +71,11 @@ export const STRINGS_TR: TranslationStrings = {
         behavior: {
             autoCleanName: 'Her yapıştırmayı temizle',
             autoCleanDesc:
-                'Kuralları her yapıştırmada uygular. Kapalıyken kurallar yalnızca Better Paste komutlarıyla uygulanır. Tek bir not "bp: false" özelliğiyle kendini dışarıda bırakabilir, "bp: true" özelliğiyle de kendini dahil edebilir.',
-            autoCleanAliases: ['otomatik', 'etkinleştir', 'devre dışı', 'not', 'hariç tut', 'özellik', 'frontmatter']
+                'Kuralları her yapıştırmada uygular. Kapalıyken kurallar yalnızca Better Paste komutlarıyla uygulanır. Tek bir not "{property}: false" özelliğiyle kendini dışarıda bırakabilir, "{property}: true" özelliğiyle de kendini dahil edebilir.',
+            autoCleanAliases: ['otomatik', 'etkinleştir', 'devre dışı', 'not', 'hariç tut', 'özellik', 'frontmatter'],
+            notePropertyName: 'Not özelliği',
+            notePropertyDesc: 'Better Paste’i tek bir not için açan veya kapatan özellik.',
+            notePropertyAliases: ['not', 'özellik', 'frontmatter', 'hariç tut', 'devre dışı', 'etkinleştir', 'bp']
         },
 
         images: {
@@ -103,15 +106,7 @@ export const STRINGS_TR: TranslationStrings = {
             customDesc: 'Kaynak adı için {{name}} ve YYYY-MM-DD gibi Moment tarih biçimlerini kullanın.',
             customMomentLink: 'Moment biçimi',
             customExample: 'Örnek: {value}',
-            customAliases: ['ad', 'dosya adı', 'tarih', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: 'Not özelliği',
-            notePropertyDesc:
-                'Better Paste’i tek bir not için açan veya kapatan özellik. "bp: false" ile not olduğu gibi bırakılır, "bp: true" ile "Her yapıştırmayı temizle" kapalı olsa bile temizlenir. Özelliği yok saymak için boş bırakın.',
-            notePropertyAliases: ['not', 'özellik', 'frontmatter', 'hariç tut', 'devre dışı', 'etkinleştir', 'bp'],
+            customAliases: ['ad', 'dosya adı', 'tarih', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Görsel genişliği özelliği',
             sizePropertyDesc:
                 'Bir nota yapıştırılan görsellerin genişliğini belirleyen frontmatter özelliği. Notta "image-width: 400" varsa, yapıştırılan görsel ![[photo.png|400]] biçimine girer. Genişlik eklenmemesi için boş bırakın.',
@@ -193,7 +188,7 @@ export const STRINGS_TR: TranslationStrings = {
         intro: [
             'Görselleri Safari’den doğrudan kasaya kopyalayın, bağlantıları izleme parametreleri olmadan yapıştırın, terminal çıktısındaki bölünmüş satırları düzeltin ve yapay zekâ metnini temizleyin. Sadece yapıştırın, gerisini Better Paste halleder.',
             'Başlamadan önce bir ipucu: **İşlemeden yapıştır** komutunu `Cmd+Shift+V` (Windows’ta `Ctrl+Shift+V`) kısayoluna atayın; böylece panodakini her zaman olduğu gibi yapıştırabilirsiniz.',
-            'Her kuralın Ayarlar, Better Paste altında kendi düğmesi vardır ve `bp: false` özelliği eklentiyi o not için kapatır.'
+            'Her kuralın Ayarlar, Better Paste altında kendi düğmesi vardır ve `{property}: false` özelliği eklentiyi o not için kapatır.'
         ],
         startButton: 'Başla'
     },

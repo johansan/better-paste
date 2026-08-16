@@ -68,8 +68,11 @@ export const STRINGS_JA: TranslationStrings = {
         behavior: {
             autoCleanName: '貼り付けのたびに整える',
             autoCleanDesc:
-                '貼り付けのたびにルールを適用します。オフのときは Better Paste のコマンドを使ったときだけ適用されます。個々のノートは "bp: false" プロパティで対象外にでき、"bp: true" で対象にできます。',
-            autoCleanAliases: ['自動', '有効', '無効', 'ノート', '除外', 'プロパティ', 'フロントマター', 'frontmatter']
+                '貼り付けのたびにルールを適用します。オフのときは Better Paste のコマンドを使ったときだけ適用されます。個々のノートは "{property}: false" プロパティで対象外にでき、"{property}: true" で対象にできます。',
+            autoCleanAliases: ['自動', '有効', '無効', 'ノート', '除外', 'プロパティ', 'フロントマター', 'frontmatter'],
+            notePropertyName: 'ノートのプロパティ',
+            notePropertyDesc: '個々のノートで Better Paste を有効または無効にするプロパティです。',
+            notePropertyAliases: ['ノート', 'プロパティ', 'フロントマター', 'frontmatter', '除外', '無効', '有効', 'bp']
         },
 
         images: {
@@ -109,15 +112,7 @@ export const STRINGS_JA: TranslationStrings = {
             customDesc: '元の名前には {{name}} を、日付には YYYY-MM-DD のような Moment の書式を使います。',
             customMomentLink: 'Moment の書式',
             customExample: '例: {value}',
-            customAliases: ['名前', 'ファイル名', '日付', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'フロントマター',
-            notePropertyName: 'ノートのプロパティ',
-            notePropertyDesc:
-                '個々のノートで Better Paste を有効または無効にするプロパティです。"bp: false" ならそのノートは変更されず、"bp: true" なら「貼り付けのたびに整える」がオフでも整えられます。空欄にするとこのプロパティを無視します。',
-            notePropertyAliases: ['ノート', 'プロパティ', 'フロントマター', 'frontmatter', '除外', '無効', '有効', 'bp'],
+            customAliases: ['名前', 'ファイル名', '日付', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: '画像幅のプロパティ',
             sizePropertyDesc:
                 'ノートに貼り付ける画像の幅を決めるフロントマターのプロパティです。ノートに "image-width: 400" があると、貼り付けた画像は ![[photo.png|400]] になります。空欄にすると幅を付けません。',
@@ -190,7 +185,7 @@ export const STRINGS_JA: TranslationStrings = {
         intro: [
             'Safari からコピーした画像を保管庫に保存し、リンクから追跡パラメーターを取り除き、折り返されたターミナル出力をつなぎ直し、AI テキストをきれいにします。あとは貼り付けるだけです。',
             'はじめる前にひとつヒント: **処理せずに貼り付け**を `Cmd+Shift+V`（Windows では `Ctrl+Shift+V`）に割り当てておくと、いつでもクリップボードの内容をそのまま貼り付けられます。',
-            'ルールはそれぞれ 設定、Better Paste で個別にオン・オフできます。ノートに `bp: false` プロパティを書けば、そのノートではプラグインが無効になります。'
+            'ルールはそれぞれ 設定、Better Paste で個別にオン・オフできます。ノートに `{property}: false` プロパティを書けば、そのノートではプラグインが無効になります。'
         ],
         startButton: 'はじめる'
     },

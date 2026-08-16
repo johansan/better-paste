@@ -75,8 +75,11 @@ export const STRINGS_AR: TranslationStrings = {
         behavior: {
             autoCleanName: 'تنظيف كل عملية لصق',
             autoCleanDesc:
-                'يطبّق القواعد عند كل لصق. عند إيقافه لا تُطبّق القواعد إلا عبر أوامر Better Paste. يمكن لملاحظة واحدة أن تستثني نفسها بالخاصية "bp: false"، أو أن تطلب التنظيف بالخاصية "bp: true".',
-            autoCleanAliases: ['تلقائي', 'تفعيل', 'تعطيل', 'ملاحظة', 'استثناء', 'خاصية', 'frontmatter']
+                'يطبّق القواعد عند كل لصق. عند إيقافه لا تُطبّق القواعد إلا عبر أوامر Better Paste. يمكن لملاحظة واحدة أن تستثني نفسها بالخاصية "{property}: false"، أو أن تطلب التنظيف بالخاصية "{property}: true".',
+            autoCleanAliases: ['تلقائي', 'تفعيل', 'تعطيل', 'ملاحظة', 'استثناء', 'خاصية', 'frontmatter'],
+            notePropertyName: 'خاصية الملاحظة',
+            notePropertyDesc: 'خاصية تُفعّل Better Paste أو تُعطّله في ملاحظة واحدة.',
+            notePropertyAliases: ['ملاحظة', 'خاصية', 'frontmatter', 'استثناء', 'تعطيل', 'تفعيل', 'bp']
         },
 
         images: {
@@ -105,15 +108,7 @@ export const STRINGS_AR: TranslationStrings = {
             customDesc: 'استخدم {{name}} لاسم المصدر وتنسيقات تاريخ Moment مثل YYYY-MM-DD.',
             customMomentLink: 'تنسيق Moment',
             customExample: 'مثال: {value}',
-            customAliases: ['اسم', 'ملف', 'تاريخ', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: 'خاصية الملاحظة',
-            notePropertyDesc:
-                'خاصية تُفعّل Better Paste أو تُعطّله في ملاحظة واحدة. مع "bp: false" تُترك الملاحظة دون تغيير، ومع "bp: true" تُنظَّف حتى عندما يكون «تنظيف كل عملية لصق» معطّلًا. اتركها فارغة لتجاهل الخاصية.',
-            notePropertyAliases: ['ملاحظة', 'خاصية', 'frontmatter', 'استثناء', 'تعطيل', 'تفعيل', 'bp'],
+            customAliases: ['اسم', 'ملف', 'تاريخ', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'خاصية عرض الصورة',
             sizePropertyDesc:
                 'خاصية frontmatter التي تحدّد عرض الصور الملصقة في ملاحظة. مع "image-width: 400" في الملاحظة تصبح الصورة الملصقة ![[photo.png|400]]. اتركها فارغة لعدم إضافة عرض.',
@@ -200,7 +195,7 @@ export const STRINGS_AR: TranslationStrings = {
         intro: [
             'انسخ الصور من Safari إلى الخزنة مباشرة، والصق الروابط من دون معاملات التتبّع، وأصلح أسطر الطرفية المقطوعة، ونظّف نصوص الذكاء الاصطناعي. الصق فقط، وسيتولى Better Paste الباقي.',
             'نصيحة قبل البدء: اربط الأمر **لصق بدون معالجة** بالاختصار `Cmd+Shift+V` (أو `Ctrl+Shift+V` في Windows) لتتمكن دائمًا من لصق محتوى الحافظة كما هو.',
-            'لكل قاعدة مفتاحها الخاص في الإعدادات، Better Paste، وتؤدي الخاصية `bp: false` إلى إيقاف الإضافة في تلك الملاحظة.'
+            'لكل قاعدة مفتاحها الخاص في الإعدادات، Better Paste، وتؤدي الخاصية `{property}: false` إلى إيقاف الإضافة في تلك الملاحظة.'
         ],
         startButton: 'ابدأ'
     },

@@ -68,8 +68,11 @@ export const STRINGS_ZH_TW: TranslationStrings = {
         behavior: {
             autoCleanName: '每次貼上都整理',
             autoCleanDesc:
-                '每次貼上都會套用規則。關閉後規則只在 Better Paste 指令中生效。單篇筆記可以用 "bp: false" 屬性排除自己，也可以用 "bp: true" 屬性單獨啟用。',
-            autoCleanAliases: ['自動', '啟用', '停用', '筆記', '排除', '屬性', 'frontmatter']
+                '每次貼上都會套用規則。關閉後規則只在 Better Paste 指令中生效。單篇筆記可以用 "{property}: false" 屬性排除自己，也可以用 "{property}: true" 屬性單獨啟用。',
+            autoCleanAliases: ['自動', '啟用', '停用', '筆記', '排除', '屬性', 'frontmatter'],
+            notePropertyName: '筆記屬性',
+            notePropertyDesc: '為單篇筆記開啟或關閉 Better Paste 的屬性。',
+            notePropertyAliases: ['筆記', '屬性', 'frontmatter', '排除', '停用', '啟用', 'bp']
         },
 
         images: {
@@ -98,15 +101,7 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             customDesc: '用 {{name}} 代表來源名稱，日期可用 YYYY-MM-DD 這類 Moment 格式。',
             customMomentLink: 'Moment 格式',
             customExample: '範例：{value}',
-            customAliases: ['名稱', '檔案名稱', '日期', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: '筆記屬性',
-            notePropertyDesc:
-                '為單篇筆記開啟或關閉 Better Paste 的屬性。寫成 "bp: false" 時該筆記不會被更動，寫成 "bp: true" 時即使「每次貼上都整理」已關閉也會整理。留空則忽略該屬性。',
-            notePropertyAliases: ['筆記', '屬性', 'frontmatter', '排除', '停用', '啟用', 'bp'],
+            customAliases: ['名稱', '檔案名稱', '日期', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: '圖片寬度屬性',
             sizePropertyDesc:
                 '決定貼進筆記的圖片寬度的 frontmatter 屬性。筆記中寫有 "image-width: 400" 時，貼上的圖片會變成 ![[photo.png|400]]。留空則不加上寬度。',
@@ -179,7 +174,7 @@ export const STRINGS_ZH_TW: TranslationStrings = {
         intro: [
             '把 Safari 中的圖片直接複製進儲存庫、貼上不帶追蹤參數的連結、修復終端機輸出中被折斷的行，並清理 AI 文字。只管貼上，剩下的交給 Better Paste。',
             '開始前的小提示：把**不做處理直接貼上**綁定到 `Cmd+Shift+V`（Windows 上為 `Ctrl+Shift+V`），隨時都能原樣貼上剪貼簿內容。',
-            '每條規則都可以在 設定、Better Paste 中單獨開關，筆記中加入 `bp: false` 屬性後，該筆記就不再被處理。'
+            '每條規則都可以在 設定、Better Paste 中單獨開關，筆記中加入 `{property}: false` 屬性後，該筆記就不再被處理。'
         ],
         startButton: '開始使用'
     },

@@ -71,8 +71,11 @@ export const STRINGS_IT: TranslationStrings = {
         behavior: {
             autoCleanName: 'Pulisci ogni incollaggio',
             autoCleanDesc:
-                'Applica le regole a ogni incollaggio. Se è disattivato, le regole vengono applicate solo tramite i comandi di Better Paste. Una singola nota può essere esclusa con la proprietà "bp: false" o inclusa con "bp: true".',
-            autoCleanAliases: ['automatico', 'attiva', 'disattiva', 'nota', 'escludi', 'proprietà', 'frontmatter', 'eccezione']
+                'Applica le regole a ogni incollaggio. Se è disattivato, le regole vengono applicate solo tramite i comandi di Better Paste. Una singola nota può essere esclusa con la proprietà "{property}: false" o inclusa con "{property}: true".',
+            autoCleanAliases: ['automatico', 'attiva', 'disattiva', 'nota', 'escludi', 'proprietà', 'frontmatter', 'eccezione'],
+            notePropertyName: 'Proprietà della nota',
+            notePropertyDesc: 'Proprietà che attiva o disattiva Better Paste per una singola nota.',
+            notePropertyAliases: ['nota', 'proprietà', 'frontmatter', 'escludi', 'disattiva', 'attiva', 'bp']
         },
 
         images: {
@@ -103,15 +106,7 @@ export const STRINGS_IT: TranslationStrings = {
             customDesc: 'Usa {{name}} per il nome della fonte e i formati data di Moment come YYYY-MM-DD.',
             customMomentLink: 'Formato Moment',
             customExample: 'Esempio: {value}',
-            customAliases: ['nome', 'file', 'data', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: 'Proprietà della nota',
-            notePropertyDesc:
-                'Proprietà che attiva o disattiva Better Paste per una singola nota. Con "bp: false" la nota resta invariata, e con "bp: true" viene pulita anche quando "Pulisci ogni incollaggio" è disattivato. Lascia vuoto per ignorare la proprietà.',
-            notePropertyAliases: ['nota', 'proprietà', 'frontmatter', 'escludi', 'disattiva', 'attiva', 'bp'],
+            customAliases: ['nome', 'file', 'data', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'Proprietà per la larghezza delle immagini',
             sizePropertyDesc:
                 'Proprietà del frontmatter che imposta la larghezza delle immagini incollate in una nota. Con "image-width: 400" nella nota, un’immagine incollata diventa ![[photo.png|400]]. Lascia vuoto per non aggiungere alcuna larghezza.',
@@ -184,7 +179,7 @@ export const STRINGS_IT: TranslationStrings = {
         intro: [
             'Copia le immagini da Safari direttamente nel vault, incolla link senza parametri di tracciamento, sistema l’output del terminale con le righe spezzate e ripulisci il testo dell’IA. Incolla e basta: al resto ci pensa Better Paste.',
             'Un consiglio prima di iniziare: assegna **Incolla senza elaborazione** a `Cmd+Shift+V` (`Ctrl+Shift+V` su Windows), così puoi sempre incollare esattamente ciò che è negli appunti.',
-            'Ogni regola ha il suo interruttore in Impostazioni, Better Paste, e la proprietà `bp: false` disattiva il plugin per quella nota.'
+            'Ogni regola ha il suo interruttore in Impostazioni, Better Paste, e la proprietà `{property}: false` disattiva il plugin per quella nota.'
         ],
         startButton: 'Inizia'
     },

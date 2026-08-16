@@ -68,8 +68,11 @@ export const STRINGS_TH: TranslationStrings = {
         behavior: {
             autoCleanName: 'จัดระเบียบทุกครั้งที่วาง',
             autoCleanDesc:
-                'ใช้กฎกับการวางทุกครั้ง เมื่อปิดไว้ กฎจะทำงานเฉพาะผ่านคำสั่งของ Better Paste โน้ตแต่ละฉบับยกเว้นตัวเองได้ด้วยคุณสมบัติ "bp: false" หรือเลือกให้จัดระเบียบได้ด้วย "bp: true"',
-            autoCleanAliases: ['อัตโนมัติ', 'เปิด', 'ปิด', 'โน้ต', 'ยกเว้น', 'คุณสมบัติ', 'frontmatter']
+                'ใช้กฎกับการวางทุกครั้ง เมื่อปิดไว้ กฎจะทำงานเฉพาะผ่านคำสั่งของ Better Paste โน้ตแต่ละฉบับยกเว้นตัวเองได้ด้วยคุณสมบัติ "{property}: false" หรือเลือกให้จัดระเบียบได้ด้วย "{property}: true"',
+            autoCleanAliases: ['อัตโนมัติ', 'เปิด', 'ปิด', 'โน้ต', 'ยกเว้น', 'คุณสมบัติ', 'frontmatter'],
+            notePropertyName: 'คุณสมบัติของโน้ต',
+            notePropertyDesc: 'คุณสมบัติที่เปิดหรือปิด Better Paste สำหรับโน้ตแต่ละฉบับ',
+            notePropertyAliases: ['โน้ต', 'คุณสมบัติ', 'frontmatter', 'ยกเว้น', 'ปิด', 'เปิด', 'bp']
         },
 
         images: {
@@ -98,15 +101,7 @@ export const STRINGS_TH: TranslationStrings = {
             customDesc: 'ใช้ {{name}} แทนชื่อต้นทาง และรูปแบบวันที่ของ Moment เช่น YYYY-MM-DD',
             customMomentLink: 'รูปแบบ Moment',
             customExample: 'ตัวอย่าง: {value}',
-            customAliases: ['ชื่อ', 'ชื่อไฟล์', 'วันที่', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: 'คุณสมบัติของโน้ต',
-            notePropertyDesc:
-                'คุณสมบัติที่เปิดหรือปิด Better Paste สำหรับโน้ตแต่ละฉบับ เมื่อเป็น "bp: false" โน้ตจะไม่ถูกแก้ไข และเมื่อเป็น "bp: true" โน้ตจะถูกจัดระเบียบแม้ว่า "จัดระเบียบทุกครั้งที่วาง" จะปิดอยู่ เว้นว่างไว้เพื่อไม่ใช้คุณสมบัตินี้',
-            notePropertyAliases: ['โน้ต', 'คุณสมบัติ', 'frontmatter', 'ยกเว้น', 'ปิด', 'เปิด', 'bp'],
+            customAliases: ['ชื่อ', 'ชื่อไฟล์', 'วันที่', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'คุณสมบัติความกว้างรูปภาพ',
             sizePropertyDesc:
                 'คุณสมบัติใน frontmatter ที่กำหนดความกว้างของรูปภาพที่วางลงในโน้ต เมื่อโน้ตมี "image-width: 400" รูปภาพที่วางจะกลายเป็น ![[photo.png|400]] เว้นว่างไว้เพื่อไม่ใส่ความกว้าง',
@@ -188,7 +183,7 @@ export const STRINGS_TH: TranslationStrings = {
         intro: [
             'คัดลอกรูปภาพจาก Safari ลงห้องนิรภัยได้โดยตรง วางลิงก์โดยไม่มีพารามิเตอร์ติดตาม ต่อบรรทัดที่ถูกตัดในผลลัพธ์เทอร์มินัล และทำความสะอาดข้อความจาก AI แค่วาง ที่เหลือ Better Paste จัดการให้',
             'เคล็ดลับก่อนเริ่ม: ตั้งค่า **วางโดยไม่ประมวลผล** เป็น `Cmd+Shift+V` (`Ctrl+Shift+V` บน Windows) เพื่อให้วางเนื้อหาในคลิปบอร์ดแบบเดิมได้ทุกเมื่อ',
-            'กฎแต่ละข้อมีสวิตช์ของตัวเองใน การตั้งค่า, Better Paste และคุณสมบัติ `bp: false` จะปิดปลั๊กอินสำหรับโน้ตนั้น'
+            'กฎแต่ละข้อมีสวิตช์ของตัวเองใน การตั้งค่า, Better Paste และคุณสมบัติ `{property}: false` จะปิดปลั๊กอินสำหรับโน้ตนั้น'
         ],
         startButton: 'เริ่มใช้งาน'
     },

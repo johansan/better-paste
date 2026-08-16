@@ -71,8 +71,11 @@ export const STRINGS_FA: TranslationStrings = {
         behavior: {
             autoCleanName: 'پاک‌سازی هر بار چسباندن',
             autoCleanDesc:
-                'قوانین را در هر چسباندن اعمال می‌کند. وقتی خاموش باشد، قوانین فقط از طریق دستورهای Better Paste اجرا می‌شوند. یک یادداشت می‌تواند با ویژگی "bp: false" خود را کنار بگذارد، یا با "bp: true" پاک‌سازی را برای خودش روشن کند.',
-            autoCleanAliases: ['خودکار', 'فعال', 'غیرفعال', 'یادداشت', 'استثنا', 'ویژگی', 'frontmatter']
+                'قوانین را در هر چسباندن اعمال می‌کند. وقتی خاموش باشد، قوانین فقط از طریق دستورهای Better Paste اجرا می‌شوند. یک یادداشت می‌تواند با ویژگی "{property}: false" خود را کنار بگذارد، یا با "{property}: true" پاک‌سازی را برای خودش روشن کند.',
+            autoCleanAliases: ['خودکار', 'فعال', 'غیرفعال', 'یادداشت', 'استثنا', 'ویژگی', 'frontmatter'],
+            notePropertyName: 'ویژگی یادداشت',
+            notePropertyDesc: 'ویژگی‌ای که Better Paste را برای یک یادداشت روشن یا خاموش می‌کند.',
+            notePropertyAliases: ['یادداشت', 'ویژگی', 'frontmatter', 'استثنا', 'غیرفعال', 'فعال', 'bp']
         },
 
         images: {
@@ -103,15 +106,7 @@ export const STRINGS_FA: TranslationStrings = {
             customDesc: 'از {{name}} برای نام منبع و از قالب‌های تاریخ Moment مانند YYYY-MM-DD استفاده کنید.',
             customMomentLink: 'قالب Moment',
             customExample: 'نمونه: {value}',
-            customAliases: ['نام', 'پرونده', 'تاریخ', 'moment', 'YYYY', '{{name}}']
-        },
-
-        frontmatter: {
-            heading: 'Frontmatter',
-            notePropertyName: 'ویژگی یادداشت',
-            notePropertyDesc:
-                'ویژگی‌ای که Better Paste را برای یک یادداشت روشن یا خاموش می‌کند. با "bp: false" یادداشت دست‌نخورده می‌ماند و با "bp: true" حتی وقتی «پاک‌سازی هر بار چسباندن» خاموش باشد، یادداشت پاک‌سازی می‌شود. برای نادیده گرفتن این ویژگی، خالی بگذارید.',
-            notePropertyAliases: ['یادداشت', 'ویژگی', 'frontmatter', 'استثنا', 'غیرفعال', 'فعال', 'bp'],
+            customAliases: ['نام', 'پرونده', 'تاریخ', 'moment', 'YYYY', '{{name}}'],
             sizePropertyName: 'ویژگی عرض تصویر',
             sizePropertyDesc:
                 'ویژگی frontmatter که عرض تصاویر چسبانده‌شده در یک یادداشت را تعیین می‌کند. با "image-width: 400" در یادداشت، تصویر چسبانده‌شده به ![[photo.png|400]] تبدیل می‌شود. برای نیفزودن عرض، خالی بگذارید.',
@@ -184,7 +179,7 @@ export const STRINGS_FA: TranslationStrings = {
         intro: [
             'تصاویر را از Safari مستقیم در گاوصندوق ذخیره کنید، پیوندها را بدون پارامترهای ردیابی بچسبانید، خط‌های شکسته خروجی پایانه را درست کنید و متن هوش مصنوعی را تمیز کنید. فقط بچسبانید، بقیه را Better Paste انجام می‌دهد.',
             'یک نکته پیش از شروع: فرمان **چسباندن بدون پردازش** را به `Cmd+Shift+V` (در Windows به `Ctrl+Shift+V`) اختصاص دهید تا همیشه بتوانید محتوای حافظه موقت را همان‌طور که هست بچسبانید.',
-            'هر قانون کلید جداگانه‌ای در تنظیمات، Better Paste دارد و ویژگی `bp: false` افزونه را برای همان یادداشت خاموش می‌کند.'
+            'هر قانون کلید جداگانه‌ای در تنظیمات، Better Paste دارد و ویژگی `{property}: false` افزونه را برای همان یادداشت خاموش می‌کند.'
         ],
         startButton: 'شروع کنید'
     },
