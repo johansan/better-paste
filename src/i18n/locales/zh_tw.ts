@@ -179,6 +179,16 @@ export const STRINGS_ZH_TW: TranslationStrings = {
         startButton: '開始使用'
     },
 
+    overlap: {
+        title: 'Better Paste：功能重複的外掛',
+        thanks: '感謝安裝並使用 Better Paste！',
+        intro: {
+            other: '你目前安裝了 {count} 個功能大致相同的外掛。請停用或移除以下外掛：'
+        },
+        outro: '可在 設定 > 第三方外掛程式 中停用。',
+        button: '知道了'
+    },
+
     whatsNew: {
         title: 'Better Paste 的新功能',
         scrollLabel: '發行說明',

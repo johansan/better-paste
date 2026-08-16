@@ -193,6 +193,17 @@ export const STRINGS_TR: TranslationStrings = {
         startButton: 'Başla'
     },
 
+    overlap: {
+        title: 'Better Paste: çakışan eklentiler',
+        thanks: 'Better Paste’i kurup kullandığınız için teşekkürler!',
+        intro: {
+            one: 'Şu anda aşağı yukarı aynı işi yapan {count} eklentiniz kurulu, bu yüzden aşağıdakileri devre dışı bırakın veya kaldırın:',
+            other: 'Şu anda aşağı yukarı aynı işi yapan {count} eklentiniz kurulu, bu yüzden aşağıdakileri devre dışı bırakın veya kaldırın:'
+        },
+        outro: 'Ayarlar > Topluluk eklentileri bölümünden devre dışı bırakabilirsiniz.',
+        button: 'Anladım'
+    },
+
     whatsNew: {
         title: 'Better Paste’te yenilikler',
         scrollLabel: 'Sürüm notları',

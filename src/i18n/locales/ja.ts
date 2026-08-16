@@ -190,6 +190,16 @@ export const STRINGS_JA: TranslationStrings = {
         startButton: 'はじめる'
     },
 
+    overlap: {
+        title: 'Better Paste: 機能が重複するプラグイン',
+        thanks: 'Better Paste をインストールしてお使いいただき、ありがとうございます！',
+        intro: {
+            other: '現在、ほぼ同じ機能のプラグインが {count} 個インストールされています。次のプラグインを無効化するか、アンインストールしてください：'
+        },
+        outro: '設定 > コミュニティプラグインで無効化できます。',
+        button: 'わかりました'
+    },
+
     whatsNew: {
         title: 'Better Paste の新機能',
         scrollLabel: 'リリースノート',

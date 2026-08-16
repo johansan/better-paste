@@ -179,6 +179,16 @@ export const STRINGS_ZH_CN: TranslationStrings = {
         startButton: '开始使用'
     },
 
+    overlap: {
+        title: 'Better Paste：功能重复的插件',
+        thanks: '感谢安装并使用 Better Paste！',
+        intro: {
+            other: '你目前安装了 {count} 个功能大致相同的插件。请禁用或卸载以下插件：'
+        },
+        outro: '可在 设置 > 第三方插件 中禁用。',
+        button: '知道了'
+    },
+
     whatsNew: {
         title: 'Better Paste 的新功能',
         scrollLabel: '发行说明',

@@ -51,6 +51,13 @@ export interface ReleaseNote {
 /** Newest first. A new release goes at the top. */
 const RELEASE_NOTES: ReleaseNote[] = [
     {
+        version: '1.0.4',
+        date: '2026-08-16',
+        new: [
+            'Better Paste now tells you when Paste URL into selection or Auto Link Title is still enabled. It covers what they do, so you can remove them.'
+        ]
+    },
+    {
         version: '1.0.3',
         date: '2026-08-16',
         new: [

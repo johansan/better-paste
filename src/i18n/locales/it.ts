@@ -184,6 +184,17 @@ export const STRINGS_IT: TranslationStrings = {
         startButton: 'Inizia'
     },
 
+    overlap: {
+        title: 'Better Paste: plugin che si sovrappongono',
+        thanks: 'Grazie per aver installato Better Paste!',
+        intro: {
+            one: 'Al momento hai {count} plugin installato che fa più o meno la stessa cosa, quindi disattiva o disinstalla:',
+            other: 'Al momento hai {count} plugin installati che fanno più o meno la stessa cosa, quindi disattiva o disinstalla:'
+        },
+        outro: 'Si disattivano in Impostazioni > Plugin di terze parti.',
+        button: 'Capito'
+    },
+
     whatsNew: {
         title: 'Novità di Better Paste',
         scrollLabel: 'Note di rilascio',

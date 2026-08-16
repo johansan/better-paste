@@ -1,0 +1,64 @@
+/*
+ * Better Paste - Plugin for Obsidian
+ * Copyright (c) 2026 Johan Sanneblad
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+import { Modal } from 'obsidian';
+import type { App } from 'obsidian';
+import { plural, strings } from '../i18n';
+import type { OverlappingPlugin } from '../pluginOverlap';
+
+/** Shown on startup while a plugin Better Paste replaces is still enabled. */
+export class PluginOverlapModal extends Modal {
+    private readonly overlaps: readonly OverlappingPlugin[];
+    private button: HTMLButtonElement | null = null;
+
+    constructor(app: App, overlaps: readonly OverlappingPlugin[]) {
+        super(app);
+        this.overlaps = overlaps;
+    }
+
+    onOpen(): void {
+        this.modalEl.addClass('better-paste-modal');
+        this.titleEl.setText(strings.overlap.title);
+
+        const body = this.contentEl.createDiv({ cls: 'better-paste-welcome-body' });
+        body.createEl('p', { text: strings.overlap.thanks });
+        // The count includes Better Paste itself, because it is one of the plugins
+        // doing the same thing. The list below names only the ones to remove.
+        body.createEl('p', { text: plural(strings.overlap.intro, this.overlaps.length + 1) });
+        const list = body.createEl('ul');
+        for (const plugin of this.overlaps) list.createEl('li', { text: plugin.name });
+        body.createEl('p', { text: strings.overlap.outro });
+
+        const buttons = this.contentEl.createDiv({ cls: 'better-paste-modal-buttons' });
+        this.button = buttons.createEl('button', { cls: 'mod-cta', text: strings.overlap.button, attr: { type: 'button' } });
+        this.button.addEventListener('click', () => {
+            this.close();
+        });
+    }
+
+    open(): void {
+        super.open();
+        window.requestAnimationFrame(() => this.button?.focus({ preventScroll: true }));
+    }
+
+    onClose(): void {
+        this.contentEl.empty();
+        this.modalEl.removeClass('better-paste-modal');
+        this.button = null;
+    }
+}

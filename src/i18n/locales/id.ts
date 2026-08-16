@@ -190,6 +190,16 @@ export const STRINGS_ID: TranslationStrings = {
         startButton: 'Mulai'
     },
 
+    overlap: {
+        title: 'Better Paste: plugin yang tumpang tindih',
+        thanks: 'Terima kasih telah memasang dan menggunakan Better Paste!',
+        intro: {
+            other: 'Saat ini ada {count} plugin terpasang yang fungsinya kurang lebih sama, jadi nonaktifkan atau hapus plugin berikut:'
+        },
+        outro: 'Nonaktifkan di Pengaturan > Plugin komunitas.',
+        button: 'Mengerti'
+    },
+
     whatsNew: {
         title: 'Yang baru di Better Paste',
         scrollLabel: 'Catatan rilis',

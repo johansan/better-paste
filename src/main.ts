@@ -25,6 +25,8 @@ import { ImageEmbedModal } from './modals/ImageEmbedModal';
 import type { ImageEmbedChoice } from './modals/ImageEmbedModal';
 import { WelcomeModal } from './modals/WelcomeModal';
 import { WhatsNewModal } from './modals/WhatsNewModal';
+import { PluginOverlapModal } from './modals/PluginOverlapModal';
+import { findOverlappingPlugins } from './pluginOverlap';
 import { BetterPasteSettingTab } from './settings/SettingTab';
 import { format, strings } from './i18n';
 import { logError } from './utils/logger';
@@ -54,6 +56,7 @@ export default class BetterPastePlugin extends Plugin {
     /** The image options dialog while it is open, closed on unload so it cannot outlive the plugin. */
     private imageModal: ImageEmbedModal | null = null;
     private startupModal: WelcomeModal | WhatsNewModal | null = null;
+    private overlapModal: PluginOverlapModal | null = null;
     /** Set on unload, so deferred callbacks and dialog closes stop touching the plugin. */
     private unloaded = false;
 
@@ -142,6 +145,7 @@ export default class BetterPastePlugin extends Plugin {
         this.app.workspace.onLayoutReady(() => {
             if (this.unloaded) return;
             this.showStartupDialog().catch(error => logError('Could not show the startup dialog', error));
+            this.showOverlapWarning();
         });
     }
 
@@ -149,9 +153,21 @@ export default class BetterPastePlugin extends Plugin {
         this.unloaded = true;
         this.imageModal?.close();
         this.startupModal?.close();
+        this.overlapModal?.close();
         // An image write may still be in flight; this stops it editing a note that the
         // plugin no longer owns
         this.pasteService.dispose();
+    }
+
+    /**
+     * Warns while a plugin Better Paste replaces is still enabled. Shown on every start,
+     * because the overlap makes each paste run through two handlers until it is removed.
+     */
+    private showOverlapWarning(): void {
+        const overlaps = findOverlappingPlugins(this.app);
+        if (overlaps.length === 0) return;
+        this.overlapModal = new PluginOverlapModal(this.app, overlaps);
+        this.overlapModal.open();
     }
 
     /** Opens the image options dialog and remembers the picks for the next paste. */

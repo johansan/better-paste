@@ -194,6 +194,17 @@ export const STRINGS_ES: TranslationStrings = {
         startButton: 'Empezar'
     },
 
+    overlap: {
+        title: 'Better Paste: plugins que se solapan',
+        thanks: '¡Gracias por instalar y usar Better Paste!',
+        intro: {
+            one: 'Ahora mismo tienes {count} plugin instalado que hace más o menos lo mismo, así que desactiva o desinstala:',
+            other: 'Ahora mismo tienes {count} plugins instalados que hacen más o menos lo mismo, así que desactiva o desinstala:'
+        },
+        outro: 'Se desactivan en Ajustes > Complementos comunitarios.',
+        button: 'Entendido'
+    },
+
     whatsNew: {
         title: 'Novedades de Better Paste',
         scrollLabel: 'Notas de la versión',

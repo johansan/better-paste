@@ -188,6 +188,16 @@ export const STRINGS_TH: TranslationStrings = {
         startButton: 'เริ่มใช้งาน'
     },
 
+    overlap: {
+        title: 'Better Paste: ปลั๊กอินที่ทำงานซ้ำซ้อน',
+        thanks: 'ขอบคุณที่ติดตั้งและใช้งาน Better Paste!',
+        intro: {
+            other: 'ตอนนี้คุณมีปลั๊กอินที่ทำงานแทบเหมือนกันติดตั้งอยู่ {count} ตัว โปรดปิดใช้งานหรือถอนการติดตั้งปลั๊กอินต่อไปนี้:'
+        },
+        outro: 'ปิดใช้งานได้ที่ การตั้งค่า > ปลั๊กอินโดยชุมชน',
+        button: 'เข้าใจแล้ว'
+    },
+
     whatsNew: {
         title: 'มีอะไรใหม่ใน Better Paste',
         scrollLabel: 'หมายเหตุประจำรุ่น',
