@@ -53,7 +53,7 @@ const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.4',
         date: '2026-08-16',
-        new: ['Better Paste now warns you when Paste URL into selection or Auto Link Title are installed and enabled.']
+        new: ['Better Paste now warns you when the plugins **Paste URL into selection** or **Auto Link Title** are installed and enabled.']
     },
     {
         version: '1.0.3',
