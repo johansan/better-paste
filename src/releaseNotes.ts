@@ -51,6 +51,17 @@ export interface ReleaseNote {
 /** Newest first. A new release goes at the top. */
 const RELEASE_NOTES: ReleaseNote[] = [
     {
+        version: '1.0.5',
+        date: '2026-08-17',
+        new: [
+            'You can now add your own link removals, everywhere or per site, and turn off built-in ones. A live tester shows the result.',
+            'You can now send in your removals to help improve the built-in list.'
+        ],
+        changed: [
+            'Link cleaning now removes only known trackers and site clutter. Every built-in removal is verified and published, and unknown parameters stay in the link.'
+        ]
+    },
+    {
         version: '1.0.4',
         date: '2026-08-16',
         new: ['Better Paste now warns you when the plugins **Paste URL into selection** or **Auto Link Title** are installed and enabled.']
