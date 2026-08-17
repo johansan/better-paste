@@ -19,6 +19,7 @@
 import { requestUrl } from 'obsidian';
 import type { RequestUrlParam, RequestUrlResponse } from 'obsidian';
 import { extensionOfUrl } from './imageReferences';
+import { titleFromProviderResponse, titleProviderRequest } from './titleProviders';
 import { IMAGE_EXTENSIONS, LINK_TITLE_TIMEOUT_SECONDS } from '../settings/constants';
 
 /** Pages declaring more than this are skipped: no title is worth buffering them. */
@@ -129,26 +130,60 @@ export class LinkTitleService {
         return url !== null && !isObviousImageUrl(url);
     }
 
+    /**
+     * Asks a site's own title endpoint, because some sites answer it while blocking
+     * ordinary page loads. Every failure returns null so the page fetch still runs.
+     */
+    private async titleFromProvider(request: string, timeoutMs: number): Promise<string | null> {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        try {
+            const response = await Promise.race([
+                this.requestPage({ url: request, method: 'GET', throw: false }),
+                new Promise<null>(resolve => {
+                    timer = window.setTimeout(() => resolve(null), timeoutMs);
+                })
+            ]);
+            if (this.disposed || response === null) return null;
+            if (response.status < 200 || response.status >= 300) return null;
+            return titleFromProviderResponse(response.text);
+        } catch {
+            return null;
+        } finally {
+            if (timer !== undefined) window.clearTimeout(timer);
+        }
+    }
+
     /** Returns a titled Markdown link, or null so the already-pasted address stays unchanged. */
     async materializeTitle(text: string): Promise<string | null> {
         if (!this.hasWork(text)) return null;
         const url = standaloneWebUrl(text);
         if (url === null) return null;
 
-        const timeoutMs = LINK_TITLE_TIMEOUT_SECONDS * 1000;
+        // One deadline covers the provider, HEAD and GET legs together, so a stalled
+        // request cannot stretch the wait past the documented limit.
+        const deadline = Date.now() + LINK_TITLE_TIMEOUT_SECONDS * 1000;
+        const remainingMs = (): number => deadline - Date.now();
         let timer: ReturnType<typeof setTimeout> | undefined;
 
         try {
+            const providerRequest = titleProviderRequest(new URL(url));
+            if (providerRequest !== null) {
+                const provided = await this.titleFromProvider(providerRequest, remainingMs());
+                if (this.disposed) return null;
+                if (provided !== null) return `[${escapeLinkTitle(provided)}](${escapeLinkDestination(url)})`;
+            }
+
             // requestUrl buffers the whole response and cannot stream or abort, so a page
             // that declares an oversized body is refused before any of it is downloaded.
             // A server that answers without a length is bounded only by the parse slice.
-            if ((await this.declaredLength(url, timeoutMs)) > MAX_PAGE_BYTES) return null;
-            if (this.disposed) return null;
+            if (remainingMs() <= 0) return null;
+            if ((await this.declaredLength(url, remainingMs())) > MAX_PAGE_BYTES) return null;
+            if (this.disposed || remainingMs() <= 0) return null;
 
             const response = await Promise.race([
                 this.requestPage({ url, method: 'GET', throw: false }),
                 new Promise<null>(resolve => {
-                    timer = window.setTimeout(() => resolve(null), timeoutMs);
+                    timer = window.setTimeout(() => resolve(null), remainingMs());
                 })
             ]);
 

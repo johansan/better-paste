@@ -55,6 +55,9 @@ const RELEASE_NOTES: ReleaseNote[] = [
         date: '2026-08-18',
         new: [
             'New command: ==Clean up PDF text== for the current selection. When you run it you get a dialog with a **text preview** where you can toggle removing page numbers and joining everything into one paragraph.'
+        ],
+        fixed: [
+            "Fixed so titles work for Reddit, YouTube, TikTok and Loom 🎉! These sites block normal page lookups, so the title is now fetched from each site's own embed service."
         ]
     },
     {

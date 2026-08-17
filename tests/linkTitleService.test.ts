@@ -94,6 +94,95 @@ describe('LinkTitleService', () => {
         expect(service.hasWork('https://example.com/page')).toBe(false);
     });
 
+    it('takes the title from a site provider before fetching the page', async () => {
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
+        const requests: string[] = [];
+        const service = new LinkTitleService(
+            () => settings,
+            async request => {
+                requests.push(typeof request === 'string' ? request : request.url);
+                return response({
+                    headers: { 'content-type': 'application/json' },
+                    text: '{"title":"A video"}'
+                });
+            },
+            () => null
+        );
+
+        const pasted = 'https://www.youtube.com/watch?v=m2maDNtho7Y';
+        expect(await service.materializeTitle(pasted)).toBe(`[A video](${pasted})`);
+        expect(requests).toEqual([`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(pasted)}`]);
+    });
+
+    it('falls back to the page fetch when the provider fails', async () => {
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
+        const service = new LinkTitleService(
+            () => settings,
+            async request => {
+                const url = typeof request === 'string' ? request : request.url;
+                if (url.includes('/oembed')) return response({ status: 404, text: '' });
+                return response({ text: '<title>A channel</title>' });
+            },
+            html => (/A channel/.test(html) ? 'A channel' : null)
+        );
+
+        expect(await service.materializeTitle('https://www.youtube.com/@SomeChannel')).toBe(
+            '[A channel](https://www.youtube.com/@SomeChannel)'
+        );
+    });
+
+    it('falls back to the page fetch when the provider answer has no title', async () => {
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
+        const service = new LinkTitleService(
+            () => settings,
+            async request => {
+                const url = typeof request === 'string' ? request : request.url;
+                if (url.includes('/oembed')) return response({ text: '{"html":"<blockquote></blockquote>"}' });
+                return response({ text: '<title>A page</title>' });
+            },
+            html => (/A page/.test(html) ? 'A page' : null)
+        );
+
+        expect(await service.materializeTitle('https://www.youtube.com/watch?v=abc')).toBe('[A page](https://www.youtube.com/watch?v=abc)');
+    });
+
+    it('escapes Markdown in a provider title', async () => {
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
+        const service = new LinkTitleService(
+            () => settings,
+            async () => response({ text: '{"title":"A [page] with *markup*"}' }),
+            () => null
+        );
+
+        expect(await service.materializeTitle('https://www.youtube.com/watch?v=abc')).toBe(
+            '[A \\[page\\] with \\*markup\\*](https://www.youtube.com/watch?v=abc)'
+        );
+    });
+
+    it('discards a provider response that arrives after disposal', async () => {
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
+        const requests: string[] = [];
+        let finishRequest: (value: RequestUrlResponse) => void = () => undefined;
+        const pending = new Promise<RequestUrlResponse>(resolve => {
+            finishRequest = resolve;
+        });
+        const service = new LinkTitleService(
+            () => settings,
+            request => {
+                requests.push(typeof request === 'string' ? request : request.url);
+                return pending;
+            },
+            () => 'A page'
+        );
+
+        const title = service.materializeTitle('https://www.youtube.com/watch?v=abc');
+        service.dispose();
+        finishRequest(response({ text: '{"title":"A video"}' }));
+
+        expect(await title).toBeNull();
+        expect(requests).toHaveLength(1);
+    });
+
     it('discards a response that arrives after disposal', async () => {
         const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
         let finishRequest: (value: RequestUrlResponse) => void = () => undefined;
