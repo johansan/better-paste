@@ -141,7 +141,7 @@ export const STRINGS_JA: TranslationStrings = {
             listAliases: ['ドメイン', 'パラメーター', 'フィルター', '削除', 'youtube'],
             listInvalid: '無効な削除ルール: {values}',
             suggestName: '削除ルールを提案する',
-            suggestDesc: 'betterpaste.md でリストを確認し、送信して、組み込みの削除ルールの改善にご協力ください。',
+            suggestDesc: '削除するパラメーターを提案して、組み込みの削除ルールの改善にご協力ください。',
             suggestAliases: ['貢献', '提出', 'シェア', '送信', 'フィルター'],
             suggestButton: '確認して送信',
             testerName: '試す',

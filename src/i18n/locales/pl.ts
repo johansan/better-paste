@@ -142,8 +142,7 @@ export const STRINGS_PL: TranslationStrings = {
             listAliases: ['domena', 'parametr', 'filtr', 'usuń', 'youtube'],
             listInvalid: 'Nieprawidłowa reguła usuwania: {values}',
             suggestName: 'Zaproponuj swoje reguły usuwania',
-            suggestDesc:
-                'Przejrzyj swoją listę na stronie betterpaste.md, a następnie prześlij ją, aby pomóc ulepszyć wbudowane reguły usuwania.',
+            suggestDesc: 'Pomóż ulepszyć wbudowane reguły usuwania, zgłaszając parametry do usunięcia.',
             suggestAliases: ['wesprzyj projekt', 'prześlij', 'udostępnij', 'wyślij', 'filtr'],
             suggestButton: 'Sprawdź i wyślij',
             testerName: 'Wypróbuj',

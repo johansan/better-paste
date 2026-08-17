@@ -145,8 +145,7 @@ export const STRINGS_NL: TranslationStrings = {
             listAliases: ['domein', 'parameter', 'filter', 'verwijderen', 'youtube'],
             listInvalid: 'Ongeldige verwijderingsregel: {values}',
             suggestName: 'Stel je verwijderingen voor',
-            suggestDesc:
-                'Bekijk je lijst op betterpaste.md en stuur deze vervolgens in om de ingebouwde verwijderingen te helpen verbeteren.',
+            suggestDesc: 'Help de ingebouwde verwijderingen te verbeteren door parameters aan te dragen die verwijderd moeten worden.',
             suggestAliases: ['bijdragen', 'indienen', 'delen', 'verzenden', 'filter'],
             suggestButton: 'Controleer en verstuur',
             testerName: 'Probeer het',

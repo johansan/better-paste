@@ -40,6 +40,15 @@ function entriesUnder(markdown, heading) {
     return entries;
 }
 
+// The lists are reference documentation, so entries stay findable by name
+function requireAlphabetical(entries, label) {
+    for (let i = 1; i < entries.length; i++) {
+        if (entries[i - 1].toLowerCase() > entries[i].toLowerCase()) {
+            throw new Error(`Not alphabetical: "${entries[i]}" belongs before "${entries[i - 1]}" (${label})`);
+        }
+    }
+}
+
 function rejectDuplicates(entries, label) {
     const seen = new Set();
     for (const entry of entries) {
@@ -113,6 +122,8 @@ const siteRemovals = entriesUnder(markdown, 'Extra parameters removed on specifi
 validateParamSets(signedUrlParamSets, 'signed URL parameter set');
 validateTrackingParams(trackingParams);
 validateSiteRemovals(siteRemovals);
+requireAlphabetical(trackingParams, 'tracking parameter');
+requireAlphabetical(siteRemovals, 'site removal');
 
 const generated = `/*
  * Better Paste - Plugin for Obsidian

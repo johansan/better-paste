@@ -135,7 +135,7 @@ export const STRINGS_FA: TranslationStrings = {
             listAliases: ['دامنه', 'پارامتر', 'فیلتر', 'حذف', 'youtube'],
             listInvalid: 'قانون حذف نامعتبر: {values}',
             suggestName: 'حذف‌های خود را پیشنهاد دهید',
-            suggestDesc: 'فهرست خود را در betterpaste.md مرور کنید، سپس آن را برای کمک به بهبود حذف‌های داخلی ارسال کنید.',
+            suggestDesc: 'با ارسال پارامترهایی برای حذف، به بهبود حذف‌های داخلی کمک کنید.',
             suggestAliases: ['مشارکت', 'ثبت', 'اشتراک‌گذاری', 'ارسال', 'فیلتر'],
             suggestButton: 'بازبینی و ارسال',
             testerName: 'امتحان کنید',

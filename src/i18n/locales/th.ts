@@ -130,7 +130,7 @@ export const STRINGS_TH: TranslationStrings = {
             listAliases: ['โดเมน', 'พารามิเตอร์', 'ฟิลเตอร์', 'ลบ', 'youtube'],
             listInvalid: 'กฎการลบที่ไม่ถูกต้อง: {values}',
             suggestName: 'เสนอรายการลบของคุณ',
-            suggestDesc: 'ตรวจสอบรายการของคุณบน betterpaste.md แล้วส่งมาเพื่อช่วยปรับปรุงการลบที่มาพร้อมปลั๊กอิน',
+            suggestDesc: 'ช่วยปรับปรุงการลบที่มาพร้อมปลั๊กอินโดยเสนอพารามิเตอร์ที่ควรลบ',
             suggestAliases: ['ร่วมสร้าง', 'เสนอ', 'แชร์', 'ส่ง', 'ฟิลเตอร์'],
             suggestButton: 'ตรวจสอบและส่ง',
             testerName: 'ลองดู',

@@ -159,7 +159,7 @@ export const STRINGS_EN = {
             listAliases: ['domain', 'parameter', 'filter', 'remove', 'youtube'],
             listInvalid: 'Invalid removal rule: {values}',
             suggestName: 'Suggest your removals',
-            suggestDesc: 'Review your list on betterpaste.md, then send it to help improve the built-in removals.',
+            suggestDesc: 'Help improve the built-in removals by contributing parameters to remove.',
             suggestAliases: ['contribute', 'submit', 'share', 'send', 'filter'],
             suggestButton: 'Review and send',
             testerName: 'Try it',

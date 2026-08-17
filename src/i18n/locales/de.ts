@@ -144,8 +144,7 @@ export const STRINGS_DE: TranslationStrings = {
             listAliases: ['domain', 'parameter', 'filter', 'entfernen', 'youtube'],
             listInvalid: 'Ungültige Entfernungsregel: {values}',
             suggestName: 'Schlage deine Entfernungen vor',
-            suggestDesc:
-                'Überprüfe deine Liste auf betterpaste.md und sende sie anschließend ein, um die integrierten Entfernungen zu verbessern.',
+            suggestDesc: 'Hilf mit, die integrierten Entfernungen zu verbessern, indem du zu entfernende Parameter beisteuerst.',
             suggestAliases: ['mitwirken', 'einsenden', 'teilen', 'senden', 'filter'],
             suggestButton: 'Überprüfen und senden',
             testerName: 'Ausprobieren',

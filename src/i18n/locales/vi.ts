@@ -142,7 +142,7 @@ export const STRINGS_VI: TranslationStrings = {
             listAliases: ['tên miền', 'tham số', 'lọc', 'loại bỏ', 'youtube'],
             listInvalid: 'Quy tắc loại bỏ không hợp lệ: {values}',
             suggestName: 'Đề xuất các mục loại bỏ của bạn',
-            suggestDesc: 'Hãy xem lại danh sách của bạn trên betterpaste.md, sau đó gửi nó để giúp cải thiện các mục loại bỏ tích hợp sẵn.',
+            suggestDesc: 'Giúp cải thiện các mục loại bỏ tích hợp sẵn bằng cách đóng góp các tham số cần loại bỏ.',
             suggestAliases: ['đóng góp', 'nộp', 'chia sẻ', 'gửi', 'lọc'],
             suggestButton: 'Kiểm tra và gửi',
             testerName: 'Thử xem',

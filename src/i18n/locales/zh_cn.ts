@@ -129,7 +129,7 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             listAliases: ['域名', '参数', '过滤器', '删除', 'youtube'],
             listInvalid: '无效的移除规则：{values}',
             suggestName: '提交你的移除规则',
-            suggestDesc: '在 betterpaste.md 上查看你的列表，然后发送给我们，帮助改进内置移除规则。',
+            suggestDesc: '提交要移除的参数，帮助改进内置移除规则。',
             suggestAliases: ['贡献', '提交', '分享', '发送', '过滤器'],
             suggestButton: '查看并发送',
             testerName: '试一试',

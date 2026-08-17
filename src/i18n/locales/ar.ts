@@ -144,7 +144,7 @@ export const STRINGS_AR: TranslationStrings = {
             listAliases: ['domain', 'معاملات', 'تصفية', 'إزالة', 'youtube'],
             listInvalid: 'قاعدة إزالة غير صالحة: {values}',
             suggestName: 'اقترح ما تريد إزالته',
-            suggestDesc: 'راجع قائمتك على betterpaste.md، ثم أرسلها للمساعدة في تحسين عمليات الإزالة المدمجة.',
+            suggestDesc: 'ساهم بمعاملات تريد إزالتها للمساعدة في تحسين عمليات الإزالة المدمجة.',
             suggestAliases: ['ساهم', 'تقديم', 'مشاركة', 'إرسال', 'تصفية'],
             suggestButton: 'مراجعة وإرسال',
             testerName: 'جرّبها',

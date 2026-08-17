@@ -135,8 +135,7 @@ export const STRINGS_TR: TranslationStrings = {
             listAliases: ['alan adı', 'parametre', 'filtre', 'kaldır', 'youtube'],
             listInvalid: 'Geçersiz kaldırma kuralı: {values}',
             suggestName: 'Kaldırma önerilerinizi gönderin',
-            suggestDesc:
-                'betterpaste.md adresindeki listenizi gözden geçirin, ardından yerleşik kaldırma kurallarının iyileştirilmesine yardımcı olmak için gönderin.',
+            suggestDesc: 'Kaldırılacak parametreler önererek yerleşik kaldırma kurallarının iyileştirilmesine yardımcı olun.',
             suggestAliases: ['katkıda bulunun', 'gönder', 'paylaş', 'öner', 'filtre'],
             suggestButton: 'İncele ve gönder',
             testerName: 'Deneyin',

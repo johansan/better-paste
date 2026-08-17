@@ -135,7 +135,7 @@ export const STRINGS_IT: TranslationStrings = {
             listAliases: ['dominio', 'parametro', 'filtro', 'rimuovi', 'youtube'],
             listInvalid: 'Regola di rimozione non valida: {values}',
             suggestName: 'Suggerisci le tue rimozioni',
-            suggestDesc: 'Controlla il tuo elenco su betterpaste.md, quindi invialo per contribuire a migliorare le rimozioni integrate.',
+            suggestDesc: 'Aiuta a migliorare le rimozioni integrate suggerendo parametri da rimuovere.',
             suggestAliases: ['contribuisci', 'invia', 'condividi', 'manda', 'filtro'],
             suggestButton: 'Controlla e invia',
             testerName: 'Provalo',

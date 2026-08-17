@@ -131,7 +131,7 @@ export const STRINGS_KO: TranslationStrings = {
             listAliases: ['도메인', '매개변수', '필터', '제거', 'youtube'],
             listInvalid: '잘못된 제거 규칙: {values}',
             suggestName: '제거 규칙 제안하기',
-            suggestDesc: 'betterpaste.md에서 목록을 검토한 후, 이를 제출하여 내장 제거 규칙을 개선하는 데 기여해 주세요.',
+            suggestDesc: '제거할 매개변수를 제안하여 내장 제거 규칙을 개선하는 데 기여해 주세요.',
             suggestAliases: ['기여하기', '제출', '공유', '보내기', '필터'],
             suggestButton: '검토 후 전송',
             testerName: '시험해 보기',

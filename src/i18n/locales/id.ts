@@ -132,7 +132,7 @@ export const STRINGS_ID: TranslationStrings = {
             listAliases: ['domain', 'parameter', 'filter', 'hapus', 'youtube'],
             listInvalid: 'Aturan penghapusan tidak valid: {values}',
             suggestName: 'Sarankan penghapusan',
-            suggestDesc: 'Tinjau daftar Anda di betterpaste.md, lalu kirimkan untuk membantu meningkatkan penghapusan bawaan.',
+            suggestDesc: 'Bantu tingkatkan penghapusan bawaan dengan menyumbangkan parameter yang perlu dihapus.',
             suggestAliases: ['berkontribusi', 'ajukan', 'bagikan', 'kirim', 'filter'],
             suggestButton: 'Tinjau dan kirim',
             testerName: 'Coba',

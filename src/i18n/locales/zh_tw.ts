@@ -129,7 +129,7 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             listAliases: ['網域', '參數', '篩選', '移除', 'youtube'],
             listInvalid: '無效的移除規則：{values}',
             suggestName: '提交你的移除規則',
-            suggestDesc: '在 betterpaste.md 上檢視你的清單，然後傳送給我們，以協助改善內建移除規則。',
+            suggestDesc: '提交要移除的參數，協助改善內建移除規則。',
             suggestAliases: ['貢獻', '提交', '分享', '傳送', '篩選'],
             suggestButton: '檢視並傳送',
             testerName: '試試看',
