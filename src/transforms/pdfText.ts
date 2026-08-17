@@ -79,11 +79,13 @@ function classifyLines(text: string): ClassifiedLine[] {
     let math = false;
     for (const line of text.split('\n')) {
         const end = start + line.length;
+        // A math delimiter is a line holding only $$, the same rule the rejoin and the
+        // marker ranges use. A $$ inside prose, such as a shell's process id, is content.
+        const delimiter = line.trim() === '$$';
         // The strict lower bound keeps a blank line that merely touches a range's
         // endpoint, such as the one after a closing fence, out of the code block
-        const mathMarks = (line.match(/\$\$/g) ?? []).length;
-        const code = math || mathMarks > 0 || codeRanges.some(range => range.start <= start && range.end > start && range.end >= end);
-        if (mathMarks % 2 === 1) math = !math;
+        const code = math || delimiter || codeRanges.some(range => range.start <= start && range.end > start && range.end >= end);
+        if (delimiter) math = !math;
         lines.push({ text: line, code });
         start = end + 1;
     }

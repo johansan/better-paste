@@ -373,6 +373,14 @@ describe('cleanPdfText options', () => {
         expect(output.match(/- Not applicable/g)?.length).toBe(2);
     });
 
+    it('removes page numbers after a prose mention of $$', () => {
+        const input = ['the shell expands $$ to the process id.', '', '14', '', 'the next page continues with more text.'].join('\n');
+
+        expect(cleanPdfText(input, options({ removeFurniture: true })).text).toBe(
+            ['the shell expands $$ to the process id.', '', 'the next page continues with more text.'].join('\n')
+        );
+    });
+
     it('keeps block math and its delimiters', () => {
         const input = ['the derivation gives the following result', '', '$$', '2', '$$', '', 'which concludes the argument here.'].join(
             '\n'
