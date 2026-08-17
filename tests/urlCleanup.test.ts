@@ -774,11 +774,17 @@ describe('review regressions', () => {
 
     it('strips the newly added tracker families', () => {
         expect(
-            cleanUrl('https://example.com/a?gad_source=1&srsltid=Af&ttclid=x&mtm_campaign=c&hsa_cam=1&mibextid=Zx&_kx=k&id=7', options())
+            cleanUrl('https://example.com/a?gad_source=1&srsltid=Af&ttclid=x&mtm_campaign=c&hsa_cam=1&mibextid=Zx&id=7', options())
         ).toBe('https://example.com/a?id=7');
         expect(cleanUrl('https://learn.microsoft.com/x?WT.mc_id=twitter&view=net-8.0', options())).toBe(
             'https://learn.microsoft.com/x?view=net-8.0'
         );
+    });
+
+    it('leaves out trackers with documented functional collisions', () => {
+        // __s, _kx and elqTrackId are real trackers, catalogued under "Deliberately left out"
+        const url = 'https://example.com/a?__s=abcdef&_kx=k&elqTrackId=t&id=7';
+        expect(cleanUrl(url, options())).toBe(url);
     });
 
     it.each([
@@ -793,10 +799,7 @@ describe('review regressions', () => {
             'https://www.linkedin.com/jobs/search/?keywords=developer'
         ],
         ['https://x.com/example/status/1?s=20&ref_src=twsrc', 'https://x.com/example/status/1'],
-        [
-            'https://www.reddit.com/r/ObsidianMD/comments/abc/?context=3&share_source=link',
-            'https://www.reddit.com/r/ObsidianMD/comments/abc/?context=3'
-        ],
+        ['https://www.instagram.com/p/abc/?igsh=MXd0&img_index=2', 'https://www.instagram.com/p/abc/?img_index=2'],
         ['https://learn.microsoft.com/dotnet/?view=net-8.0&ocid=AID', 'https://learn.microsoft.com/dotnet/?view=net-8.0'],
         ['https://apps.apple.com/app/id1?l=en&itsct=apps_box&itscg=30200', 'https://apps.apple.com/app/id1?l=en'],
         ['https://open.spotify.com/track/abc?si=share123', 'https://open.spotify.com/track/abc'],

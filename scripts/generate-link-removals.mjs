@@ -32,21 +32,13 @@ function entriesUnder(markdown, heading) {
     const block = section.match(/```text\n([\s\S]*?)\n```/);
     if (!block) throw new Error(`Missing text block under: ${marker}`);
 
+    // "#" lines group entries by vendor, the same comment syntax the settings field accepts
     const entries = block[1]
         .split('\n')
         .map(line => line.trim())
-        .filter(Boolean);
+        .filter(line => line.length > 0 && !line.startsWith('#'));
     if (entries.length === 0) throw new Error(`Empty list under: ${marker}`);
     return entries;
-}
-
-// The lists are reference documentation, so entries stay findable by name
-function requireAlphabetical(entries, label) {
-    for (let i = 1; i < entries.length; i++) {
-        if (entries[i - 1].toLowerCase() > entries[i].toLowerCase()) {
-            throw new Error(`Not alphabetical: "${entries[i]}" belongs before "${entries[i - 1]}" (${label})`);
-        }
-    }
 }
 
 function rejectDuplicates(entries, label) {
@@ -122,8 +114,6 @@ const siteRemovals = entriesUnder(markdown, 'Extra parameters removed on specifi
 validateParamSets(signedUrlParamSets, 'signed URL parameter set');
 validateTrackingParams(trackingParams);
 validateSiteRemovals(siteRemovals);
-requireAlphabetical(trackingParams, 'tracking parameter');
-requireAlphabetical(siteRemovals, 'site removal');
 
 const generated = `/*
  * Better Paste - Plugin for Obsidian
