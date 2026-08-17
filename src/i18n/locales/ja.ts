@@ -25,6 +25,7 @@ export const STRINGS_JA: TranslationStrings = {
         pasteRaw: '処理せずに貼り付け',
         cleanSelection: '選択範囲を整える',
         cleanTerminal: 'ターミナル出力を整える',
+        cleanPdf: 'PDFのテキストを整える',
         commasInside: 'カンマを引用符の内側に移動',
         commasOutside: 'カンマを引用符の外側に移動',
         toggleCleanup: '自動整形を切り替え'
@@ -180,6 +181,14 @@ export const STRINGS_JA: TranslationStrings = {
         none: '何もしない',
         apply: '適用',
         cancel: 'キャンセル'
+    },
+
+    pdfModal: {
+        furniture: 'ページ番号を削除',
+        singleParagraph: 'すべてを1つの段落にまとめる',
+        description:
+            '折り返された行をつなぎ直し、ハイフンで分割された単語を修復し、合字を通常の文字に変換し、余分なスペースを取り除きます。',
+        preview: 'プレビュー'
     },
 
     welcome: {

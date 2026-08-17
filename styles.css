@@ -330,3 +330,37 @@
     margin: 0 0 var(--size-4-3);
     line-height: 1.5;
 }
+
+.better-paste-pdf-modal {
+    width: 46em;
+    max-width: 90vw;
+}
+
+.better-paste-pdf-description {
+    margin-bottom: var(--size-4-2);
+    font-size: var(--font-ui-smaller);
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.better-paste-pdf-preview-label {
+    margin-top: var(--size-4-4);
+    margin-bottom: var(--size-4-1);
+    font-size: var(--font-ui-smaller);
+    font-weight: var(--font-semibold);
+    color: var(--text-muted);
+}
+
+.better-paste-pdf-preview {
+    max-height: 16em;
+    overflow: auto;
+    padding: var(--size-4-2);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-s);
+    background-color: var(--background-secondary);
+    font-size: var(--font-ui-smaller);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    user-select: text;
+}

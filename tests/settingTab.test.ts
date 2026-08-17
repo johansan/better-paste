@@ -37,7 +37,7 @@ import { BUILT_IN_LINK_REMOVALS_URL } from '../src/urls';
  * Settings the tab deliberately has no row for, because they are state the plugin keeps
  * rather than a choice the user makes.
  */
-const STORED_STATE_KEYS = ['lastShownVersion', 'imageLastSize', 'imageLastClass'];
+const STORED_STATE_KEYS = ['lastShownVersion', 'imageLastSize', 'imageLastClass', 'pdfLastFurniture', 'pdfLastSingleParagraph'];
 
 /** Settings owned by a custom-rendered row rather than a declarative control. */
 const CUSTOM_RENDER_SETTING_KEYS = ['imageNameTemplate', 'imageSizeChoice', 'imageSizeOptions', 'imageClassChoice', 'imageClassOptions'];

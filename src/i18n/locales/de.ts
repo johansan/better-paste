@@ -25,6 +25,7 @@ export const STRINGS_DE: TranslationStrings = {
         pasteRaw: 'Ohne Verarbeitung einfügen',
         cleanSelection: 'Auswahl bereinigen',
         cleanTerminal: 'Terminalausgabe bereinigen',
+        cleanPdf: 'PDF-Text bereinigen',
         commasInside: 'Kommas innerhalb der Anführungszeichen setzen',
         commasOutside: 'Kommas außerhalb der Anführungszeichen setzen',
         toggleCleanup: 'Automatische Bereinigung umschalten'
@@ -201,6 +202,14 @@ export const STRINGS_DE: TranslationStrings = {
         none: 'Nichts tun',
         apply: 'Anwenden',
         cancel: 'Abbrechen'
+    },
+
+    pdfModal: {
+        furniture: 'Seitenzahlen entfernen',
+        singleParagraph: 'Alles zu einem Absatz verbinden',
+        description:
+            'Umbrochene Zeilen werden wieder verbunden, getrennte Wörter repariert, Ligaturen in einfache Buchstaben umgewandelt und überflüssige Leerzeichen entfernt.',
+        preview: 'Vorschau'
     },
 
     welcome: {

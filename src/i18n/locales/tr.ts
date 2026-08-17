@@ -25,6 +25,7 @@ export const STRINGS_TR: TranslationStrings = {
         pasteRaw: 'İşlemeden yapıştır',
         cleanSelection: 'Seçimi temizle',
         cleanTerminal: 'Terminal çıktısını temizle',
+        cleanPdf: 'PDF metnini temizle',
         commasInside: 'Virgülleri tırnak içine taşı',
         commasOutside: 'Virgülleri tırnak dışına taşı',
         toggleCleanup: 'Otomatik temizlemeyi aç veya kapat'
@@ -183,6 +184,14 @@ export const STRINGS_TR: TranslationStrings = {
         none: 'Hiçbir şey yapma',
         apply: 'Uygula',
         cancel: 'İptal'
+    },
+
+    pdfModal: {
+        furniture: 'Sayfa numaralarını kaldır',
+        singleParagraph: 'Tümünü tek paragrafta birleştir',
+        description:
+            'Bölünmüş satırlar birleştirilir, tire ile bölünen sözcükler onarılır, ligatürler düz harflere çevrilir ve fazla boşluklar kaldırılır.',
+        preview: 'Önizleme'
     },
 
     welcome: {

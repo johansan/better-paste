@@ -65,6 +65,12 @@ export const LIST_MARKERS: readonly string[] = ['•', '‣', '▪', '▫', '▸
 export const MIN_WRAP_WIDTH = 60;
 
 /**
+ * The same floor for text copied out of a PDF. A two-column layout wraps prose around
+ * 45 characters, so the terminal floor would block every rejoin.
+ */
+export const PDF_MIN_WRAP_WIDTH = 35;
+
+/**
  * How far below the longest line still counts as a full line when inferring the wrap column.
  *
  * A terminal breaks a line when the next word will not fit, so a wrapped line falls short

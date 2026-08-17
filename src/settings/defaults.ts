@@ -31,6 +31,8 @@ export const DEFAULT_SETTINGS: BetterPasteSettings = {
     imageClassChoice: '',
     imageLastSize: '',
     imageLastClass: '',
+    pdfLastFurniture: true,
+    pdfLastSingleParagraph: false,
     imageNameTemplate: DEFAULT_IMAGE_NAME_TEMPLATE,
 
     noteProperty: 'bp',

@@ -23,6 +23,8 @@ import { frontmatterRanges, normalizeInvisibleCharacters, straightenDashes, stra
 import { applyCommaPlacement } from '../transforms/textProcessing';
 import type { TextCommaPlacement } from '../transforms/textProcessing';
 import { cleanTerminalText } from '../transforms/terminalText';
+import { cleanPdfText } from '../transforms/pdfText';
+import type { PdfCleanupOptions } from '../transforms/pdfText';
 import { buildUrlCleanupOptions, cleanUrlsInText, httpUrlRanges } from '../transforms/urlCleanup';
 import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './imageReferences';
 import { parseCommaList } from '../settings/normalize';
@@ -112,6 +114,9 @@ export function isPreformattedHtml(html: string): boolean {
 /** Asks the user which size and class this paste's embeds should get. */
 export type ImageOptionsPrompt = (sizes: readonly string[] | null, classes: readonly string[] | null) => Promise<ImageEmbedChoice | null>;
 
+/** Shows the PDF cleanup dialog for the selection and resolves with the picks, or null on cancel. */
+export type PdfOptionsPrompt = (text: string) => Promise<PdfCleanupOptions | null>;
+
 /** A stored embed choice is honoured only while its value is still one of the options. */
 function embedChoice(choice: string, options: readonly string[]): string {
     if (choice === 'ask') return options.length > 0 ? 'ask' : '';
@@ -124,6 +129,7 @@ export class PasteService {
     private readonly images: ImageService;
     private readonly titles: LinkTitleService;
     private readonly promptImageOptions: ImageOptionsPrompt;
+    private readonly promptPdfOptions: PdfOptionsPrompt;
     /** Set on unload, so awaited work that is still in flight stops touching the editor. */
     private disposed = false;
     /** Ranges still awaiting work, kept aligned when another pending paste is rewritten. */
@@ -135,12 +141,14 @@ export class PasteService {
         getSettings: () => BetterPasteSettings,
         images: ImageService,
         titles: LinkTitleService,
-        promptImageOptions: ImageOptionsPrompt = () => Promise.resolve(null)
+        promptImageOptions: ImageOptionsPrompt = () => Promise.resolve(null),
+        promptPdfOptions: PdfOptionsPrompt = () => Promise.resolve(null)
     ) {
         this.getSettings = getSettings;
         this.images = images;
         this.titles = titles;
         this.promptImageOptions = promptImageOptions;
+        this.promptPdfOptions = promptPdfOptions;
     }
 
     /** Called from the plugin's onunload. */
@@ -361,6 +369,40 @@ export class PasteService {
         this.applyToSelection(editor, selection =>
             cleanTerminalText(selection, { terminalRejoin: 'indented', terminalBullets: 'markdown' })
         );
+    }
+
+    /**
+     * Command handler: cleans PDF text in the current selection, behind a dialog that
+     * previews the result and offers the situational cleanups. A dialog rather than
+     * settings, because a page number cannot be told from content
+     * without seeing the text.
+     */
+    async cleanPdfSelection(editor: Editor): Promise<void> {
+        const selection = editor.getSelection();
+        // A single selection only: the dialog previews one text, but replaceSelection
+        // would write that text into every cursor's range
+        if (!selection || editor.listSelections().length > 1) {
+            new Notice(format(strings.notices.prefix, { message: strings.notices.selectTextFirst }));
+            return;
+        }
+
+        const options = await this.promptPdfOptions(selection);
+        if (options === null || this.disposed) return;
+        // The dialog blocks typing, but sync or a popout can still rewrite the note
+        // while it is open, and replacing a changed selection would destroy that edit.
+        // The notice tells the user to reselect and run the command again.
+        if (editor.getSelection() !== selection) {
+            new Notice(format(strings.notices.prefix, { message: strings.notices.selectTextFirst }));
+            return;
+        }
+
+        const result = cleanPdfText(selection, options);
+        if (!result.changed) {
+            new Notice(format(strings.notices.prefix, { message: strings.notices.nothingToClean }));
+            return;
+        }
+
+        editor.replaceSelection(result.text);
     }
 
     /** Command handler: places commas next to closing quotes in the current selection. */

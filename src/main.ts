@@ -23,6 +23,8 @@ import { LinkTitleService } from './paste/LinkTitleService';
 import { PasteService } from './paste/PasteService';
 import { ImageEmbedModal } from './modals/ImageEmbedModal';
 import type { ImageEmbedChoice } from './modals/ImageEmbedModal';
+import { PdfCleanupModal } from './modals/PdfCleanupModal';
+import type { PdfCleanupOptions } from './transforms/pdfText';
 import { WelcomeModal } from './modals/WelcomeModal';
 import { WhatsNewModal } from './modals/WhatsNewModal';
 import { PluginOverlapModal } from './modals/PluginOverlapModal';
@@ -61,6 +63,8 @@ export default class BetterPastePlugin extends Plugin {
     private pasteService!: PasteService;
     /** The image options dialog while it is open, closed on unload so it cannot outlive the plugin. */
     private imageModal: ImageEmbedModal | null = null;
+    /** The PDF cleanup dialog while it is open, closed on unload for the same reason. */
+    private pdfModal: PdfCleanupModal | null = null;
     private startupModal: WelcomeModal | WhatsNewModal | null = null;
     private overlapModal: PluginOverlapModal | null = null;
     /** Set on unload, so deferred callbacks and dialog closes stop touching the plugin. */
@@ -75,7 +79,8 @@ export default class BetterPastePlugin extends Plugin {
             () => this.settings,
             imageService,
             linkTitleService,
-            (sizes, classes) => this.promptImageOptions(sizes, classes)
+            (sizes, classes) => this.promptImageOptions(sizes, classes),
+            text => this.promptPdfOptions(text)
         );
 
         this.registerEvent(
@@ -121,6 +126,14 @@ export default class BetterPastePlugin extends Plugin {
         });
 
         this.addCommand({
+            id: 'selection-clean-pdf',
+            name: strings.commands.cleanPdf,
+            editorCallback: (editor: Editor) => {
+                void this.pasteService.cleanPdfSelection(editor);
+            }
+        });
+
+        this.addCommand({
             id: 'selection-commas-inside',
             name: strings.commands.commasInside,
             editorCallback: (editor: Editor) => {
@@ -157,6 +170,7 @@ export default class BetterPastePlugin extends Plugin {
     onunload(): void {
         this.unloaded = true;
         this.imageModal?.close();
+        this.pdfModal?.close();
         this.startupModal?.close();
         this.overlapModal?.close();
         // An image write may still be in flight; this stops it editing a note that the
@@ -199,6 +213,30 @@ export default class BetterPastePlugin extends Plugin {
                 }
             );
             this.imageModal.open();
+        });
+    }
+
+    /** Opens the PDF cleanup dialog and remembers the picks for the next run. */
+    private promptPdfOptions(text: string): Promise<PdfCleanupOptions | null> {
+        return new Promise(resolve => {
+            this.pdfModal = new PdfCleanupModal(
+                this.app,
+                text,
+                {
+                    removeFurniture: this.settings.pdfLastFurniture,
+                    singleParagraph: this.settings.pdfLastSingleParagraph
+                },
+                options => {
+                    this.pdfModal = null;
+                    if (options) {
+                        this.settings.pdfLastFurniture = options.removeFurniture;
+                        this.settings.pdfLastSingleParagraph = options.singleParagraph;
+                        void this.saveSettings();
+                    }
+                    resolve(options);
+                }
+            );
+            this.pdfModal.open();
         });
     }
 

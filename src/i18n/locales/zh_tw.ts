@@ -25,6 +25,7 @@ export const STRINGS_ZH_TW: TranslationStrings = {
         pasteRaw: '不做處理直接貼上',
         cleanSelection: '整理選取內容',
         cleanTerminal: '整理終端機輸出',
+        cleanPdf: '整理 PDF 文字',
         commasInside: '將逗號移到引號內',
         commasOutside: '將逗號移到引號外',
         toggleCleanup: '切換自動整理'
@@ -168,6 +169,13 @@ export const STRINGS_ZH_TW: TranslationStrings = {
         none: '什麼都不做',
         apply: '套用',
         cancel: '取消'
+    },
+
+    pdfModal: {
+        furniture: '移除頁碼',
+        singleParagraph: '合併為一個段落',
+        description: '重新連接折行、修復被連字號拆開的單字、將合字轉換為一般字母，並移除多餘的空格。',
+        preview: '預覽'
     },
 
     welcome: {

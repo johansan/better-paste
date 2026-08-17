@@ -20,7 +20,7 @@ If you find Better Paste useful, please consider [☕️ Buying me a coffee](htt
 
 ## 2 What it does
 
-Six examples. Every rule has its own toggle, so turn off what you do not need.
+Seven examples. Every rule has its own toggle, so turn off what you do not need.
 
 ### 2.1 Images from Safari
 
@@ -81,7 +81,27 @@ becomes
 npm warn deprecated inflight@1.0.6: This module is not supported and leaks memory. Do not use it. Check out lru-cache instead.
 ```
 
-### 2.5 Cleanup of AI-generated text
+### 2.5 Text from PDFs
+
+PDFs wrap paragraphs into short lines and break words with hyphens. Select the pasted text and run **Clean up PDF text**:
+
+```
+The findings suggest that long-term expo-
+sure has a measurable effect on the out-
+come in both groups.
+```
+
+becomes
+
+```
+The findings suggest that long-term exposure has a measurable effect on the outcome in both groups.
+```
+
+Ligatures like ﬁ become real letters too, so search finds the words again.
+
+The command opens a dialog with a preview, so you see the result before it lands. Two switches handle what no rule can guess: remove page numbers, or join everything into one paragraph. Your picks are remembered for the next time.
+
+### 2.6 Cleanup of AI-generated text
 
 Chatbot text comes with curly quotes, long dashes and invisible characters. The invisible ones are removed on every paste, and with **Quotes** and **Dashes** turned on the rest becomes plain text too:
 
@@ -95,7 +115,7 @@ becomes
 "It works," she said - finally.
 ```
 
-### 2.6 Commas and quotes
+### 2.7 Commas and quotes
 
 Prefer your commas outside the quotation marks? Select the text and run **Move commas outside quotes**:
 
@@ -208,12 +228,13 @@ Images come out as `![[picture.png|400]]`, Obsidian's own size syntax. `400x300`
 
 ## 5 Commands
 
-Seven commands, ready for your own hotkeys (Settings, Hotkeys). The ids are for URI schemes and plugins like Commander, prefixed `better-paste:`.
+Eight commands, ready for your own hotkeys (Settings, Hotkeys). The ids are for URI schemes and plugins like Commander, prefixed `better-paste:`.
 
 - **Paste** (`paste`): paste through the rules, even in a note that opted out.
 - **Paste without processing** (`paste-raw`): paste exactly what is on the clipboard.
 - **Clean up selection** (`selection-clean`): run the text rules on selected text.
 - **Clean up terminal output** (`selection-clean-terminal`): rejoin wrapped lines, remove leading indentation and turn `•` bullets into Markdown lists in the selection. On demand, because only you know the text came from a terminal.
+- **Clean up PDF text** (`selection-clean-pdf`): rejoin the short lines a PDF layout makes, repair words broken by hyphens and expand ligatures in the selection. A dialog previews the result and offers page number and paragraph options.
 - **Move commas inside quotes** (`selection-commas-inside`) and **Move commas outside quotes** (`selection-commas-outside`): comma style next to closing quotes, applied to the selection.
 - **Toggle automatic cleanup** (`toggle-cleanup`): flip the master switch.
 

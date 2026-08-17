@@ -25,6 +25,7 @@ export const STRINGS_UK: TranslationStrings = {
         pasteRaw: 'Вставити без обробки',
         cleanSelection: 'Очистити виділення',
         cleanTerminal: 'Очистити вивід термінала',
+        cleanPdf: 'Очистити текст із PDF',
         commasInside: 'Перенести коми всередину лапок',
         commasOutside: 'Перенести коми за лапки',
         toggleCleanup: 'Перемкнути автоматичне очищення'
@@ -191,6 +192,14 @@ export const STRINGS_UK: TranslationStrings = {
         none: 'Нічого не робити',
         apply: 'Застосувати',
         cancel: 'Скасувати'
+    },
+
+    pdfModal: {
+        furniture: 'Прибрати номери сторінок',
+        singleParagraph: "Об'єднати все в один абзац",
+        description:
+            "Перенесені рядки з'єднуються, розірвані дефісом слова відновлюються, лігатури замінюються звичайними літерами, а зайві пробіли вилучаються.",
+        preview: 'Попередній перегляд'
     },
 
     welcome: {

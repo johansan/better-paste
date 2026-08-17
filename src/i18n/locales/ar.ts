@@ -25,6 +25,7 @@ export const STRINGS_AR: TranslationStrings = {
         pasteRaw: 'لصق بدون معالجة',
         cleanSelection: 'تنظيف التحديد',
         cleanTerminal: 'تنظيف مخرجات الطرفية',
+        cleanPdf: 'تنظيف نص PDF',
         commasInside: 'نقل الفواصل إلى داخل علامات الاقتباس',
         commasOutside: 'نقل الفواصل إلى خارج علامات الاقتباس',
         toggleCleanup: 'تبديل التنظيف التلقائي'
@@ -183,6 +184,14 @@ export const STRINGS_AR: TranslationStrings = {
         none: 'لا تفعل شيئًا',
         apply: 'تطبيق',
         cancel: 'إلغاء'
+    },
+
+    pdfModal: {
+        furniture: 'إزالة أرقام الصفحات',
+        singleParagraph: 'دمج الكل في فقرة واحدة',
+        description:
+            'يُعاد وصل الأسطر الملتفّة، وتُصلَح الكلمات المقسومة بشرطة، وتُحوَّل الحروف المركّبة إلى حروف عادية، وتُزال المسافات الزائدة.',
+        preview: 'معاينة'
     },
 
     welcome: {

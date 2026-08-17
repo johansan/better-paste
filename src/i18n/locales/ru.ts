@@ -25,6 +25,7 @@ export const STRINGS_RU: TranslationStrings = {
         pasteRaw: 'Вставить без обработки',
         cleanSelection: 'Очистить выделение',
         cleanTerminal: 'Очистить вывод терминала',
+        cleanPdf: 'Очистить текст из PDF',
         commasInside: 'Перенести запятые внутрь кавычек',
         commasOutside: 'Перенести запятые за кавычки',
         toggleCleanup: 'Переключить автоматическую очистку'
@@ -191,6 +192,14 @@ export const STRINGS_RU: TranslationStrings = {
         none: 'Ничего не делать',
         apply: 'Применить',
         cancel: 'Отмена'
+    },
+
+    pdfModal: {
+        furniture: 'Убрать номера страниц',
+        singleParagraph: 'Объединить всё в один абзац',
+        description:
+            'Перенесённые строки соединяются, разорванные дефисом слова восстанавливаются, лигатуры заменяются обычными буквами, а лишние пробелы удаляются.',
+        preview: 'Предпросмотр'
     },
 
     welcome: {

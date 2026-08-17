@@ -25,6 +25,7 @@ export const STRINGS_VI: TranslationStrings = {
         pasteRaw: 'Dán không xử lý',
         cleanSelection: 'Dọn phần đã chọn',
         cleanTerminal: 'Dọn đầu ra terminal',
+        cleanPdf: 'Dọn văn bản từ PDF',
         commasInside: 'Chuyển dấu phẩy vào trong dấu ngoặc kép',
         commasOutside: 'Chuyển dấu phẩy ra ngoài dấu ngoặc kép',
         toggleCleanup: 'Bật tắt dọn dẹp tự động'
@@ -181,6 +182,14 @@ export const STRINGS_VI: TranslationStrings = {
         none: 'Không làm gì',
         apply: 'Áp dụng',
         cancel: 'Hủy'
+    },
+
+    pdfModal: {
+        furniture: 'Xóa số trang',
+        singleParagraph: 'Gộp tất cả thành một đoạn văn',
+        description:
+            'Các dòng bị ngắt được nối lại, từ bị tách bởi dấu gạch nối được sửa, chữ cái dính liền thành một ký tự được tách rời và khoảng trắng thừa bị xóa.',
+        preview: 'Xem trước'
     },
 
     welcome: {

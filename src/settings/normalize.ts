@@ -90,7 +90,10 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
         textQuotes: asBoolean(data.textQuotes, defaults.textQuotes),
         textDashes: asBoolean(data.textDashes, defaults.textDashes),
 
-        lastShownVersion: normalizeVersion(data.lastShownVersion)
+        lastShownVersion: normalizeVersion(data.lastShownVersion),
+
+        pdfLastFurniture: asBoolean(data.pdfLastFurniture, defaults.pdfLastFurniture),
+        pdfLastSingleParagraph: asBoolean(data.pdfLastSingleParagraph, defaults.pdfLastSingleParagraph)
     };
 }
 

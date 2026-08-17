@@ -25,6 +25,7 @@ export const STRINGS_ID: TranslationStrings = {
         pasteRaw: 'Tempel tanpa pemrosesan',
         cleanSelection: 'Bersihkan pilihan',
         cleanTerminal: 'Bersihkan keluaran terminal',
+        cleanPdf: 'Bersihkan teks PDF',
         commasInside: 'Pindahkan koma ke dalam tanda kutip',
         commasOutside: 'Pindahkan koma ke luar tanda kutip',
         toggleCleanup: 'Alihkan pembersihan otomatis'
@@ -180,6 +181,14 @@ export const STRINGS_ID: TranslationStrings = {
         none: 'Jangan lakukan apa-apa',
         apply: 'Terapkan',
         cancel: 'Batal'
+    },
+
+    pdfModal: {
+        furniture: 'Hapus nomor halaman',
+        singleParagraph: 'Gabungkan semua menjadi satu paragraf',
+        description:
+            'Baris yang terpotong disambung kembali, kata yang terbelah tanda hubung diperbaiki, ligatur diubah menjadi huruf biasa, dan spasi berlebih dihapus.',
+        preview: 'Pratinjau'
     },
 
     welcome: {

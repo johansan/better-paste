@@ -25,6 +25,7 @@ export const STRINGS_PT_BR: TranslationStrings = {
         pasteRaw: 'Colar sem processamento',
         cleanSelection: 'Limpar a seleção',
         cleanTerminal: 'Limpar a saída do terminal',
+        cleanPdf: 'Limpar texto de PDF',
         commasInside: 'Colocar vírgulas dentro das aspas',
         commasOutside: 'Colocar vírgulas fora das aspas',
         toggleCleanup: 'Alternar a limpeza automática'
@@ -174,6 +175,14 @@ export const STRINGS_PT_BR: TranslationStrings = {
         none: 'Não fazer nada',
         apply: 'Aplicar',
         cancel: 'Cancelar'
+    },
+
+    pdfModal: {
+        furniture: 'Remover números de página',
+        singleParagraph: 'Juntar tudo em um único parágrafo',
+        description:
+            'As linhas quebradas são reunidas, as palavras divididas por hífen são reparadas, as ligaduras viram letras normais e os espaços extras são removidos.',
+        preview: 'Pré-visualização'
     },
 
     welcome: {

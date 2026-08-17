@@ -51,6 +51,13 @@ export interface ReleaseNote {
 /** Newest first. A new release goes at the top. */
 const RELEASE_NOTES: ReleaseNote[] = [
     {
+        version: '1.0.6',
+        date: '2026-08-18',
+        new: [
+            'New command: ==Clean up PDF text== for the current selection. When you run it you get a dialog with a **text preview** where you can toggle removing page numbers and joining everything into one paragraph.'
+        ]
+    },
+    {
         version: '1.0.5',
         date: '2026-08-17',
         new: [

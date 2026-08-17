@@ -25,6 +25,7 @@ export const STRINGS_IT: TranslationStrings = {
         pasteRaw: 'Incolla senza elaborazione',
         cleanSelection: 'Pulisci la selezione',
         cleanTerminal: 'Pulisci l’output del terminale',
+        cleanPdf: 'Pulisci il testo PDF',
         commasInside: 'Sposta le virgole dentro le virgolette',
         commasOutside: 'Sposta le virgole fuori dalle virgolette',
         toggleCleanup: 'Attiva o disattiva la pulizia automatica'
@@ -174,6 +175,14 @@ export const STRINGS_IT: TranslationStrings = {
         none: 'Non fare nulla',
         apply: 'Applica',
         cancel: 'Annulla'
+    },
+
+    pdfModal: {
+        furniture: 'Rimuovi i numeri di pagina',
+        singleParagraph: 'Unisci tutto in un solo paragrafo',
+        description:
+            'Le righe spezzate vengono riunite, le parole divise dal trattino riparate, le legature convertite in lettere normali e gli spazi in eccesso rimossi.',
+        preview: 'Anteprima'
     },
 
     welcome: {

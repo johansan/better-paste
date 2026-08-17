@@ -93,4 +93,7 @@ export interface BetterPasteSettings {
     imageLastSize: string;
     /** The class picked in the last image paste dialog, preselected in the next one. */
     imageLastClass: string;
+    /** The toggles picked in the last PDF cleanup dialog, preselected in the next one. */
+    pdfLastFurniture: boolean;
+    pdfLastSingleParagraph: boolean;
 }

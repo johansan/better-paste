@@ -25,6 +25,7 @@ export const STRINGS_TH: TranslationStrings = {
         pasteRaw: 'วางโดยไม่ประมวลผล',
         cleanSelection: 'จัดระเบียบข้อความที่เลือก',
         cleanTerminal: 'จัดระเบียบผลลัพธ์เทอร์มินัล',
+        cleanPdf: 'จัดระเบียบข้อความจาก PDF',
         commasInside: 'ย้ายจุลภาคเข้าไปในอัญประกาศ',
         commasOutside: 'ย้ายจุลภาคออกนอกอัญประกาศ',
         toggleCleanup: 'สลับการจัดระเบียบอัตโนมัติ'
@@ -178,6 +179,13 @@ export const STRINGS_TH: TranslationStrings = {
         none: 'ไม่ต้องทำอะไร',
         apply: 'นำไปใช้',
         cancel: 'ยกเลิก'
+    },
+
+    pdfModal: {
+        furniture: 'ลบเลขหน้า',
+        singleParagraph: 'รวมทั้งหมดเป็นย่อหน้าเดียว',
+        description: 'ต่อบรรทัดที่ถูกตัดกลับเข้าด้วยกัน ซ่อมคำที่ถูกแบ่งด้วยยัติภังค์ แปลงอักษรควบเป็นตัวอักษรปกติ และลบช่องว่างส่วนเกิน',
+        preview: 'แสดงตัวอย่าง'
     },
 
     welcome: {

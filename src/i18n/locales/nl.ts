@@ -25,6 +25,7 @@ export const STRINGS_NL: TranslationStrings = {
         pasteRaw: 'Plakken zonder bewerking',
         cleanSelection: 'Selectie opschonen',
         cleanTerminal: 'Terminaluitvoer opschonen',
+        cleanPdf: 'PDF-tekst opschonen',
         commasInside: 'Komma’s binnen de aanhalingstekens zetten',
         commasOutside: 'Komma’s buiten de aanhalingstekens zetten',
         toggleCleanup: 'Automatisch opschonen aan- of uitzetten'
@@ -193,6 +194,14 @@ export const STRINGS_NL: TranslationStrings = {
         none: 'Niets doen',
         apply: 'Toepassen',
         cancel: 'Annuleren'
+    },
+
+    pdfModal: {
+        furniture: 'Paginanummers verwijderen',
+        singleParagraph: 'Alles samenvoegen tot één alinea',
+        description:
+            'Afgebroken regels worden samengevoegd, afgebroken woorden hersteld, ligaturen omgezet in gewone letters en overtollige spaties verwijderd.',
+        preview: 'Voorvertoning'
     },
 
     welcome: {

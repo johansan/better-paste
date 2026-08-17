@@ -39,6 +39,7 @@ export const STRINGS_EN = {
         pasteRaw: 'Paste without processing',
         cleanSelection: 'Clean up selection',
         cleanTerminal: 'Clean up terminal output',
+        cleanPdf: 'Clean up PDF text',
         commasInside: 'Move commas inside quotes',
         commasOutside: 'Move commas outside quotes',
         toggleCleanup: 'Toggle automatic cleanup'
@@ -210,6 +211,13 @@ export const STRINGS_EN = {
         none: 'Do nothing',
         apply: 'Apply',
         cancel: 'Cancel'
+    },
+
+    pdfModal: {
+        furniture: 'Remove page numbers',
+        singleParagraph: 'Join everything into one paragraph',
+        description: 'Rejoins wrapped lines, repairs hyphenated words, turns ligatures into plain letters and removes extra spaces.',
+        preview: 'Preview'
     },
 
     welcome: {

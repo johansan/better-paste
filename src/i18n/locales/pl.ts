@@ -25,6 +25,7 @@ export const STRINGS_PL: TranslationStrings = {
         pasteRaw: 'Wklej bez przetwarzania',
         cleanSelection: 'Wyczyść zaznaczenie',
         cleanTerminal: 'Wyczyść tekst z terminala',
+        cleanPdf: 'Wyczyść tekst z pliku PDF',
         commasInside: 'Przenieś przecinki do cudzysłowów',
         commasOutside: 'Przenieś przecinki poza cudzysłowy',
         toggleCleanup: 'Przełącz automatyczne czyszczenie'
@@ -181,6 +182,14 @@ export const STRINGS_PL: TranslationStrings = {
         none: 'Nic nie rób',
         apply: 'Zastosuj',
         cancel: 'Anuluj'
+    },
+
+    pdfModal: {
+        furniture: 'Usuń numery stron',
+        singleParagraph: 'Połącz wszystko w jeden akapit',
+        description:
+            'Zawinięte wiersze są łączone, wyrazy przedzielone łącznikiem naprawiane, ligatury zamieniane na zwykłe litery, a zbędne spacje usuwane.',
+        preview: 'Podgląd'
     },
 
     welcome: {

@@ -37,7 +37,7 @@ const DASHES = new RegExp('[\\u2013\\u2014]', 'g');
 /**
  * Curly double quotes, including the low-9 form German uses as an opening quote.
  *
- * The guillemets « » are deliberately absent: they are the ordinary quotation marks of
+ * The guillemets \u00AB \u00BB are deliberately absent: they are the ordinary quotation marks of
  * French, Russian and several other languages, so replacing them would not be tidying up
  * pasted text, it would be rewriting correctly set text.
  */
@@ -45,7 +45,7 @@ const DOUBLE_QUOTES = new RegExp('[\\u201C\\u201D\\u201E\\u201F]', 'g');
 
 /**
  * Curly single quotes. U+2019 matters most of the three: it is the character assistants
- * and web pages use for an apostrophe, so "don’t" becomes "don't".
+ * and web pages use for an apostrophe, so "don\u2019t" becomes "don't".
  */
 const SINGLE_QUOTES = new RegExp('[\\u2018\\u2019\\u201A\\u201B]', 'g');
 
@@ -145,6 +145,11 @@ export function markdownSyntaxRanges(input: string): ProtectedRange[] {
     ];
 }
 
+/** Spans whose spacing is a name or data: wikilink targets, link destinations, HTML tags. */
+export function linkSyntaxRanges(input: string): ProtectedRange[] {
+    return syntaxRanges(input, [WIKILINK, LINK_DESTINATION, HTML_TAG]);
+}
+
 /** The spans the given patterns occupy, collected as protected ranges. */
 function syntaxRanges(input: string, patterns: readonly RegExp[]): ProtectedRange[] {
     const ranges: ProtectedRange[] = [];
@@ -224,7 +229,7 @@ export function straightenQuotes(input: string, protect: readonly ProtectedRange
  * decided.
  */
 export function straightenDashes(input: string, protect: readonly ProtectedRange[] = []): TypographyResult {
-    // A dash inside [[2013–14 Premier League]] or a destination is part of the name, and
+    // A dash inside [[2013\u201314 Premier League]] or a destination is part of the name, and
     // changing it breaks the link. Frontmatter values are data.
     const protectedRanges = [
         ...markdownCodeRanges(input),

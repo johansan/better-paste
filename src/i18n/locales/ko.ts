@@ -25,6 +25,7 @@ export const STRINGS_KO: TranslationStrings = {
         pasteRaw: '처리 없이 붙여넣기',
         cleanSelection: '선택 영역 정리',
         cleanTerminal: '터미널 출력 정리',
+        cleanPdf: 'PDF 텍스트 정리',
         commasInside: '쉼표를 따옴표 안으로 이동',
         commasOutside: '쉼표를 따옴표 밖으로 이동',
         toggleCleanup: '자동 정리 전환'
@@ -170,6 +171,13 @@ export const STRINGS_KO: TranslationStrings = {
         none: '아무것도 안 함',
         apply: '적용',
         cancel: '취소'
+    },
+
+    pdfModal: {
+        furniture: '페이지 번호 제거',
+        singleParagraph: '모두 한 문단으로 합치기',
+        description: '줄바꿈된 줄을 다시 잇고, 하이픈으로 나뉜 단어를 복원하고, 합자를 일반 글자로 바꾸고, 불필요한 공백을 제거합니다.',
+        preview: '미리보기'
     },
 
     welcome: {

@@ -25,6 +25,7 @@ export const STRINGS_ES: TranslationStrings = {
         pasteRaw: 'Pegar sin procesar',
         cleanSelection: 'Limpiar la selección',
         cleanTerminal: 'Limpiar la salida de terminal',
+        cleanPdf: 'Limpiar texto de PDF',
         commasInside: 'Colocar comas dentro de las comillas',
         commasOutside: 'Colocar comas fuera de las comillas',
         toggleCleanup: 'Alternar la limpieza automática'
@@ -184,6 +185,14 @@ export const STRINGS_ES: TranslationStrings = {
         none: 'No hacer nada',
         apply: 'Aplicar',
         cancel: 'Cancelar'
+    },
+
+    pdfModal: {
+        furniture: 'Quitar números de página',
+        singleParagraph: 'Unir todo en un solo párrafo',
+        description:
+            'Las líneas cortadas se vuelven a unir, las palabras divididas con guion se reparan, las ligaduras se convierten en letras normales y los espacios sobrantes se eliminan.',
+        preview: 'Vista previa'
     },
 
     welcome: {

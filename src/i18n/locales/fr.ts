@@ -25,6 +25,7 @@ export const STRINGS_FR: TranslationStrings = {
         pasteRaw: 'Coller sans traitement',
         cleanSelection: 'Nettoyer la sélection',
         cleanTerminal: 'Nettoyer la sortie de terminal',
+        cleanPdf: 'Nettoyer le texte PDF',
         commasInside: 'Placer les virgules à l’intérieur des guillemets',
         commasOutside: 'Placer les virgules à l’extérieur des guillemets',
         toggleCleanup: 'Activer ou désactiver le nettoyage automatique'
@@ -184,6 +185,14 @@ export const STRINGS_FR: TranslationStrings = {
         none: 'Ne rien faire',
         apply: 'Appliquer',
         cancel: 'Annuler'
+    },
+
+    pdfModal: {
+        furniture: 'Supprimer les numéros de page',
+        singleParagraph: 'Tout regrouper en un seul paragraphe',
+        description:
+            "Les lignes coupées sont réunies, les mots coupés par un trait d'union réparés, les ligatures converties en lettres simples et les espaces superflus supprimés.",
+        preview: 'Aperçu'
     },
 
     welcome: {

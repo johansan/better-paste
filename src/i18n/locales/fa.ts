@@ -25,6 +25,7 @@ export const STRINGS_FA: TranslationStrings = {
         pasteRaw: 'چسباندن بدون پردازش',
         cleanSelection: 'پاک‌سازی متن انتخاب‌شده',
         cleanTerminal: 'پاک‌سازی خروجی پایانه',
+        cleanPdf: 'پاک‌سازی متن PDF',
         commasInside: 'انتقال ویرگول‌ها به داخل گیومه',
         commasOutside: 'انتقال ویرگول‌ها به خارج از گیومه',
         toggleCleanup: 'تغییر وضعیت پاک‌سازی خودکار'
@@ -174,6 +175,14 @@ export const STRINGS_FA: TranslationStrings = {
         none: 'کاری انجام نشود',
         apply: 'اعمال',
         cancel: 'لغو'
+    },
+
+    pdfModal: {
+        furniture: 'حذف شماره صفحه‌ها',
+        singleParagraph: 'ادغام همه در یک پاراگراف',
+        description:
+            'خط‌های شکسته دوباره به هم می‌پیوندند، واژه‌های جداشده با خط تیره ترمیم می‌شوند، حروف ترکیبی به حروف ساده تبدیل می‌شوند و فاصله‌های اضافی حذف می‌شوند.',
+        preview: 'پیش‌نمایش'
     },
 
     welcome: {

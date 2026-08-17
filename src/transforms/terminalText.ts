@@ -17,7 +17,7 @@
  */
 
 import { stripAnsi } from './ansi';
-import { frontmatterRanges } from './typography';
+import { frontmatterRanges, linkSyntaxRanges } from './typography';
 import { markdownCodeRanges, overlapsRange } from './markdownRanges';
 import { LIST_MARKERS, MIN_WRAP_WIDTH, WRAP_TOLERANCE } from '../settings/constants';
 
@@ -27,10 +27,23 @@ export interface TerminalCleanupOptions {
     terminalRejoin: 'indented' | 'any' | 'never';
     /** 'markdown' rewrites bullets such as \u2022 into Markdown list items. */
     terminalBullets: 'preserve' | 'markdown';
+    /** Repairs words that a PDF layout hyphenated at a line end when the lines rejoin. */
+    mergeHyphens?: boolean;
+    /** Collapses the space runs that justified PDF text leaves between words. */
+    collapseSpaces?: boolean;
+    /** Lower bound for the inferred wrap column. Defaults to the terminal floor. */
+    minWrapWidth?: number;
+    /**
+     * Leaves lines between $$ delimiters verbatim, because they are Obsidian math. Off
+     * for terminal output, where $$ is the shell's process id rather than a delimiter.
+     */
+    protectMath?: boolean;
 }
 
 /** Markdown constructs that always begin their own block and never continue the previous paragraph. */
 const NUMBERED_LIST = /^\s*\d{1,9}[.)]\s/;
+/** An enumerator such as (a), (12), [3] or c), which begins its own item in PDF lists. */
+const ENUMERATOR = /^\s*(?:\([a-z0-9]{1,4}\)|\[\d{1,4}\]|[a-z0-9]{1,4}\))\s/i;
 const HEADING = /^\s{0,3}#{1,6}(\s|$)/;
 const BLOCKQUOTE = /^\s{0,3}>/;
 const TABLE_ROW = /^\s*\|/;
@@ -95,6 +108,102 @@ function hasMarkdownHardBreak(line: string): boolean {
 }
 
 /**
+ * True when the line ends with a word or number broken at the margin: a letter or a
+ * digit, then an ASCII hyphen, a soft hyphen or one of the hyphen forms PDF fonts emit
+ * (U+2010, U+FE63, U+FF0D). The non-breaking hyphen U+2011 is deliberately absent,
+ * because its meaning is that the word must not break there. Requiring a letter, a
+ * digit or a combining mark in front keeps thematic breaks and stray dashes out,
+ * because "---" is a rule and not a broken word. The mark counts because it always
+ * sits on a letter, and some scripts keep it separate even after normalization.
+ */
+export function endsHyphenated(line: string): boolean {
+    return /[\p{L}\d\p{M}][-\u00AD\u2010\uFE63\uFF0D]$/u.test(line.trimEnd());
+}
+
+/**
+ * True when the line's last word carries a web address, with a scheme or as the bare
+ * www form PDFs print. Such a line never rejoins: a space join buries the break inside
+ * the address, and a bare join could fuse an address that really ended there with the
+ * next word, so the break stays visible.
+ */
+function endsWithUrl(line: string): boolean {
+    const trimmed = line.trimEnd();
+    return /:\/\/\S*$/.test(trimmed) || /(^|\s)www\.\S+$/i.test(trimmed);
+}
+
+/**
+ * Block math spans, from a line holding only $$ to its closing line. An unclosed
+ * opener protects nothing, so a stray $$ cannot swallow the rest of the text.
+ */
+function dollarMathRanges(text: string): { start: number; end: number }[] {
+    const ranges: { start: number; end: number }[] = [];
+    let offset = 0;
+    let openStart = -1;
+    for (const line of text.split('\n')) {
+        if (line.trim() === '$$') {
+            if (openStart < 0) {
+                openStart = offset;
+            } else {
+                ranges.push({ start: openStart, end: offset + line.length });
+                openStart = -1;
+            }
+        }
+        offset += line.length + 1;
+    }
+    return ranges;
+}
+
+/**
+ * Joins two prose fragments across a removed break. A break after a web address stays
+ * visible, because a space join buries it and a bare join could fuse an address that
+ * really ended there with the next word. After a digit a hyphen is content, a range or
+ * a compound such as 10-20 or 5-fold, so it stays and only the break goes. After a
+ * letter it is the layout's own when the word resumes in lowercase, so it goes; before
+ * a capital it belongs to a compound such as Navier-Stokes or RNA-Seq, so it also
+ * stays, because a false join is harder to spot than a kept hyphen. An en or em dash
+ * set tight against its word keeps that style, and the scripts that write without
+ * spaces join bare. Everything else joins with one space.
+ */
+export function joinFragments(previous: string, fragment: string): string {
+    if (endsWithUrl(previous)) return `${previous}\n${fragment}`;
+    if (endsHyphenated(previous)) {
+        const afterDigit = /\d[-\u00AD\u2010\uFE63\uFF0D]$/u.test(previous);
+        const brokenWord = !afterDigit && /^\p{Ll}/u.test(fragment);
+        return brokenWord ? previous.slice(0, -1) + fragment : previous + fragment;
+    }
+    if (/\S[\u2013\u2014]$/.test(previous)) return previous + fragment;
+    if (CJK_TAIL.test(previous) && CJK_HEAD.test(fragment)) return previous + fragment;
+    return `${previous} ${fragment}`;
+}
+
+/**
+ * Scripts and their punctuation that wrap without spaces: Thai, then CJK symbols, kana,
+ * Han and fullwidth forms. Hangul is absent because Korean spaces its words.
+ */
+const CJK_TAIL = /[\u0E00-\u0E7F\u3000-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]$/;
+const CJK_HEAD = /^[\u0E00-\u0E7F\u3000-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/;
+
+/**
+ * Collapses runs of spaces between words, which justified PDF text leaves behind. Runs
+ * at a line start are indentation and runs at a line end are Markdown hard breaks, so
+ * only runs between visible characters collapse. Code, frontmatter and link targets
+ * keep their spacing: there the runs are content, and one space fewer in a wikilink
+ * silently points it at a different note. The overlap test covers the spaces alone,
+ * so a run that merely follows a code span still collapses.
+ */
+function collapseSpaceRuns(text: string, protectMath: boolean): string {
+    const protectedRanges = [
+        ...markdownCodeRanges(text),
+        ...frontmatterRanges(text),
+        ...linkSyntaxRanges(text),
+        ...(protectMath ? dollarMathRanges(text) : [])
+    ];
+    return text.replace(/(\S) {2,}(?=\S)/g, (match, before: string, offset: number) =>
+        overlapsRange(protectedRanges, offset + 1, offset + match.length) ? match : `${before} `
+    );
+}
+
+/**
  * Works out the column the terminal wrapped at, from the text itself.
  *
  * A terminal breaks every long line at the same column, so wrapped lines cluster just
@@ -105,7 +214,7 @@ function hasMarkdownHardBreak(line: string): boolean {
  * This replaces asking the user for a threshold they cannot know: the answer depends on
  * how wide their terminal window happened to be when they copied.
  */
-export function inferWrapWidth(lines: readonly string[]): number {
+export function inferWrapWidth(lines: readonly string[], floor: number = MIN_WRAP_WIDTH): number {
     // Fenced content is copied verbatim, so a long JSON line inside a log dump must not
     // drag the threshold above the prose the user actually wants rejoined
     const prose: string[] = [];
@@ -124,14 +233,14 @@ export function inferWrapWidth(lines: readonly string[]): number {
     }
 
     const lengths = prose.map(line => line.trimEnd().length);
-    if (lengths.length < 2) return MIN_WRAP_WIDTH;
+    if (lengths.length < 2) return floor;
 
     // Spread would blow the argument limit on a large pasted log
     const longest = lengths.reduce((max, length) => (length > max ? length : max), 0);
     const nearLongest = lengths.filter(length => length >= longest - WRAP_TOLERANCE).length;
-    if (nearLongest < 2) return MIN_WRAP_WIDTH;
+    if (nearLongest < 2) return floor;
 
-    return Math.max(MIN_WRAP_WIDTH, longest - WRAP_TOLERANCE);
+    return Math.max(floor, longest - WRAP_TOLERANCE);
 }
 
 /**
@@ -165,6 +274,7 @@ function isHeadingLine(line: string): boolean {
 function startsNewBlock(line: string): boolean {
     if (listMarkerOf(line) !== null) return true;
     if (NUMBERED_LIST.test(line)) return true;
+    if (ENUMERATOR.test(line)) return true;
     if (HEADING.test(line)) return true;
     if (BLOCKQUOTE.test(line)) return true;
     if (fenceDelimiterOf(line) !== null) return true;
@@ -210,9 +320,9 @@ function toMarkdownBullet(line: string): string {
     return `${prefix}- ${body}`;
 }
 
-/** Converts terminal bullets without rewriting Markdown code or frontmatter values. */
-function convertMarkdownBullets(text: string): string {
-    const protectedRanges = [...markdownCodeRanges(text), ...frontmatterRanges(text)];
+/** Converts terminal bullets without rewriting Markdown code, math or frontmatter values. */
+function convertMarkdownBullets(text: string, protectMath: boolean): string {
+    const protectedRanges = [...markdownCodeRanges(text), ...frontmatterRanges(text), ...(protectMath ? dollarMathRanges(text) : [])];
     let offset = 0;
 
     return text
@@ -243,6 +353,7 @@ function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptio
     const paragraphs: Paragraph[] = [];
     let current: Paragraph | null = null;
     let fence: FenceDelimiter | null = null;
+    let math = false;
 
     // A leading frontmatter block is data: rejoining a long value line with the key
     // below it would silently merge two YAML entries into one. Blank lines before the
@@ -266,6 +377,14 @@ function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptio
     }
 
     for (const line of lines.slice(consumed)) {
+        // Everything inside a math block is a formula, where a rejoin or a bullet
+        // rewrite would change its meaning
+        if (math) {
+            paragraphs.push({ lines: [line], verbatim: true });
+            if (line.trim() === '$$') math = false;
+            continue;
+        }
+
         if (isBlank(line) && fence === null) {
             current = null;
             // Runs of blank lines collapse here rather than over the rendered text,
@@ -281,6 +400,13 @@ function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptio
             // Everything between fences is copied verbatim, including the closing fence
             paragraphs.push({ lines: [line], verbatim: true });
             if (closesFence(line, fence)) fence = null;
+            continue;
+        }
+
+        if (options.protectMath === true && line.trim() === '$$') {
+            current = null;
+            math = true;
+            paragraphs.push({ lines: [line], verbatim: true });
             continue;
         }
 
@@ -321,7 +447,11 @@ function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptio
             // a paragraph into it. Nested list or blockquote prefixes are looked through.
             !isHeadingLine(first) &&
             !startsNewBlock(line) &&
-            previous.trimEnd().length >= wrapWidth &&
+            !(options.mergeHyphens === true && endsWithUrl(previous)) &&
+            // A trailing hyphen is wrap evidence on its own: a layout hyphenates a word
+            // only when the line has reached the margin, so the width check would reject
+            // exactly the narrow-column lines that need the repair most.
+            (previous.trimEnd().length >= wrapWidth || (options.mergeHyphens === true && endsHyphenated(previous))) &&
             (!requireIndent || indentWidth(line) > indentWidth(first));
 
         if (continues && current) {
@@ -340,15 +470,28 @@ function groupParagraphs(lines: readonly string[], options: TerminalCleanupOptio
  * that terminal output puts in front of prose. Indentation is kept for list items, which
  * use it for nesting, and for indented code blocks.
  */
-function renderParagraph(paragraph: Paragraph, preserveIndent: boolean): string {
+function renderParagraph(paragraph: Paragraph, options: TerminalCleanupOptions): string {
     if (paragraph.verbatim) return paragraph.lines.join('\n');
 
     const first = paragraph.lines[0];
-    const joined = paragraph.lines.map((line, index) => (index === 0 ? line.trimEnd() : line.trim())).join(' ');
+
+    let joined = first.trimEnd();
+    for (const line of paragraph.lines.slice(1)) {
+        const fragment = line.trim();
+        if (options.mergeHyphens !== true) {
+            joined = `${joined} ${fragment}`;
+        } else if (joined.endsWith('\u00AD')) {
+            // A soft hyphen exists only to mark the wrap point, so it goes no matter
+            // what follows
+            joined = joined.slice(0, -1) + fragment;
+        } else {
+            joined = joinFragments(joined, fragment);
+        }
+    }
 
     // In the never mode the line breaks are the layout, so what is left of the indentation
     // after the shared dedent is content too
-    if (preserveIndent) return joined;
+    if (options.terminalRejoin === 'never') return joined;
 
     // A residual indent below the code-block threshold is wrapping decoration, not structure
     const isStructural = listMarkerOf(first) !== null || NUMBERED_LIST.test(first);
@@ -372,7 +515,7 @@ export function cleanTerminalText(input: string, options: TerminalCleanupOptions
     const hadEscapes = text !== normalized;
 
     const lines = dedent(text.split('\n'));
-    const wrapWidth = inferWrapWidth(lines);
+    const wrapWidth = inferWrapWidth(lines, options.minWrapWidth);
 
     const preserveIndent = options.terminalRejoin === 'never';
     const paragraphs = groupParagraphs(lines, options, wrapWidth);
@@ -386,18 +529,20 @@ export function cleanTerminalText(input: string, options: TerminalCleanupOptions
     const rejoined = paragraphs.some(paragraph => !paragraph.verbatim && paragraph.lines.length > 1);
 
     if (!preserveIndent && !hadEscapes && !rejoined) {
-        // Converting bullets is a separate, explicit request, so it still applies. The
-        // whitespace work does not.
-        if (options.terminalBullets !== 'markdown') return { text: input, changed: false };
-        const converted = convertMarkdownBullets(input);
+        // Converting bullets and collapsing space runs are separate, explicit requests,
+        // so they still apply. The dedent and trim work does not.
+        let converted = input;
+        if (options.terminalBullets === 'markdown') converted = convertMarkdownBullets(converted, options.protectMath === true);
+        if (options.collapseSpaces === true) converted = collapseSpaceRuns(converted, options.protectMath === true);
         return { text: converted, changed: converted !== input };
     }
 
-    const rendered = paragraphs.map(paragraph => renderParagraph(paragraph, preserveIndent));
+    const rendered = paragraphs.map(paragraph => renderParagraph(paragraph, options));
 
     let output = rendered.join('\n');
 
-    if (options.terminalBullets === 'markdown') output = convertMarkdownBullets(output);
+    if (options.terminalBullets === 'markdown') output = convertMarkdownBullets(output, options.protectMath === true);
+    if (options.collapseSpaces === true) output = collapseSpaceRuns(output, options.protectMath === true);
 
     return { text: output, changed: output !== input };
 }
