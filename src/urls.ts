@@ -23,6 +23,9 @@ const RAW_BASE_URL = `https://raw.githubusercontent.com/${REPOSITORY}/main`;
 export const SUPPORT_SPONSOR_URL = 'https://github.com/sponsors/johansan/';
 export const SUPPORT_BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/johansan';
 
+/** Human-readable source for the link removal lists bundled during the build. */
+export const BUILT_IN_LINK_REMOVALS_URL = `https://github.com/${REPOSITORY}/blob/main/LINK_REMOVALS.md`;
+
 /** Moment tokens supported by custom image filename formats. */
 export const MOMENT_FORMAT_DOCS_URL = 'https://momentjs.com/docs/#/displaying/format/';
 

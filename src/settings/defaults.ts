@@ -38,9 +38,7 @@ export const DEFAULT_SETTINGS: BetterPasteSettings = {
 
     linkEnabled: true,
     linkTitles: true,
-    linkStrip: 'all',
-    // Empty means "use the shipped rules unchanged"; entries here are merged over them
-    linkRules: [],
+    linkRemovals: [],
 
     textTrim: true,
     textInvisible: true,

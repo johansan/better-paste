@@ -103,18 +103,17 @@ export default class BetterPastePlugin extends Plugin {
             }
         });
 
+        // Ids are permanent and name the target first: "selection-<what>". Never reuse a retired id.
         this.addCommand({
-            id: 'clean',
+            id: 'selection-clean',
             name: strings.commands.cleanSelection,
             editorCallback: (editor: Editor) => {
                 this.pasteService.cleanSelection(editor);
             }
         });
 
-        // On-demand transforms follow the pattern "clean-<what>" and "<what>-<how>",
-        // so further processing commands slot in beside these
         this.addCommand({
-            id: 'clean-terminal',
+            id: 'selection-clean-terminal',
             name: strings.commands.cleanTerminal,
             editorCallback: (editor: Editor) => {
                 this.pasteService.cleanTerminalSelection(editor);
@@ -122,7 +121,7 @@ export default class BetterPastePlugin extends Plugin {
         });
 
         this.addCommand({
-            id: 'commas-inside',
+            id: 'selection-commas-inside',
             name: strings.commands.commasInside,
             editorCallback: (editor: Editor) => {
                 this.pasteService.placeCommas(editor, 'inside');
@@ -130,7 +129,7 @@ export default class BetterPastePlugin extends Plugin {
         });
 
         this.addCommand({
-            id: 'commas-outside',
+            id: 'selection-commas-outside',
             name: strings.commands.commasOutside,
             editorCallback: (editor: Editor) => {
                 this.pasteService.placeCommas(editor, 'outside');

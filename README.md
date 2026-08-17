@@ -136,8 +136,8 @@ Alt text survives the download, and if a download fails the original link stays 
 ### 3.3 Links
 
 - **Fetch titles for pasted links**: on by default, see example 2.3 above.
-- **Clean pasted links** and **Which parameters to remove**: strip every parameter except what site rules keep, or be careful and only strip known trackers.
-- **Site rules**: 33 sites built in, with a live tester. This is why a YouTube link keeps its video ID while the tracking junk is stripped:
+- **Clean pasted links**: removes common trackers everywhere, plus known clutter from sites such as YouTube, Google and Amazon.
+- **Link removals**: add parameter names you also want removed everywhere or on specific sites. A live tester shows the result before you paste:
 
 ```
 https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLxAbC123&si=8f2a1c&utm_source=share&t=42
@@ -149,20 +149,24 @@ becomes
 
 ```
 https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLxAbC123&t=42
-https://www.amazon.com/dp/B0CHX1W1XY/ref=sr_1_3
+https://www.amazon.com/dp/B0CHX1W1XY/ref=sr_1_3?keywords=usb+hub
 https://www.google.co.uk/search?q=obsidian+plugins
 ```
 
-A site rule looks like this:
+A removal looks like this:
 
 ```
-youtube.com | v, t, list, index, start     keep only these parameters
-gitlab.com                                 keep every parameter
-google.* | q, tbm, hl                      any top-level domain
-mine.example | id                          your own rule
+fbclid
+mine.example | source, ref
 ```
 
-Subdomains are covered automatically, `google.*` matches google.com and google.se alike, and only your own edits are saved, so new rules in future releases still reach you.
+`fbclid` removes that parameter on every site. `mine.example | source, ref` removes `source` and `ref` on mine.example and its subdomains, while every other parameter stays. And `google.*` matches google.com and google.se alike. You can see every [built-in removal](https://github.com/johansan/better-paste/blob/main/LINK_REMOVALS.md), and updates to that file arrive with plugin releases. **Suggest your removals** opens betterpaste.md with your list filled in. Review it there, then open a draft in your email app. Cryptographically signed links stay unchanged. Shared files and gift articles keep their access parameters.
+
+Start a line with `!` to turn off the built-in removals for one site:
+
+```
+!youtube.com
+```
 
 ### 3.4 Text processing
 
@@ -204,14 +208,14 @@ Images come out as `![[picture.png|400]]`, Obsidian's own size syntax. `400x300`
 
 ## 5 Commands
 
-Seven commands, ready for your own hotkeys (Settings, Hotkeys):
+Seven commands, ready for your own hotkeys (Settings, Hotkeys). The ids are for URI schemes and plugins like Commander, prefixed `better-paste:`.
 
-- **Paste**: paste through the rules, even in a note that opted out.
-- **Paste without processing**: paste exactly what is on the clipboard.
-- **Clean up selection**: run the text rules on selected text.
-- **Clean up terminal output**: rejoin wrapped lines, remove leading indentation and turn `•` bullets into Markdown lists in the selection. On demand, because only you know the text came from a terminal.
-- **Move commas inside quotes** and **Move commas outside quotes**: comma style next to closing quotes, applied to the selection.
-- **Toggle automatic cleanup**: flip the master switch.
+- **Paste** (`paste`): paste through the rules, even in a note that opted out.
+- **Paste without processing** (`paste-raw`): paste exactly what is on the clipboard.
+- **Clean up selection** (`selection-clean`): run the text rules on selected text.
+- **Clean up terminal output** (`selection-clean-terminal`): rejoin wrapped lines, remove leading indentation and turn `•` bullets into Markdown lists in the selection. On demand, because only you know the text came from a terminal.
+- **Move commas inside quotes** (`selection-commas-inside`) and **Move commas outside quotes** (`selection-commas-outside`): comma style next to closing quotes, applied to the selection.
+- **Toggle automatic cleanup** (`toggle-cleanup`): flip the master switch.
 
 <br/>
 

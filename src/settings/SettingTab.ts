@@ -22,7 +22,6 @@ import type BetterPastePlugin from '../main';
 import { parseLines } from './normalize';
 import { DEFAULT_SETTINGS } from './defaults';
 import { aliases, format, strings } from '../i18n';
-import { diffDomainRules, renderDomainRules } from '../transforms/urlCleanup';
 import { DYNAMIC_DESCRIPTION_KEYS, LIST_KEY_SUFFIX, SETTINGS_CLASS, toggle } from './pages/context';
 import type { DynamicDescriptionKey, SettingsPageContext } from './pages/context';
 import { createImageLandingDefinitions } from './pages/imagesPage';
@@ -34,7 +33,7 @@ import { createStartDefinitions } from './pages/startPage';
  * Settings stored as a list of lines but edited as one text field. The control key carries
  * a suffix so the tab knows to convert between the two forms.
  */
-const LIST_KEYS = ['linkRules'] as const;
+const LIST_KEYS = ['linkRemovals'] as const;
 type ListSettingKey = (typeof LIST_KEYS)[number];
 
 function isListControlKey(key: string): boolean {
@@ -124,14 +123,14 @@ export class BetterPasteSettingTab extends PluginSettingTab {
      * straight from `plugin.settings`.
      */
     getControlValue(key: string): unknown {
-        if (isListControlKey(key)) return renderDomainRules(this.plugin.settings[listKeyOf(key)]);
+        if (isListControlKey(key)) return this.plugin.settings[listKeyOf(key)].join('\n');
         return super.getControlValue(key);
     }
 
     /** Writes a control's value, splitting the text form of a list setting back into lines. */
     async setControlValue(key: string, value: unknown): Promise<void> {
         if (isListControlKey(key)) {
-            this.plugin.settings[listKeyOf(key)] = diffDomainRules(parseLines(typeof value === 'string' ? value : ''));
+            this.plugin.settings[listKeyOf(key)] = parseLines(typeof value === 'string' ? value : '');
             await this.plugin.saveSettings();
             this.afterChange();
             return;

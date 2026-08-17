@@ -17,11 +17,12 @@
  */
 
 import type { Setting, SettingDefinitionItem, SettingGroupItem } from 'obsidian';
+import { LINK_REMOVALS_UPDATED, SHIPPED_PARAM_REMOVALS, TRACKING_PARAMS } from '../constants';
 import { DEFAULT_SETTINGS } from '../defaults';
-import { SHIPPED_DOMAIN_RULES } from '../constants';
-import { findInvalidDomainRules } from '../normalize';
-import { buildUrlCleanupOptions, cleanUrl, mergeDomainRules } from '../../transforms/urlCleanup';
-import { aliases, format, plural, strings } from '../../i18n';
+import { findInvalidRemovalRules } from '../normalize';
+import { buildUrlCleanupOptions, cleanUrl } from '../../transforms/urlCleanup';
+import { aliases, format, localeTag, plural, strings } from '../../i18n';
+import { BUILT_IN_LINK_REMOVALS_URL } from '../../urls';
 import { LIST_KEY_SUFFIX, SETTINGS_CLASS } from './context';
 import type { SettingsPageContext } from './context';
 
@@ -53,14 +54,75 @@ function cleaningExample(): string | DocumentFragment {
     });
 }
 
+/** Renders a translated description whose blank line separates two paragraphs. */
+function paragraphDescription(text: string): string | DocumentFragment {
+    if (typeof createFragment === 'undefined') return text;
+
+    return createFragment(fragment => {
+        text.split('\n\n').forEach((paragraph, index) => {
+            if (index > 0) {
+                fragment.createEl('br');
+                fragment.createEl('br');
+            }
+            fragment.appendText(paragraph);
+        });
+    });
+}
+
 /** Sample URL shown in the tester before the user types their own. */
 const URL_SAMPLE = 'https://support.claude.com/en/articles/16266773-how-claude-marks-ai-generated-content?utm_source=news&_bhlid=abc123';
 
-/** Placeholder for the rule list, which is a rule rather than a sentence. */
-const RULE_PLACEHOLDER = 'example.com: id, page';
+/** Placeholder for the removal list, which is a rule rather than a sentence. */
+const REMOVAL_PLACEHOLDER = 'fbclid\nexample.com | source, ref';
+
+/** Contribution page. The rule text stays in the fragment until the user submits the form. */
+const CONTRIBUTION_URL = 'https://betterpaste.md/contribute/';
+
+/** Website locale folders corresponding to the plugin's BCP 47 locale tags. */
+const CONTRIBUTION_LOCALES = new Set([
+    'ar',
+    'de',
+    'es',
+    'fa',
+    'fr',
+    'id',
+    'it',
+    'ja',
+    'ko',
+    'nl',
+    'pl',
+    'pt',
+    'pt-br',
+    'ru',
+    'th',
+    'tr',
+    'uk',
+    'vi',
+    'zh-cn',
+    'zh-tw'
+]);
 
 /** How many invalid rules the validation message names before it stops listing them. */
 const INVALID_RULES_SHOWN = 3;
+
+/** Shows the catalog date in the same language as the settings around it. */
+function formatRemovalDate(date: string): string {
+    const parsed = new Date(`${date}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return date;
+    return parsed.toLocaleDateString(localeTag, { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+/** Builds the private browser handoff. The removal text is kept in the fragment. */
+export function linkRemovalContributionUrl(removals: readonly string[], version: string, language = localeTag): string {
+    const normalized = language.toLowerCase();
+    const websiteLocale = normalized === 'pt-pt' ? 'pt' : normalized;
+    const localizedBase = CONTRIBUTION_LOCALES.has(websiteLocale)
+        ? CONTRIBUTION_URL.replace('/contribute/', `/${websiteLocale}/contribute/`)
+        : CONTRIBUTION_URL;
+    const suggested = removals.filter(line => !line.trim().startsWith('!'));
+    const fragment = new URLSearchParams({ rules: suggested.join('\n'), version });
+    return `${localizedBase}#${fragment.toString()}`;
+}
 
 /** Rows shown directly under the Links heading on the landing page. */
 export function createLinkLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
@@ -82,36 +144,25 @@ export function createLinkLandingDefinitions(context: SettingsPageContext): Sett
             control: { type: 'toggle', key: 'linkEnabled', defaultValue: DEFAULT_SETTINGS.linkEnabled }
         },
         {
-            name: text.stripName,
-            desc: text.stripDesc,
-            visible: enabled,
-            aliases: aliases(source => source.settings.links.stripAliases),
-            control: {
-                type: 'dropdown',
-                key: 'linkStrip',
-                defaultValue: DEFAULT_SETTINGS.linkStrip,
-                options: {
-                    all: text.stripAll,
-                    tracking: text.stripTracking
-                }
-            }
-        },
-        {
             type: 'page',
-            name: text.rulesName,
-            desc: text.rulesDesc,
+            name: text.removalsName,
+            desc: text.removalsDesc,
             visible: enabled,
-            displayValue: () => plural(text.rulesCount, mergeDomainRules(context.settings().linkRules).length),
-            // A rule that will not parse is only reported on the page that holds it, so the
+            displayValue: () =>
+                plural(
+                    text.rulesCount,
+                    context.settings().linkRemovals.filter(line => line.trim().length > 0 && !line.trim().startsWith('#')).length
+                ),
+            // A removal that will not parse is only reported on the page that holds it, so the
             // link has to carry the warning back to the landing page
-            status: () => (findInvalidDomainRules(context.settings().linkRules.join('\n')).length > 0 ? 'warning' : null),
-            items: createSitesPageDefinitions(context)
+            status: () => (findInvalidRemovalRules(context.settings().linkRemovals.join('\n')).length > 0 ? 'warning' : null),
+            items: createRemovalsPageDefinitions(context)
         }
     ];
 }
 
-/** The Sites to leave alone sub-page: the rule list, plus a tester to check a rule works. */
-function createSitesPageDefinitions(context: SettingsPageContext): SettingDefinitionItem[] {
+/** Built-in and user-defined removals, plus a tester and contribution handoff. */
+function createRemovalsPageDefinitions(context: SettingsPageContext): SettingDefinitionItem[] {
     // Wrapped in a group so styles.css can reach the textarea: only a group carries a class
     return [
         {
@@ -119,24 +170,49 @@ function createSitesPageDefinitions(context: SettingsPageContext): SettingDefini
             cls: SETTINGS_CLASS,
             items: [
                 {
-                    name: strings.settings.links.listName,
-                    desc: format(strings.settings.links.listDesc, {
-                        sites: plural(strings.settings.links.listShippedCount, SHIPPED_DOMAIN_RULES.length)
+                    name: strings.settings.links.builtInName,
+                    desc: format(strings.settings.links.builtInDesc, {
+                        date: formatRemovalDate(LINK_REMOVALS_UPDATED),
+                        trackingCount: TRACKING_PARAMS.length,
+                        siteCount: SHIPPED_PARAM_REMOVALS.length
                     }),
+                    render: setting => {
+                        setting.addButton(button =>
+                            button.setButtonText(strings.settings.links.builtInButton).onClick(() => {
+                                window.open(BUILT_IN_LINK_REMOVALS_URL);
+                            })
+                        );
+                    }
+                },
+                {
+                    name: strings.settings.links.listName,
+                    desc: paragraphDescription(strings.settings.links.listDesc),
                     aliases: aliases(source => source.settings.links.listAliases),
                     control: {
                         type: 'textarea',
-                        key: `linkRules${LIST_KEY_SUFFIX}`,
+                        key: `linkRemovals${LIST_KEY_SUFFIX}`,
                         rows: 6,
-                        placeholder: RULE_PLACEHOLDER,
+                        placeholder: REMOVAL_PLACEHOLDER,
                         defaultValue: '',
                         validate: value => {
-                            const invalid = findInvalidDomainRules(typeof value === 'string' ? value : '');
+                            const invalid = findInvalidRemovalRules(typeof value === 'string' ? value : '');
                             if (invalid.length === 0) return;
                             return format(strings.settings.links.listInvalid, {
                                 values: invalid.slice(0, INVALID_RULES_SHOWN).join(', ')
                             });
                         }
+                    }
+                },
+                {
+                    name: strings.settings.links.suggestName,
+                    desc: strings.settings.links.suggestDesc,
+                    aliases: aliases(source => source.settings.links.suggestAliases),
+                    render: setting => {
+                        setting.addButton(button =>
+                            button.setButtonText(strings.settings.links.suggestButton).onClick(() => {
+                                window.open(linkRemovalContributionUrl(context.settings().linkRemovals, context.version));
+                            })
+                        );
                     }
                 },
                 {

@@ -17,40 +17,40 @@
  */
 
 import { matchesAnyGlob } from '../utils/glob';
-import { SHIPPED_DOMAIN_RULES, TRACKING_PARAMS } from '../settings/constants';
+import { SHIPPED_PARAM_REMOVALS, SIGNED_URL_PARAM_SETS, TRACKING_PARAMS } from '../settings/constants';
 import { markdownCodeRanges, overlapsRange } from './markdownRanges';
-import type { BetterPasteSettings, LinkStripMode } from '../settings/types';
+import type { BetterPasteSettings } from '../settings/types';
 
 /** How many labels a wildcard top-level domain may stand for, covering ".com" and ".co.uk". */
 const MAX_TLD_LABELS = 2;
 
 /** Common second-level labels used before a two-letter country suffix. */
-const COUNTRY_SECOND_LEVEL_LABELS = new Set(['ac', 'co', 'com', 'edu', 'gov', 'net', 'org']);
+const COUNTRY_SECOND_LEVEL_LABELS = new Set(['ac', 'co', 'com', 'edu', 'go', 'gov', 'ne', 'net', 'or', 'org']);
 
-/** A parsed line from the site rules. */
-export interface DomainRule {
-    /** Hostname the rule applies to, matched against the host itself and any subdomain. */
+/** A parsed domain-specific parameter removal. */
+export interface DomainRemoval {
+    /** Hostname the removal applies to, matched against the host itself and any subdomain. */
     domain: string;
-    /** True for a rule written "google.*", which matches the site on any top-level domain. */
+    /** True for a line written "google.*", which matches the site on any top-level domain. */
     anyTld: boolean;
-    /** True when the rule lists no parameters, meaning every parameter survives. */
-    keepAll: boolean;
-    /** Parameter names that survive on this domain. */
+    /** Parameter names or glob patterns removed on this domain. */
     params: string[];
 }
 
-/**
- * Cleaning options with the site rules already parsed. Parsing happens once per paste
- * rather than once per URL, which matters for a document full of links.
- */
+/** Cleaning options with built-in and user-defined removals already parsed. */
 export interface UrlCleanupOptions {
-    strip: LinkStripMode;
-    rules: readonly DomainRule[];
+    globalParams: readonly string[];
+    removals: readonly DomainRemoval[];
 }
 
 /** Builds the cleaning options for a paste from the stored settings. */
-export function buildUrlCleanupOptions(settings: Pick<BetterPasteSettings, 'linkStrip' | 'linkRules'>): UrlCleanupOptions {
-    return { strip: settings.linkStrip, rules: mergeDomainRules(settings.linkRules) };
+export function buildUrlCleanupOptions(settings: Pick<BetterPasteSettings, 'linkRemovals'>): UrlCleanupOptions {
+    const disabled = disabledDomains(settings.linkRemovals);
+    const shipped = parseDomainRemovals(SHIPPED_PARAM_REMOVALS).filter(removal => !isDisabledRemoval(removal, disabled));
+    return {
+        globalParams: [...TRACKING_PARAMS, ...parseGlobalRemovals(settings.linkRemovals)],
+        removals: [...shipped, ...parseDomainRemovals(settings.linkRemovals)]
+    };
 }
 
 /**
@@ -277,11 +277,11 @@ function normalizeDomain(domain: string): { domain: string; anyTld: boolean } {
 }
 
 /** True when `host` is the rule's site, a subdomain of it, or it under another top-level domain. */
-function hostMatchesRule(host: string, rule: DomainRule): boolean {
-    if (!rule.anyTld) return host === rule.domain || host.endsWith(`.${rule.domain}`);
+function hostMatchesRemoval(host: string, removal: DomainRemoval): boolean {
+    if (!removal.anyTld) return host === removal.domain || host.endsWith(`.${removal.domain}`);
 
     const labels = host.split('.');
-    const wanted = rule.domain.split('.');
+    const wanted = removal.domain.split('.');
 
     for (let start = 0; start + wanted.length < labels.length; start++) {
         if (!wanted.every((label, offset) => labels[start + offset] === label)) continue;
@@ -300,19 +300,44 @@ function hostMatchesRule(host: string, rule: DomainRule): boolean {
     return false;
 }
 
-/** Parses site rule lines, ignoring blank lines and '#' comments. */
-export function parseDomainRules(lines: readonly string[]): DomainRule[] {
-    const rules: DomainRule[] = [];
+/** Sites disabled with a user line such as "!youtube.com", stored without any wildcard. */
+function disabledDomains(lines: readonly string[]): string[] {
+    const disabled: string[] = [];
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith('!')) continue;
+        const { domain } = normalizeDomain(trimmed.slice(1));
+        if (domain) disabled.push(domain);
+    }
+    return disabled;
+}
+
+/**
+ * True when a "!site" line names this shipped removal's site or a parent of it. Subdomains
+ * count because the shipped list is not shown in the settings field, so "!google.*" has to
+ * reach the shipped "www.google.*" and "maps.google.*" entries without the user knowing
+ * their exact spelling.
+ */
+function isDisabledRemoval(removal: DomainRemoval, disabled: readonly string[]): boolean {
+    return disabled.some(domain => removal.domain === domain || removal.domain.endsWith(`.${domain}`));
+}
+
+/** Parses domain removal lines, ignoring comments and lines without any parameters. */
+export function parseDomainRemovals(lines: readonly string[]): DomainRemoval[] {
+    const removals: DomainRemoval[] = [];
 
     for (const line of lines) {
         const trimmed = line.trim();
         if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('!')) continue;
 
-        // Either separator is accepted; "|" is what the settings field shows, because a
-        // colon also appears inside the URLs these rules are about
-        const separator = trimmed.search(/[|:]/);
-        const rawDomain = separator >= 0 ? trimmed.slice(0, separator) : trimmed;
-        const rawParams = separator >= 0 ? trimmed.slice(separator + 1) : '';
+        // The pipe wins over a colon, so "localhost:3000 | debug" is not read as a
+        // parameter list starting at the port
+        const pipe = trimmed.indexOf('|');
+        const separator = pipe >= 0 ? pipe : trimmed.indexOf(':');
+        if (separator < 0) continue;
+
+        const rawDomain = trimmed.slice(0, separator);
+        const rawParams = trimmed.slice(separator + 1);
 
         const { domain, anyTld } = normalizeDomain(rawDomain);
         if (!domain) continue;
@@ -321,108 +346,19 @@ export function parseDomainRules(lines: readonly string[]): DomainRule[] {
             .split(',')
             .map(param => param.trim())
             .filter(param => param.length > 0);
+        if (params.length === 0) continue;
 
-        rules.push({ domain, anyTld, keepAll: params.length === 0, params });
+        removals.push({ domain, anyTld, params });
     }
 
-    return rules;
+    return removals;
 }
 
-/**
- * Combines the shipped site rules with the user's own.
- *
- * The shipped list lives in code rather than in the user's settings so that rules added in
- * a later release still reach people who have added rules of their own. A user rule for the
- * same domain replaces the shipped one, and a line of the form `!example.com` drops a
- * shipped rule entirely.
- */
-export function mergeDomainRules(userRules: readonly string[]): DomainRule[] {
-    const disabled = new Set<string>();
-    const kept: string[] = [];
-
-    for (const line of userRules) {
-        const trimmed = line.trim();
-        if (trimmed.startsWith('!')) {
-            // Stored without any wildcard, so "!google.*" and "!google" both disable the
-            // shipped rules for google and its subdomains
-            const { domain } = normalizeDomain(trimmed.slice(1));
-            if (domain) disabled.add(domain);
-            continue;
-        }
-        kept.push(line);
-    }
-
-    // A later line for the same site replaces an earlier one, rather than sitting behind it
-    // forever: findDomainRule keeps the first of two equally specific rules
-    const byDomain = new Map<string, DomainRule>();
-    for (const rule of parseDomainRules(kept)) byDomain.set(rule.domain, rule);
-    const user = [...byDomain.values()];
-
-    // Removals are exact because the settings field shows every shipped rule separately.
-    // Deleting google.* must not also delete a maps.google.* row the user left in place.
-    const isDisabled = (rule: DomainRule): boolean => disabled.has(rule.domain);
-
-    const shipped = parseDomainRules(SHIPPED_DOMAIN_RULES).filter(rule => !byDomain.has(rule.domain) && !isDisabled(rule));
-
-    return [...shipped, ...user];
-}
-
-/** Renders a rule the way the settings field shows it. */
-export function formatDomainRule(rule: DomainRule): string {
-    const site = rule.anyTld ? `${rule.domain}.*` : rule.domain;
-    return rule.keepAll ? site : `${site} | ${rule.params.join(', ')}`;
-}
-
-/**
- * The full rule list as the settings field shows it: the shipped rules and the user's own,
- * merged, so every site can be read and edited in one place.
- */
-export function renderDomainRules(userRules: readonly string[]): string {
-    return mergeDomainRules(userRules).map(formatDomainRule).join('\n');
-}
-
-/**
- * Turns an edited rule list back into just the user's changes.
- *
- * Only the difference from the shipped list is stored, so a rule added to a later release
- * still reaches someone who has edited their own. A site the user removed from the field
- * comes back as an explicit "!example.com" line.
- */
-export function diffDomainRules(lines: readonly string[]): string[] {
-    const shown = new Map<string, DomainRule>();
-    for (const rule of parseDomainRules(lines)) shown.set(rule.domain, rule);
-
-    const shipped = new Map<string, DomainRule>();
-    for (const rule of parseDomainRules(SHIPPED_DOMAIN_RULES)) shipped.set(rule.domain, rule);
-
-    const removals = [...shipped.values()]
-        .filter(rule => !shown.has(rule.domain))
-        .map(rule => `!${rule.anyTld ? `${rule.domain}.*` : rule.domain}`);
-
-    const additions = [...shown.values()]
-        .filter(rule => {
-            const base = shipped.get(rule.domain);
-            return !base || formatDomainRule(base) !== formatDomainRule(rule);
-        })
-        .map(formatDomainRule);
-
-    return [...removals, ...additions];
-}
-
-/**
- * Finds the rule that applies to `host`, preferring the most specific match so that
- * "maps.google.com" wins over "google.com" when both are configured.
- */
-export function findDomainRule(host: string, rules: readonly DomainRule[]): DomainRule | null {
-    const normalizedHost = host.toLowerCase();
-    let best: DomainRule | null = null;
-
-    for (const rule of rules) {
-        if (!hostMatchesRule(normalizedHost, rule)) continue;
-        if (!best || rule.domain.length > best.domain.length) best = rule;
-    }
-
-    return best;
+/** Parses bare parameter names that the user wants removed on every site. */
+export function parseGlobalRemovals(lines: readonly string[]): string[] {
+    return lines
+        .map(line => line.trim())
+        .filter(line => line.length > 0 && !line.startsWith('#') && !line.startsWith('!') && !/[|:\s,]/.test(line));
 }
 
 /** Splits a raw query string into pairs while keeping each pair's original encoding. */
@@ -442,27 +378,16 @@ function splitQuery(query: string): { name: string; raw: string }[] {
     });
 }
 
-/** True when a site rule explicitly preserves this parameter. */
-function ruleKeeps(rule: DomainRule | null, name: string): boolean {
-    if (!rule) return false;
-    if (rule.keepAll) return true;
-    return rule.params.some(param => param.toLowerCase() === name.toLowerCase());
+/** True when the query contains a known cryptographic signature parameter set. */
+function isSignedUrl(pairs: readonly { name: string }[]): boolean {
+    const names = new Set(pairs.map(pair => pair.name.toLowerCase()));
+    return SIGNED_URL_PARAM_SETS.some(required => required.every(name => names.has(name.toLowerCase())));
 }
 
-/**
- * Decides whether a single query parameter survives cleaning.
- *
- * In tracking mode a site rule may only rescue a parameter, never remove one. Letting a
- * rule act as a whitelist there would silently strip ordinary parameters from a user who
- * chose the conservative mode precisely to avoid that.
- */
-function shouldKeepParam(name: string, rule: DomainRule | null, mode: LinkStripMode): boolean {
-    if (mode === 'tracking') {
-        if (!matchesAnyGlob(name, TRACKING_PARAMS)) return true;
-        return ruleKeeps(rule, name);
-    }
-
-    return ruleKeeps(rule, name);
+/** True when a parameter matches a global or domain-specific removal. */
+function shouldRemoveParam(name: string, host: string, globalParams: readonly string[], removals: readonly DomainRemoval[]): boolean {
+    if (matchesAnyGlob(name, globalParams)) return true;
+    return removals.some(removal => hostMatchesRemoval(host, removal) && matchesAnyGlob(name, removal.params));
 }
 
 /**
@@ -504,8 +429,13 @@ export function cleanUrl(raw: string, options: UrlCleanupOptions): string {
     const base = queryIndex >= 0 ? withoutFragment.slice(0, queryIndex) : withoutFragment;
     const query = queryIndex >= 0 ? withoutFragment.slice(queryIndex + 1) : '';
 
-    const rule = findDomainRule(parsed.hostname, options.rules);
-    const kept = splitQuery(query).filter(pair => shouldKeepParam(pair.name, rule, options.strip));
+    const pairs = splitQuery(query);
+    // A cryptographically signed URL is preserved byte for byte. Removing any query
+    // parameter can invalidate its signature, and the failure only shows when clicked.
+    if (isSignedUrl(pairs)) return raw;
+
+    const host = parsed.hostname.toLowerCase();
+    const kept = pairs.filter(pair => !shouldRemoveParam(pair.name, host, options.globalParams, options.removals));
 
     const nextQuery = kept.map(pair => pair.raw).join('&');
     const rebuilt = `${base}${nextQuery ? `?${nextQuery}` : ''}${cleanFragment(fragment)}`;

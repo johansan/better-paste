@@ -16,13 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * How much of a pasted link is removed.
- * - 'all': drop every query parameter unless a site rule keeps it
- * - 'tracking': drop only parameters known to be tracking
- */
-export type LinkStripMode = 'all' | 'tracking';
-
 /** Naming scheme for saved images. */
 export type ImageNameFormat = 'source' | 'custom';
 
@@ -74,13 +67,8 @@ export interface BetterPasteSettings {
     linkEnabled: boolean;
     /** Turn a pasted standalone web address into a Markdown link using the page title. */
     linkTitles: boolean;
-    /** Whether to drop every parameter or only known tracking ones. */
-    linkStrip: LinkStripMode;
-    /**
-     * The user's own site rules, merged over the shipped list at read time so that
-     * updates to the shipped rules keep reaching people who have added their own.
-     */
-    linkRules: string[];
+    /** Global and domain-specific parameter removals defined by the user. */
+    linkRemovals: string[];
 
     /* Text processing */
 

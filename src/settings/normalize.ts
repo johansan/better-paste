@@ -18,7 +18,7 @@
 
 import { DEFAULT_SETTINGS } from './defaults';
 import { normalizeVersion } from '../releaseNotes';
-import type { BetterPasteSettings, ImageNameFormat, LinkStripMode } from './types';
+import type { BetterPasteSettings, ImageNameFormat } from './types';
 
 function asBoolean(value: unknown, fallback: boolean): boolean {
     return typeof value === 'boolean' ? value : fallback;
@@ -36,8 +36,6 @@ function asStringArray(value: unknown): string[] {
 function asEnum<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
     return typeof value === 'string' && (allowed as readonly string[]).includes(value) ? (value as T) : fallback;
 }
-
-const STRIP_MODES: readonly LinkStripMode[] = ['all', 'tracking'];
 
 /** Splits a comma-separated options field into trimmed values, dropping blank ones. */
 export function parseCommaList(value: string): string[] {
@@ -83,9 +81,9 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
 
         linkEnabled: asBoolean(data.linkEnabled, defaults.linkEnabled),
         linkTitles: asBoolean(data.linkTitles, defaults.linkTitles),
-        linkStrip: asEnum(data.linkStrip, STRIP_MODES, defaults.linkStrip),
-        // Only the user's own rules are stored; the shipped list is merged in at read time
-        linkRules: asStringArray(data.linkRules),
+        // The former linkRules field held parameter keep-lists. It cannot be migrated
+        // because interpreting those names as removals would reverse the user's intent.
+        linkRemovals: asStringArray(data.linkRemovals),
 
         textTrim: asBoolean(data.textTrim, defaults.textTrim),
         textInvisible: asBoolean(data.textInvisible, defaults.textInvisible),
@@ -104,24 +102,44 @@ export function parseLines(value: string): string[] {
         .filter(line => line.trim().length > 0);
 }
 
-/** Reports site rule lines that will not parse, so the settings UI can flag them. */
-export function findInvalidDomainRules(value: string): string[] {
+/** Reports removal lines that will not parse, so the settings UI can flag them. */
+export function findInvalidRemovalRules(value: string): string[] {
     const invalid: string[] = [];
 
     for (const line of parseLines(value)) {
         const trimmed = line.trim();
         if (trimmed.startsWith('#')) continue;
 
-        const body = trimmed.startsWith('!') ? trimmed.slice(1).trim() : trimmed;
-        const site = body.split(/[|:]/)[0].trim();
+        const disabled = trimmed.startsWith('!');
+        const body = disabled ? trimmed.slice(1).trim() : trimmed;
+        // The pipe wins over a colon, so a site written with a port such as
+        // "localhost:3000 | debug" is judged whole rather than split at the colon
+        const pipe = body.indexOf('|');
+        const separator = pipe >= 0 ? pipe : body.indexOf(':');
+        if (!disabled && separator < 0) {
+            if (!body || /[\s,]/.test(body)) invalid.push(trimmed);
+            continue;
+        }
+
+        const site = (separator < 0 ? body : body.slice(0, separator)).trim();
+        const params =
+            separator < 0
+                ? []
+                : body
+                      .slice(separator + 1)
+                      .split(',')
+                      .map(param => param.trim())
+                      .filter(param => param.length > 0);
 
         // "*.example.com" and "example.*" are both accepted spellings
         const anyTld = site.endsWith('.*');
         const domain = (anyTld ? site.slice(0, -2) : site).replace(/^\*\./, '');
 
         const labels = /^[a-z0-9-]+(\.[a-z0-9-]+)*$/i.test(domain);
-        const looksLikeDomain = labels && (anyTld || domain.includes('.') || domain === 'localhost');
-        if (!looksLikeDomain) invalid.push(trimmed);
+        // A site rule accepts a single-label intranet host. A disable line needs a dot or
+        // a wildcard because every shipped removal it could reach names a public site.
+        const looksLikeDomain = labels && (!disabled || anyTld || domain.includes('.'));
+        if (!looksLikeDomain || (disabled ? separator >= 0 : params.length === 0)) invalid.push(trimmed);
     }
 
     return invalid;

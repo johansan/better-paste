@@ -47,6 +47,8 @@ step() {
 
 # ESLint is configured to report unused disable directives as errors, so a clean
 # run here also means no stale suppressions
+step "Link removal data" npm run generate:link-removals
+
 step "ESLint" npm run lint
 
 step "Stylelint" npm run lint:styles

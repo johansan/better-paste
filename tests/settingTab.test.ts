@@ -16,9 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
     App,
+    Setting,
     SettingDefinition,
     SettingDefinitionControl,
     SettingDefinitionGroup,
@@ -29,7 +30,8 @@ import { BetterPasteSettingTab } from '../src/settings/SettingTab';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import type BetterPastePlugin from '../src/main';
 import type { BetterPasteSettings } from '../src/settings/types';
-import { SHIPPED_DOMAIN_RULES } from '../src/settings/constants';
+import { linkRemovalContributionUrl } from '../src/settings/pages/linksPage';
+import { BUILT_IN_LINK_REMOVALS_URL } from '../src/urls';
 
 /**
  * Settings the tab deliberately has no row for, because they are state the plugin keeps
@@ -222,7 +224,7 @@ describe('settings tree', () => {
 
     it('puts the detail on sub-pages, declared so search can still reach it', () => {
         const found = pages(tab.getSettingDefinitions());
-        expect(found.map(page => page.name)).toEqual(['Site rules']);
+        expect(found.map(page => page.name)).toEqual(['Link removals']);
         // `items` keeps a page in the searchable tree; the imperative `page` form does not
         for (const page of found) {
             expect(page.items, `"${page.name}" has no items`).toBeDefined();
@@ -230,11 +232,11 @@ describe('settings tree', () => {
         }
     });
 
-    it('shows the site count on its sub-page link', () => {
+    it('shows the user-defined entry count on its sub-page link', () => {
         const found = pages(tab.getSettingDefinitions());
-        const sites = found.find(page => page.name === 'Site rules');
+        const removals = found.find(page => page.name === 'Link removals');
 
-        expect(typeof sites?.displayValue === 'function' ? sites.displayValue() : sites?.displayValue).toMatch(/^\d+ sites$/);
+        expect(typeof removals?.displayValue === 'function' ? removals.displayValue() : removals?.displayValue).toMatch(/^\d+ entries$/);
     });
 
     it('gives every master toggle search terms for what it hides', () => {
@@ -256,72 +258,82 @@ describe('settings values', () => {
         tab = makeTab(plugin);
     });
 
-    it('writes a plain setting through and persists it', async () => {
-        await tab.setControlValue('linkStrip', 'tracking');
-        expect(plugin.settings.linkStrip).toBe('tracking');
+    it('describes the built-in removals separately from the user list', () => {
+        const builtIn = flatten(tab.getSettingDefinitions()).find(row => row.name === 'Built-in removals');
+        expect(builtIn?.desc).toBe(
+            'Updated August 17, 2026. Global tracking filters: 67. Site-specific rules: 17. Cryptographically signed links stay unchanged.'
+        );
+        expect(tab.getControlValue('linkRemovals.text')).toBe('');
+    });
+
+    it('opens the public built-in removal list', () => {
+        const builtIn = flatten(tab.getSettingDefinitions()).find(row => row.name === 'Built-in removals');
+        let buttonText = '';
+        let click: (() => void) | undefined;
+        const button = {
+            setButtonText(value: string) {
+                buttonText = value;
+                return button;
+            },
+            onClick(handler: () => void) {
+                click = handler;
+                return button;
+            }
+        };
+        const setting = {
+            addButton(configure: (value: typeof button) => void) {
+                configure(button);
+                return setting;
+            }
+        };
+        const open = vi.fn();
+        vi.stubGlobal('window', { open });
+
+        builtIn?.render?.(setting as unknown as Setting);
+        click?.();
+
+        expect(buttonText).toBe('View list');
+        expect(open).toHaveBeenCalledWith(BUILT_IN_LINK_REMOVALS_URL);
+        vi.unstubAllGlobals();
+    });
+
+    it('stores user-defined removals without copying the built-in list', async () => {
+        await tab.setControlValue('linkRemovals.text', 'fbclid\nmine.example | source, ref');
+        expect(plugin.settings.linkRemovals).toEqual(['fbclid', 'mine.example | source, ref']);
+        expect(tab.getControlValue('linkRemovals.text')).toBe('fbclid\nmine.example | source, ref');
         expect(plugin.saveCount()).toBe(1);
     });
 
-    it('shows every site rule, shipped ones included, so they can be edited', () => {
-        const shown = String(tab.getControlValue('linkRules.text')).split('\n');
-        expect(shown).toHaveLength(SHIPPED_DOMAIN_RULES.length);
-        expect(shown).toContain('youtube.com | v, t, list, index, start');
+    it('hands contribution text to the localized website in the URL fragment', () => {
+        const contribution = new URL(
+            linkRemovalContributionUrl(['fbclid', 'mine.example | source, ref', '!youtube.com'], '1.2.3', 'pt-BR')
+        );
+        const fragment = new URLSearchParams(contribution.hash.slice(1));
+
+        expect(contribution.pathname).toBe('/pt-br/contribute/');
+        expect(contribution.search).toBe('');
+        expect(fragment.get('rules')).toBe('fbclid\nmine.example | source, ref');
+        expect(fragment.get('version')).toBe('1.2.3');
     });
 
-    it('stores only what the user changed, so later releases can still add rules', async () => {
-        const shown = String(tab.getControlValue('linkRules.text'));
-        await tab.setControlValue('linkRules.text', `${shown}\nmine.example | id`);
-        expect(plugin.settings.linkRules).toEqual(['mine.example | id']);
-    });
-
-    it('remembers a rule the user deleted from the field', async () => {
-        const kept = String(tab.getControlValue('linkRules.text'))
-            .split('\n')
-            .filter(line => !line.startsWith('youtube.com'))
-            .join('\n');
-
-        await tab.setControlValue('linkRules.text', kept);
-        expect(plugin.settings.linkRules).toEqual(['!youtube.com']);
-        expect(String(tab.getControlValue('linkRules.text'))).not.toContain('youtube.com |');
-    });
-
-    it('keeps specific Google rules when only the generic rule is deleted', async () => {
-        const kept = String(tab.getControlValue('linkRules.text'))
-            .split('\n')
-            .filter(line => !line.startsWith('google.*'))
-            .join('\n');
-
-        await tab.setControlValue('linkRules.text', kept);
-
-        const shown = String(tab.getControlValue('linkRules.text'));
-        const sites = pages(tab.getSettingDefinitions()).find(page => page.name === 'Site rules');
-        const status = typeof sites?.status === 'function' ? sites.status() : sites?.status;
-        expect(plugin.settings.linkRules).toEqual(['!google.*']);
-        expect(shown.split('\n')).not.toContain('google.* | q, tbm, hl');
-        expect(shown).toContain('maps.google.* | q, ll, z');
-        expect(shown).toContain('docs.google.*');
-        expect(status).toBeNull();
-    });
-
-    it('round-trips an unedited list to no stored changes', async () => {
-        await tab.setControlValue('linkRules.text', String(tab.getControlValue('linkRules.text')));
-        expect(plugin.settings.linkRules).toEqual([]);
-    });
-
-    it('does not rebuild the settings page while a site rule is being typed', async () => {
-        const shown = String(tab.getControlValue('linkRules.text'));
+    it('does not rebuild the settings page while a removal is being typed', async () => {
         const before = (tab as unknown as { updateCount: number }).updateCount;
 
-        await tab.setControlValue('linkRules.text', `${shown}\nmine.example | id`);
+        await tab.setControlValue('linkRemovals.text', 'mine.example | source');
 
         expect((tab as unknown as { updateCount: number }).updateCount).toBe(before);
     });
 
-    it('rejects a site rule that is not a domain', () => {
-        const row = controlRows(tab).find(candidate => candidate.control.key === 'linkRules.text');
+    it('describes and validates global and site-specific removals', () => {
+        const row = controlRows(tab).find(candidate => candidate.control.key === 'linkRemovals.text');
         const validate = row?.control.validate as ((value: string) => string | void) | undefined;
-        expect(validate?.('example.com: id')).toBeUndefined();
-        expect(validate?.('youtube,com: v')).toContain('youtube,com');
+        expect(row?.desc).toContain('"fbclid" removes the fbclid parameter wherever it appears.\n\n');
+        expect(row?.desc).toContain('This removes source and ref from example.com and its subdomains, while every other parameter stays.');
+        expect(row?.control.type === 'textarea' ? row.control.placeholder : undefined).toBe('fbclid\nexample.com | source, ref');
+        expect(validate?.('fbclid')).toBeUndefined();
+        expect(validate?.('example.com | source')).toBeUndefined();
+        expect(validate?.('youtube,com | si')).toContain('youtube,com');
+        expect(validate?.('two parameter names')).toContain('two parameter names');
     });
 });
 
@@ -349,8 +361,8 @@ describe('dependent settings', () => {
     });
 
     it('hides the link detail when the rule is off', () => {
-        expect(isVisible(rowFor('linkStrip', { linkEnabled: false }))).toBe(false);
-        expect(isVisible(pageFor('Site rules', { linkEnabled: false }))).toBe(false);
+        expect(isVisible(pageFor('Link removals', { linkEnabled: false }))).toBe(false);
+        expect(isVisible(pageFor('Link removals', { linkEnabled: true }))).toBe(true);
     });
 
     it('keeps the quote and dash choices independent of invisible characters', () => {

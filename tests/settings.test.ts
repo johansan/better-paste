@@ -17,12 +17,12 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { findInvalidDomainRules, normalizeSettings, parseLines } from '../src/settings/normalize';
+import { findInvalidRemovalRules, normalizeSettings, parseLines } from '../src/settings/normalize';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
-import { SHIPPED_DOMAIN_RULES } from '../src/settings/constants';
+import { SHIPPED_PARAM_REMOVALS } from '../src/settings/constants';
 import { isPreformattedHtml, isSingleImageFile } from '../src/paste/PasteService';
 import { runTextPipeline } from '../src/transforms';
-import { mergeDomainRules } from '../src/transforms/urlCleanup';
+import { parseDomainRemovals } from '../src/transforms/urlCleanup';
 import { fakeFile } from './stubs/editor';
 
 describe('normalizeSettings', () => {
@@ -47,12 +47,12 @@ describe('normalizeSettings', () => {
 
     it('keeps valid stored values', () => {
         const result = normalizeSettings({
-            linkStrip: 'tracking',
+            linkRemovals: ['example.com | source'],
             linkTitles: false,
             imageNameFormat: 'custom',
             imageNameTemplate: '{{name}}-YYYY-MM-DD'
         });
-        expect(result.linkStrip).toBe('tracking');
+        expect(result.linkRemovals).toEqual(['example.com | source']);
         expect(result.linkTitles).toBe(false);
         expect(result.imageNameFormat).toBe('custom');
         expect(result.imageNameTemplate).toBe('{{name}}-YYYY-MM-DD');
@@ -78,18 +78,21 @@ describe('normalizeSettings', () => {
         expect(result).toEqual(DEFAULT_SETTINGS);
     });
 
-    it("stores only the user's own site rules, leaving the shipped list in code", () => {
-        expect(normalizeSettings({ linkRules: ['mine.example: id'] }).linkRules).toEqual(['mine.example: id']);
-        expect(mergeDomainRules([])).toHaveLength(SHIPPED_DOMAIN_RULES.length);
+    it('stores only user-defined removals, leaving the shipped list in code', () => {
+        expect(normalizeSettings({ linkRemovals: ['mine.example | source'] }).linkRemovals).toEqual(['mine.example | source']);
+        expect(parseDomainRemovals(SHIPPED_PARAM_REMOVALS)).toHaveLength(SHIPPED_PARAM_REMOVALS.length);
     });
 
     it('round-trips its own output unchanged', () => {
-        const once = normalizeSettings({ linkStrip: 'tracking', linkRules: ['mine.example: id'] });
+        const once = normalizeSettings({ linkRemovals: ['mine.example | source'] });
         expect(normalizeSettings(once)).toEqual(once);
     });
 
-    it('rejects an unknown enum value', () => {
-        expect(normalizeSettings({ linkStrip: 'sometimes' }).linkStrip).toBe(DEFAULT_SETTINGS.linkStrip);
+    it('does not reinterpret old keep-lists as removals', () => {
+        expect(normalizeSettings({ linkStrip: 'all', linkRules: ['mine.example | id'] }).linkRemovals).toEqual([]);
+    });
+
+    it('rejects an unknown image name format', () => {
         expect(normalizeSettings({ imageNameFormat: 'fancy' }).imageNameFormat).toBe(DEFAULT_SETTINGS.imageNameFormat);
     });
 });
@@ -103,17 +106,28 @@ describe('parseLines and rule validation', () => {
         expect(parseLines('youtube.com: v, t')).toEqual(['youtube.com: v, t']);
     });
 
-    it('accepts well-formed site rules', () => {
-        expect(findInvalidDomainRules('example.com\nyoutube.com: v, t\n!github.com\n*.wild.org\nlocalhost')).toEqual([]);
+    it('accepts well-formed removals', () => {
+        expect(findInvalidRemovalRules('fbclid\nyoutube.com | si, feature\n*.wild.org: ref\nlocalhost | debug\n!youtube.com')).toEqual([]);
     });
 
-    it('flags a line that is not a site name', () => {
-        expect(findInvalidDomainRules('youtube,com: v')).toEqual(['youtube,com: v']);
-        expect(findInvalidDomainRules('not a domain')).toEqual(['not a domain']);
+    it('flags a bad site, malformed global entry or disabled rule with parameters', () => {
+        expect(findInvalidRemovalRules('youtube,com: v')).toEqual(['youtube,com: v']);
+        expect(findInvalidRemovalRules('two parameter names')).toEqual(['two parameter names']);
+        expect(findInvalidRemovalRules('!youtube.com | si')).toEqual(['!youtube.com | si']);
+    });
+
+    it('accepts a single-label intranet site rule but not a single-label disable', () => {
+        expect(findInvalidRemovalRules('intranet | source')).toEqual([]);
+        // A single label can never reach a shipped removal, so disabling one is a mistake
+        expect(findInvalidRemovalRules('!fbclid')).toEqual(['!fbclid']);
+    });
+
+    it('flags a site written with a port instead of splitting it at the colon', () => {
+        expect(findInvalidRemovalRules('localhost:3000 | debug')).toEqual(['localhost:3000 | debug']);
     });
 
     it('ignores comments when validating', () => {
-        expect(findInvalidDomainRules('# just a note about things')).toEqual([]);
+        expect(findInvalidRemovalRules('# just a note about things')).toEqual([]);
     });
 });
 
@@ -200,7 +214,7 @@ describe('runTextPipeline', () => {
         expect(runTextPipeline('Just a sentence.', DEFAULT_SETTINGS).changed).toBe(false);
     });
 
-    it('keeps a signed image URL intact when image downloading is off', () => {
+    it('keeps image access parameters when image downloading is off', () => {
         const input = 'See ![shot](https://cdn.discordapp.com/attachments/123/456/shot.png?ex=66f&is=66e&hm=abc123)';
         expect(runTextPipeline(input, { ...DEFAULT_SETTINGS, imageEnabled: false }).text).toBe(input);
     });

@@ -124,32 +124,30 @@ export const STRINGS_PL: TranslationStrings = {
             cleaningName: 'Czyść wklejane odnośniki',
             cleaningDesc: 'Usuwa parametry śledzące z wklejanych odnośników:',
             cleaningAliases: ['url', 'śledzenie', 'utm', 'parametry', 'zapytanie', 'witryna', 'domena', 'youtube', 'wyjątek'],
-            stripName: 'Które parametry usuwać',
-            stripDesc: 'Parametry śledzące to nazwy takie jak utm_source, fbclid i gclid.',
-            stripAliases: ['utm', 'śledzenie', 'zapytanie', 'parametry'],
-            stripAll: 'Każdy parametr, o ile reguła witryny go nie zachowa',
-            stripTracking: 'Tylko znane parametry śledzące',
-            rulesName: 'Reguły witryn',
-            rulesDesc: 'Parametry zachowywane w wybranych witrynach.',
+            removalsName: 'Usuwanie parametrów z odnośników',
+            removalsDesc: 'Dodatkowe parametry do usuwania wszędzie lub w wybranych witrynach.',
             rulesCount: {
-                one: '{count} witryna',
-                few: '{count} witryny',
-                many: '{count} witryn',
-                other: '{count} witryny'
+                one: '{count} wpis',
+                few: '{count} wpisy',
+                many: '{count} wpisów',
+                other: '{count} wpisu'
             },
-            listName: 'Twoje reguły witryn',
+            builtInName: 'Wbudowane reguły usuwania',
+            builtInDesc:
+                'Zaktualizowano {date}. Globalne filtry śledzenia: {trackingCount}. Reguły specyficzne dla witryn: {siteCount}. Linki podpisane kryptograficznie pozostają niezmienione.',
+            builtInButton: 'Wyświetl listę',
+            listName: 'Twoje reguły usuwania',
             listDesc:
-                'Reguły dla {sites} są już częścią wtyczki. Dodaj tutaj własne reguły, po jednej w wierszu. „example.com” zachowuje wszystkie parametry tej witryny, „example.com: a, b” zachowuje tylko te dwa, a „!example.com” usuwa regułę dostarczaną z wtyczką. Poddomeny są rozpoznawane automatycznie.',
-            listShippedCount: {
-                one: '{count} popularnej witryny',
-                few: '{count} popularnych witryn',
-                many: '{count} popularnych witryn',
-                other: '{count} popularnej witryny'
-            },
-            listAliases: ['domena', 'wyjątek', 'biała lista', 'youtube'],
-            listInvalid: 'To nie jest nazwa witryny: {values}',
+                'Aby usunąć parametr ze zwykłych linków na każdej witrynie, wystarczy wpisać samą nazwę tego parametru. Na przykład wpisanie „fbclid” spowoduje usunięcie parametru „fbclid” wszędzie tam, gdzie się pojawia.\n\nAby usunąć parametry tylko z jednej witryny, użyj formatu example.com | source, ref. Spowoduje to usunięcie parametrów „source” i „ref” z witryny example.com i jej subdomen, podczas gdy wszystkie pozostałe parametry pozostaną niezmienione. Aby wyłączyć wbudowane reguły usuwania dla danej witryny, rozpocznij wiersz od znaku „!”. Linki podpisane kryptograficznie pozostają zawsze niezmienione.',
+            listAliases: ['domena', 'parametr', 'filtr', 'usuń', 'youtube'],
+            listInvalid: 'Nieprawidłowa reguła usuwania: {values}',
+            suggestName: 'Zaproponuj swoje reguły usuwania',
+            suggestDesc:
+                'Przejrzyj swoją listę na stronie betterpaste.md, a następnie prześlij ją, aby pomóc ulepszyć wbudowane reguły usuwania.',
+            suggestAliases: ['wesprzyj projekt', 'prześlij', 'udostępnij', 'wyślij', 'filtr'],
+            suggestButton: 'Sprawdź i wyślij',
             testerName: 'Wypróbuj',
-            testerDesc: 'Wklej odnośnik, aby zobaczyć, co zachowują reguły.',
+            testerDesc: 'Wklej odnośnik, aby zobaczyć oczyszczony wynik.',
             testerLabel: 'Odnośnik do wyczyszczenia',
             testerEmpty: 'Wyczyszczony odnośnik pojawi się tutaj.'
         },
