@@ -26,6 +26,7 @@ export const STRINGS_FA: TranslationStrings = {
         cleanSelection: 'پاک‌سازی متن انتخاب‌شده',
         cleanTerminal: 'پاک‌سازی خروجی پایانه',
         cleanPdf: 'پاک‌سازی متن PDF',
+        runSnippet: 'اجرای قطعه',
         commasInside: 'انتقال ویرگول‌ها به داخل گیومه',
         commasOutside: 'انتقال ویرگول‌ها به خارج از گیومه',
         toggleCleanup: 'تغییر وضعیت پاک‌سازی خودکار'
@@ -179,7 +180,7 @@ export const STRINGS_FA: TranslationStrings = {
             wikiButton: 'نمایش ویکی',
             regexButton: 'باز کردن ابزار آزمایش عبارت منظم',
             snippetsName: 'قطعه‌ها',
-            snippetsDesc: 'قطعه‌های جست‌وجو و جایگزینی بسازید و مشخص کنید کدام‌یک اجرا شوند.',
+            snippetsDesc: 'قطعه‌های خود را اضافه و ویرایش کنید. آن‌هایی را که باید هنگام چسباندن اجرا شوند روشن کنید.',
             enabledSnippetsCount: { one: '{count} قطعه فعال', other: '{count} قطعه فعال' },
             snippetRulesCount: { one: '{count} قاعده', other: '{count} قاعده' },
             invalidRulesCount: { one: '{count} خط نامعتبر', other: '{count} خط نامعتبر' },
@@ -200,11 +201,12 @@ export const STRINGS_FA: TranslationStrings = {
             nameName: 'نام',
             rulesName: 'قواعد',
             rulesDesc: 'در هر خط یک جایگزینی با عبارت منظم JavaScript وارد کنید.',
+            wikiPasteHint: 'یک قطعه آماده را از ویکی کپی کنید و مستقیم در کادر قواعد بچسبانید.',
             invalidLine: 'خط {line}: {value}',
             saveButton: 'ذخیره',
             recognizedSnippetsCount: { one: '{count} قطعه شناسایی شد', other: '{count} قطعه شناسایی شد' },
             recognizedRulesCount: { one: '{count} قاعده شناسایی شد', other: '{count} قاعده شناسایی شد' },
-            unparseableName: 'خط‌های خوانده‌نشده',
+            unparseableName: 'خط‌های شناسایی‌نشده',
             importFallbackName: 'قطعه درون‌ریزی‌شده'
         }
     },

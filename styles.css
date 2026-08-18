@@ -104,14 +104,15 @@
     flex-wrap: wrap;
     align-items: center;
     gap: var(--size-4-2);
-    margin-top: var(--size-4-2);
+    margin-top: var(--size-4-4);
+    margin-bottom: var(--size-4-4);
 }
 
 .better-paste-pipeline-step {
     padding: var(--size-4-2) var(--size-4-3);
     border: 1px solid var(--background-modifier-border);
     border-radius: var(--radius-s);
-    background-color: var(--background-secondary);
+    background-color: var(--background-primary);
     font-size: var(--font-ui-smaller);
 }
 
@@ -126,18 +127,26 @@
     margin-top: var(--size-4-2);
 }
 
-.better-paste-snippet-edit-button {
+.better-paste-settings .better-paste-snippet-edit-button {
+    height: auto;
+    min-height: 0;
+    min-width: 0;
     margin-inline-start: var(--size-4-1);
     padding: 0;
     border: 0;
-    background: transparent;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
     color: var(--text-accent);
     font: inherit;
+    line-height: inherit;
     cursor: pointer;
 }
 
-.better-paste-snippet-edit-button:hover {
-    background: transparent;
+.better-paste-settings .better-paste-snippet-edit-button:hover,
+.better-paste-settings .better-paste-snippet-edit-button:focus-visible {
+    background-color: transparent;
+    box-shadow: none;
     color: var(--text-accent-hover);
     text-decoration: underline;
 }

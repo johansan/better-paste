@@ -17,10 +17,11 @@
  */
 
 import { Modal, Setting } from 'obsidian';
-import type { App, ButtonComponent } from 'obsidian';
+import type { App, ButtonComponent, TextComponent } from 'obsidian';
 import { format, strings } from '../i18n';
-import { applyTextSnippets, createTextSnippetId, findInvalidSnippetRuleLines } from '../transforms/snippets';
+import { applyTextSnippets, createTextSnippetId, findInvalidSnippetRuleLines, snippetNameFromRules } from '../transforms/snippets';
 import type { TextSnippet } from './types';
+import { SNIPPETS_WIKI_URL } from './constants';
 
 /** Converts the textarea value into stored lines without dropping comments or blanks. */
 function rulesFromText(value: string): string[] {
@@ -34,6 +35,7 @@ export class TextSnippetModal extends Modal {
     private validationEl: HTMLElement | null = null;
     private previewEl: HTMLElement | null = null;
     private saveButton: ButtonComponent | null = null;
+    private nameInput: TextComponent | null = null;
     private sample = '';
     private saving = false;
 
@@ -51,13 +53,14 @@ export class TextSnippetModal extends Modal {
         this.modalEl.addClass('better-paste-snippet-modal');
 
         new Setting(this.contentEl).setName(text.nameName).addText(input => {
+            this.nameInput = input;
             input.setValue(this.snippet.name).onChange(value => {
                 this.snippet.name = value;
                 this.updateSaveButton();
             });
         });
 
-        new Setting(this.contentEl)
+        const rulesSetting = new Setting(this.contentEl)
             .setName(text.rulesName)
             .setDesc(text.rulesDesc)
             .setClass('better-paste-snippet-rules-setting')
@@ -66,12 +69,13 @@ export class TextSnippetModal extends Modal {
                     .setPlaceholder(String.raw`s/\[\d+\]//g`)
                     .setValue(this.snippet.rules.join('\n'))
                     .onChange(value => {
-                        this.snippet.rules = rulesFromText(value);
-                        this.renderValidation();
-                        this.renderPreview();
+                        this.updateRules(value);
                     });
                 input.inputEl.rows = 8;
             });
+        rulesSetting.descEl.createEl('br');
+        const wiki = rulesSetting.descEl.createEl('a', { text: text.wikiPasteHint, href: SNIPPETS_WIKI_URL });
+        wiki.setAttrs({ target: '_blank', rel: 'noopener noreferrer' });
 
         this.validationEl = this.contentEl.createDiv({ cls: 'better-paste-snippet-validation' });
         this.validationEl.setAttrs({ role: 'status', 'aria-live': 'polite' });
@@ -123,6 +127,21 @@ export class TextSnippetModal extends Modal {
         }
     }
 
+    private updateRules(value: string): void {
+        this.snippet.rules = rulesFromText(value);
+        if (!this.snippet.name.trim()) {
+            const name = snippetNameFromRules(this.snippet.rules);
+            if (name !== null) {
+                this.snippet.name = name;
+                this.nameInput?.setValue(name);
+            }
+            this.updateSaveButton();
+        }
+
+        this.renderValidation();
+        this.renderPreview();
+    }
+
     private renderPreview(): void {
         if (!this.previewEl) return;
         if (!this.sample) {
@@ -150,6 +169,7 @@ export class TextSnippetModal extends Modal {
     }
 
     onClose(): void {
+        this.nameInput = null;
         this.contentEl.empty();
     }
 }

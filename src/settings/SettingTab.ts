@@ -27,7 +27,7 @@ import type { DynamicDescriptionKey, SettingsPageContext } from './pages/context
 import { createImageLandingDefinitions } from './pages/imagesPage';
 import { createLinkLandingDefinitions } from './pages/linksPage';
 import { createTextProcessingDefinitions } from './pages/textProcessingPage';
-import { createCustomProcessingDefinitions } from './pages/customProcessingPage';
+import { createCustomProcessingDefinitions, openSnippetEditor } from './pages/customProcessingPage';
 import { createStartDefinitions } from './pages/startPage';
 
 /**
@@ -70,6 +70,7 @@ export class BetterPasteSettingTab extends PluginSettingTab {
     // getControlValue reads from it. Declaring rather than redefining the field narrows the
     // type without emitting a class field that would shadow the base's reference.
     declare plugin: BetterPastePlugin;
+    private readonly snippetEditListenerDocuments = new WeakSet<Document>();
 
     constructor(app: App, plugin: BetterPastePlugin) {
         super(app, plugin);
@@ -129,11 +130,32 @@ export class BetterPasteSettingTab extends PluginSettingTab {
                 type: 'group',
                 cls: SETTINGS_CLASS,
                 heading: strings.settings.custom.heading,
-                items: createCustomProcessingDefinitions(context)
+                items: createCustomProcessingDefinitions(context, ownerDocument => this.registerSnippetEditListener(ownerDocument))
             },
             // Last, because release notes, support links and the other plugins are not settings
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.start.heading, items: createStartDefinitions(context) }
         ];
+    }
+
+    /** Subsection pages render outside the tab container, so their owning document handles delegated clicks. */
+    private registerSnippetEditListener(ownerDocument: Document): void {
+        const ownerWindow = ownerDocument.defaultView;
+        if (!ownerWindow || this.snippetEditListenerDocuments.has(ownerDocument)) return;
+        this.snippetEditListenerDocuments.add(ownerDocument);
+
+        this.plugin.registerDomEvent(ownerDocument, 'click', event => {
+            const target = event.target;
+            if (!(target instanceof ownerWindow.Element)) return;
+            const button = target.closest<HTMLButtonElement>('.better-paste-snippet-edit-button');
+            if (!button) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+            const snippetId = button.dataset.snippetId;
+            if (!snippetId) return;
+            const snippet = this.plugin.settings.textSnippets.find(candidate => candidate.id === snippetId);
+            if (snippet) openSnippetEditor(this.context, snippet);
+        });
     }
 
     /**

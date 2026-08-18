@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
     App,
     Setting,
@@ -30,6 +30,7 @@ import { BetterPasteSettingTab } from '../src/settings/SettingTab';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import type BetterPastePlugin from '../src/main';
 import type { BetterPasteSettings } from '../src/settings/types';
+import { TextSnippetModal } from '../src/settings/TextSnippetModal';
 import { linkRemovalContributionUrl } from '../src/settings/pages/linksPage';
 import { BUILT_IN_LINK_REMOVALS_URL } from '../src/urls';
 
@@ -52,20 +53,39 @@ const CUSTOM_RENDER_SETTING_KEYS = [
 /** Minimal plugin double exposing only what the setting tab touches. */
 function fakePlugin(overrides: Partial<BetterPasteSettings> = {}) {
     const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, ...overrides };
+    const domEvents: { element: unknown; type: string; callback: (event: MouseEvent) => void }[] = [];
     let saves = 0;
     return {
         settings,
         manifest: { version: '1.0.0' },
         showWhatsNew: () => undefined,
+        registerDomEvent: (element: unknown, type: string, callback: (event: MouseEvent) => void) => {
+            domEvents.push({ element, type, callback });
+        },
         saveSettings: async () => {
             saves += 1;
         },
+        domEvents: () => domEvents,
         saveCount: () => saves
     };
 }
 
+class MainWindowElement {
+    readonly dataset: Record<string, string> = {};
+
+    constructor(private readonly closestMatch: MainWindowElement | null) {}
+
+    closest(selector: string): MainWindowElement | null {
+        return selector === '.better-paste-snippet-edit-button' ? this.closestMatch : null;
+    }
+}
+
 function makeTab(plugin: ReturnType<typeof fakePlugin>): BetterPasteSettingTab {
-    return new BetterPasteSettingTab({} as App, plugin as unknown as BetterPastePlugin);
+    const tab = new BetterPasteSettingTab({} as App, plugin as unknown as BetterPastePlugin);
+    (tab as unknown as { containerEl: { ownerDocument: Document } }).containerEl = {
+        ownerDocument: documentTarget as unknown as Document
+    };
+    return tab;
 }
 
 /** A definition that holds other definitions: a group, a list, or a sub-page. */
@@ -118,8 +138,10 @@ class PreviewElement {
     readonly children: PreviewElement[] = [];
     readonly listeners = new Map<string, () => void>();
     readonly attrs: Record<string, string> = {};
+    ownerDocument: unknown = documentTarget;
     value = '';
     text = '';
+    private windowMigrationListener: (() => void) | null = null;
     private parent: PreviewElement | null = null;
 
     constructor(
@@ -143,8 +165,16 @@ class PreviewElement {
         return this.append(new PreviewElement('div', options));
     }
 
+    createSpan(options: PreviewElementOptions = {}): PreviewElement {
+        return this.append(new PreviewElement('span', options));
+    }
+
     createEl(tagName: string, options: PreviewElementOptions = {}): PreviewElement {
         return this.append(new PreviewElement(tagName, options));
+    }
+
+    appendText(text: string): void {
+        this.text += text;
     }
 
     setAttrs(attrs: Record<string, string>): void {
@@ -157,6 +187,18 @@ class PreviewElement {
 
     addEventListener(event: string, listener: () => void): void {
         this.listeners.set(event, listener);
+    }
+
+    onWindowMigrated(listener: () => void): () => void {
+        this.windowMigrationListener = listener;
+        return () => {
+            this.windowMigrationListener = null;
+        };
+    }
+
+    migrateTo(ownerDocument: unknown): void {
+        this.ownerDocument = ownerDocument;
+        this.windowMigrationListener?.();
     }
 
     querySelector(selector: string): PreviewElement | null {
@@ -199,6 +241,25 @@ class PreviewElement {
         return false;
     }
 }
+
+const documentTarget = { defaultView: { Element: MainWindowElement } };
+
+function renderSnippetTools(tab: BetterPasteSettingTab, ownerDocument: unknown): PreviewElement {
+    const snippets = pages(tab.getSettingDefinitions()).find(page => page.name === 'Snippets');
+    const preview = flatten([...(snippets?.items ?? [])]).find(row => row.name === 'Try it');
+    const settingEl = new PreviewElement();
+    settingEl.ownerDocument = ownerDocument;
+    preview?.render?.({ settingEl } as unknown as Setting);
+    return settingEl;
+}
+
+beforeEach(() => {
+    vi.stubGlobal('document', documentTarget);
+});
+
+afterEach(() => {
+    vi.unstubAllGlobals();
+});
 
 describe('settings tree', () => {
     let plugin: ReturnType<typeof fakePlugin>;
@@ -428,6 +489,123 @@ describe('settings values', () => {
         const rows = controlRows(tab).filter(row => row.name === 'Same name');
 
         expect(rows.map(row => row.control.key)).toEqual(['textSnippet:first', 'textSnippet:second']);
+    });
+
+    it('puts delegated edit metadata in the snippet description fragment', () => {
+        vi.stubGlobal('createFragment', (build: (fragment: PreviewElement) => void) => {
+            const fragment = new PreviewElement('fragment');
+            build(fragment);
+            return fragment;
+        });
+        plugin.settings.textSnippets = [{ id: 'replace', name: 'Replace', rules: ['s/a/b/g'], enabled: true }];
+
+        try {
+            const row = controlRows(tab).find(candidate => candidate.name === 'Replace');
+            const description = row?.desc as unknown as PreviewElement;
+            const edit = description.querySelector('.better-paste-snippet-edit-button');
+
+            expect(description.text).toBe('1 rule ');
+            expect(edit?.tagName).toBe('button');
+            expect(edit?.attrs).toEqual({ type: 'button', 'data-snippet-id': 'replace' });
+            expect(edit?.listeners.has('click')).toBe(false);
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
+    it('delegates snippet edit clicks once and resolves the live snippet', () => {
+        plugin.settings.textSnippets = [{ id: 'replace', name: 'Old name', rules: ['s/a/b/g'], enabled: true }];
+        renderSnippetTools(tab, documentTarget);
+        renderSnippetTools(tab, documentTarget);
+
+        const registrations = plugin.domEvents();
+        expect(registrations).toHaveLength(1);
+        expect(registrations[0]?.element).toBe(documentTarget);
+        expect(registrations[0]?.type).toBe('click');
+
+        plugin.settings.textSnippets = [{ id: 'replace', name: 'Current name', rules: ['s/c/d/g'], enabled: false }];
+        const button = new MainWindowElement(null);
+        button.dataset.snippetId = 'replace';
+        const target = new MainWindowElement(button);
+        const preventDefault = vi.fn();
+        const stopPropagation = vi.fn();
+        const event = {
+            target,
+            preventDefault,
+            stopPropagation
+        } as unknown as MouseEvent;
+        const open = vi.spyOn(TextSnippetModal.prototype, 'open');
+
+        try {
+            registrations[0]?.callback(event);
+
+            expect(preventDefault).toHaveBeenCalledOnce();
+            expect(stopPropagation).toHaveBeenCalledOnce();
+            expect(open).toHaveBeenCalledOnce();
+            const openedModal: unknown = open.mock.instances[0];
+            expect((openedModal as { snippet: { name: string } }).snippet.name).toBe('Current name');
+        } finally {
+            open.mockRestore();
+        }
+    });
+
+    it('registers edit delegation in every document where the tab renders', () => {
+        class PopoutElement {
+            readonly dataset: Record<string, string> = {};
+
+            constructor(private readonly closestMatch: PopoutElement | null) {}
+
+            closest(selector: string): PopoutElement | null {
+                return selector === '.better-paste-snippet-edit-button' ? this.closestMatch : null;
+            }
+        }
+
+        const popoutDocument = { defaultView: { Element: PopoutElement } };
+        plugin.settings.textSnippets = [{ id: 'popout', name: 'Popout snippet', rules: ['s/a/b/g'], enabled: true }];
+        const migratedTools = renderSnippetTools(tab, documentTarget);
+        migratedTools.migrateTo(popoutDocument);
+        renderSnippetTools(tab, popoutDocument);
+
+        const registrations = plugin.domEvents();
+        expect(registrations.map(registration => registration.element)).toEqual([documentTarget, popoutDocument]);
+
+        const button = new PopoutElement(null);
+        button.dataset.snippetId = 'popout';
+        const event = {
+            target: new PopoutElement(button),
+            preventDefault: vi.fn(),
+            stopPropagation: vi.fn()
+        } as unknown as MouseEvent;
+        const open = vi.spyOn(TextSnippetModal.prototype, 'open');
+
+        try {
+            registrations[1]?.callback(event);
+            expect(open).toHaveBeenCalledOnce();
+        } finally {
+            open.mockRestore();
+        }
+    });
+
+    it('keeps pasted snippet rules verbatim and fills only an empty name', () => {
+        const pasted = ['# Remove citations', '', '# Keep this comment', 's/a/b/g', '', '// Keep this too'].join('\n');
+        const modal = new TextSnippetModal({} as App, null, async () => undefined);
+        const nameInput = { setValue: vi.fn() };
+        const editable = modal as unknown as {
+            nameInput: typeof nameInput;
+            snippet: { name: string; rules: string[] };
+            updateRules: (value: string) => void;
+        };
+        editable.nameInput = nameInput;
+
+        editable.updateRules(pasted);
+
+        expect(editable.snippet).toMatchObject({ name: 'Remove citations', rules: pasted.split('\n') });
+        expect(nameInput.setValue).toHaveBeenCalledWith('Remove citations');
+
+        editable.snippet.name = 'My name';
+        editable.updateRules('# Different name\ns/c/d/g');
+        expect(editable.snippet).toMatchObject({ name: 'My name', rules: ['# Different name', 's/c/d/g'] });
+        expect(nameInput.setValue).toHaveBeenCalledTimes(1);
     });
 
     it('shows enabled snippet counts and invalid rules on the page link', () => {

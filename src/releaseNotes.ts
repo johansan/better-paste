@@ -53,8 +53,10 @@ const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.7',
         date: '2026-08-18',
+        banner: '1.0.7.jpg',
         new: [
-            'Added support for ==custom regex snippets==! Configure in settings, ready-made snippets to import are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets).'
+            'Added support for ==custom regex snippets==! Configure in settings, ready-made snippets to import are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets).',
+            'New command: ==Run snippet== applies a snippet of your choice to the current selection, even one that is switched off for pasting.'
         ]
     },
     {

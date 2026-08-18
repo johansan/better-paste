@@ -111,7 +111,8 @@ function unescapeReplacement(value: string, delimiter: string): string {
 /** Parses one sed-style replacement, distinguishing ignored lines from invalid ones. */
 export function parseSnippetRuleLine(line: string): SnippetRuleParseResult {
     const trimmed = line.trim();
-    if (!trimmed || line.trimStart().startsWith('//')) return { status: 'ignored' };
+    const start = line.trimStart();
+    if (!trimmed || start.startsWith('//') || start.startsWith('#')) return { status: 'ignored' };
     if (line[0] !== 's' || line.length < 2) return { status: 'invalid' };
 
     const delimiterCodePoint = line.codePointAt(1);
@@ -166,41 +167,78 @@ export function applyTextSnippets(input: string, snippets: readonly TextSnippet[
     return { text, changed: text !== input };
 }
 
-/** Parses the wiki interchange format, keeping valid rules and reporting the rest. */
+/** Returns the text from the first hash comment, without its marker. */
+export function snippetNameFromRules(rules: readonly string[]): string | null {
+    const comment = rules.find(line => line.trimStart().startsWith('#'));
+    return comment === undefined ? null : comment.trimStart().slice(1).trim();
+}
+
+function isBlankLine(line: string): boolean {
+    return line.trim().length === 0;
+}
+
+function isHashComment(line: string): boolean {
+    return line.trimStart().startsWith('#');
+}
+
+/** A detached heading ends a block or is followed by another hash comment. */
+function isDetachedHeading(lines: readonly string[], index: number): boolean {
+    if (!isHashComment(lines[index] ?? '')) return false;
+    const next = lines[index + 1];
+    return next === undefined || isBlankLine(next) || isHashComment(next);
+}
+
+/** Parses snippet content, splitting only when a detached heading starts a new segment. */
 export function parseSnippetInterchange(input: string, fallbackName: string): SnippetInterchangeResult {
+    if (!input.trim()) return { snippets: [], ruleCount: 0, invalidLines: [] };
+
+    const lines = input.split(/\r?\n/u);
     const snippets: TextSnippet[] = [];
     const invalidLines: InvalidSnippetRuleLine[] = [];
-    let name: string | null = null;
+    let ruleCount = 0;
     let rules: string[] = [];
 
     const flush = (): void => {
-        if (name === null && rules.length === 0) return;
-        snippets.push({ id: createTextSnippetId(), name: name || fallbackName, rules, enabled: true });
+        if (!rules.some(line => !isBlankLine(line))) return;
+        snippets.push({
+            id: createTextSnippetId(),
+            name: snippetNameFromRules(rules) || fallbackName,
+            rules,
+            enabled: true
+        });
         rules = [];
     };
 
-    input.split(/\r?\n/u).forEach((line, index) => {
-        const trimmed = line.trim();
-        if (!trimmed) return;
-        if (line.trimStart().startsWith('#')) {
-            flush();
-            name = line.trimStart().slice(1).trim() || fallbackName;
-            return;
-        }
+    lines.forEach((line, index) => {
+        if (isDetachedHeading(lines, index) && rules.some(candidate => !isBlankLine(candidate))) flush();
+        rules.push(line);
 
-        if (parseSnippetRuleLine(line).status !== 'invalid') rules.push(line);
-        else invalidLines.push({ lineNumber: index + 1, line });
+        const parsed = parseSnippetRuleLine(line);
+        if (parsed.status === 'valid') ruleCount += 1;
+        else if (parsed.status === 'invalid') invalidLines.push({ lineNumber: index + 1, line });
     });
     flush();
 
-    return {
-        snippets,
-        ruleCount: snippets.reduce((count, snippet) => count + countSnippetRuleLines(snippet.rules), 0),
-        invalidLines
-    };
+    return { snippets, ruleCount, invalidLines };
 }
 
-/** Writes snippets in the plain-text format used by the wiki and import dialog. */
+/** Writes snippet content with current names and one blank line between snippets. */
 export function serializeTextSnippets(snippets: readonly TextSnippet[], fallbackName: string): string {
-    return snippets.map(snippet => [`# ${snippet.name.trim() || fallbackName}`, ...snippet.rules].join('\n')).join('\n\n');
+    return snippets
+        .map(snippet => {
+            const name = snippet.name.trim() || fallbackName;
+            const firstContent = snippet.rules.findIndex(line => !isBlankLine(line));
+            const lines = [...snippet.rules];
+
+            if (firstContent >= 0 && isDetachedHeading(lines, firstContent)) {
+                const headingName = (lines[firstContent] ?? '').trimStart().slice(1).trim();
+                if (headingName !== name) lines[firstContent] = `# ${name}`;
+            } else {
+                lines.unshift(`# ${name}`, '');
+            }
+
+            while (lines.length > 0 && isBlankLine(lines[lines.length - 1] ?? '')) lines.pop();
+            return lines.join('\n');
+        })
+        .join('\n\n');
 }

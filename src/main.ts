@@ -30,6 +30,7 @@ import { WhatsNewModal } from './modals/WhatsNewModal';
 import { PluginOverlapModal } from './modals/PluginOverlapModal';
 import { findOverlappingPlugins } from './pluginOverlap';
 import { BetterPasteSettingTab } from './settings/SettingTab';
+import { TextSnippetPickerModal } from './settings/TextSnippetPickerModal';
 import { format, strings } from './i18n';
 import { logError } from './utils/logger';
 import { DEFAULT_SETTINGS } from './settings/defaults';
@@ -65,6 +66,8 @@ export default class BetterPastePlugin extends Plugin {
     private imageModal: ImageEmbedModal | null = null;
     /** The PDF cleanup dialog while it is open, closed on unload for the same reason. */
     private pdfModal: PdfCleanupModal | null = null;
+    /** The snippet picker while it is open, closed on unload so it cannot outlive the plugin. */
+    private snippetPickerModal: TextSnippetPickerModal | null = null;
     private startupModal: WelcomeModal | WhatsNewModal | null = null;
     private overlapModal: PluginOverlapModal | null = null;
     /** Set on unload, so deferred callbacks and dialog closes stop touching the plugin. */
@@ -134,6 +137,16 @@ export default class BetterPastePlugin extends Plugin {
         });
 
         this.addCommand({
+            id: 'selection-run-snippet',
+            name: strings.commands.runSnippet,
+            editorCheckCallback: (checking: boolean, editor: Editor) => {
+                if (this.settings.textSnippets.length === 0) return false;
+                if (!checking) this.openSnippetPicker(editor);
+                return true;
+            }
+        });
+
+        this.addCommand({
             id: 'selection-commas-inside',
             name: strings.commands.commasInside,
             editorCallback: (editor: Editor) => {
@@ -171,6 +184,7 @@ export default class BetterPastePlugin extends Plugin {
         this.unloaded = true;
         this.imageModal?.close();
         this.pdfModal?.close();
+        this.snippetPickerModal?.close();
         this.startupModal?.close();
         this.overlapModal?.close();
         // An image write may still be in flight; this stops it editing a note that the
@@ -238,6 +252,25 @@ export default class BetterPastePlugin extends Plugin {
             );
             this.pdfModal.open();
         });
+    }
+
+    /** Opens every stored snippet for an explicit run against the editor selection. */
+    private openSnippetPicker(editor: Editor): void {
+        const selection = editor.getSelection();
+        // A single selection only: getSelection reads one text, but replaceSelection
+        // would write that text into every cursor's range
+        if (!selection || editor.listSelections().length > 1) {
+            new Notice(format(strings.notices.prefix, { message: strings.notices.selectTextFirst }));
+            return;
+        }
+
+        this.snippetPickerModal?.close();
+        this.snippetPickerModal = new TextSnippetPickerModal(this.app, this.settings.textSnippets, snippet => {
+            this.snippetPickerModal = null;
+            if (this.unloaded) return;
+            this.pasteService.runSnippet(editor, snippet);
+        });
+        this.snippetPickerModal.open();
     }
 
     async loadSettings(): Promise<void> {

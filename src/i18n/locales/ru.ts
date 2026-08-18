@@ -26,6 +26,7 @@ export const STRINGS_RU: TranslationStrings = {
         cleanSelection: 'Очистить выделение',
         cleanTerminal: 'Очистить вывод терминала',
         cleanPdf: 'Очистить текст из PDF',
+        runSnippet: 'Выполнить сниппет',
         commasInside: 'Перенести запятые внутрь кавычек',
         commasOutside: 'Перенести запятые за кавычки',
         toggleCleanup: 'Переключить автоматическую очистку'
@@ -188,7 +189,7 @@ export const STRINGS_RU: TranslationStrings = {
 
         custom: {
             heading: 'Пользовательская обработка',
-            pipelineName: 'Применить пользовательские сниппеты с регулярными выражениями к тексту',
+            pipelineName: 'Применять к тексту пользовательские сниппеты с регулярными выражениями',
             pastedText: 'Вставленный текст',
             builtInRules: 'Встроенные правила',
             customSnippets: 'Пользовательские сниппеты',
@@ -196,7 +197,7 @@ export const STRINGS_RU: TranslationStrings = {
             wikiButton: 'Открыть вики',
             regexButton: 'Открыть тестер регулярных выражений',
             snippetsName: 'Сниппеты',
-            snippetsDesc: 'Создавайте сниппеты поиска и замены и выбирайте, какие из них выполнять.',
+            snippetsDesc: 'Добавляйте и изменяйте свои сниппеты. Включите те, которые должны выполняться при вставке.',
             enabledSnippetsCount: {
                 one: '{count} включённый сниппет',
                 few: '{count} включённых сниппета',
@@ -220,11 +221,11 @@ export const STRINGS_RU: TranslationStrings = {
             addSnippet: 'Добавить сниппет',
             editButton: 'Изменить сниппет',
             exportName: 'Экспортировать сниппеты',
-            exportDesc: 'Копирует все сниппеты в формате обмена из вики.',
+            exportDesc: 'Копирует все сниппеты в формате обмена вики.',
             exportButton: 'Копировать сниппеты',
             importName: 'Импортировать сниппеты',
             importDesc: 'Добавляет сниппеты из формата обмена вики.',
-            previewName: 'Попробовать',
+            previewName: 'Попробуйте',
             previewDesc: 'Введите пример текста, чтобы увидеть результат всех включённых сниппетов.',
             modalPreviewDesc: 'Введите пример текста, чтобы увидеть результат этого сниппета.',
             previewInputLabel: 'Пример текста',
@@ -232,6 +233,7 @@ export const STRINGS_RU: TranslationStrings = {
             nameName: 'Название',
             rulesName: 'Правила',
             rulesDesc: 'Введите по одной замене с регулярным выражением JavaScript в каждой строке.',
+            wikiPasteHint: 'Скопируйте готовый сниппет из вики и вставьте его прямо в поле правил.',
             invalidLine: 'Строка {line}: {value}',
             saveButton: 'Сохранить',
             recognizedSnippetsCount: {
@@ -241,10 +243,10 @@ export const STRINGS_RU: TranslationStrings = {
                 other: 'Распознано {count} сниппета'
             },
             recognizedRulesCount: {
-                one: 'Распознано {count} правило',
-                few: 'Распознано {count} правила',
-                many: 'Распознано {count} правил',
-                other: 'Распознано {count} правила'
+                one: 'распознано {count} правило',
+                few: 'распознано {count} правила',
+                many: 'распознано {count} правил',
+                other: 'распознано {count} правила'
             },
             unparseableName: 'Нераспознанные строки',
             importFallbackName: 'Импортированный сниппет'

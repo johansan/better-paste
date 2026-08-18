@@ -28,6 +28,8 @@ import { logError } from '../../utils/logger';
 import { SETTINGS_CLASS, TEXT_SNIPPET_KEY_PREFIX } from './context';
 import type { SettingsPageContext } from './context';
 
+type RegisterSnippetEditListener = (ownerDocument: Document) => void;
+
 /** Saves a structural list change and rebuilds the definitions that represent it. */
 async function saveAndUpdate(context: SettingsPageContext): Promise<void> {
     await context.saveSettings();
@@ -35,7 +37,7 @@ async function saveAndUpdate(context: SettingsPageContext): Promise<void> {
 }
 
 /** The rule count, validation warning and edit action shown under a snippet name. */
-function snippetDescription(context: SettingsPageContext, snippet: TextSnippet): string | DocumentFragment {
+function snippetDescription(snippet: TextSnippet): string | DocumentFragment {
     const text = strings.settings.custom;
     const rules = plural(text.snippetRulesCount, countSnippetRuleLines(snippet.rules));
     const invalid = findInvalidSnippetRuleLines(snippet.rules).length;
@@ -46,21 +48,18 @@ function snippetDescription(context: SettingsPageContext, snippet: TextSnippet):
     return createFragment(fragment => {
         fragment.appendText(description);
         fragment.appendText(' ');
-        const edit = fragment.createEl('button', {
+        // The framework clones description fragments, so element listeners are lost but
+        // attributes survive. One delegated listener on the owning document handles clicks.
+        fragment.createEl('button', {
             cls: 'better-paste-snippet-edit-button',
             text: text.editButton,
-            attr: { type: 'button' }
-        });
-        edit.addEventListener('click', event => {
-            event.preventDefault();
-            event.stopPropagation();
-            openSnippetEditor(context, snippet);
+            attr: { type: 'button', 'data-snippet-id': snippet.id }
         });
     });
 }
 
 /** Opens the editor and persists either a replacement or a new list item. */
-function openSnippetEditor(context: SettingsPageContext, snippet: TextSnippet | null): void {
+export function openSnippetEditor(context: SettingsPageContext, snippet: TextSnippet | null): void {
     new TextSnippetModal(context.app, snippet, async saved => {
         const snippets = context.settings().textSnippets;
         const index = snippet ? snippets.findIndex(candidate => candidate.id === snippet.id) : -1;
@@ -90,26 +89,28 @@ function renderPipeline(setting: Setting): void {
 }
 
 /** One identified toggle and edit affordance inside the reorderable list. */
-function snippetDefinition(context: SettingsPageContext, snippet: TextSnippet): SettingDefinition {
+function snippetDefinition(snippet: TextSnippet): SettingDefinition {
     const text = strings.settings.custom;
-    const key = `${TEXT_SNIPPET_KEY_PREFIX}${snippet.id}`;
 
     return {
         name: snippet.name || text.unnamedSnippet,
-        desc: snippetDescription(context, snippet),
-        control: { type: 'toggle', key }
+        desc: snippetDescription(snippet),
+        control: { type: 'toggle', key: `${TEXT_SNIPPET_KEY_PREFIX}${snippet.id}` }
     };
 }
 
 /** Reorderable snippet list and the import, export, and preview tools below it. */
-function createSnippetsPageDefinitions(context: SettingsPageContext): SettingDefinitionItem[] {
+function createSnippetsPageDefinitions(
+    context: SettingsPageContext,
+    registerSnippetEditListener: RegisterSnippetEditListener
+): SettingDefinitionItem[] {
     const text = strings.settings.custom;
 
     return [
         {
             type: 'list',
             cls: SETTINGS_CLASS,
-            items: context.settings().textSnippets.map(snippet => snippetDefinition(context, snippet)),
+            items: context.settings().textSnippets.map(snippet => snippetDefinition(snippet)),
             emptyState: text.emptyState,
             addItem: {
                 name: text.addSnippet,
@@ -169,7 +170,13 @@ function createSnippetsPageDefinitions(context: SettingsPageContext): SettingDef
                     name: text.previewName,
                     desc: text.previewDesc,
                     searchable: false,
-                    render: setting => renderSnippetPreview(setting, context)
+                    render: setting => {
+                        const register = (): void => registerSnippetEditListener(setting.settingEl.ownerDocument);
+                        const stopWatchingWindow = setting.settingEl.onWindowMigrated(register);
+                        register();
+                        renderSnippetPreview(setting, context);
+                        return stopWatchingWindow;
+                    }
                 }
             ]
         }
@@ -207,7 +214,10 @@ function renderSnippetPreview(setting: Setting, context: SettingsPageContext): v
 }
 
 /** Pipeline overview and the link to the full snippet editor page. */
-export function createCustomProcessingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
+export function createCustomProcessingDefinitions(
+    context: SettingsPageContext,
+    registerSnippetEditListener: RegisterSnippetEditListener
+): SettingGroupItem[] {
     const text = strings.settings.custom;
 
     return [
@@ -224,7 +234,7 @@ export function createCustomProcessingDefinitions(context: SettingsPageContext):
                 plural(text.enabledSnippetsCount, context.settings().textSnippets.filter(snippet => snippet.enabled).length),
             status: () =>
                 context.settings().textSnippets.some(snippet => findInvalidSnippetRuleLines(snippet.rules).length > 0) ? 'warning' : null,
-            items: createSnippetsPageDefinitions(context)
+            items: createSnippetsPageDefinitions(context, registerSnippetEditListener)
         }
     ];
 }

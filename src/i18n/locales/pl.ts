@@ -26,6 +26,7 @@ export const STRINGS_PL: TranslationStrings = {
         cleanSelection: 'Wyczyść zaznaczenie',
         cleanTerminal: 'Wyczyść tekst z terminala',
         cleanPdf: 'Wyczyść tekst z pliku PDF',
+        runSnippet: 'Uruchom fragment',
         commasInside: 'Przenieś przecinki do cudzysłowów',
         commasOutside: 'Przenieś przecinki poza cudzysłowy',
         toggleCleanup: 'Przełącz automatyczne czyszczenie'
@@ -178,15 +179,15 @@ export const STRINGS_PL: TranslationStrings = {
 
         custom: {
             heading: 'Przetwarzanie niestandardowe',
-            pipelineName: 'Zastosuj niestandardowe fragmenty wyrażeń regularnych do tekstu',
+            pipelineName: 'Stosuj niestandardowe fragmenty wyrażeń regularnych do tekstu',
             pastedText: 'Wklejony tekst',
-            builtInRules: 'Reguły wbudowane',
+            builtInRules: 'Wbudowane reguły',
             customSnippets: 'Niestandardowe fragmenty',
             note: 'Notatka',
             wikiButton: 'Otwórz wiki',
             regexButton: 'Otwórz tester wyrażeń regularnych',
             snippetsName: 'Fragmenty',
-            snippetsDesc: 'Twórz fragmenty wyszukiwania i zastępowania oraz wybieraj, które mają działać.',
+            snippetsDesc: 'Dodawaj i edytuj swoje fragmenty. Włącz te, które mają działać przy wklejaniu.',
             enabledSnippetsCount: {
                 one: '{count} włączony fragment',
                 few: '{count} włączone fragmenty',
@@ -221,7 +222,8 @@ export const STRINGS_PL: TranslationStrings = {
             previewEmpty: 'Przetworzony tekst pojawi się tutaj.',
             nameName: 'Nazwa',
             rulesName: 'Reguły',
-            rulesDesc: 'Wpisz po jednym zastąpieniu z wyrażeniem regularnym JavaScript w każdym wierszu.',
+            rulesDesc: 'Wpisz w każdym wierszu jedną regułę zamiany z wyrażeniem regularnym JavaScript.',
+            wikiPasteHint: 'Skopiuj gotowy fragment z wiki i wklej go bezpośrednio w pole reguł.',
             invalidLine: 'Wiersz {line}: {value}',
             saveButton: 'Zapisz',
             recognizedSnippetsCount: {
@@ -231,10 +233,10 @@ export const STRINGS_PL: TranslationStrings = {
                 other: 'Rozpoznano {count} fragmentu'
             },
             recognizedRulesCount: {
-                one: 'Rozpoznano {count} regułę',
-                few: 'Rozpoznano {count} reguły',
-                many: 'Rozpoznano {count} reguł',
-                other: 'Rozpoznano {count} reguły'
+                one: 'rozpoznano {count} regułę',
+                few: 'rozpoznano {count} reguły',
+                many: 'rozpoznano {count} reguł',
+                other: 'rozpoznano {count} reguły'
             },
             unparseableName: 'Nierozpoznane wiersze',
             importFallbackName: 'Zaimportowany fragment'

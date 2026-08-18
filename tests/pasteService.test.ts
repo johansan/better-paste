@@ -1194,3 +1194,42 @@ describe('cleanSelection', () => {
         expect(editor.getValue()).toBe('unchanged');
     });
 });
+
+describe('runSnippet', () => {
+    it('runs a disabled snippet against the selected text', () => {
+        const { service } = build();
+        const editor = selecting('keep cat here', 'cat');
+
+        service.runSnippet(editor.asEditor(), {
+            id: 'rename-cat',
+            name: 'Rename cat',
+            rules: ['s/cat/dog/g'],
+            enabled: false
+        });
+
+        expect(editor.getValue()).toBe('keep dog here');
+    });
+
+    it('refuses multiple selections before replacing text', () => {
+        const { service } = build();
+        const editor = selecting('cat\nbird', 'cat');
+        vi.spyOn(editor, 'listSelections').mockReturnValue([
+            { anchor: { line: 0, ch: 0 }, head: { line: 0, ch: 3 } },
+            { anchor: { line: 1, ch: 0 }, head: { line: 1, ch: 4 } }
+        ]);
+        const replaceSelection = vi.spyOn(editor, 'replaceSelection');
+        const noticeCount = Notice.instances.length;
+
+        service.runSnippet(editor.asEditor(), {
+            id: 'rename-cat',
+            name: 'Rename cat',
+            rules: ['s/cat/dog/g'],
+            enabled: true
+        });
+
+        expect(replaceSelection).not.toHaveBeenCalled();
+        expect(editor.getValue()).toBe('cat\nbird');
+        expect(Notice.instances).toHaveLength(noticeCount + 1);
+        expect(Notice.instances[noticeCount].message).toBe('Better Paste: select some text first');
+    });
+});

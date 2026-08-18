@@ -26,6 +26,7 @@ export const STRINGS_TH: TranslationStrings = {
         cleanSelection: 'จัดระเบียบข้อความที่เลือก',
         cleanTerminal: 'จัดระเบียบผลลัพธ์เทอร์มินัล',
         cleanPdf: 'จัดระเบียบข้อความจาก PDF',
+        runSnippet: 'เรียกใช้ชุดคำสั่ง',
         commasInside: 'ย้ายจุลภาคเข้าไปในอัญประกาศ',
         commasOutside: 'ย้ายจุลภาคออกนอกอัญประกาศ',
         toggleCleanup: 'สลับการจัดระเบียบอัตโนมัติ'
@@ -44,7 +45,7 @@ export const STRINGS_TH: TranslationStrings = {
         imagesFailedLinkKept: '{images} จึงคงลิงก์เดิมไว้',
         imagesFailedNothingPasted: '{images} จึงไม่ได้วางอะไรเลย',
         snippetsCopied: 'คัดลอกชุดคำสั่งแล้ว',
-        snippetsCopyFailed: 'ไม่สามารถคัดลอกชุดคำสั่งได้'
+        snippetsCopyFailed: 'คัดลอกชุดคำสั่งไม่สำเร็จ'
     },
 
     settings: {
@@ -175,17 +176,17 @@ export const STRINGS_TH: TranslationStrings = {
 
         custom: {
             heading: 'การประมวลผลแบบกำหนดเอง',
-            pipelineName: 'ใช้ชุดคำสั่งนิพจน์ทั่วไปแบบกำหนดเองกับข้อความ',
+            pipelineName: 'ใช้ชุดคำสั่ง regex แบบกำหนดเองกับข้อความ',
             pastedText: 'ข้อความที่วาง',
             builtInRules: 'กฎในตัว',
             customSnippets: 'ชุดคำสั่งแบบกำหนดเอง',
             note: 'โน้ต',
             wikiButton: 'เปิดวิกิ',
-            regexButton: 'เปิดเครื่องมือทดสอบนิพจน์ทั่วไป',
+            regexButton: 'เปิดเครื่องมือทดสอบ regex',
             snippetsName: 'ชุดคำสั่ง',
-            snippetsDesc: 'สร้างชุดคำสั่งค้นหาและแทนที่ แล้วเลือกชุดที่ต้องการใช้',
+            snippetsDesc: 'เพิ่มและแก้ไขชุดคำสั่งของคุณ เปิดใช้ชุดที่ต้องการให้ทำงานเมื่อวาง',
             enabledSnippetsCount: { other: 'เปิดใช้อยู่ {count} ชุด' },
-            snippetRulesCount: { other: '{count} กฎ' },
+            snippetRulesCount: { other: 'กฎ {count} ข้อ' },
             invalidRulesCount: { other: '{count} บรรทัดไม่ถูกต้อง' },
             unnamedSnippet: 'ชุดคำสั่งไม่มีชื่อ',
             emptyState: 'คุณยังไม่ได้สร้างชุดคำสั่ง',
@@ -196,14 +197,15 @@ export const STRINGS_TH: TranslationStrings = {
             exportButton: 'คัดลอกชุดคำสั่ง',
             importName: 'นำเข้าชุดคำสั่ง',
             importDesc: 'เพิ่มชุดคำสั่งจากรูปแบบแลกเปลี่ยนของวิกิ',
-            previewName: 'ทดลองใช้',
+            previewName: 'ลองดู',
             previewDesc: 'พิมพ์ข้อความตัวอย่างเพื่อดูผลลัพธ์จากชุดคำสั่งที่เปิดใช้ทั้งหมด',
             modalPreviewDesc: 'พิมพ์ข้อความตัวอย่างเพื่อดูผลลัพธ์จากชุดคำสั่งนี้',
             previewInputLabel: 'ข้อความตัวอย่าง',
             previewEmpty: 'ข้อความที่ประมวลผลแล้วจะแสดงที่นี่',
             nameName: 'ชื่อ',
             rulesName: 'กฎ',
-            rulesDesc: 'ใส่การแทนที่ด้วยนิพจน์ทั่วไป JavaScript หนึ่งรายการต่อบรรทัด',
+            rulesDesc: 'ใส่การแทนที่ด้วย regex ของ JavaScript หนึ่งรายการต่อบรรทัด',
+            wikiPasteHint: 'คัดลอกชุดคำสั่งสำเร็จรูปจากวิกิแล้ววางลงในช่องกฎได้เลย',
             invalidLine: 'บรรทัด {line}: {value}',
             saveButton: 'บันทึก',
             recognizedSnippetsCount: { other: 'พบชุดคำสั่ง {count} ชุด' },

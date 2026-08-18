@@ -37,7 +37,7 @@ import { escapeLinkDestination, escapeLinkTitle } from './LinkTitleService';
 import type { LinkTitleService } from './LinkTitleService';
 import { logError } from '../utils/logger';
 import { showNotice } from '../utils/notices';
-import type { BetterPasteSettings } from '../settings/types';
+import type { BetterPasteSettings, TextSnippet } from '../settings/types';
 
 /** How far before the recorded offset to look when re-finding text the user may have shifted. */
 const REALIGN_WINDOW = 512;
@@ -359,6 +359,19 @@ export class PasteService {
     /** Command handler: applies the text rules to the current selection. */
     cleanSelection(editor: Editor): void {
         this.applyToSelection(editor, selection => runTextPipeline(selection, this.getSettings()));
+    }
+
+    /** Command handler: applies one stored snippet to the current selection. */
+    runSnippet(editor: Editor, snippet: TextSnippet): void {
+        const selection = editor.getSelection();
+        // A single selection only: getSelection reads one text, but replaceSelection
+        // would write that text into every cursor's range
+        if (!selection || editor.listSelections().length > 1) {
+            new Notice(format(strings.notices.prefix, { message: strings.notices.selectTextFirst }));
+            return;
+        }
+
+        this.applyToSelection(editor, selection => applyTextSnippets(selection, [{ ...snippet, enabled: true }]));
     }
 
     /**

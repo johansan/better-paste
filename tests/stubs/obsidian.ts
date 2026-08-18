@@ -82,6 +82,10 @@ export class Plugin {}
 
 export class Modal {
     constructor(public app: unknown) {}
+
+    open(): void {}
+
+    close(): void {}
 }
 
 interface StubPlugin {

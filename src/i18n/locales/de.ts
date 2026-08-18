@@ -26,6 +26,7 @@ export const STRINGS_DE: TranslationStrings = {
         cleanSelection: 'Auswahl bereinigen',
         cleanTerminal: 'Terminalausgabe bereinigen',
         cleanPdf: 'PDF-Text bereinigen',
+        runSnippet: 'Snippet ausführen',
         commasInside: 'Kommas innerhalb der Anführungszeichen setzen',
         commasOutside: 'Kommas außerhalb der Anführungszeichen setzen',
         toggleCleanup: 'Automatische Bereinigung umschalten'
@@ -206,7 +207,8 @@ export const STRINGS_DE: TranslationStrings = {
             wikiButton: 'Wiki anzeigen',
             regexButton: 'Regex-Testumgebung öffnen',
             snippetsName: 'Snippets',
-            snippetsDesc: 'Erstelle Snippets zum Suchen und Ersetzen und wähle aus, welche ausgeführt werden.',
+            snippetsDesc:
+                'Füge deine Snippets hinzu und bearbeite sie. Schalte diejenigen ein, die beim Einfügen ausgeführt werden sollen.',
             enabledSnippetsCount: { one: '{count} aktives Snippet', other: '{count} aktive Snippets' },
             snippetRulesCount: { one: '{count} Regel', other: '{count} Regeln' },
             invalidRulesCount: { one: '{count} ungültige Zeile', other: '{count} ungültige Zeilen' },
@@ -226,12 +228,13 @@ export const STRINGS_DE: TranslationStrings = {
             previewEmpty: 'Der verarbeitete Text erscheint hier.',
             nameName: 'Name',
             rulesName: 'Regeln',
-            rulesDesc: 'Gib pro Zeile eine JavaScript-Ersetzung mit regulärem Ausdruck ein.',
+            rulesDesc: 'Gib pro Zeile eine Ersetzung mit einem regulären JavaScript-Ausdruck ein.',
+            wikiPasteHint: 'Kopiere ein fertiges Snippet aus dem Wiki und füge es direkt in das Regelfeld ein.',
             invalidLine: 'Zeile {line}: {value}',
             saveButton: 'Speichern',
             recognizedSnippetsCount: { one: '{count} Snippet erkannt', other: '{count} Snippets erkannt' },
             recognizedRulesCount: { one: '{count} Regel erkannt', other: '{count} Regeln erkannt' },
-            unparseableName: 'Nicht lesbare Zeilen',
+            unparseableName: 'Nicht erkannte Zeilen',
             importFallbackName: 'Importiertes Snippet'
         }
     },

@@ -26,6 +26,7 @@ export const STRINGS_UK: TranslationStrings = {
         cleanSelection: 'Очистити виділення',
         cleanTerminal: 'Очистити вивід термінала',
         cleanPdf: 'Очистити текст із PDF',
+        runSnippet: 'Виконати сніпет',
         commasInside: 'Перенести коми всередину лапок',
         commasOutside: 'Перенести коми за лапки',
         toggleCleanup: 'Перемкнути автоматичне очищення'
@@ -188,7 +189,7 @@ export const STRINGS_UK: TranslationStrings = {
 
         custom: {
             heading: 'Власна обробка',
-            pipelineName: 'Застосувати власні сніпети з регулярними виразами до тексту',
+            pipelineName: 'Застосовувати до тексту власні сніпети з регулярними виразами',
             pastedText: 'Вставлений текст',
             builtInRules: 'Вбудовані правила',
             customSnippets: 'Власні сніпети',
@@ -196,7 +197,7 @@ export const STRINGS_UK: TranslationStrings = {
             wikiButton: 'Відкрити вікі',
             regexButton: 'Відкрити тестер регулярних виразів',
             snippetsName: 'Сніпети',
-            snippetsDesc: 'Створюйте сніпети пошуку й заміни та вибирайте, які з них виконувати.',
+            snippetsDesc: 'Додавайте та редагуйте свої сніпети. Увімкніть ті, що мають виконуватися під час вставки.',
             enabledSnippetsCount: {
                 one: '{count} увімкнений сніпет',
                 few: '{count} увімкнені сніпети',
@@ -220,18 +221,19 @@ export const STRINGS_UK: TranslationStrings = {
             addSnippet: 'Додати сніпет',
             editButton: 'Редагувати сніпет',
             exportName: 'Експортувати сніпети',
-            exportDesc: 'Копіює всі сніпети у форматі обміну з вікі.',
+            exportDesc: 'Копіює всі сніпети у форматі обміну вікі.',
             exportButton: 'Копіювати сніпети',
             importName: 'Імпортувати сніпети',
             importDesc: 'Додає сніпети з формату обміну вікі.',
-            previewName: 'Спробувати',
+            previewName: 'Спробуйте',
             previewDesc: 'Введіть приклад тексту, щоб побачити результат усіх увімкнених сніпетів.',
             modalPreviewDesc: 'Введіть приклад тексту, щоб побачити результат цього сніпета.',
             previewInputLabel: 'Приклад тексту',
-            previewEmpty: 'Оброблений текст з’явиться тут.',
+            previewEmpty: 'Оброблений текст зʼявиться тут.',
             nameName: 'Назва',
             rulesName: 'Правила',
             rulesDesc: 'Введіть по одній заміні з регулярним виразом JavaScript у кожному рядку.',
+            wikiPasteHint: 'Скопіюйте готовий сніпет із вікі та вставте його прямо в поле правил.',
             invalidLine: 'Рядок {line}: {value}',
             saveButton: 'Зберегти',
             recognizedSnippetsCount: {
@@ -241,10 +243,10 @@ export const STRINGS_UK: TranslationStrings = {
                 other: 'Розпізнано {count} сніпета'
             },
             recognizedRulesCount: {
-                one: 'Розпізнано {count} правило',
-                few: 'Розпізнано {count} правила',
-                many: 'Розпізнано {count} правил',
-                other: 'Розпізнано {count} правила'
+                one: 'розпізнано {count} правило',
+                few: 'розпізнано {count} правила',
+                many: 'розпізнано {count} правил',
+                other: 'розпізнано {count} правила'
             },
             unparseableName: 'Нерозпізнані рядки',
             importFallbackName: 'Імпортований сніпет'

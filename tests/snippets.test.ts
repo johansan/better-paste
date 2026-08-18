@@ -23,7 +23,8 @@ import {
     findInvalidSnippetRuleLines,
     parseSnippetInterchange,
     parseSnippetRuleLine,
-    serializeTextSnippets
+    serializeTextSnippets,
+    snippetNameFromRules
 } from '../src/transforms/snippets';
 import { runTextPipeline } from '../src/transforms';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
@@ -101,12 +102,10 @@ describe('snippet rule parser', () => {
         expect(parseSnippetRuleLine('   ').status).toBe('ignored');
         expect(parseSnippetRuleLine('// explanation').status).toBe('ignored');
         expect(parseSnippetRuleLine('  // explanation').status).toBe('ignored');
-        expect(findInvalidSnippetRuleLines(['', '// explanation', '  // another'])).toEqual([]);
-        expect(countSnippetRuleLines(['', '// explanation', 's/a/b/g', '# Import heading'])).toBe(2);
-    });
-
-    it('rejects interchange headings as rules', () => {
-        expect(findInvalidSnippetRuleLines(['# Remove citations'])).toEqual([{ lineNumber: 1, line: '# Remove citations' }]);
+        expect(parseSnippetRuleLine('# explanation').status).toBe('ignored');
+        expect(parseSnippetRuleLine('  # explanation').status).toBe('ignored');
+        expect(findInvalidSnippetRuleLines(['', '// explanation', '  // another', '# heading', '  # detail'])).toEqual([]);
+        expect(countSnippetRuleLines(['', '// explanation', '# heading', 's/a/b/g', 'not a rule'])).toBe(2);
     });
 
     it('rejects malformed expressions and flags', () => {
@@ -144,7 +143,7 @@ describe('snippet application', () => {
     });
 
     it('skips comments, disabled snippets, and invalid rule lines', () => {
-        const snippets = [snippet(['// explanation', 'not a rule', 's/cat/dog/g']), snippet(['s/dog/fox/g'], false)];
+        const snippets = [snippet(['// explanation', '# more detail', 'not a rule', 's/cat/dog/g']), snippet(['s/dog/fox/g'], false)];
         expect(applyTextSnippets('cat', snippets)).toEqual({ text: 'dog', changed: true });
     });
 });
@@ -169,53 +168,114 @@ describe('snippet pipeline order', () => {
 });
 
 describe('snippet interchange format', () => {
-    it('round-trips comments, empty snippets, and multiple snippets', () => {
-        const source = [
-            snippet(['// Keep this explanation', '  // Keep its indentation', 's/foo/bar/g'], true, 'Commented'),
-            snippet([], true, 'Empty'),
-            snippet(['s/cat/dog/g'], true, 'Last')
-        ];
+    it('takes a name from the first hash comment', () => {
+        expect(snippetNameFromRules(['// Intro', '  #  Remove citations  ', '# Ignored'])).toBe('Remove citations');
+        expect(snippetNameFromRules(['// Intro', 's/a/b/g'])).toBeNull();
+    });
 
-        const parsed = parseSnippetInterchange(serializeTextSnippets(source, 'Imported snippet'), 'Imported snippet');
+    it('keeps the reference block as one snippet with every line intact', () => {
+        const input = [
+            '# Remove Perplexity citations',
+            '',
+            '# Remove linked citations like [2](https://source)',
+            String.raw`s|\[\d+\]\(https?://[^)]*\)||g`,
+            '',
+            '# Remove plain citations like [1]',
+            String.raw`s/\[\d+\]//g`
+        ].join('\n');
+        const parsed = parseSnippetInterchange(input, 'Imported snippet');
 
-        expect(parsed.snippets.map(({ name, rules }) => ({ name, rules }))).toEqual(source.map(({ name, rules }) => ({ name, rules })));
+        expect(parsed.snippets.map(({ name, rules }) => ({ name, rules }))).toEqual([
+            { name: 'Remove Perplexity citations', rules: input.split('\n') }
+        ]);
         expect(parsed.ruleCount).toBe(2);
         expect(parsed.invalidLines).toEqual([]);
     });
 
-    it('serializes and parses snippets in order', () => {
-        const source = [
-            snippet([String.raw`s/\[\d+\]//g`, String.raw`s/\[(wikipedia|reddit)\]//gi`], true, 'Remove citations'),
-            snippet(['s/foo/bar/g'], false, 'Rename terms')
-        ];
-        const serialized = serializeTextSnippets(source, 'Imported snippet');
-        const parsed = parseSnippetInterchange(serialized, 'Imported snippet');
+    it('keeps an attached heading and its rule in one snippet', () => {
+        const input = ['# Remove source tags like [wikipedia]', String.raw`s/\[(wikipedia|reddit|youtube)\]//gi`].join('\n');
+        const parsed = parseSnippetInterchange(input, 'Imported snippet');
 
-        expect(serialized).toBe(
-            [
-                '# Remove citations',
-                String.raw`s/\[\d+\]//g`,
-                String.raw`s/\[(wikipedia|reddit)\]//gi`,
-                '',
-                '# Rename terms',
-                's/foo/bar/g'
-            ].join('\n')
-        );
-        expect(parsed.snippets.map(({ name, rules, enabled }) => ({ name, rules, enabled }))).toEqual([
-            { name: 'Remove citations', rules: source[0].rules, enabled: true },
-            { name: 'Rename terms', rules: source[1].rules, enabled: true }
+        expect(parsed.snippets.map(({ name, rules }) => ({ name, rules }))).toEqual([
+            { name: 'Remove source tags like [wikipedia]', rules: input.split('\n') }
         ]);
         expect(parsed.invalidLines).toEqual([]);
     });
 
-    it('uses the fallback name for rules before the first heading', () => {
-        const parsed = parseSnippetInterchange('s/foo/bar/g\n\n# Named\ns/a/b/', 'Imported snippet');
-        expect(parsed.snippets.map(value => value.name)).toEqual(['Imported snippet', 'Named']);
+    it('splits only at detached headings and keeps attached comments in their segment', () => {
+        const parsed = parseSnippetInterchange(
+            ['s/start/prefix/', '', '# First', '', '# Explains the next rule', 's/a/b/g', '', '# Second', '', 's/c/d/g'].join('\n'),
+            'Imported snippet'
+        );
+
+        expect(parsed.snippets.map(({ name, rules }) => ({ name, rules }))).toEqual([
+            { name: 'Imported snippet', rules: ['s/start/prefix/', ''] },
+            { name: 'First', rules: ['# First', '', '# Explains the next rule', 's/a/b/g', ''] },
+            { name: 'Second', rules: ['# Second', '', 's/c/d/g'] }
+        ]);
     });
 
-    it('reports lines that cannot be imported', () => {
+    it('round-trips detached headings verbatim and canonicalizes heading-free rules once', () => {
+        const fallbackName = 'Imported snippet';
+        const roundTrip = (source: TextSnippet): { exported: string; imported: TextSnippet } => {
+            const exported = serializeTextSnippets([source], fallbackName);
+            const parsed = parseSnippetInterchange(exported, fallbackName);
+            expect(parsed.invalidLines).toEqual([]);
+            expect(parsed.snippets).toHaveLength(1);
+            const imported = parsed.snippets[0];
+            if (!imported) throw new Error('Snippet did not import');
+            return { exported, imported };
+        };
+
+        const detachedRules = ['# Existing heading', '', '# Detail', 's/a/b/g'];
+        const detachedTrip = roundTrip(snippet(detachedRules, true, 'Existing heading'));
+        expect(detachedTrip.exported).toBe(detachedRules.join('\n'));
+        expect(detachedTrip.imported.rules.join('\n')).toBe(detachedTrip.exported);
+
+        const headingFree = snippet(['s/cat/dog/g'], true, 'Replace cats');
+        const firstTrip = roundTrip(headingFree);
+        expect({ name: firstTrip.imported.name, rules: firstTrip.imported.rules }).toEqual({
+            name: 'Replace cats',
+            rules: ['# Replace cats', '', 's/cat/dog/g']
+        });
+        expect(applyTextSnippets('cat cat', [firstTrip.imported])).toEqual(applyTextSnippets('cat cat', [headingFree]));
+
+        const secondTrip = roundTrip(firstTrip.imported);
+        expect(secondTrip.exported).toBe(firstTrip.exported);
+        expect(secondTrip.imported.rules.join('\n')).toBe(firstTrip.imported.rules.join('\n'));
+    });
+
+    it('exports a renamed detached heading under the current name', () => {
+        const fallbackName = 'Imported snippet';
+        const storedRules = ['# Old name', '', 's/a/b/g'];
+        const imported = parseSnippetInterchange(storedRules.join('\n'), fallbackName).snippets[0];
+        if (!imported) throw new Error('Snippet did not import');
+        imported.name = 'New name';
+
+        const exported = serializeTextSnippets([imported], fallbackName);
+
+        expect(exported).toBe(['# New name', '', 's/a/b/g'].join('\n'));
+        expect(imported.rules).toEqual(storedRules);
+        expect(parseSnippetInterchange(exported, fallbackName).snippets[0]?.name).toBe('New name');
+    });
+
+    it('keeps one blank separator byte-stable across repeated round trips', () => {
+        const fallbackName = 'Imported snippet';
+        const expected = ['# First', '', 's/a/b/g', '', '# Second', '', 's/c/d/g'].join('\n');
+        let interchange = expected;
+
+        for (let trip = 0; trip < 2; trip++) {
+            const parsed = parseSnippetInterchange(interchange, fallbackName);
+            expect(parsed.snippets).toHaveLength(2);
+            interchange = serializeTextSnippets(parsed.snippets, fallbackName);
+            expect(interchange).toBe(expected);
+        }
+    });
+
+    it('keeps and reports lines that cannot be parsed', () => {
         const parsed = parseSnippetInterchange('# Mixed\ns/foo/bar/g\nnot a rule\ns/[a-/x/', 'Imported snippet');
         expect(parsed.ruleCount).toBe(1);
+        expect(parsed.snippets[0]?.rules).toEqual(['# Mixed', 's/foo/bar/g', 'not a rule', 's/[a-/x/']);
         expect(parsed.invalidLines).toEqual([
             { lineNumber: 3, line: 'not a rule' },
             { lineNumber: 4, line: 's/[a-/x/' }

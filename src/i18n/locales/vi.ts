@@ -26,6 +26,7 @@ export const STRINGS_VI: TranslationStrings = {
         cleanSelection: 'Dọn phần đã chọn',
         cleanTerminal: 'Dọn đầu ra terminal',
         cleanPdf: 'Dọn văn bản từ PDF',
+        runSnippet: 'Chạy đoạn mã',
         commasInside: 'Chuyển dấu phẩy vào trong dấu ngoặc kép',
         commasOutside: 'Chuyển dấu phẩy ra ngoài dấu ngoặc kép',
         toggleCleanup: 'Bật tắt dọn dẹp tự động'
@@ -44,7 +45,7 @@ export const STRINGS_VI: TranslationStrings = {
         imagesFailedLinkKept: '{images}, đã giữ liên kết gốc',
         imagesFailedNothingPasted: '{images}, nên không dán gì cả',
         snippetsCopied: 'đã sao chép đoạn mã',
-        snippetsCopyFailed: 'không thể sao chép đoạn mã'
+        snippetsCopyFailed: 'không sao chép được đoạn mã'
     },
 
     settings: {
@@ -186,7 +187,7 @@ export const STRINGS_VI: TranslationStrings = {
             wikiButton: 'Mở wiki',
             regexButton: 'Mở công cụ thử biểu thức chính quy',
             snippetsName: 'Đoạn mã',
-            snippetsDesc: 'Tạo các đoạn mã tìm và thay thế, rồi chọn những đoạn sẽ chạy.',
+            snippetsDesc: 'Thêm và sửa các đoạn mã của bạn. Bật những đoạn bạn muốn chạy khi dán.',
             enabledSnippetsCount: { other: '{count} đoạn mã đang bật' },
             snippetRulesCount: { other: '{count} quy tắc' },
             invalidRulesCount: { other: '{count} dòng không hợp lệ' },
@@ -199,7 +200,7 @@ export const STRINGS_VI: TranslationStrings = {
             exportButton: 'Sao chép đoạn mã',
             importName: 'Nhập đoạn mã',
             importDesc: 'Thêm đoạn mã từ định dạng trao đổi của wiki.',
-            previewName: 'Thử',
+            previewName: 'Thử xem',
             previewDesc: 'Nhập văn bản mẫu để xem kết quả của mọi đoạn mã đang bật.',
             modalPreviewDesc: 'Nhập văn bản mẫu để xem kết quả của đoạn mã này.',
             previewInputLabel: 'Văn bản mẫu',
@@ -207,11 +208,12 @@ export const STRINGS_VI: TranslationStrings = {
             nameName: 'Tên',
             rulesName: 'Quy tắc',
             rulesDesc: 'Nhập một phép thay thế bằng biểu thức chính quy JavaScript trên mỗi dòng.',
+            wikiPasteHint: 'Sao chép một đoạn mã có sẵn từ wiki và dán thẳng vào ô quy tắc.',
             invalidLine: 'Dòng {line}: {value}',
             saveButton: 'Lưu',
             recognizedSnippetsCount: { other: 'Đã nhận dạng {count} đoạn mã' },
-            recognizedRulesCount: { other: 'Đã nhận dạng {count} quy tắc' },
-            unparseableName: 'Các dòng không thể đọc',
+            recognizedRulesCount: { other: 'đã nhận dạng {count} quy tắc' },
+            unparseableName: 'Các dòng không nhận dạng được',
             importFallbackName: 'Đoạn mã đã nhập'
         }
     },
