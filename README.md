@@ -2,7 +2,7 @@
 
 Read in your language: [English](https://betterpaste.md/docs.html) • [العربية](https://betterpaste.md/ar/docs.html) • [Deutsch](https://betterpaste.md/de/docs.html) • [Español](https://betterpaste.md/es/docs.html) • [فارسی](https://betterpaste.md/fa/docs.html) • [Français](https://betterpaste.md/fr/docs.html) • [Bahasa Indonesia](https://betterpaste.md/id/docs.html) • [Italiano](https://betterpaste.md/it/docs.html) • [Nederlands](https://betterpaste.md/nl/docs.html) • [Polski](https://betterpaste.md/pl/docs.html) • [Português](https://betterpaste.md/pt/docs.html) • [Português (Brasil)](https://betterpaste.md/pt-br/docs.html) • [Русский](https://betterpaste.md/ru/docs.html) • [ไทย](https://betterpaste.md/th/docs.html) • [Türkçe](https://betterpaste.md/tr/docs.html) • [Українська](https://betterpaste.md/uk/docs.html) • [Tiếng Việt](https://betterpaste.md/vi/docs.html) • [日本語](https://betterpaste.md/ja/docs.html) • [한국어](https://betterpaste.md/ko/docs.html) • [中文简体](https://betterpaste.md/zh-cn/docs.html) • [中文繁體](https://betterpaste.md/zh-tw/docs.html)
 
-Stop fixing formatting after every paste! Better Paste finally lets you copy images from Safari to Obsidian, it strips tracking parameters from URLs, fetches page titles, and cleans up AI-generated text. Just paste, and the plugin handles the rest. Broken terminal output? One command away.
+Stop fixing formatting after every paste! Better Paste finally lets you copy images from Safari to Obsidian, it strips tracking parameters from URLs, fetches page titles, and cleans up AI-generated text. Your own regex snippets run on every paste too. Just paste, and the plugin handles the rest. Broken terminal output? One command away.
 
 If you find Better Paste useful, please consider [☕️ Buying me a coffee](https://buymeacoffee.com/johansan) or [Sponsor on GitHub ❤️](https://github.com/sponsors/johansan).
 
@@ -20,9 +20,25 @@ If you find Better Paste useful, please consider [☕️ Buying me a coffee](htt
 
 ## 2 What it does
 
-Seven examples. Every rule has its own toggle, so turn off what you do not need.
+Eight examples. Some run on every paste, others are commands you run when you need them.
 
-### 2.1 Images from Safari
+### 2.1 Custom snippets
+
+Write your own find and replace rules with regex and they run on every paste. This one removes ChatGPT's source markers:
+
+```
+The fix shipped last week 【23†source】 and rollout begins today 【24†source】.
+```
+
+becomes
+
+```
+The fix shipped last week and rollout begins today.
+```
+
+Ready-made snippets to import are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets): strip Perplexity citations, remove bold from headings, collapse runs of blank lines, and more. How a rule is written is in [section 3.5](#35-custom-processing).
+
+### 2.2 Images from Safari
 
 Copy an image in Safari, paste it into Obsidian, and you get a web link instead of the image. Annoying! Better Paste saves the actual image into your vault:
 
@@ -36,7 +52,7 @@ becomes
 ![[skyline-8f21a.jpg]]
 ```
 
-### 2.2 Tracking parameters
+### 2.3 Tracking parameters
 
 Links you copy from newsletters and social apps drag a lot of tracking junk along. Better Paste cleans it off:
 
@@ -50,7 +66,7 @@ becomes
 https://www.theverge.com/2026/1/9/story
 ```
 
-### 2.3 Link titles
+### 2.4 Link titles
 
 Paste a bare URL and it turns into a Markdown link with the real page title:
 
@@ -66,7 +82,9 @@ becomes
 
 The URL is pasted right away and updates when the title arrives, so nothing blocks.
 
-### 2.4 Terminal output
+Reddit, YouTube, TikTok and Loom block ordinary page lookups, so their titles are fetched from each site's own embed service instead.
+
+### 2.5 Terminal output
 
 Terminals break long lines at the window edge. Escape codes are stripped on every paste, and when you select the pasted output and run **Clean up terminal output**, the lines are joined back together:
 
@@ -81,7 +99,7 @@ becomes
 npm warn deprecated inflight@1.0.6: This module is not supported and leaks memory. Do not use it. Check out lru-cache instead.
 ```
 
-### 2.5 Text from PDFs
+### 2.6 Text from PDFs
 
 PDFs wrap paragraphs into short lines and break words with hyphens. Select the pasted text and run **Clean up PDF text**:
 
@@ -101,7 +119,7 @@ Ligatures like ﬁ become real letters too, so search finds the words again.
 
 The command opens a dialog with a preview, so you see the result before it lands. Two switches handle what no rule can guess: remove page numbers, or join everything into one paragraph. Your picks are remembered for the next time.
 
-### 2.6 Cleanup of AI-generated text
+### 2.7 Cleanup of AI-generated text
 
 Chatbot text comes with curly quotes, long dashes and invisible characters. The invisible ones are removed on every paste, and with **Quotes** and **Dashes** turned on the rest becomes plain text too:
 
@@ -115,7 +133,7 @@ becomes
 "It works," she said - finally.
 ```
 
-### 2.7 Commas and quotes
+### 2.8 Commas and quotes
 
 Prefer your commas outside the quotation marks? Select the text and run **Move commas outside quotes**:
 
@@ -131,13 +149,11 @@ She called it "finished", then left.
 
 **Move commas inside quotes** goes the other way.
 
-Or inside, or leave them alone. No change is the default.
-
 <br/>
 
 ## 3 Settings
 
-Seventeen settings. Here are the ones you will actually look for.
+Here are the settings you will actually look for.
 
 ### 3.1 Behavior
 
@@ -155,7 +171,7 @@ Alt text survives the download, and if a download fails the original link stays 
 
 ### 3.3 Links
 
-- **Fetch titles for pasted links**: on by default, see example 2.3 above.
+- **Fetch titles for pasted links**: on by default, see example 2.4 above.
 - **Clean pasted links**: removes common trackers everywhere, plus known clutter from sites such as YouTube, Google and Amazon.
 - **Link removals**: add parameter names you also want removed everywhere or on specific sites. A live tester shows the result before you paste:
 
@@ -195,6 +211,20 @@ Start a line with `!` to turn off the built-in removals for one site:
 - **Quotes**: turns curly quotes and apostrophes into straight ones, so `“don’t”` becomes `"don't"`. Off by default, so your typography is kept until you opt in.
 - **Dashes**: turns en and em dashes into hyphens. Also off by default. Quotes and dashes inside code, links and note names are left alone.
 
+### 3.5 Custom processing
+
+- **Snippets**: your own regex rules, run after the built-in rules on every paste. Each snippet has its own switch, and they run in list order, so drag to reorder.
+- A rule is one JavaScript regex replacement per line, in the form `s/find/replace/flags`. Lines starting with `#` are comments:
+
+```
+# Remove ChatGPT source markers
+s/ ?【\d+†source】//g
+```
+
+- **Try it**: type sample text and watch every enabled snippet run on it, live. The snippet editor has the same preview for the snippet you are writing.
+- **Import snippets** and **Export snippets**: move snippets between vaults through the clipboard. Ready-made ones are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets); copy one there and paste it in.
+- **Open regex playground**: opens [regex101](https://regex101.com/) set up the way the rules work, for building and testing a find pattern.
+
 <br/>
 
 ## 4 Per-note control
@@ -228,13 +258,14 @@ Images come out as `![[picture.png|400]]`, Obsidian's own size syntax. `400x300`
 
 ## 5 Commands
 
-Eight commands, ready for your own hotkeys (Settings, Hotkeys). The ids are for URI schemes and plugins like Commander, prefixed `better-paste:`.
+Nine commands, ready for your own hotkeys (Settings, Hotkeys). The ids are for URI schemes and plugins like Commander, prefixed `better-paste:`.
 
 - **Paste** (`paste`): paste through the rules, even in a note that opted out.
 - **Paste without processing** (`paste-raw`): paste exactly what is on the clipboard.
 - **Clean up selection** (`selection-clean`): run the text rules on selected text.
 - **Clean up terminal output** (`selection-clean-terminal`): rejoin wrapped lines, remove leading indentation and turn `•` bullets into Markdown lists in the selection. On demand, because only you know the text came from a terminal.
 - **Clean up PDF text** (`selection-clean-pdf`): rejoin the short lines a PDF layout makes, repair words broken by hyphens and expand ligatures in the selection. A dialog previews the result and offers page number and paragraph options.
+- **Run snippet** (`selection-run-snippet`): pick a snippet and apply it to the selection, even one that is switched off for pasting.
 - **Move commas inside quotes** (`selection-commas-inside`) and **Move commas outside quotes** (`selection-commas-outside`): comma style next to closing quotes, applied to the selection.
 - **Toggle automatic cleanup** (`toggle-cleanup`): flip the master switch.
 
