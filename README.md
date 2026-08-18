@@ -24,10 +24,10 @@ Eight examples. Some run on every paste, others are commands you run when you ne
 
 ### 2.1 Custom snippets
 
-Write your own find and replace rules with regex and they run on every paste. This one removes ChatGPT's source markers:
+Write your own find and replace rules with regex and they run on every paste. This one removes Perplexity's citation markers:
 
 ```
-The fix shipped last week 【23†source】 and rollout begins today 【24†source】.
+The fix shipped last week[1][2] and rollout begins today[3].
 ```
 
 becomes
@@ -36,7 +36,7 @@ becomes
 The fix shipped last week and rollout begins today.
 ```
 
-Ready-made snippets to import are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets): strip Perplexity citations, remove bold from headings, collapse runs of blank lines, and more. How a rule is written is in [section 3.5](#35-custom-processing).
+Ready-made snippets to import are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets): convert ChatGPT math, remove bold from headings, collapse runs of blank lines, and more. How a rule is written is in [section 3.5](#35-custom-processing).
 
 ### 2.2 Images from Safari
 
@@ -217,8 +217,8 @@ Start a line with `!` to turn off the built-in removals for one site:
 - A rule is one JavaScript regex replacement per line, in the form `s/find/replace/flags`. Lines starting with `#` are comments:
 
 ```
-# Remove ChatGPT source markers
-s/ ?【\d+†source】//g
+# Remove Perplexity citations
+s/\[\d+\]//g
 ```
 
 - **Try it**: type sample text and watch every enabled snippet run on it, live. The snippet editor has the same preview for the snippet you are writing.
