@@ -45,7 +45,9 @@ export const STRINGS_FA: TranslationStrings = {
             other: '{count} تصویر ذخیره نشد'
         },
         imagesFailedLinkKept: '{images}، پیوند اصلی نگه داشته شد',
-        imagesFailedNothingPasted: '{images}، بنابراین چیزی چسبانده نشد'
+        imagesFailedNothingPasted: '{images}، بنابراین چیزی چسبانده نشد',
+        snippetsCopied: 'قطعه‌ها کپی شدند',
+        snippetsCopyFailed: 'کپی قطعه‌ها ممکن نشد'
     },
 
     settings: {
@@ -165,6 +167,45 @@ export const STRINGS_FA: TranslationStrings = {
             dashesDesc: 'نیم‌خط و خط تیره بلند را به خط پیوند تبدیل می‌کند.',
             dashesAliases: ['خط تیره', 'خط تیره بلند', 'نیم‌خط', 'خط پیوند', 'هایفن', 'نشانه‌گذاری', 'تایپوگرافی', 'هوش مصنوعی'],
             dashesExample: 'نتیجه — برخلاف پیش‌بینی‌ها — خوب بود.'
+        },
+
+        custom: {
+            heading: 'پردازش سفارشی',
+            pipelineName: 'اعمال قطعه‌های عبارت منظم سفارشی روی متن',
+            pastedText: 'متن چسبانده‌شده',
+            builtInRules: 'قواعد داخلی',
+            customSnippets: 'قطعه‌های سفارشی',
+            note: 'یادداشت',
+            wikiButton: 'نمایش ویکی',
+            regexButton: 'باز کردن ابزار آزمایش عبارت منظم',
+            snippetsName: 'قطعه‌ها',
+            snippetsDesc: 'قطعه‌های جست‌وجو و جایگزینی بسازید و مشخص کنید کدام‌یک اجرا شوند.',
+            enabledSnippetsCount: { one: '{count} قطعه فعال', other: '{count} قطعه فعال' },
+            snippetRulesCount: { one: '{count} قاعده', other: '{count} قاعده' },
+            invalidRulesCount: { one: '{count} خط نامعتبر', other: '{count} خط نامعتبر' },
+            unnamedSnippet: 'قطعه بدون نام',
+            emptyState: 'هنوز هیچ قطعه‌ای نساخته‌اید.',
+            addSnippet: 'افزودن قطعه',
+            editButton: 'ویرایش قطعه',
+            exportName: 'برون‌بری قطعه‌ها',
+            exportDesc: 'همه قطعه‌ها را با قالب تبادل ویکی کپی می‌کند.',
+            exportButton: 'کپی قطعه‌ها',
+            importName: 'درون‌ریزی قطعه‌ها',
+            importDesc: 'قطعه‌ها را از قالب تبادل ویکی اضافه می‌کند.',
+            previewName: 'امتحان کنید',
+            previewDesc: 'متن نمونه‌ای بنویسید تا نتیجه همه قطعه‌های فعال را ببینید.',
+            modalPreviewDesc: 'متن نمونه‌ای بنویسید تا نتیجه این قطعه را ببینید.',
+            previewInputLabel: 'متن نمونه',
+            previewEmpty: 'متن پردازش‌شده اینجا نمایش داده می‌شود.',
+            nameName: 'نام',
+            rulesName: 'قواعد',
+            rulesDesc: 'در هر خط یک جایگزینی با عبارت منظم JavaScript وارد کنید.',
+            invalidLine: 'خط {line}: {value}',
+            saveButton: 'ذخیره',
+            recognizedSnippetsCount: { one: '{count} قطعه شناسایی شد', other: '{count} قطعه شناسایی شد' },
+            recognizedRulesCount: { one: '{count} قاعده شناسایی شد', other: '{count} قاعده شناسایی شد' },
+            unparseableName: 'خط‌های خوانده‌نشده',
+            importFallbackName: 'قطعه درون‌ریزی‌شده'
         }
     },
 

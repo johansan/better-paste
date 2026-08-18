@@ -23,6 +23,7 @@ import { frontmatterRanges, normalizeInvisibleCharacters, straightenDashes, stra
 import { applyCommaPlacement } from '../transforms/textProcessing';
 import type { TextCommaPlacement } from '../transforms/textProcessing';
 import { cleanTerminalText } from '../transforms/terminalText';
+import { applyTextSnippets } from '../transforms/snippets';
 import { cleanPdfText } from '../transforms/pdfText';
 import type { PdfCleanupOptions } from '../transforms/pdfText';
 import { buildUrlCleanupOptions, cleanUrlsInText, httpUrlRanges } from '../transforms/urlCleanup';
@@ -434,7 +435,14 @@ export class PasteService {
      */
     private scheduleRichPostProcess(editor: Editor, info: MarkdownView | MarkdownFileInfo): void {
         const settings = this.getSettings();
-        if (!settings.textInvisible && !settings.textQuotes && !settings.textDashes && !settings.linkEnabled && !settings.imageEnabled)
+        if (
+            !settings.textInvisible &&
+            !settings.textQuotes &&
+            !settings.textDashes &&
+            !settings.linkEnabled &&
+            !settings.imageEnabled &&
+            !settings.textSnippets.some(snippet => snippet.enabled)
+        )
             return;
 
         const targetFile = info.file;
@@ -486,6 +494,8 @@ export class PasteService {
             const protect = [...imageReferenceRanges(text), ...frontmatterRanges(text)];
             text = cleanUrlsInText(text, buildUrlCleanupOptions(settings), protect).text;
         }
+
+        text = applyTextSnippets(text, settings.textSnippets).text;
 
         let downloadedFiles: TFile[] = [];
         if (this.images.hasWork(text)) {

@@ -91,6 +91,105 @@
 }
 
 /* ------------------------------------------------------------------ */
+/* Custom processing                                                   */
+/* ------------------------------------------------------------------ */
+
+/* The diagram and its explanation use the full row width. */
+.setting-item.better-paste-pipeline-setting {
+    display: block;
+}
+
+.better-paste-pipeline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--size-4-2);
+    margin-top: var(--size-4-2);
+}
+
+.better-paste-pipeline-step {
+    padding: var(--size-4-2) var(--size-4-3);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-s);
+    background-color: var(--background-secondary);
+    font-size: var(--font-ui-smaller);
+}
+
+.better-paste-pipeline-arrow {
+    color: var(--text-muted);
+}
+
+.better-paste-pipeline-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-4-2);
+    margin-top: var(--size-4-2);
+}
+
+.better-paste-snippet-edit-button {
+    margin-inline-start: var(--size-4-1);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--text-accent);
+    font: inherit;
+    cursor: pointer;
+}
+
+.better-paste-snippet-edit-button:hover {
+    background: transparent;
+    color: var(--text-accent-hover);
+    text-decoration: underline;
+}
+
+.better-paste-snippet-modal {
+    width: 48em;
+    max-width: 90vw;
+}
+
+/* The rules need the full modal width so expressions remain readable. */
+.better-paste-snippet-modal .better-paste-snippet-rules-setting {
+    display: block;
+}
+
+.better-paste-snippet-modal .better-paste-snippet-rules-setting .setting-item-control {
+    width: 100%;
+    margin-top: var(--size-4-2);
+}
+
+.better-paste-snippet-rules-setting textarea {
+    width: 100%;
+    resize: vertical;
+    font-family: var(--font-monospace);
+    font-size: var(--font-ui-smaller);
+    line-height: 1.5;
+}
+
+.better-paste-snippet-validation,
+.better-paste-snippet-import-summary,
+.better-paste-snippet-import-desc,
+.better-paste-snippet-preview-desc {
+    margin-top: var(--size-4-1);
+    color: var(--text-muted);
+    font-size: var(--font-ui-smaller);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.better-paste-snippet-validation-error {
+    color: var(--text-error);
+}
+
+.better-paste-snippet-invalid-heading,
+.better-paste-snippet-preview-label {
+    margin-top: var(--size-4-3);
+    color: var(--text-muted);
+    font-size: var(--font-ui-smaller);
+    font-weight: var(--font-semibold);
+}
+
+/* ------------------------------------------------------------------ */
 /* Cards for the author's other plugins                                */
 /* ------------------------------------------------------------------ */
 

@@ -42,7 +42,9 @@ export const STRINGS_ZH_CN: TranslationStrings = {
         fetchingTitle: '正在获取标题...',
         imagesFailed: { other: '有 {count} 张图片未能保存' },
         imagesFailedLinkKept: '{images}，已保留原始链接',
-        imagesFailedNothingPasted: '{images}，因此没有粘贴任何内容'
+        imagesFailedNothingPasted: '{images}，因此没有粘贴任何内容',
+        snippetsCopied: '片段已复制',
+        snippetsCopyFailed: '无法复制片段'
     },
 
     settings: {
@@ -159,6 +161,45 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             dashesDesc: '把连接号和破折号换成连字符。',
             dashesAliases: ['破折号', '连字符', '连接号', '短横线', '标点', '排版', 'ai'],
             dashesExample: '这个结果 — 出乎意料 — 很好。'
+        },
+
+        custom: {
+            heading: '自定义处理',
+            pipelineName: '将自定义正则表达式片段应用于文本',
+            pastedText: '已粘贴文本',
+            builtInRules: '内置规则',
+            customSnippets: '自定义片段',
+            note: '笔记',
+            wikiButton: '查看 Wiki',
+            regexButton: '打开正则表达式测试工具',
+            snippetsName: '片段',
+            snippetsDesc: '创建查找和替换片段，并选择要运行的片段。',
+            enabledSnippetsCount: { other: '已启用 {count} 个片段' },
+            snippetRulesCount: { other: '{count} 条规则' },
+            invalidRulesCount: { other: '{count} 行无效内容' },
+            unnamedSnippet: '未命名片段',
+            emptyState: '你还没有创建任何片段。',
+            addSnippet: '添加片段',
+            editButton: '编辑片段',
+            exportName: '导出片段',
+            exportDesc: '以 Wiki 交换格式复制所有片段。',
+            exportButton: '复制片段',
+            importName: '导入片段',
+            importDesc: '从 Wiki 交换格式追加片段。',
+            previewName: '试一试',
+            previewDesc: '输入示例文本，查看所有已启用片段的处理结果。',
+            modalPreviewDesc: '输入示例文本，查看此片段的处理结果。',
+            previewInputLabel: '示例文本',
+            previewEmpty: '处理后的文本会显示在这里。',
+            nameName: '名称',
+            rulesName: '规则',
+            rulesDesc: '每行输入一个 JavaScript 正则表达式替换。',
+            invalidLine: '第 {line} 行：{value}',
+            saveButton: '保存',
+            recognizedSnippetsCount: { other: '识别出 {count} 个片段' },
+            recognizedRulesCount: { other: '识别出 {count} 条规则' },
+            unparseableName: '无法解析的行',
+            importFallbackName: '导入的片段'
         }
     },
 

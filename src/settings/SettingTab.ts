@@ -22,11 +22,12 @@ import type BetterPastePlugin from '../main';
 import { parseLines } from './normalize';
 import { DEFAULT_SETTINGS } from './defaults';
 import { aliases, format, strings } from '../i18n';
-import { DYNAMIC_DESCRIPTION_KEYS, LIST_KEY_SUFFIX, SETTINGS_CLASS, toggle } from './pages/context';
+import { DYNAMIC_DESCRIPTION_KEYS, LIST_KEY_SUFFIX, SETTINGS_CLASS, TEXT_SNIPPET_KEY_PREFIX, toggle } from './pages/context';
 import type { DynamicDescriptionKey, SettingsPageContext } from './pages/context';
 import { createImageLandingDefinitions } from './pages/imagesPage';
 import { createLinkLandingDefinitions } from './pages/linksPage';
 import { createTextProcessingDefinitions } from './pages/textProcessingPage';
+import { createCustomProcessingDefinitions } from './pages/customProcessingPage';
 import { createStartDefinitions } from './pages/startPage';
 
 /**
@@ -43,6 +44,14 @@ function isListControlKey(key: string): boolean {
 
 function listKeyOf(controlKey: string): ListSettingKey {
     return controlKey.slice(0, -LIST_KEY_SUFFIX.length) as ListSettingKey;
+}
+
+function isTextSnippetControlKey(key: string): boolean {
+    return key.startsWith(TEXT_SNIPPET_KEY_PREFIX);
+}
+
+function textSnippetIdOf(controlKey: string): string {
+    return controlKey.slice(TEXT_SNIPPET_KEY_PREFIX.length);
 }
 
 function isDynamicDescriptionKey(key: string): key is DynamicDescriptionKey {
@@ -69,10 +78,14 @@ export class BetterPasteSettingTab extends PluginSettingTab {
     /** Shared by every page module. Settings are read live so `visible` predicates stay current. */
     private get context(): SettingsPageContext {
         return {
+            app: this.app,
             settings: () => this.plugin.settings,
             version: this.plugin.manifest.version,
             showWhatsNew: () => this.plugin.showWhatsNew(),
             saveSettings: () => this.plugin.saveSettings(),
+            getControlValue: key => this.getControlValue(key),
+            setControlValue: (key, value) => this.setControlValue(key, value),
+            update: () => this.update(),
             dynamicDescription: key => this.dynamicDescription(key)
         };
     }
@@ -112,6 +125,12 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.images.heading, items: createImageLandingDefinitions(context) },
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.links.heading, items: createLinkLandingDefinitions(context) },
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.text.heading, items: createTextProcessingDefinitions() },
+            {
+                type: 'group',
+                cls: SETTINGS_CLASS,
+                heading: strings.settings.custom.heading,
+                items: createCustomProcessingDefinitions(context)
+            },
             // Last, because release notes, support links and the other plugins are not settings
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.start.heading, items: createStartDefinitions(context) }
         ];
@@ -124,6 +143,9 @@ export class BetterPasteSettingTab extends PluginSettingTab {
      */
     getControlValue(key: string): unknown {
         if (isListControlKey(key)) return this.plugin.settings[listKeyOf(key)].join('\n');
+        if (isTextSnippetControlKey(key)) {
+            return this.plugin.settings.textSnippets.find(snippet => snippet.id === textSnippetIdOf(key))?.enabled ?? false;
+        }
         return super.getControlValue(key);
     }
 
@@ -133,6 +155,15 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             this.plugin.settings[listKeyOf(key)] = parseLines(typeof value === 'string' ? value : '');
             await this.plugin.saveSettings();
             this.afterChange();
+            return;
+        }
+
+        if (isTextSnippetControlKey(key)) {
+            const snippet = this.plugin.settings.textSnippets.find(candidate => candidate.id === textSnippetIdOf(key));
+            if (!snippet || typeof value !== 'boolean') return;
+            snippet.enabled = value;
+            await this.plugin.saveSettings();
+            this.update();
             return;
         }
 

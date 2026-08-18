@@ -47,7 +47,9 @@ export const STRINGS_PL: TranslationStrings = {
             other: 'nie udało się zapisać {count} obrazu'
         },
         imagesFailedLinkKept: '{images}, zachowano oryginalny odnośnik',
-        imagesFailedNothingPasted: '{images}, więc nic nie zostało wklejone'
+        imagesFailedNothingPasted: '{images}, więc nic nie zostało wklejone',
+        snippetsCopied: 'fragmenty skopiowane',
+        snippetsCopyFailed: 'nie udało się skopiować fragmentów'
     },
 
     settings: {
@@ -172,6 +174,70 @@ export const STRINGS_PL: TranslationStrings = {
             dashesDesc: 'Zamienia półpauzy i pauzy na łączniki.',
             dashesAliases: ['myślnik', 'pauza', 'półpauza', 'łącznik', 'dywiz', 'interpunkcja', 'typografia', 'ai'],
             dashesExample: 'Wynik — wbrew wszystkiemu — był dobry.'
+        },
+
+        custom: {
+            heading: 'Przetwarzanie niestandardowe',
+            pipelineName: 'Zastosuj niestandardowe fragmenty wyrażeń regularnych do tekstu',
+            pastedText: 'Wklejony tekst',
+            builtInRules: 'Reguły wbudowane',
+            customSnippets: 'Niestandardowe fragmenty',
+            note: 'Notatka',
+            wikiButton: 'Otwórz wiki',
+            regexButton: 'Otwórz tester wyrażeń regularnych',
+            snippetsName: 'Fragmenty',
+            snippetsDesc: 'Twórz fragmenty wyszukiwania i zastępowania oraz wybieraj, które mają działać.',
+            enabledSnippetsCount: {
+                one: '{count} włączony fragment',
+                few: '{count} włączone fragmenty',
+                many: '{count} włączonych fragmentów',
+                other: '{count} włączonego fragmentu'
+            },
+            snippetRulesCount: {
+                one: '{count} reguła',
+                few: '{count} reguły',
+                many: '{count} reguł',
+                other: '{count} reguły'
+            },
+            invalidRulesCount: {
+                one: '{count} nieprawidłowy wiersz',
+                few: '{count} nieprawidłowe wiersze',
+                many: '{count} nieprawidłowych wierszy',
+                other: '{count} nieprawidłowego wiersza'
+            },
+            unnamedSnippet: 'Fragment bez nazwy',
+            emptyState: 'Nie masz jeszcze żadnych fragmentów.',
+            addSnippet: 'Dodaj fragment',
+            editButton: 'Edytuj fragment',
+            exportName: 'Eksportuj fragmenty',
+            exportDesc: 'Kopiuje wszystkie fragmenty w formacie wymiany z wiki.',
+            exportButton: 'Kopiuj fragmenty',
+            importName: 'Importuj fragmenty',
+            importDesc: 'Dodaje fragmenty z formatu wymiany z wiki.',
+            previewName: 'Wypróbuj',
+            previewDesc: 'Wpisz przykładowy tekst, aby zobaczyć wynik wszystkich włączonych fragmentów.',
+            modalPreviewDesc: 'Wpisz przykładowy tekst, aby zobaczyć wynik tego fragmentu.',
+            previewInputLabel: 'Przykładowy tekst',
+            previewEmpty: 'Przetworzony tekst pojawi się tutaj.',
+            nameName: 'Nazwa',
+            rulesName: 'Reguły',
+            rulesDesc: 'Wpisz po jednym zastąpieniu z wyrażeniem regularnym JavaScript w każdym wierszu.',
+            invalidLine: 'Wiersz {line}: {value}',
+            saveButton: 'Zapisz',
+            recognizedSnippetsCount: {
+                one: 'Rozpoznano {count} fragment',
+                few: 'Rozpoznano {count} fragmenty',
+                many: 'Rozpoznano {count} fragmentów',
+                other: 'Rozpoznano {count} fragmentu'
+            },
+            recognizedRulesCount: {
+                one: 'Rozpoznano {count} regułę',
+                few: 'Rozpoznano {count} reguły',
+                many: 'Rozpoznano {count} reguł',
+                other: 'Rozpoznano {count} reguły'
+            },
+            unparseableName: 'Nierozpoznane wiersze',
+            importFallbackName: 'Zaimportowany fragment'
         }
     },
 

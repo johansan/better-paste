@@ -45,7 +45,9 @@ export const STRINGS_DE: TranslationStrings = {
             other: '{count} Bilder konnten nicht gespeichert werden'
         },
         imagesFailedLinkKept: '{images}, der ursprüngliche Link wurde behalten',
-        imagesFailedNothingPasted: '{images}, daher wurde nichts eingefügt'
+        imagesFailedNothingPasted: '{images}, daher wurde nichts eingefügt',
+        snippetsCopied: 'Snippets kopiert',
+        snippetsCopyFailed: 'Snippets konnten nicht kopiert werden'
     },
 
     settings: {
@@ -192,6 +194,45 @@ export const STRINGS_DE: TranslationStrings = {
                 'ki'
             ],
             dashesExample: 'Das Ergebnis — allen Widerständen zum Trotz — war gut.'
+        },
+
+        custom: {
+            heading: 'Eigene Verarbeitung',
+            pipelineName: 'Eigene Regex-Snippets auf Text anwenden',
+            pastedText: 'Eingefügter Text',
+            builtInRules: 'Integrierte Regeln',
+            customSnippets: 'Eigene Snippets',
+            note: 'Notiz',
+            wikiButton: 'Wiki anzeigen',
+            regexButton: 'Regex-Testumgebung öffnen',
+            snippetsName: 'Snippets',
+            snippetsDesc: 'Erstelle Snippets zum Suchen und Ersetzen und wähle aus, welche ausgeführt werden.',
+            enabledSnippetsCount: { one: '{count} aktives Snippet', other: '{count} aktive Snippets' },
+            snippetRulesCount: { one: '{count} Regel', other: '{count} Regeln' },
+            invalidRulesCount: { one: '{count} ungültige Zeile', other: '{count} ungültige Zeilen' },
+            unnamedSnippet: 'Unbenanntes Snippet',
+            emptyState: 'Du hast noch keine Snippets erstellt.',
+            addSnippet: 'Snippet hinzufügen',
+            editButton: 'Snippet bearbeiten',
+            exportName: 'Snippets exportieren',
+            exportDesc: 'Kopiert alle Snippets im Austauschformat des Wikis.',
+            exportButton: 'Snippets kopieren',
+            importName: 'Snippets importieren',
+            importDesc: 'Fügt Snippets aus dem Austauschformat des Wikis hinzu.',
+            previewName: 'Ausprobieren',
+            previewDesc: 'Gib Beispieltext ein, um das Ergebnis aller aktiven Snippets zu sehen.',
+            modalPreviewDesc: 'Gib Beispieltext ein, um das Ergebnis dieses Snippets zu sehen.',
+            previewInputLabel: 'Beispieltext',
+            previewEmpty: 'Der verarbeitete Text erscheint hier.',
+            nameName: 'Name',
+            rulesName: 'Regeln',
+            rulesDesc: 'Gib pro Zeile eine JavaScript-Ersetzung mit regulärem Ausdruck ein.',
+            invalidLine: 'Zeile {line}: {value}',
+            saveButton: 'Speichern',
+            recognizedSnippetsCount: { one: '{count} Snippet erkannt', other: '{count} Snippets erkannt' },
+            recognizedRulesCount: { one: '{count} Regel erkannt', other: '{count} Regeln erkannt' },
+            unparseableName: 'Nicht lesbare Zeilen',
+            importFallbackName: 'Importiertes Snippet'
         }
     },
 

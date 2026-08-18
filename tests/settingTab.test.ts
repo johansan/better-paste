@@ -40,7 +40,14 @@ import { BUILT_IN_LINK_REMOVALS_URL } from '../src/urls';
 const STORED_STATE_KEYS = ['lastShownVersion', 'imageLastSize', 'imageLastClass', 'pdfLastFurniture', 'pdfLastSingleParagraph'];
 
 /** Settings owned by a custom-rendered row rather than a declarative control. */
-const CUSTOM_RENDER_SETTING_KEYS = ['imageNameTemplate', 'imageSizeChoice', 'imageSizeOptions', 'imageClassChoice', 'imageClassOptions'];
+const CUSTOM_RENDER_SETTING_KEYS = [
+    'imageNameTemplate',
+    'imageSizeChoice',
+    'imageSizeOptions',
+    'imageClassChoice',
+    'imageClassOptions',
+    'textSnippets'
+];
 
 /** Minimal plugin double exposing only what the setting tab touches. */
 function fakePlugin(overrides: Partial<BetterPasteSettings> = {}) {
@@ -97,6 +104,100 @@ function controlRows(tab: BetterPasteSettingTab): SettingDefinitionControl[] {
 function isVisible(row: { visible?: boolean | (() => boolean) } | undefined): boolean | undefined {
     if (!row) return undefined;
     return typeof row.visible === 'function' ? row.visible() : row.visible;
+}
+
+interface PreviewElementOptions {
+    cls?: string | string[];
+    text?: string;
+    attr?: Record<string, string>;
+}
+
+/** DOM subset used by the custom snippet preview renderer. */
+class PreviewElement {
+    readonly classes = new Set<string>();
+    readonly children: PreviewElement[] = [];
+    readonly listeners = new Map<string, () => void>();
+    readonly attrs: Record<string, string> = {};
+    value = '';
+    text = '';
+    private parent: PreviewElement | null = null;
+
+    constructor(
+        readonly tagName = 'div',
+        options: PreviewElementOptions = {}
+    ) {
+        if (options.cls) this.addClass(...(Array.isArray(options.cls) ? options.cls : [options.cls]));
+        if (options.text) this.text = options.text;
+        if (options.attr) this.setAttrs(options.attr);
+    }
+
+    addClass(...classes: string[]): void {
+        for (const cls of classes) this.classes.add(cls);
+    }
+
+    removeClass(...classes: string[]): void {
+        for (const cls of classes) this.classes.delete(cls);
+    }
+
+    createDiv(options: PreviewElementOptions = {}): PreviewElement {
+        return this.append(new PreviewElement('div', options));
+    }
+
+    createEl(tagName: string, options: PreviewElementOptions = {}): PreviewElement {
+        return this.append(new PreviewElement(tagName, options));
+    }
+
+    setAttrs(attrs: Record<string, string>): void {
+        Object.assign(this.attrs, attrs);
+    }
+
+    setText(text: string): void {
+        this.text = text;
+    }
+
+    addEventListener(event: string, listener: () => void): void {
+        this.listeners.set(event, listener);
+    }
+
+    querySelector(selector: string): PreviewElement | null {
+        return this.querySelectorAll(selector)[0] ?? null;
+    }
+
+    querySelectorAll(selector: string): PreviewElement[] {
+        const descendants = this.descendants();
+        if (selector === '.better-paste-preview textarea') {
+            return descendants.filter(element => element.tagName === 'textarea' && element.hasAncestorClass('better-paste-preview'));
+        }
+        if (selector.startsWith('.')) {
+            const cls = selector.slice(1);
+            return descendants.filter(element => element.classes.has(cls));
+        }
+        return descendants.filter(element => element.tagName === selector);
+    }
+
+    remove(): void {
+        if (!this.parent) return;
+        const index = this.parent.children.indexOf(this);
+        if (index >= 0) this.parent.children.splice(index, 1);
+        this.parent = null;
+    }
+
+    private append(element: PreviewElement): PreviewElement {
+        element.parent = this;
+        this.children.push(element);
+        return element;
+    }
+
+    private descendants(): PreviewElement[] {
+        return this.children.flatMap(child => [child, ...child.descendants()]);
+    }
+
+    private hasAncestorClass(cls: string): boolean {
+        for (let current = this.parent; current; current = current.parent) {
+            if (current.classes.has(cls)) return true;
+        }
+        return false;
+    }
 }
 
 describe('settings tree', () => {
@@ -159,7 +260,7 @@ describe('settings tree', () => {
             .getSettingDefinitions()
             .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
 
-        expect(groups.map(group => group.heading)).toEqual([undefined, 'Images', 'Links', 'Text processing', 'About']);
+        expect(groups.map(group => group.heading)).toEqual([undefined, 'Images', 'Links', 'Text processing', 'Custom processing', 'About']);
     });
 
     it('puts the note property under the master toggle and the width property under Images', () => {
@@ -224,7 +325,7 @@ describe('settings tree', () => {
 
     it('puts the detail on sub-pages, declared so search can still reach it', () => {
         const found = pages(tab.getSettingDefinitions());
-        expect(found.map(page => page.name)).toEqual(['Link removals']);
+        expect(found.map(page => page.name)).toEqual(['Link removals', 'Snippets']);
         // `items` keeps a page in the searchable tree; the imperative `page` form does not
         for (const page of found) {
             expect(page.items, `"${page.name}" has no items`).toBeDefined();
@@ -302,6 +403,61 @@ describe('settings values', () => {
         expect(plugin.settings.linkRemovals).toEqual(['fbclid', 'mine.example | source, ref']);
         expect(tab.getControlValue('linkRemovals.text')).toBe('fbclid\nmine.example | source, ref');
         expect(plugin.saveCount()).toBe(1);
+    });
+
+    it('bridges stable snippet toggle keys to the matching list entry', async () => {
+        plugin.settings.textSnippets = [
+            { id: 'first', name: 'First', rules: ['s/a/b/g'], enabled: true },
+            { id: 'second', name: 'Second', rules: ['s/b/c/g'], enabled: false }
+        ];
+
+        expect(tab.getControlValue('textSnippet:second')).toBe(false);
+        await tab.setControlValue('textSnippet:second', true);
+
+        expect(plugin.settings.textSnippets.map(snippet => snippet.enabled)).toEqual([true, true]);
+        expect(plugin.saveCount()).toBe(1);
+        expect((tab as unknown as { updateCount: number }).updateCount).toBe(1);
+    });
+
+    it('uses snippet ids as row keys when displayed names match', () => {
+        plugin.settings.textSnippets = [
+            { id: 'first', name: 'Same name', rules: ['s/a/b/g'], enabled: true },
+            { id: 'second', name: 'Same name', rules: ['s/b/c/g'], enabled: false }
+        ];
+
+        const rows = controlRows(tab).filter(row => row.name === 'Same name');
+
+        expect(rows.map(row => row.control.key)).toEqual(['textSnippet:first', 'textSnippet:second']);
+    });
+
+    it('shows enabled snippet counts and invalid rules on the page link', () => {
+        plugin.settings.textSnippets = [
+            { id: 'valid', name: 'Valid', rules: ['s/a/b/g'], enabled: true },
+            { id: 'invalid', name: 'Invalid', rules: ['not a rule'], enabled: false }
+        ];
+        const snippets = pages(tab.getSettingDefinitions()).find(page => page.name === 'Snippets');
+
+        expect(typeof snippets?.displayValue === 'function' ? snippets.displayValue() : snippets?.displayValue).toBe('1 enabled snippet');
+        expect(typeof snippets?.status === 'function' ? snippets.status() : snippets?.status).toBe('warning');
+    });
+
+    it('replaces the snippet preview and preserves its sample when the row renders again', () => {
+        plugin.settings.textSnippets = [{ id: 'replace', name: 'Replace', rules: ['s/a/b/g'], enabled: true }];
+        const snippets = pages(tab.getSettingDefinitions()).find(page => page.name === 'Snippets');
+        const preview = flatten([...(snippets?.items ?? [])]).find(row => row.name === 'Try it');
+        const settingEl = new PreviewElement();
+        const setting = { settingEl };
+
+        preview?.render?.(setting as unknown as Setting);
+        const input = settingEl.querySelector('.better-paste-preview textarea');
+        if (!input) throw new Error('The snippet preview has no textarea');
+        input.value = 'a';
+
+        preview?.render?.(setting as unknown as Setting);
+
+        expect(settingEl.querySelectorAll('.better-paste-preview')).toHaveLength(1);
+        expect(settingEl.querySelector('.better-paste-preview textarea')?.value).toBe('a');
+        expect(settingEl.querySelector('.better-paste-preview-output')?.text).toBe('b');
     });
 
     it('hands contribution text to the localized website in the URL fragment', () => {

@@ -49,7 +49,9 @@ export const STRINGS_AR: TranslationStrings = {
             other: 'تعذّر حفظ {count} صورة'
         },
         imagesFailedLinkKept: '{images}، وأُبقي الرابط الأصلي',
-        imagesFailedNothingPasted: '{images}، لذلك لم يُلصق شيء'
+        imagesFailedNothingPasted: '{images}، لذلك لم يُلصق شيء',
+        snippetsCopied: 'نُسخت المقتطفات',
+        snippetsCopyFailed: 'تعذّر نسخ المقتطفات'
     },
 
     settings: {
@@ -174,6 +176,80 @@ export const STRINGS_AR: TranslationStrings = {
             dashesDesc: 'يحوّل الشرطات القصيرة والطويلة إلى واصلات.',
             dashesAliases: ['شرطة', 'شرطة طويلة', 'شرطة قصيرة', 'واصلة', 'ترقيم', 'طباعة', 'ذكاء اصطناعي'],
             dashesExample: 'كانت النتيجة — رغم كل الصعاب — جيدة.'
+        },
+
+        custom: {
+            heading: 'معالجة مخصصة',
+            pipelineName: 'تطبيق مقتطفات التعبيرات النمطية المخصصة على النص',
+            pastedText: 'النص الملصق',
+            builtInRules: 'القواعد المضمّنة',
+            customSnippets: 'المقتطفات المخصصة',
+            note: 'الملاحظة',
+            wikiButton: 'عرض الويكي',
+            regexButton: 'فتح أداة اختبار التعبيرات النمطية',
+            snippetsName: 'المقتطفات',
+            snippetsDesc: 'أنشئ مقتطفات للبحث والاستبدال واختر ما تريد تشغيله منها.',
+            enabledSnippetsCount: {
+                zero: '{count} مقتطفات مفعّلة',
+                one: '{count} مقتطف مفعّل',
+                two: '{count} مقتطفان مفعّلان',
+                few: '{count} مقتطفات مفعّلة',
+                many: '{count} مقتطفًا مفعّلًا',
+                other: '{count} مقتطف مفعّل'
+            },
+            snippetRulesCount: {
+                zero: '{count} قواعد',
+                one: '{count} قاعدة',
+                two: '{count} قاعدتان',
+                few: '{count} قواعد',
+                many: '{count} قاعدةً',
+                other: '{count} قاعدة'
+            },
+            invalidRulesCount: {
+                zero: '{count} أسطر غير صالحة',
+                one: '{count} سطر غير صالح',
+                two: '{count} سطران غير صالحين',
+                few: '{count} أسطر غير صالحة',
+                many: '{count} سطرًا غير صالح',
+                other: '{count} سطر غير صالح'
+            },
+            unnamedSnippet: 'مقتطف بلا اسم',
+            emptyState: 'لم تنشئ أي مقتطفات بعد.',
+            addSnippet: 'إضافة مقتطف',
+            editButton: 'تحرير المقتطف',
+            exportName: 'تصدير المقتطفات',
+            exportDesc: 'ينسخ كل المقتطفات بتنسيق التبادل المستخدم في الويكي.',
+            exportButton: 'نسخ المقتطفات',
+            importName: 'استيراد المقتطفات',
+            importDesc: 'يضيف مقتطفات من تنسيق التبادل المستخدم في الويكي.',
+            previewName: 'جرّب',
+            previewDesc: 'اكتب نصًا تجريبيًا لرؤية نتيجة كل المقتطفات المفعّلة.',
+            modalPreviewDesc: 'اكتب نصًا تجريبيًا لرؤية نتيجة هذا المقتطف.',
+            previewInputLabel: 'نص تجريبي',
+            previewEmpty: 'سيظهر النص المعالَج هنا.',
+            nameName: 'الاسم',
+            rulesName: 'القواعد',
+            rulesDesc: 'أدخل استبدالًا واحدًا بتعبير نمطي من JavaScript في كل سطر.',
+            invalidLine: 'السطر {line}: {value}',
+            saveButton: 'حفظ',
+            recognizedSnippetsCount: {
+                zero: 'تم التعرّف على {count} مقتطفات',
+                one: 'تم التعرّف على {count} مقتطف',
+                two: 'تم التعرّف على {count} مقتطفين',
+                few: 'تم التعرّف على {count} مقتطفات',
+                many: 'تم التعرّف على {count} مقتطفًا',
+                other: 'تم التعرّف على {count} مقتطف'
+            },
+            recognizedRulesCount: {
+                zero: 'تم التعرّف على {count} قواعد',
+                one: 'تم التعرّف على {count} قاعدة',
+                two: 'تم التعرّف على {count} قاعدتين',
+                few: 'تم التعرّف على {count} قواعد',
+                many: 'تم التعرّف على {count} قاعدةً',
+                other: 'تم التعرّف على {count} قاعدة'
+            },
+            unparseableName: 'أسطر غير قابلة للتحليل',
+            importFallbackName: 'مقتطف مستورد'
         }
     },
 

@@ -48,6 +48,16 @@ export const DEFAULT_IMAGE_NAME_TEMPLATE = '{{name}}';
 /* URLs                                                                        */
 /* -------------------------------------------------------------------------- */
 
+/** Documentation for writing and sharing custom processing snippets. */
+export const SNIPPETS_WIKI_URL = 'https://github.com/johansan/better-paste/wiki/Snippets';
+
+/**
+ * Saved regex101 entry with the JavaScript flavor, substitution mode and a Perplexity
+ * sample. A permalink rather than URL parameters because the flavor has no parameter
+ * and the site would otherwise open its PCRE2 default.
+ */
+export const REGEX_PLAYGROUND_URL = 'https://regex101.com/r/8sw6Xt/1';
+
 export { LINK_REMOVALS_UPDATED, SHIPPED_PARAM_REMOVALS, SIGNED_URL_PARAM_SETS, TRACKING_PARAMS } from './linkRemovals.generated';
 
 /* -------------------------------------------------------------------------- */

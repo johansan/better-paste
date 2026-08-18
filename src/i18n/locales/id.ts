@@ -42,7 +42,9 @@ export const STRINGS_ID: TranslationStrings = {
         fetchingTitle: 'mengambil judul...',
         imagesFailed: { other: '{count} gambar gagal disimpan' },
         imagesFailedLinkKept: '{images}, tautan aslinya dipertahankan',
-        imagesFailedNothingPasted: '{images}, jadi tidak ada yang ditempel'
+        imagesFailedNothingPasted: '{images}, jadi tidak ada yang ditempel',
+        snippetsCopied: 'cuplikan disalin',
+        snippetsCopyFailed: 'cuplikan tidak dapat disalin'
     },
 
     settings: {
@@ -171,6 +173,45 @@ export const STRINGS_ID: TranslationStrings = {
             dashesDesc: 'Mengubah tanda pisah en dan em menjadi tanda hubung.',
             dashesAliases: ['tanda pisah', 'tanda pisah panjang', 'tanda hubung', 'strip', 'tanda baca', 'tipografi', 'ai'],
             dashesExample: 'Hasilnya — di luar dugaan — bagus.'
+        },
+
+        custom: {
+            heading: 'Pemrosesan khusus',
+            pipelineName: 'Terapkan cuplikan regex khusus pada teks',
+            pastedText: 'Teks yang ditempel',
+            builtInRules: 'Aturan bawaan',
+            customSnippets: 'Cuplikan khusus',
+            note: 'Catatan',
+            wikiButton: 'Buka wiki',
+            regexButton: 'Buka tempat uji ekspresi reguler',
+            snippetsName: 'Cuplikan',
+            snippetsDesc: 'Buat cuplikan cari dan ganti, lalu pilih cuplikan yang dijalankan.',
+            enabledSnippetsCount: { other: '{count} cuplikan aktif' },
+            snippetRulesCount: { other: '{count} aturan' },
+            invalidRulesCount: { other: '{count} baris tidak valid' },
+            unnamedSnippet: 'Cuplikan tanpa nama',
+            emptyState: 'Anda belum membuat cuplikan.',
+            addSnippet: 'Tambah cuplikan',
+            editButton: 'Edit cuplikan',
+            exportName: 'Ekspor cuplikan',
+            exportDesc: 'Menyalin semua cuplikan dalam format pertukaran wiki.',
+            exportButton: 'Salin cuplikan',
+            importName: 'Impor cuplikan',
+            importDesc: 'Menambahkan cuplikan dari format pertukaran wiki.',
+            previewName: 'Coba',
+            previewDesc: 'Ketik teks contoh untuk melihat hasil dari semua cuplikan aktif.',
+            modalPreviewDesc: 'Ketik teks contoh untuk melihat hasil dari cuplikan ini.',
+            previewInputLabel: 'Teks contoh',
+            previewEmpty: 'Teks yang diproses akan muncul di sini.',
+            nameName: 'Nama',
+            rulesName: 'Aturan',
+            rulesDesc: 'Masukkan satu penggantian ekspresi reguler JavaScript per baris.',
+            invalidLine: 'Baris {line}: {value}',
+            saveButton: 'Simpan',
+            recognizedSnippetsCount: { other: '{count} cuplikan dikenali' },
+            recognizedRulesCount: { other: '{count} aturan dikenali' },
+            unparseableName: 'Baris yang tidak dikenali',
+            importFallbackName: 'Cuplikan yang diimpor'
         }
     },
 

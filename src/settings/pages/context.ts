@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { SettingDefinition } from 'obsidian';
+import type { App, SettingDefinition } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../defaults';
 import type { BetterPasteSettings } from '../types';
 
@@ -26,6 +26,7 @@ import type { BetterPasteSettings } from '../types';
  * time because Obsidian re-evaluates them on each render.
  */
 export interface SettingsPageContext {
+    app: App;
     settings: () => BetterPasteSettings;
     /** Plugin version, named on the What's new row. */
     version: string;
@@ -33,6 +34,12 @@ export interface SettingsPageContext {
     showWhatsNew: () => void;
     /** Persists a value changed by a custom-rendered setting row. */
     saveSettings: () => Promise<void>;
+    /** Reads a declarative control value through the setting tab's storage bridge. */
+    getControlValue: (key: string) => unknown;
+    /** Writes a declarative control value through the setting tab's storage bridge. */
+    setControlValue: (key: string, value: unknown) => Promise<void>;
+    /** Rebuilds definitions after a list changes shape or visible text. */
+    update: () => void;
     /** Description whose text names `key`'s current value and follows its renames. */
     dynamicDescription: (key: DynamicDescriptionKey) => string | DocumentFragment;
 }
@@ -43,6 +50,9 @@ export type DynamicDescriptionKey = (typeof DYNAMIC_DESCRIPTION_KEYS)[number];
 
 /** Suffix marking a control key whose stored value is a list but is edited as text. */
 export const LIST_KEY_SUFFIX = '.text';
+
+/** Prefix for per-snippet toggles whose stable key contains the snippet id. */
+export const TEXT_SNIPPET_KEY_PREFIX = 'textSnippet:';
 
 /** Class applied to the plugin's setting groups so styles.css can scope to them. */
 export const SETTINGS_CLASS = 'better-paste-settings';

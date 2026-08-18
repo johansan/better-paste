@@ -42,7 +42,9 @@ export const STRINGS_TH: TranslationStrings = {
         fetchingTitle: 'กำลังดึงชื่อเรื่อง...',
         imagesFailed: { other: 'บันทึกรูปภาพ {count} รูปไม่สำเร็จ' },
         imagesFailedLinkKept: '{images} จึงคงลิงก์เดิมไว้',
-        imagesFailedNothingPasted: '{images} จึงไม่ได้วางอะไรเลย'
+        imagesFailedNothingPasted: '{images} จึงไม่ได้วางอะไรเลย',
+        snippetsCopied: 'คัดลอกชุดคำสั่งแล้ว',
+        snippetsCopyFailed: 'ไม่สามารถคัดลอกชุดคำสั่งได้'
     },
 
     settings: {
@@ -169,6 +171,45 @@ export const STRINGS_TH: TranslationStrings = {
             dashesDesc: 'เปลี่ยนเอ็นแดชและเอ็มแดชเป็นยัติภังค์',
             dashesAliases: ['ขีด', 'แดช', 'ขีดยาว', 'ขีดกลาง', 'ยัติภังค์', 'เครื่องหมายวรรคตอน', 'การพิมพ์', 'ai'],
             dashesExample: 'ผลลัพธ์ — แม้จะมีอุปสรรค — ก็ออกมาดี'
+        },
+
+        custom: {
+            heading: 'การประมวลผลแบบกำหนดเอง',
+            pipelineName: 'ใช้ชุดคำสั่งนิพจน์ทั่วไปแบบกำหนดเองกับข้อความ',
+            pastedText: 'ข้อความที่วาง',
+            builtInRules: 'กฎในตัว',
+            customSnippets: 'ชุดคำสั่งแบบกำหนดเอง',
+            note: 'โน้ต',
+            wikiButton: 'เปิดวิกิ',
+            regexButton: 'เปิดเครื่องมือทดสอบนิพจน์ทั่วไป',
+            snippetsName: 'ชุดคำสั่ง',
+            snippetsDesc: 'สร้างชุดคำสั่งค้นหาและแทนที่ แล้วเลือกชุดที่ต้องการใช้',
+            enabledSnippetsCount: { other: 'เปิดใช้อยู่ {count} ชุด' },
+            snippetRulesCount: { other: '{count} กฎ' },
+            invalidRulesCount: { other: '{count} บรรทัดไม่ถูกต้อง' },
+            unnamedSnippet: 'ชุดคำสั่งไม่มีชื่อ',
+            emptyState: 'คุณยังไม่ได้สร้างชุดคำสั่ง',
+            addSnippet: 'เพิ่มชุดคำสั่ง',
+            editButton: 'แก้ไขชุดคำสั่ง',
+            exportName: 'ส่งออกชุดคำสั่ง',
+            exportDesc: 'คัดลอกชุดคำสั่งทั้งหมดในรูปแบบแลกเปลี่ยนของวิกิ',
+            exportButton: 'คัดลอกชุดคำสั่ง',
+            importName: 'นำเข้าชุดคำสั่ง',
+            importDesc: 'เพิ่มชุดคำสั่งจากรูปแบบแลกเปลี่ยนของวิกิ',
+            previewName: 'ทดลองใช้',
+            previewDesc: 'พิมพ์ข้อความตัวอย่างเพื่อดูผลลัพธ์จากชุดคำสั่งที่เปิดใช้ทั้งหมด',
+            modalPreviewDesc: 'พิมพ์ข้อความตัวอย่างเพื่อดูผลลัพธ์จากชุดคำสั่งนี้',
+            previewInputLabel: 'ข้อความตัวอย่าง',
+            previewEmpty: 'ข้อความที่ประมวลผลแล้วจะแสดงที่นี่',
+            nameName: 'ชื่อ',
+            rulesName: 'กฎ',
+            rulesDesc: 'ใส่การแทนที่ด้วยนิพจน์ทั่วไป JavaScript หนึ่งรายการต่อบรรทัด',
+            invalidLine: 'บรรทัด {line}: {value}',
+            saveButton: 'บันทึก',
+            recognizedSnippetsCount: { other: 'พบชุดคำสั่ง {count} ชุด' },
+            recognizedRulesCount: { other: 'พบกฎ {count} ข้อ' },
+            unparseableName: 'บรรทัดที่อ่านไม่ได้',
+            importFallbackName: 'ชุดคำสั่งที่นำเข้า'
         }
     },
 

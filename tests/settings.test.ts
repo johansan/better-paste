@@ -58,6 +58,30 @@ describe('normalizeSettings', () => {
         expect(result.imageNameTemplate).toBe('{{name}}-YYYY-MM-DD');
     });
 
+    it('normalizes malformed custom snippets without losing usable rules', () => {
+        const result = normalizeSettings({
+            textSnippets: [
+                null,
+                12,
+                {},
+                { id: 'kept', name: '  Citations  ', rules: ['// note', 's/foo/bar/g', 7], enabled: false },
+                { id: 'kept', name: 'Duplicate id', rules: ['s/x/y/'], enabled: true },
+                { id: '', name: '', rules: ['s/a/b/'], enabled: 'yes' },
+                { id: 9, name: 'Broken but named', rules: 's/a/b/', enabled: 'yes' },
+                { name: '', rules: ['not a rule'] }
+            ]
+        });
+
+        expect(result.textSnippets).toHaveLength(4);
+        expect(result.textSnippets[0]).toEqual({ id: 'kept', name: 'Citations', rules: ['// note', 's/foo/bar/g'], enabled: false });
+        expect(result.textSnippets[1]).toMatchObject({ name: 'Duplicate id', rules: ['s/x/y/'], enabled: true });
+        expect(result.textSnippets[1].id).not.toBe('kept');
+        expect(result.textSnippets[2].id).toMatch(/^[a-z0-9]{7}$/u);
+        expect(result.textSnippets[2]).toMatchObject({ name: '', rules: ['s/a/b/'], enabled: true });
+        expect(result.textSnippets[3].id).toMatch(/^[a-z0-9]{7}$/u);
+        expect(result.textSnippets[3]).toMatchObject({ name: 'Broken but named', rules: [], enabled: true });
+    });
+
     it('replaces values of the wrong type', () => {
         const result = normalizeSettings({ autoClean: 'yes', imageSizeProperty: 7 });
         expect(result.autoClean).toBe(DEFAULT_SETTINGS.autoClean);

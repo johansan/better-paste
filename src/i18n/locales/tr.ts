@@ -45,7 +45,9 @@ export const STRINGS_TR: TranslationStrings = {
             other: '{count} görsel kaydedilemedi'
         },
         imagesFailedLinkKept: '{images}, özgün bağlantı korundu',
-        imagesFailedNothingPasted: '{images}, bu yüzden hiçbir şey yapıştırılmadı'
+        imagesFailedNothingPasted: '{images}, bu yüzden hiçbir şey yapıştırılmadı',
+        snippetsCopied: 'parçacıklar kopyalandı',
+        snippetsCopyFailed: 'parçacıklar kopyalanamadı'
     },
 
     settings: {
@@ -174,6 +176,45 @@ export const STRINGS_TR: TranslationStrings = {
             dashesDesc: 'Orta ve uzun çizgileri kısa çizgiye dönüştürür.',
             dashesAliases: ['tire', 'çizgi', 'kısa çizgi', 'orta çizgi', 'uzun çizgi', 'uzun tire', 'noktalama', 'tipografi', 'yapay zeka'],
             dashesExample: 'Sonuç — her şeye rağmen — iyiydi.'
+        },
+
+        custom: {
+            heading: 'Özel işleme',
+            pipelineName: 'Özel regex parçacıklarını metne uygulayın',
+            pastedText: 'Yapıştırılan metin',
+            builtInRules: 'Yerleşik kurallar',
+            customSnippets: 'Özel parçacıklar',
+            note: 'Not',
+            wikiButton: 'Wiki’yi görüntüle',
+            regexButton: 'Düzenli ifade test aracını aç',
+            snippetsName: 'Parçacıklar',
+            snippetsDesc: 'Bul ve değiştir parçacıkları oluşturun ve hangilerinin çalışacağını seçin.',
+            enabledSnippetsCount: { one: '{count} etkin parçacık', other: '{count} etkin parçacık' },
+            snippetRulesCount: { one: '{count} kural', other: '{count} kural' },
+            invalidRulesCount: { one: '{count} geçersiz satır', other: '{count} geçersiz satır' },
+            unnamedSnippet: 'Adsız parçacık',
+            emptyState: 'Henüz bir parçacık oluşturmadınız.',
+            addSnippet: 'Parçacık ekle',
+            editButton: 'Parçacığı düzenle',
+            exportName: 'Parçacıkları dışa aktar',
+            exportDesc: 'Tüm parçacıkları wiki değişim biçiminde kopyalar.',
+            exportButton: 'Parçacıkları kopyala',
+            importName: 'Parçacıkları içe aktar',
+            importDesc: 'Wiki değişim biçiminden parçacıklar ekler.',
+            previewName: 'Dene',
+            previewDesc: 'Tüm etkin parçacıkların sonucunu görmek için örnek metin yazın.',
+            modalPreviewDesc: 'Bu parçacığın sonucunu görmek için örnek metin yazın.',
+            previewInputLabel: 'Örnek metin',
+            previewEmpty: 'İşlenen metin burada görünür.',
+            nameName: 'Ad',
+            rulesName: 'Kurallar',
+            rulesDesc: 'Her satıra bir JavaScript düzenli ifade değişimi girin.',
+            invalidLine: 'Satır {line}: {value}',
+            saveButton: 'Kaydet',
+            recognizedSnippetsCount: { one: '{count} parçacık tanındı', other: '{count} parçacık tanındı' },
+            recognizedRulesCount: { one: '{count} kural tanındı', other: '{count} kural tanındı' },
+            unparseableName: 'Okunamayan satırlar',
+            importFallbackName: 'İçe aktarılan parçacık'
         }
     },
 

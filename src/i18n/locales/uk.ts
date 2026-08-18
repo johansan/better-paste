@@ -47,7 +47,9 @@ export const STRINGS_UK: TranslationStrings = {
             other: 'не вдалося зберегти {count} зображення'
         },
         imagesFailedLinkKept: '{images}, початкове посилання збережено',
-        imagesFailedNothingPasted: '{images}, тому нічого не вставлено'
+        imagesFailedNothingPasted: '{images}, тому нічого не вставлено',
+        snippetsCopied: 'сніпети скопійовано',
+        snippetsCopyFailed: 'не вдалося скопіювати сніпети'
     },
 
     settings: {
@@ -182,6 +184,70 @@ export const STRINGS_UK: TranslationStrings = {
             dashesDesc: 'Замінює середнє та довге тире на дефіси.',
             dashesAliases: ['тире', 'довге тире', 'середнє тире', 'коротке тире', 'дефіс', 'пунктуація', 'типографіка', 'ші'],
             dashesExample: 'Результат — попри все — виявився добрим.'
+        },
+
+        custom: {
+            heading: 'Власна обробка',
+            pipelineName: 'Застосувати власні сніпети з регулярними виразами до тексту',
+            pastedText: 'Вставлений текст',
+            builtInRules: 'Вбудовані правила',
+            customSnippets: 'Власні сніпети',
+            note: 'Нотатка',
+            wikiButton: 'Відкрити вікі',
+            regexButton: 'Відкрити тестер регулярних виразів',
+            snippetsName: 'Сніпети',
+            snippetsDesc: 'Створюйте сніпети пошуку й заміни та вибирайте, які з них виконувати.',
+            enabledSnippetsCount: {
+                one: '{count} увімкнений сніпет',
+                few: '{count} увімкнені сніпети',
+                many: '{count} увімкнених сніпетів',
+                other: '{count} увімкненого сніпета'
+            },
+            snippetRulesCount: {
+                one: '{count} правило',
+                few: '{count} правила',
+                many: '{count} правил',
+                other: '{count} правила'
+            },
+            invalidRulesCount: {
+                one: '{count} неправильний рядок',
+                few: '{count} неправильні рядки',
+                many: '{count} неправильних рядків',
+                other: '{count} неправильного рядка'
+            },
+            unnamedSnippet: 'Сніпет без назви',
+            emptyState: 'Ви ще не створили жодного сніпета.',
+            addSnippet: 'Додати сніпет',
+            editButton: 'Редагувати сніпет',
+            exportName: 'Експортувати сніпети',
+            exportDesc: 'Копіює всі сніпети у форматі обміну з вікі.',
+            exportButton: 'Копіювати сніпети',
+            importName: 'Імпортувати сніпети',
+            importDesc: 'Додає сніпети з формату обміну вікі.',
+            previewName: 'Спробувати',
+            previewDesc: 'Введіть приклад тексту, щоб побачити результат усіх увімкнених сніпетів.',
+            modalPreviewDesc: 'Введіть приклад тексту, щоб побачити результат цього сніпета.',
+            previewInputLabel: 'Приклад тексту',
+            previewEmpty: 'Оброблений текст з’явиться тут.',
+            nameName: 'Назва',
+            rulesName: 'Правила',
+            rulesDesc: 'Введіть по одній заміні з регулярним виразом JavaScript у кожному рядку.',
+            invalidLine: 'Рядок {line}: {value}',
+            saveButton: 'Зберегти',
+            recognizedSnippetsCount: {
+                one: 'Розпізнано {count} сніпет',
+                few: 'Розпізнано {count} сніпети',
+                many: 'Розпізнано {count} сніпетів',
+                other: 'Розпізнано {count} сніпета'
+            },
+            recognizedRulesCount: {
+                one: 'Розпізнано {count} правило',
+                few: 'Розпізнано {count} правила',
+                many: 'Розпізнано {count} правил',
+                other: 'Розпізнано {count} правила'
+            },
+            unparseableName: 'Нерозпізнані рядки',
+            importFallbackName: 'Імпортований сніпет'
         }
     },
 

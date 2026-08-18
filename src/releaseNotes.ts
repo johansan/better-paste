@@ -51,8 +51,15 @@ export interface ReleaseNote {
 /** Newest first. A new release goes at the top. */
 const RELEASE_NOTES: ReleaseNote[] = [
     {
-        version: '1.0.6',
+        version: '1.0.7',
         date: '2026-08-18',
+        new: [
+            'Added support for ==custom regex snippets==! Configure in settings, ready-made snippets to import are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets).'
+        ]
+    },
+    {
+        version: '1.0.6',
+        date: '2026-08-17',
         new: [
             'New command: ==Clean up PDF text== for the current selection. When you run it you get a dialog with a **text preview** where you can toggle removing page numbers and joining everything into one paragraph.'
         ],

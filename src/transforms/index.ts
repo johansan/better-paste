@@ -20,6 +20,7 @@ import { frontmatterRanges, normalizeInvisibleCharacters, straightenDashes, stra
 import { stripAnsi } from './ansi';
 import { buildUrlCleanupOptions, cleanUrlsInText, httpUrlRanges } from './urlCleanup';
 import { imageReferenceRanges } from '../paste/imageReferences';
+import { applyTextSnippets } from './snippets';
 import type { BetterPasteSettings } from '../settings/types';
 
 export interface TextPipelineResult {
@@ -66,6 +67,8 @@ export function runTextPipeline(input: string, settings: BetterPasteSettings): T
     if (settings.textDashes) text = straightenDashes(text, httpUrlRanges(text)).text;
 
     if (settings.textQuotes) text = straightenQuotes(text, httpUrlRanges(text)).text;
+
+    text = applyTextSnippets(text, settings.textSnippets).text;
 
     // Last, so it also clears whatever the rules above left at the edges
     if (settings.textTrim) text = trimPasteEdges(text);

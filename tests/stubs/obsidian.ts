@@ -80,6 +80,10 @@ export class TFile {
 
 export class Plugin {}
 
+export class Modal {
+    constructor(public app: unknown) {}
+}
+
 interface StubPlugin {
     settings: Record<string, unknown>;
     saveSettings?: () => Promise<void>;

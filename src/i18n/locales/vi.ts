@@ -42,7 +42,9 @@ export const STRINGS_VI: TranslationStrings = {
         fetchingTitle: 'đang lấy tiêu đề...',
         imagesFailed: { other: 'không lưu được {count} ảnh' },
         imagesFailedLinkKept: '{images}, đã giữ liên kết gốc',
-        imagesFailedNothingPasted: '{images}, nên không dán gì cả'
+        imagesFailedNothingPasted: '{images}, nên không dán gì cả',
+        snippetsCopied: 'đã sao chép đoạn mã',
+        snippetsCopyFailed: 'không thể sao chép đoạn mã'
     },
 
     settings: {
@@ -172,6 +174,45 @@ export const STRINGS_VI: TranslationStrings = {
             dashesDesc: 'Chuyển gạch ngang en và em thành gạch nối.',
             dashesAliases: ['gạch ngang', 'gạch ngang dài', 'gạch nối', 'dấu câu', 'kiểu chữ', 'ai'],
             dashesExample: 'Kết quả — bất chấp mọi thứ — rất tốt.'
+        },
+
+        custom: {
+            heading: 'Xử lý tùy chỉnh',
+            pipelineName: 'Áp dụng các đoạn mã regex tùy chỉnh cho văn bản',
+            pastedText: 'Văn bản đã dán',
+            builtInRules: 'Quy tắc tích hợp',
+            customSnippets: 'Đoạn mã tùy chỉnh',
+            note: 'Ghi chú',
+            wikiButton: 'Mở wiki',
+            regexButton: 'Mở công cụ thử biểu thức chính quy',
+            snippetsName: 'Đoạn mã',
+            snippetsDesc: 'Tạo các đoạn mã tìm và thay thế, rồi chọn những đoạn sẽ chạy.',
+            enabledSnippetsCount: { other: '{count} đoạn mã đang bật' },
+            snippetRulesCount: { other: '{count} quy tắc' },
+            invalidRulesCount: { other: '{count} dòng không hợp lệ' },
+            unnamedSnippet: 'Đoạn mã chưa đặt tên',
+            emptyState: 'Bạn chưa tạo đoạn mã nào.',
+            addSnippet: 'Thêm đoạn mã',
+            editButton: 'Sửa đoạn mã',
+            exportName: 'Xuất đoạn mã',
+            exportDesc: 'Sao chép tất cả đoạn mã theo định dạng trao đổi của wiki.',
+            exportButton: 'Sao chép đoạn mã',
+            importName: 'Nhập đoạn mã',
+            importDesc: 'Thêm đoạn mã từ định dạng trao đổi của wiki.',
+            previewName: 'Thử',
+            previewDesc: 'Nhập văn bản mẫu để xem kết quả của mọi đoạn mã đang bật.',
+            modalPreviewDesc: 'Nhập văn bản mẫu để xem kết quả của đoạn mã này.',
+            previewInputLabel: 'Văn bản mẫu',
+            previewEmpty: 'Văn bản đã xử lý sẽ xuất hiện ở đây.',
+            nameName: 'Tên',
+            rulesName: 'Quy tắc',
+            rulesDesc: 'Nhập một phép thay thế bằng biểu thức chính quy JavaScript trên mỗi dòng.',
+            invalidLine: 'Dòng {line}: {value}',
+            saveButton: 'Lưu',
+            recognizedSnippetsCount: { other: 'Đã nhận dạng {count} đoạn mã' },
+            recognizedRulesCount: { other: 'Đã nhận dạng {count} quy tắc' },
+            unparseableName: 'Các dòng không thể đọc',
+            importFallbackName: 'Đoạn mã đã nhập'
         }
     },
 

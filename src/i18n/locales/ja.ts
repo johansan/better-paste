@@ -42,7 +42,9 @@ export const STRINGS_JA: TranslationStrings = {
         fetchingTitle: 'タイトルを取得中...',
         imagesFailed: { other: '画像 {count} 件を保存できませんでした' },
         imagesFailedLinkKept: '{images}。元のリンクを残しました',
-        imagesFailedNothingPasted: '{images}。そのため何も貼り付けていません'
+        imagesFailedNothingPasted: '{images}。そのため何も貼り付けていません',
+        snippetsCopied: 'スニペットをコピーしました',
+        snippetsCopyFailed: 'スニペットをコピーできませんでした'
     },
 
     settings: {
@@ -171,6 +173,45 @@ export const STRINGS_JA: TranslationStrings = {
             dashesDesc: 'en ダッシュと em ダッシュをハイフンに変えます。',
             dashesAliases: ['ダッシュ', 'em ダッシュ', 'en ダッシュ', '全角ダッシュ', 'ハイフン', '句読点', 'タイポグラフィ', 'ai'],
             dashesExample: 'その結果は — 予想に反して — 良かった。'
+        },
+
+        custom: {
+            heading: 'カスタム処理',
+            pipelineName: 'カスタム正規表現スニペットをテキストに適用',
+            pastedText: '貼り付けたテキスト',
+            builtInRules: '組み込みルール',
+            customSnippets: 'カスタムスニペット',
+            note: 'ノート',
+            wikiButton: 'Wiki を開く',
+            regexButton: '正規表現テストを開く',
+            snippetsName: 'スニペット',
+            snippetsDesc: '検索置換スニペットを作成し、実行するものを選びます。',
+            enabledSnippetsCount: { other: '有効なスニペット {count} 件' },
+            snippetRulesCount: { other: 'ルール {count} 件' },
+            invalidRulesCount: { other: '無効な行 {count} 件' },
+            unnamedSnippet: '名前のないスニペット',
+            emptyState: 'スニペットはまだありません。',
+            addSnippet: 'スニペットを追加',
+            editButton: 'スニペットを編集',
+            exportName: 'スニペットをエクスポート',
+            exportDesc: 'すべてのスニペットを Wiki の交換形式でコピーします。',
+            exportButton: 'スニペットをコピー',
+            importName: 'スニペットをインポート',
+            importDesc: 'Wiki の交換形式からスニペットを追加します。',
+            previewName: '試す',
+            previewDesc: 'サンプルテキストを入力して、有効なすべてのスニペットの結果を確認します。',
+            modalPreviewDesc: 'サンプルテキストを入力して、このスニペットの結果を確認します。',
+            previewInputLabel: 'サンプルテキスト',
+            previewEmpty: '処理後のテキストがここに表示されます。',
+            nameName: '名前',
+            rulesName: 'ルール',
+            rulesDesc: '1 行につき 1 つの JavaScript 正規表現置換を入力します。',
+            invalidLine: '{line} 行目: {value}',
+            saveButton: '保存',
+            recognizedSnippetsCount: { other: 'スニペット {count} 件を認識' },
+            recognizedRulesCount: { other: 'ルール {count} 件を認識' },
+            unparseableName: '解析できない行',
+            importFallbackName: 'インポートしたスニペット'
         }
     },
 

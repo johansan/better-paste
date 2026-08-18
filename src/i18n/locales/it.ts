@@ -45,7 +45,9 @@ export const STRINGS_IT: TranslationStrings = {
             other: '{count} immagini non sono state salvate'
         },
         imagesFailedLinkKept: '{images}, il collegamento originale è stato mantenuto',
-        imagesFailedNothingPasted: '{images}, quindi non è stato incollato nulla'
+        imagesFailedNothingPasted: '{images}, quindi non è stato incollato nulla',
+        snippetsCopied: 'snippet copiati',
+        snippetsCopyFailed: 'impossibile copiare gli snippet'
     },
 
     settings: {
@@ -165,6 +167,45 @@ export const STRINGS_IT: TranslationStrings = {
             dashesDesc: 'Converte i trattini medi e lunghi in trattini brevi.',
             dashesAliases: ['lineetta', 'trattino lungo', 'trattino', 'punteggiatura', 'tipografia', 'ia'],
             dashesExample: 'Il risultato — contro ogni previsione — era buono.'
+        },
+
+        custom: {
+            heading: 'Elaborazione personalizzata',
+            pipelineName: 'Applica snippet regex personalizzati al testo',
+            pastedText: 'Testo incollato',
+            builtInRules: 'Regole integrate',
+            customSnippets: 'Snippet personalizzati',
+            note: 'Nota',
+            wikiButton: 'Apri la wiki',
+            regexButton: 'Apri lo strumento per espressioni regolari',
+            snippetsName: 'Snippet',
+            snippetsDesc: 'Crea snippet di ricerca e sostituzione e scegli quali eseguire.',
+            enabledSnippetsCount: { one: '{count} snippet attivo', other: '{count} snippet attivi' },
+            snippetRulesCount: { one: '{count} regola', other: '{count} regole' },
+            invalidRulesCount: { one: '{count} riga non valida', other: '{count} righe non valide' },
+            unnamedSnippet: 'Snippet senza nome',
+            emptyState: 'Non hai ancora creato snippet.',
+            addSnippet: 'Aggiungi snippet',
+            editButton: 'Modifica snippet',
+            exportName: 'Esporta snippet',
+            exportDesc: 'Copia tutti gli snippet nel formato di scambio della wiki.',
+            exportButton: 'Copia snippet',
+            importName: 'Importa snippet',
+            importDesc: 'Aggiunge snippet dal formato di scambio della wiki.',
+            previewName: 'Prova',
+            previewDesc: 'Digita un testo di esempio per vedere il risultato di tutti gli snippet attivi.',
+            modalPreviewDesc: 'Digita un testo di esempio per vedere il risultato di questo snippet.',
+            previewInputLabel: 'Testo di esempio',
+            previewEmpty: 'Il testo elaborato apparirà qui.',
+            nameName: 'Nome',
+            rulesName: 'Regole',
+            rulesDesc: 'Inserisci una sostituzione con espressione regolare JavaScript per riga.',
+            invalidLine: 'Riga {line}: {value}',
+            saveButton: 'Salva',
+            recognizedSnippetsCount: { one: '{count} snippet riconosciuto', other: '{count} snippet riconosciuti' },
+            recognizedRulesCount: { one: '{count} regola riconosciuta', other: '{count} regole riconosciute' },
+            unparseableName: 'Righe non riconosciute',
+            importFallbackName: 'Snippet importato'
         }
     },
 

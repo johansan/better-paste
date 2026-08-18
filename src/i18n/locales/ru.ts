@@ -47,7 +47,9 @@ export const STRINGS_RU: TranslationStrings = {
             other: 'не удалось сохранить {count} изображения'
         },
         imagesFailedLinkKept: '{images}, исходная ссылка сохранена',
-        imagesFailedNothingPasted: '{images}, поэтому ничего не вставлено'
+        imagesFailedNothingPasted: '{images}, поэтому ничего не вставлено',
+        snippetsCopied: 'сниппеты скопированы',
+        snippetsCopyFailed: 'не удалось скопировать сниппеты'
     },
 
     settings: {
@@ -182,6 +184,70 @@ export const STRINGS_RU: TranslationStrings = {
             dashesDesc: 'Заменяет среднее и длинное тире на дефисы.',
             dashesAliases: ['тире', 'длинное тире', 'среднее тире', 'короткое тире', 'дефис', 'пунктуация', 'типографика', 'ии'],
             dashesExample: 'Результат — вопреки всему — оказался хорошим.'
+        },
+
+        custom: {
+            heading: 'Пользовательская обработка',
+            pipelineName: 'Применить пользовательские сниппеты с регулярными выражениями к тексту',
+            pastedText: 'Вставленный текст',
+            builtInRules: 'Встроенные правила',
+            customSnippets: 'Пользовательские сниппеты',
+            note: 'Заметка',
+            wikiButton: 'Открыть вики',
+            regexButton: 'Открыть тестер регулярных выражений',
+            snippetsName: 'Сниппеты',
+            snippetsDesc: 'Создавайте сниппеты поиска и замены и выбирайте, какие из них выполнять.',
+            enabledSnippetsCount: {
+                one: '{count} включённый сниппет',
+                few: '{count} включённых сниппета',
+                many: '{count} включённых сниппетов',
+                other: '{count} включённого сниппета'
+            },
+            snippetRulesCount: {
+                one: '{count} правило',
+                few: '{count} правила',
+                many: '{count} правил',
+                other: '{count} правила'
+            },
+            invalidRulesCount: {
+                one: '{count} неверная строка',
+                few: '{count} неверные строки',
+                many: '{count} неверных строк',
+                other: '{count} неверной строки'
+            },
+            unnamedSnippet: 'Сниппет без названия',
+            emptyState: 'Вы ещё не создали ни одного сниппета.',
+            addSnippet: 'Добавить сниппет',
+            editButton: 'Изменить сниппет',
+            exportName: 'Экспортировать сниппеты',
+            exportDesc: 'Копирует все сниппеты в формате обмена из вики.',
+            exportButton: 'Копировать сниппеты',
+            importName: 'Импортировать сниппеты',
+            importDesc: 'Добавляет сниппеты из формата обмена вики.',
+            previewName: 'Попробовать',
+            previewDesc: 'Введите пример текста, чтобы увидеть результат всех включённых сниппетов.',
+            modalPreviewDesc: 'Введите пример текста, чтобы увидеть результат этого сниппета.',
+            previewInputLabel: 'Пример текста',
+            previewEmpty: 'Обработанный текст появится здесь.',
+            nameName: 'Название',
+            rulesName: 'Правила',
+            rulesDesc: 'Введите по одной замене с регулярным выражением JavaScript в каждой строке.',
+            invalidLine: 'Строка {line}: {value}',
+            saveButton: 'Сохранить',
+            recognizedSnippetsCount: {
+                one: 'Распознан {count} сниппет',
+                few: 'Распознано {count} сниппета',
+                many: 'Распознано {count} сниппетов',
+                other: 'Распознано {count} сниппета'
+            },
+            recognizedRulesCount: {
+                one: 'Распознано {count} правило',
+                few: 'Распознано {count} правила',
+                many: 'Распознано {count} правил',
+                other: 'Распознано {count} правила'
+            },
+            unparseableName: 'Нераспознанные строки',
+            importFallbackName: 'Импортированный сниппет'
         }
     },
 

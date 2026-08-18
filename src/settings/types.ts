@@ -19,6 +19,14 @@
 /** Naming scheme for saved images. */
 export type ImageNameFormat = 'source' | 'custom';
 
+/** One user-defined sequence of regular expression replacements. */
+export interface TextSnippet {
+    id: string;
+    name: string;
+    rules: string[];
+    enabled: boolean;
+}
+
 export interface BetterPasteSettings {
     /* Pasting */
 
@@ -80,6 +88,11 @@ export interface BetterPasteSettings {
     textQuotes: boolean;
     /** Turn en and em dashes into hyphens. */
     textDashes: boolean;
+
+    /* Custom processing */
+
+    /** User-defined replacements, applied in list order after the built-in text rules. */
+    textSnippets: TextSnippet[];
 
     /* Stored state */
 

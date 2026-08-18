@@ -57,7 +57,9 @@ export const STRINGS_EN = {
         fetchingTitle: 'fetching title...',
         imagesFailed: { one: '{count} image could not be saved', other: '{count} images could not be saved' } as PluralForms,
         imagesFailedLinkKept: '{images}, the original link was kept',
-        imagesFailedNothingPasted: '{images}, so nothing was pasted'
+        imagesFailedNothingPasted: '{images}, so nothing was pasted',
+        snippetsCopied: 'snippets copied',
+        snippetsCopyFailed: 'could not copy snippets'
     },
 
     settings: {
@@ -201,6 +203,45 @@ export const STRINGS_EN = {
             dashesDesc: 'Converts en and em dashes into hyphens.',
             dashesAliases: ['dash', 'em dash', 'en dash', 'hyphen', 'punctuation', 'typography', 'ai'],
             dashesExample: 'The result — against all odds — was fine.'
+        },
+
+        custom: {
+            heading: 'Custom processing',
+            pipelineName: 'Apply custom regex snippets to text',
+            pastedText: 'Pasted text',
+            builtInRules: 'Built-in rules',
+            customSnippets: 'Custom snippets',
+            note: 'Note',
+            wikiButton: 'View wiki',
+            regexButton: 'Open regex playground',
+            snippetsName: 'Snippets',
+            snippetsDesc: 'Create find and replace snippets and choose which ones run.',
+            enabledSnippetsCount: { one: '{count} enabled snippet', other: '{count} enabled snippets' } as PluralForms,
+            snippetRulesCount: { one: '{count} rule', other: '{count} rules' } as PluralForms,
+            invalidRulesCount: { one: '{count} invalid line', other: '{count} invalid lines' } as PluralForms,
+            unnamedSnippet: 'Unnamed snippet',
+            emptyState: 'You have not created any snippets yet.',
+            addSnippet: 'Add snippet',
+            editButton: 'Edit snippet',
+            exportName: 'Export snippets',
+            exportDesc: 'Copy all snippets in the wiki interchange format.',
+            exportButton: 'Copy snippets',
+            importName: 'Import snippets',
+            importDesc: 'Append snippets from the wiki interchange format.',
+            previewName: 'Try it',
+            previewDesc: 'Type sample text to see the result from every enabled snippet.',
+            modalPreviewDesc: 'Type sample text to see the result from this snippet.',
+            previewInputLabel: 'Sample text',
+            previewEmpty: 'The processed text appears here.',
+            nameName: 'Name',
+            rulesName: 'Rules',
+            rulesDesc: 'Enter one JavaScript regular expression replacement per line.',
+            invalidLine: 'Line {line}: {value}',
+            saveButton: 'Save',
+            recognizedSnippetsCount: { one: '{count} snippet recognized', other: '{count} snippets recognized' } as PluralForms,
+            recognizedRulesCount: { one: '{count} rule recognized', other: '{count} rules recognized' } as PluralForms,
+            unparseableName: 'Unparseable lines',
+            importFallbackName: 'Imported snippet'
         }
     },
 

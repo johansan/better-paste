@@ -45,7 +45,9 @@ export const STRINGS_NL: TranslationStrings = {
             other: '{count} afbeeldingen konden niet worden opgeslagen'
         },
         imagesFailedLinkKept: '{images}, de oorspronkelijke link is behouden',
-        imagesFailedNothingPasted: '{images}, dus er is niets geplakt'
+        imagesFailedNothingPasted: '{images}, dus er is niets geplakt',
+        snippetsCopied: 'snippets gekopieerd',
+        snippetsCopyFailed: 'snippets konden niet worden gekopieerd'
     },
 
     settings: {
@@ -184,6 +186,45 @@ export const STRINGS_NL: TranslationStrings = {
             dashesDesc: 'Zet halve en hele kastlijntjes om in koppeltekens.',
             dashesAliases: ['streepje', 'kastlijntje', 'gedachtestreepje', 'koppelteken', 'interpunctie', 'typografie', 'ai'],
             dashesExample: 'Het resultaat — tegen alle verwachtingen in — was goed.'
+        },
+
+        custom: {
+            heading: 'Aangepaste verwerking',
+            pipelineName: 'Aangepaste regex-snippets op tekst toepassen',
+            pastedText: 'Geplakte tekst',
+            builtInRules: 'Ingebouwde regels',
+            customSnippets: 'Aangepaste snippets',
+            note: 'Notitie',
+            wikiButton: 'Wiki bekijken',
+            regexButton: 'Regex-speelplaats openen',
+            snippetsName: 'Snippets',
+            snippetsDesc: 'Maak snippets voor zoeken en vervangen en kies welke worden uitgevoerd.',
+            enabledSnippetsCount: { one: '{count} actieve snippet', other: '{count} actieve snippets' },
+            snippetRulesCount: { one: '{count} regel', other: '{count} regels' },
+            invalidRulesCount: { one: '{count} ongeldige regel', other: '{count} ongeldige regels' },
+            unnamedSnippet: 'Naamloze snippet',
+            emptyState: 'Je hebt nog geen snippets gemaakt.',
+            addSnippet: 'Snippet toevoegen',
+            editButton: 'Snippet bewerken',
+            exportName: 'Snippets exporteren',
+            exportDesc: 'Kopieert alle snippets in de uitwisselingsindeling van de wiki.',
+            exportButton: 'Snippets kopiëren',
+            importName: 'Snippets importeren',
+            importDesc: 'Voegt snippets uit de uitwisselingsindeling van de wiki toe.',
+            previewName: 'Proberen',
+            previewDesc: 'Typ voorbeeldtekst om het resultaat van alle actieve snippets te zien.',
+            modalPreviewDesc: 'Typ voorbeeldtekst om het resultaat van deze snippet te zien.',
+            previewInputLabel: 'Voorbeeldtekst',
+            previewEmpty: 'De verwerkte tekst verschijnt hier.',
+            nameName: 'Naam',
+            rulesName: 'Regels',
+            rulesDesc: 'Voer per regel één JavaScript-vervanging met een reguliere expressie in.',
+            invalidLine: 'Regel {line}: {value}',
+            saveButton: 'Opslaan',
+            recognizedSnippetsCount: { one: '{count} snippet herkend', other: '{count} snippets herkend' },
+            recognizedRulesCount: { one: '{count} regel herkend', other: '{count} regels herkend' },
+            unparseableName: 'Niet-herkende regels',
+            importFallbackName: 'Geïmporteerde snippet'
         }
     },
 

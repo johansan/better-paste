@@ -42,7 +42,9 @@ export const STRINGS_ZH_TW: TranslationStrings = {
         fetchingTitle: '正在取得標題...',
         imagesFailed: { other: '有 {count} 張圖片未能儲存' },
         imagesFailedLinkKept: '{images}，已保留原始連結',
-        imagesFailedNothingPasted: '{images}，因此沒有貼上任何內容'
+        imagesFailedNothingPasted: '{images}，因此沒有貼上任何內容',
+        snippetsCopied: '片段已複製',
+        snippetsCopyFailed: '無法複製片段'
     },
 
     settings: {
@@ -159,6 +161,45 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             dashesDesc: '把連接號和破折號換成連字號。',
             dashesAliases: ['破折號', '連字號', '連接號', '橫線', '標點', '排版', 'ai'],
             dashesExample: '這個結果 — 出乎意料 — 很好。'
+        },
+
+        custom: {
+            heading: '自訂處理',
+            pipelineName: '將自訂正規表示式片段套用至文字',
+            pastedText: '已貼上文字',
+            builtInRules: '內建規則',
+            customSnippets: '自訂片段',
+            note: '筆記',
+            wikiButton: '檢視 Wiki',
+            regexButton: '開啟正規表示式測試工具',
+            snippetsName: '片段',
+            snippetsDesc: '建立尋找與取代片段，並選擇要執行的片段。',
+            enabledSnippetsCount: { other: '已啟用 {count} 個片段' },
+            snippetRulesCount: { other: '{count} 條規則' },
+            invalidRulesCount: { other: '{count} 行無效內容' },
+            unnamedSnippet: '未命名片段',
+            emptyState: '你還沒有建立任何片段。',
+            addSnippet: '新增片段',
+            editButton: '編輯片段',
+            exportName: '匯出片段',
+            exportDesc: '以 Wiki 交換格式複製所有片段。',
+            exportButton: '複製片段',
+            importName: '匯入片段',
+            importDesc: '從 Wiki 交換格式附加片段。',
+            previewName: '試一試',
+            previewDesc: '輸入範例文字，查看所有已啟用片段的處理結果。',
+            modalPreviewDesc: '輸入範例文字，查看此片段的處理結果。',
+            previewInputLabel: '範例文字',
+            previewEmpty: '處理後的文字會顯示在這裡。',
+            nameName: '名稱',
+            rulesName: '規則',
+            rulesDesc: '每行輸入一個 JavaScript 正規表示式取代。',
+            invalidLine: '第 {line} 行：{value}',
+            saveButton: '儲存',
+            recognizedSnippetsCount: { other: '辨識出 {count} 個片段' },
+            recognizedRulesCount: { other: '辨識出 {count} 條規則' },
+            unparseableName: '無法解析的行',
+            importFallbackName: '匯入的片段'
         }
     },
 

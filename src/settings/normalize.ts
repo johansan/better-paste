@@ -18,7 +18,8 @@
 
 import { DEFAULT_SETTINGS } from './defaults';
 import { normalizeVersion } from '../releaseNotes';
-import type { BetterPasteSettings, ImageNameFormat } from './types';
+import { createTextSnippetId, parseSnippetRuleLine } from '../transforms/snippets';
+import type { BetterPasteSettings, ImageNameFormat, TextSnippet } from './types';
 
 function asBoolean(value: unknown, fallback: boolean): boolean {
     return typeof value === 'boolean' ? value : fallback;
@@ -31,6 +32,34 @@ function asString(value: unknown, fallback: string): string {
 function asStringArray(value: unknown): string[] {
     if (!Array.isArray(value)) return [];
     return value.filter((entry): entry is string => typeof entry === 'string');
+}
+
+function asTextSnippets(value: unknown): TextSnippet[] {
+    if (!Array.isArray(value)) return [];
+
+    const snippets: TextSnippet[] = [];
+    const ids = new Set<string>();
+    for (const entry of value) {
+        if (typeof entry !== 'object' || entry === null || Array.isArray(entry)) continue;
+
+        const data = entry as Record<string, unknown>;
+        const name = asString(data.name, '').trim();
+        const rules = asStringArray(data.rules);
+        const hasUsableRule = rules.some(line => parseSnippetRuleLine(line).status === 'valid');
+        if (!name && !hasUsableRule) continue;
+
+        let id = asString(data.id, '').trim();
+        while (!id || ids.has(id)) id = createTextSnippetId();
+        ids.add(id);
+
+        snippets.push({
+            id,
+            name,
+            rules,
+            enabled: asBoolean(data.enabled, true)
+        });
+    }
+    return snippets;
 }
 
 function asEnum<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
@@ -89,6 +118,8 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
         textInvisible: asBoolean(data.textInvisible, defaults.textInvisible),
         textQuotes: asBoolean(data.textQuotes, defaults.textQuotes),
         textDashes: asBoolean(data.textDashes, defaults.textDashes),
+
+        textSnippets: asTextSnippets(data.textSnippets),
 
         lastShownVersion: normalizeVersion(data.lastShownVersion),
 

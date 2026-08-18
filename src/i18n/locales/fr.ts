@@ -45,7 +45,9 @@ export const STRINGS_FR: TranslationStrings = {
             other: '{count} images n’ont pas pu être enregistrées'
         },
         imagesFailedLinkKept: '{images}, le lien d’origine a été conservé',
-        imagesFailedNothingPasted: '{images}, donc rien n’a été collé'
+        imagesFailedNothingPasted: '{images}, donc rien n’a été collé',
+        snippetsCopied: 'extraits copiés',
+        snippetsCopyFailed: 'impossible de copier les extraits'
     },
 
     settings: {
@@ -175,6 +177,45 @@ export const STRINGS_FR: TranslationStrings = {
             dashesDesc: 'Convertit les tirets cadratins et demi-cadratins en traits d’union.',
             dashesAliases: ['tiret', 'tiret cadratin', 'tiret demi-cadratin', "trait d'union", 'ponctuation', 'typographie', 'ia'],
             dashesExample: 'Le résultat — contre toute attente — était bon.'
+        },
+
+        custom: {
+            heading: 'Traitement personnalisé',
+            pipelineName: 'Appliquer des extraits regex personnalisés au texte',
+            pastedText: 'Texte collé',
+            builtInRules: 'Règles intégrées',
+            customSnippets: 'Extraits personnalisés',
+            note: 'Note',
+            wikiButton: 'Voir le wiki',
+            regexButton: 'Ouvrir le testeur d’expressions régulières',
+            snippetsName: 'Extraits',
+            snippetsDesc: 'Créez des extraits de recherche et remplacement et choisissez ceux qui s’exécutent.',
+            enabledSnippetsCount: { one: '{count} extrait activé', other: '{count} extraits activés' },
+            snippetRulesCount: { one: '{count} règle', other: '{count} règles' },
+            invalidRulesCount: { one: '{count} ligne invalide', other: '{count} lignes invalides' },
+            unnamedSnippet: 'Extrait sans nom',
+            emptyState: 'Vous n’avez encore créé aucun extrait.',
+            addSnippet: 'Ajouter un extrait',
+            editButton: 'Modifier l’extrait',
+            exportName: 'Exporter les extraits',
+            exportDesc: 'Copie tous les extraits au format d’échange du wiki.',
+            exportButton: 'Copier les extraits',
+            importName: 'Importer des extraits',
+            importDesc: 'Ajoute des extraits depuis le format d’échange du wiki.',
+            previewName: 'Essayer',
+            previewDesc: 'Saisissez un exemple de texte pour voir le résultat de tous les extraits activés.',
+            modalPreviewDesc: 'Saisissez un exemple de texte pour voir le résultat de cet extrait.',
+            previewInputLabel: 'Exemple de texte',
+            previewEmpty: 'Le texte traité apparaîtra ici.',
+            nameName: 'Nom',
+            rulesName: 'Règles',
+            rulesDesc: 'Saisissez un remplacement par expression régulière JavaScript par ligne.',
+            invalidLine: 'Ligne {line} : {value}',
+            saveButton: 'Enregistrer',
+            recognizedSnippetsCount: { one: '{count} extrait reconnu', other: '{count} extraits reconnus' },
+            recognizedRulesCount: { one: '{count} règle reconnue', other: '{count} règles reconnues' },
+            unparseableName: 'Lignes non reconnues',
+            importFallbackName: 'Extrait importé'
         }
     },
 

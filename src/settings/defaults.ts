@@ -47,6 +47,8 @@ export const DEFAULT_SETTINGS: BetterPasteSettings = {
     textQuotes: false,
     textDashes: false,
 
+    textSnippets: [],
+
     // Empty means no release notes have been shown in this vault yet
     lastShownVersion: ''
 };

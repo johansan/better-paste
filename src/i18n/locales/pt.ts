@@ -45,7 +45,9 @@ export const STRINGS_PT: TranslationStrings = {
             other: 'não foi possível guardar {count} imagens'
         },
         imagesFailedLinkKept: '{images}, a ligação original foi mantida',
-        imagesFailedNothingPasted: '{images}, por isso nada foi colado'
+        imagesFailedNothingPasted: '{images}, por isso nada foi colado',
+        snippetsCopied: 'fragmentos copiados',
+        snippetsCopyFailed: 'não foi possível copiar os fragmentos'
     },
 
     settings: {
@@ -175,6 +177,45 @@ export const STRINGS_PT: TranslationStrings = {
             dashesDesc: 'Converte as meias-riscas e os travessões em hífenes.',
             dashesAliases: ['travessão', 'meia-risca', 'hífen', 'pontuação', 'tipografia', 'ia'],
             dashesExample: 'O resultado — contra todas as expectativas — ficou bom.'
+        },
+
+        custom: {
+            heading: 'Processamento personalizado',
+            pipelineName: 'Aplicar fragmentos personalizados de expressões regulares ao texto',
+            pastedText: 'Texto colado',
+            builtInRules: 'Regras integradas',
+            customSnippets: 'Fragmentos personalizados',
+            note: 'Nota',
+            wikiButton: 'Ver wiki',
+            regexButton: 'Abrir ambiente de expressões regulares',
+            snippetsName: 'Fragmentos',
+            snippetsDesc: 'Crie fragmentos de pesquisa e substituição e escolha quais são aplicados.',
+            enabledSnippetsCount: { one: '{count} fragmento ativo', other: '{count} fragmentos ativos' },
+            snippetRulesCount: { one: '{count} regra', other: '{count} regras' },
+            invalidRulesCount: { one: '{count} linha inválida', other: '{count} linhas inválidas' },
+            unnamedSnippet: 'Fragmento sem nome',
+            emptyState: 'Ainda não criou nenhum fragmento.',
+            addSnippet: 'Adicionar fragmento',
+            editButton: 'Editar fragmento',
+            exportName: 'Exportar fragmentos',
+            exportDesc: 'Copia todos os fragmentos no formato de intercâmbio da wiki.',
+            exportButton: 'Copiar fragmentos',
+            importName: 'Importar fragmentos',
+            importDesc: 'Adiciona fragmentos a partir do formato de intercâmbio da wiki.',
+            previewName: 'Experimentar',
+            previewDesc: 'Escreva um texto de exemplo para ver o resultado de todos os fragmentos ativos.',
+            modalPreviewDesc: 'Escreva um texto de exemplo para ver o resultado deste fragmento.',
+            previewInputLabel: 'Texto de exemplo',
+            previewEmpty: 'O texto processado aparece aqui.',
+            nameName: 'Nome',
+            rulesName: 'Regras',
+            rulesDesc: 'Introduza uma substituição com expressão regular JavaScript por linha.',
+            invalidLine: 'Linha {line}: {value}',
+            saveButton: 'Guardar',
+            recognizedSnippetsCount: { one: '{count} fragmento reconhecido', other: '{count} fragmentos reconhecidos' },
+            recognizedRulesCount: { one: '{count} regra reconhecida', other: '{count} regras reconhecidas' },
+            unparseableName: 'Linhas não reconhecidas',
+            importFallbackName: 'Fragmento importado'
         }
     },
 

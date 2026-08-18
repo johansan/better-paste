@@ -815,6 +815,27 @@ describe('handleEditorPaste: rich content', () => {
 
         expect(editor.getValue()).toBe('He called it "finished" then left.');
     });
+
+    it('applies custom snippets to rich browser content', async () => {
+        const { service } = build({
+            textInvisible: false,
+            linkEnabled: false,
+            imageEnabled: false,
+            textSnippets: [
+                {
+                    id: 'citations',
+                    name: 'Remove Perplexity citations',
+                    rules: [String.raw`s/\[\d+\]//g`],
+                    enabled: true
+                }
+            ]
+        });
+        const editor = new FakeEditor('');
+
+        await pasteRich(service, editor, '<p>Answer [1]</p>', 'Answer [1]');
+
+        expect(editor.getValue()).toBe('Answer ');
+    });
 });
 
 describe('surviving an edit during the image write', () => {

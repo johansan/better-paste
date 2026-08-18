@@ -45,7 +45,9 @@ export const STRINGS_PT_BR: TranslationStrings = {
             other: 'não foi possível salvar {count} imagens'
         },
         imagesFailedLinkKept: '{images}, o link original foi mantido',
-        imagesFailedNothingPasted: '{images}, então nada foi colado'
+        imagesFailedNothingPasted: '{images}, então nada foi colado',
+        snippetsCopied: 'trechos copiados',
+        snippetsCopyFailed: 'não foi possível copiar os trechos'
     },
 
     settings: {
@@ -165,6 +167,45 @@ export const STRINGS_PT_BR: TranslationStrings = {
             dashesDesc: 'Converte as meias-riscas e os travessões em hifens.',
             dashesAliases: ['travessão', 'meia-risca', 'hífen', 'pontuação', 'tipografia', 'ia'],
             dashesExample: 'O resultado — contra todas as expectativas — ficou bom.'
+        },
+
+        custom: {
+            heading: 'Processamento personalizado',
+            pipelineName: 'Aplicar trechos personalizados de expressões regulares ao texto',
+            pastedText: 'Texto colado',
+            builtInRules: 'Regras integradas',
+            customSnippets: 'Trechos personalizados',
+            note: 'Nota',
+            wikiButton: 'Ver wiki',
+            regexButton: 'Abrir ambiente de expressões regulares',
+            snippetsName: 'Trechos',
+            snippetsDesc: 'Crie trechos de localizar e substituir e escolha quais serão aplicados.',
+            enabledSnippetsCount: { one: '{count} trecho ativado', other: '{count} trechos ativados' },
+            snippetRulesCount: { one: '{count} regra', other: '{count} regras' },
+            invalidRulesCount: { one: '{count} linha inválida', other: '{count} linhas inválidas' },
+            unnamedSnippet: 'Trecho sem nome',
+            emptyState: 'Você ainda não criou nenhum trecho.',
+            addSnippet: 'Adicionar trecho',
+            editButton: 'Editar trecho',
+            exportName: 'Exportar trechos',
+            exportDesc: 'Copia todos os trechos no formato de intercâmbio da wiki.',
+            exportButton: 'Copiar trechos',
+            importName: 'Importar trechos',
+            importDesc: 'Adiciona trechos do formato de intercâmbio da wiki.',
+            previewName: 'Testar',
+            previewDesc: 'Digite um texto de exemplo para ver o resultado de todos os trechos ativados.',
+            modalPreviewDesc: 'Digite um texto de exemplo para ver o resultado deste trecho.',
+            previewInputLabel: 'Texto de exemplo',
+            previewEmpty: 'O texto processado aparecerá aqui.',
+            nameName: 'Nome',
+            rulesName: 'Regras',
+            rulesDesc: 'Digite uma substituição com expressão regular JavaScript por linha.',
+            invalidLine: 'Linha {line}: {value}',
+            saveButton: 'Salvar',
+            recognizedSnippetsCount: { one: '{count} trecho reconhecido', other: '{count} trechos reconhecidos' },
+            recognizedRulesCount: { one: '{count} regra reconhecida', other: '{count} regras reconhecidas' },
+            unparseableName: 'Linhas não reconhecidas',
+            importFallbackName: 'Trecho importado'
         }
     },
 

@@ -42,7 +42,9 @@ export const STRINGS_KO: TranslationStrings = {
         fetchingTitle: '제목 가져오는 중...',
         imagesFailed: { other: '이미지 {count}개를 저장하지 못했습니다' },
         imagesFailedLinkKept: '{images}. 원래 링크를 유지했습니다',
-        imagesFailedNothingPasted: '{images}. 그래서 아무것도 붙여넣지 않았습니다'
+        imagesFailedNothingPasted: '{images}. 그래서 아무것도 붙여넣지 않았습니다',
+        snippetsCopied: '스니펫을 복사했습니다',
+        snippetsCopyFailed: '스니펫을 복사하지 못했습니다'
     },
 
     settings: {
@@ -161,6 +163,45 @@ export const STRINGS_KO: TranslationStrings = {
             dashesDesc: '엔 대시와 엠 대시를 하이픈으로 바꿉니다.',
             dashesAliases: ['대시', '엠 대시', '엔 대시', '하이픈', '줄표', '붙임표', '문장 부호', '타이포그래피', 'ai'],
             dashesExample: '그 결과는 — 모든 예상을 깨고 — 좋았다.'
+        },
+
+        custom: {
+            heading: '사용자 지정 처리',
+            pipelineName: '사용자 지정 정규식 스니펫을 텍스트에 적용',
+            pastedText: '붙여넣은 텍스트',
+            builtInRules: '기본 규칙',
+            customSnippets: '사용자 지정 스니펫',
+            note: '노트',
+            wikiButton: '위키 보기',
+            regexButton: '정규 표현식 테스트 도구 열기',
+            snippetsName: '스니펫',
+            snippetsDesc: '찾기 및 바꾸기 스니펫을 만들고 실행할 항목을 선택합니다.',
+            enabledSnippetsCount: { other: '활성화된 스니펫 {count}개' },
+            snippetRulesCount: { other: '규칙 {count}개' },
+            invalidRulesCount: { other: '잘못된 줄 {count}개' },
+            unnamedSnippet: '이름 없는 스니펫',
+            emptyState: '아직 만든 스니펫이 없습니다.',
+            addSnippet: '스니펫 추가',
+            editButton: '스니펫 편집',
+            exportName: '스니펫 내보내기',
+            exportDesc: '모든 스니펫을 위키 교환 형식으로 복사합니다.',
+            exportButton: '스니펫 복사',
+            importName: '스니펫 가져오기',
+            importDesc: '위키 교환 형식에서 스니펫을 추가합니다.',
+            previewName: '시험해 보기',
+            previewDesc: '예제 텍스트를 입력하여 활성화된 모든 스니펫의 결과를 확인합니다.',
+            modalPreviewDesc: '예제 텍스트를 입력하여 이 스니펫의 결과를 확인합니다.',
+            previewInputLabel: '예제 텍스트',
+            previewEmpty: '처리된 텍스트가 여기에 표시됩니다.',
+            nameName: '이름',
+            rulesName: '규칙',
+            rulesDesc: '한 줄에 하나의 JavaScript 정규 표현식 바꾸기를 입력하세요.',
+            invalidLine: '{line}번 줄: {value}',
+            saveButton: '저장',
+            recognizedSnippetsCount: { other: '스니펫 {count}개 인식됨' },
+            recognizedRulesCount: { other: '규칙 {count}개 인식됨' },
+            unparseableName: '해석할 수 없는 줄',
+            importFallbackName: '가져온 스니펫'
         }
     },
 
