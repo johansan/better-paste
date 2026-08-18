@@ -1,10 +1,10 @@
-# ![Better Paste](https://raw.githubusercontent.com/johansan/better-paste/main/images/welcome.gif)
-
 Read in your language: [English](https://betterpaste.md/docs.html) • [العربية](https://betterpaste.md/ar/docs.html) • [Deutsch](https://betterpaste.md/de/docs.html) • [Español](https://betterpaste.md/es/docs.html) • [فارسی](https://betterpaste.md/fa/docs.html) • [Français](https://betterpaste.md/fr/docs.html) • [Bahasa Indonesia](https://betterpaste.md/id/docs.html) • [Italiano](https://betterpaste.md/it/docs.html) • [Nederlands](https://betterpaste.md/nl/docs.html) • [Polski](https://betterpaste.md/pl/docs.html) • [Português](https://betterpaste.md/pt/docs.html) • [Português (Brasil)](https://betterpaste.md/pt-br/docs.html) • [Русский](https://betterpaste.md/ru/docs.html) • [ไทย](https://betterpaste.md/th/docs.html) • [Türkçe](https://betterpaste.md/tr/docs.html) • [Українська](https://betterpaste.md/uk/docs.html) • [Tiếng Việt](https://betterpaste.md/vi/docs.html) • [日本語](https://betterpaste.md/ja/docs.html) • [한국어](https://betterpaste.md/ko/docs.html) • [中文简体](https://betterpaste.md/zh-cn/docs.html) • [中文繁體](https://betterpaste.md/zh-tw/docs.html)
 
-Stop fixing formatting after every paste! Better Paste finally lets you copy images from Safari to Obsidian, it strips tracking parameters from URLs, fetches page titles, and cleans up AI-generated text. Your own regex snippets run on every paste too. Just paste, and the plugin handles the rest. Broken terminal output? One command away.
+![Better Paste](https://raw.githubusercontent.com/johansan/better-paste/main/images/welcome.gif)
 
-If you find Better Paste useful, please consider [☕️ Buying me a coffee](https://buymeacoffee.com/johansan) or [Sponsor on GitHub ❤️](https://github.com/sponsors/johansan).
+Stop fixing formatting after every paste! Better Paste finally lets you copy images from Safari to Obsidian, it strips tracking parameters from URLs, fetches page titles, and cleans up AI-generated text. Your own regex snippets run on every paste too. Just paste, and the plugin handles the rest.
+
+If you love using Better Paste, please consider [☕️ Buying me a coffee](https://buymeacoffee.com/johansan) or [Sponsor on GitHub ❤️](https://github.com/sponsors/johansan).
 
 <br/>
 
