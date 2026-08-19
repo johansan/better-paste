@@ -16,9 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** Naming scheme for saved images. */
-export type ImageNameFormat = 'source' | 'custom';
-
 /** One user-defined sequence of regular expression replacements. */
 export interface TextSnippet {
     id: string;
@@ -37,9 +34,7 @@ export interface BetterPasteSettings {
 
     /** Save pasted pictures into the vault instead of leaving them as links. */
     imageEnabled: boolean;
-    /** Naming scheme for saved images. */
-    imageNameFormat: ImageNameFormat;
-    /** Custom source-name and Moment date format for saved image filenames. */
+    /** File name format for saved images: source-name, note and property tokens, counters and Moment dates. */
     imageNameTemplate: string;
     /** Comma-separated widths offered for saved image embeds, such as "400, 600, 800". */
     imageSizeOptions: string;

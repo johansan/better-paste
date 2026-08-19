@@ -63,11 +63,11 @@ function savingExample(): string | DocumentFragment {
     });
 }
 
-/** Custom filename format with the same one-line example used by the real save path. */
+/** Filename format field with the same one-line example used by the real save path. */
 function renderCustomFilenameFormat(setting: Setting, context: SettingsPageContext): void {
     const text = strings.settings.images;
 
-    setting.setName(text.customName);
+    setting.setName(text.nameFormatName);
     setting.settingEl.addClass('better-paste-filename-format');
     setting.descEl.appendText(text.customDesc);
     setting.descEl.createEl('br');
@@ -77,7 +77,13 @@ function renderCustomFilenameFormat(setting: Setting, context: SettingsPageConte
     const example = setting.descEl.createDiv({ cls: 'better-paste-example' });
 
     const renderExample = (template: string): void => {
-        const tokens = buildFileNameTokens(FILENAME_EXAMPLE_URL);
+        // The note name and property tokens show sample values, and a counter shows its
+        // first number, so the example stays honest for any template
+        const tokens = {
+            ...buildFileNameTokens(FILENAME_EXAMPLE_URL),
+            noteName: text.customExampleNote,
+            property: (key: string) => key
+        };
         const baseName = applyFileNameTemplate(template, tokens, FILENAME_EXAMPLE_DATE);
         example.setText(format(text.customExample, { value: `${baseName}.jpg` }));
     };
@@ -130,22 +136,8 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
         },
         {
             name: text.nameFormatName,
-            desc: text.nameFormatDesc,
-            visible: enabled,
-            control: {
-                type: 'dropdown',
-                key: 'imageNameFormat',
-                defaultValue: DEFAULT_SETTINGS.imageNameFormat,
-                options: {
-                    source: text.nameFormatSource,
-                    custom: text.nameFormatCustom
-                }
-            }
-        },
-        {
-            name: text.customName,
             aliases: aliases(source => source.settings.images.customAliases),
-            visible: () => enabled() && context.settings().imageNameFormat === 'custom',
+            visible: enabled,
             render: setting => renderCustomFilenameFormat(setting, context)
         },
         {

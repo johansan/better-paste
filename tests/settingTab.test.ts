@@ -355,11 +355,10 @@ describe('settings tree', () => {
         expect(names.indexOf('Fetch titles for pasted links')).toBeLessThan(names.indexOf('Clean pasted links'));
     });
 
-    it('offers source and custom image filename formats', () => {
-        const row = controlRows(tab).find(candidate => candidate.control.key === 'imageNameFormat');
-        expect(row?.control.type).toBe('dropdown');
-        if (row?.control.type !== 'dropdown') throw new Error('File names is not a dropdown');
-        expect(row.control.options).toEqual({ source: 'Name from source', custom: 'Custom format' });
+    it('renders the filename format as a single field', () => {
+        const rows = flatten(tab.getSettingDefinitions()).filter(candidate => candidate.name === 'File names');
+        expect(rows).toHaveLength(1);
+        expect(rows[0].render).toBeDefined();
     });
 
     it('offers quotes and dashes as plain toggles', () => {
@@ -681,17 +680,11 @@ describe('dependent settings', () => {
     }
 
     it('hides the image detail when the rule is off', () => {
-        expect(isVisible(rowFor('imageNameFormat', { imageEnabled: false }))).toBe(false);
-        expect(isVisible(rowFor('imageNameFormat', { imageEnabled: true }))).toBe(true);
-    });
+        const fileNames = (settings: Partial<BetterPasteSettings>) =>
+            flatten(makeTab(fakePlugin(settings)).getSettingDefinitions()).find(row => row.name === 'File names');
 
-    it('shows the custom filename row only for the custom format', () => {
-        const customRow = (settings: Partial<BetterPasteSettings>) =>
-            flatten(makeTab(fakePlugin(settings)).getSettingDefinitions()).find(row => row.name === 'Custom format');
-
-        expect(isVisible(customRow({ imageNameFormat: 'source' }))).toBe(false);
-        expect(isVisible(customRow({ imageNameFormat: 'custom' }))).toBe(true);
-        expect(isVisible(customRow({ imageNameFormat: 'custom', imageEnabled: false }))).toBe(false);
+        expect(isVisible(fileNames({ imageEnabled: false }))).toBe(false);
+        expect(isVisible(fileNames({ imageEnabled: true }))).toBe(true);
     });
 
     it('hides the link detail when the rule is off', () => {

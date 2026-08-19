@@ -161,6 +161,19 @@ export function resolveImageSize(frontmatter: unknown, property: string): string
     return normalizeImageSize(readProperty(frontmatter, property));
 }
 
+/**
+ * Reads a property as text for use in a file name: a non-empty string or a finite
+ * number. Anything else, booleans, arrays and dates included, has no place in a file
+ * name and reads as missing.
+ */
+export function resolveNameProperty(frontmatter: unknown, property: string): string | null {
+    const value = readProperty(frontmatter, property);
+    if (typeof value === 'number') return Number.isFinite(value) ? String(value) : null;
+    if (typeof value !== 'string') return null;
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
+}
+
 /** What a note asks for, overriding the global setting in that direction. */
 export type NotePasteOverride = 'on' | 'off';
 

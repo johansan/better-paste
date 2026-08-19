@@ -41,11 +41,14 @@ export function moment(date: Date): { format: (pattern: string) => string } {
     };
 
     return {
-        format: (pattern: string): string =>
-            pattern.replace(/\[([^\]]*)\]|YYYY|MM|DD|HH|mm|ss/g, token => {
+        format: (pattern: string): string => {
+            // Real Moment answers an empty pattern with its default ISO output
+            if (!pattern) return `${values.YYYY}-${values.MM}-${values.DD}T${values.HH}:${values.mm}:${values.ss}+00:00`;
+            return pattern.replace(/\[([^\]]*)\]|YYYY|MM|DD|HH|mm|ss/g, token => {
                 const literal = /^\[([^\]]*)\]$/.exec(token);
                 return literal ? literal[1] : (values[token] ?? token);
-            })
+            });
+        }
     };
 }
 
@@ -76,6 +79,8 @@ export class TFolder {
 
 export class TFile {
     path = '';
+    basename = '';
+    extension = '';
 }
 
 export class Plugin {}

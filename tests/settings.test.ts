@@ -49,12 +49,10 @@ describe('normalizeSettings', () => {
         const result = normalizeSettings({
             linkRemovals: ['example.com | source'],
             linkTitles: false,
-            imageNameFormat: 'custom',
             imageNameTemplate: '{{name}}-YYYY-MM-DD'
         });
         expect(result.linkRemovals).toEqual(['example.com | source']);
         expect(result.linkTitles).toBe(false);
-        expect(result.imageNameFormat).toBe('custom');
         expect(result.imageNameTemplate).toBe('{{name}}-YYYY-MM-DD');
     });
 
@@ -116,8 +114,11 @@ describe('normalizeSettings', () => {
         expect(normalizeSettings({ linkStrip: 'all', linkRules: ['mine.example | id'] }).linkRemovals).toEqual([]);
     });
 
-    it('rejects an unknown image name format', () => {
-        expect(normalizeSettings({ imageNameFormat: 'fancy' }).imageNameFormat).toBe(DEFAULT_SETTINGS.imageNameFormat);
+    it('resets the template when the old format dropdown stored source', () => {
+        expect(normalizeSettings({ imageNameFormat: 'source', imageNameTemplate: '{{noteName}}' }).imageNameTemplate).toBe(
+            DEFAULT_SETTINGS.imageNameTemplate
+        );
+        expect(normalizeSettings({ imageNameFormat: 'custom', imageNameTemplate: '{{noteName}}' }).imageNameTemplate).toBe('{{noteName}}');
     });
 });
 

@@ -30,9 +30,13 @@ import { buildUrlCleanupOptions, cleanUrlsInText, httpUrlRanges } from '../trans
 import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './imageReferences';
 import { parseCommaList } from '../settings/normalize';
 import type { ImageEmbedChoice } from '../modals/ImageEmbedModal';
-import { extractFrontmatterBlock, isInsideVerbatimContext, notePasteOverride, resolveImageSize } from './noteOptions';
+import { extractFrontmatterBlock, isInsideVerbatimContext, notePasteOverride, resolveImageSize, resolveNameProperty } from './noteOptions';
 import { format, plural, strings } from '../i18n';
-import type { ImageService } from './ImageService';
+import { baseNameFromPath, buildFileNameTokens, expandFileNameTemplate, resolveExtension } from '../utils/filenames';
+import type { FileNameTokens } from '../utils/filenames';
+import { IMAGE_EXTENSIONS } from '../settings/constants';
+import { MAX_IMAGE_BYTES } from './ImageService';
+import type { ImageNamingContext, ImageService } from './ImageService';
 import { escapeLinkDestination, escapeLinkTitle } from './LinkTitleService';
 import type { LinkTitleService } from './LinkTitleService';
 import { logError } from '../utils/logger';
@@ -84,7 +88,11 @@ function linkFromSelection(selection: string, clipboardText: string, url: string
 /** True when the clipboard carries exactly one image file. */
 export function isSingleImageFile(files: FileList | readonly File[]): boolean {
     const list = Array.from(files);
-    return list.length === 1 && list[0].type.toLowerCase().startsWith('image/');
+    if (list.length !== 1) return false;
+    if (list[0].type.toLowerCase().startsWith('image/')) return true;
+    // A file copied from a file manager can carry a blank or generic type while keeping
+    // its image extension, so the name answers when the type says nothing
+    return resolveExtension(list[0].type, list[0].name || '', IMAGE_EXTENSIONS) !== null;
 }
 
 /**
@@ -191,12 +199,26 @@ export class PasteService {
             // avoid the HTML flavour or apply a note-specific width.
             if (!settings.imageEnabled || !isSingleImageFile(clipboard.files)) return false;
 
-            // Two reasons to take over a bitmap paste. Safari's "Copy image" puts the bitmap
+            // Two clipboard shapes reach this branch. Safari's "Copy image" puts the bitmap
             // AND an <img> tag on the clipboard, and Obsidian prefers the HTML there, which
-            // turns a copied picture into an external link. And when the note or the embed
-            // settings ask for a size or class, only this plugin knows to apply it. Otherwise
-            // Obsidian's own handler already stores the bitmap correctly and is left to do so.
-            if (!htmlHasImages(html) && !this.decoratesEmbeds(editor)) return false;
+            // turns a copied picture into an external link, so that flavour is always taken
+            // over. A bare nameless bitmap, such as a screenshot, is taken over to run it
+            // through the file name format and any size or class; it gets the same name
+            // Obsidian would give it, so a default setup pastes identically to the app.
+            const file = clipboard.files[0];
+            if (!htmlHasImages(html)) {
+                // A bitmap the save would reject stays with Obsidian: taking it over
+                // suppresses the native paste, and without an HTML flavour there is no
+                // URL to fall back on, so the failed save would swallow the screenshot
+                if (resolveExtension(file.type, file.name || '', IMAGE_EXTENSIONS) === null || file.size > MAX_IMAGE_BYTES) return false;
+                // A file with a real name of its own was copied from a file manager, and
+                // Obsidian's handler resolves its path, linking an image that is already
+                // in the vault instead of duplicating it. It is only claimed when a size
+                // or class has to be applied, which is what this plugin always did.
+                const ownName = baseNameFromPath(file.name || '');
+                if (ownName !== null && ownName.toLowerCase() !== 'image' && !this.decoratesEmbeds(editor)) return false;
+                if (!this.namesClipboardImage(file, editor, info, settings)) return false;
+            }
 
             void this.pasteClipboardImage(clipboard, editor, info, html);
             return true;
@@ -253,12 +275,13 @@ export class PasteService {
         const valueBefore = editor.getValue();
         const file = clipboard.files[0];
         const sources = imageSourcesFromHtml(html);
+        const naming = this.imageNaming(editor);
 
         const { size, cssClass } = await this.resolveEmbedOptions(editor);
         let stored: { embed: string; file: TFile } | null = null;
 
         try {
-            stored = await this.images.saveClipboardImage(file, sources[0] ?? '', () => targetFile?.path ?? '', size, cssClass);
+            stored = await this.images.saveClipboardImage(file, sources[0] ?? '', () => targetFile?.path ?? '', size, cssClass, naming);
         } catch (error) {
             logError('Could not save a pasted image', error);
         }
@@ -513,8 +536,9 @@ export class PasteService {
         let downloadedFiles: TFile[] = [];
         if (this.images.hasWork(text)) {
             try {
+                const naming = this.imageNaming(editor);
                 const embedOptions = await this.resolveEmbedOptions(editor);
-                const result = await this.images.materializeImages(text, targetPath, embedOptions.size, embedOptions.cssClass);
+                const result = await this.images.materializeImages(text, targetPath, embedOptions.size, embedOptions.cssClass, naming);
                 text = result.text;
                 imagesFailed = result.failed;
                 downloadedFiles = result.files;
@@ -551,8 +575,15 @@ export class PasteService {
         try {
             let failed = 0;
             try {
+                const naming = this.imageNaming(editor);
                 const embedOptions = await this.resolveEmbedOptions(editor);
-                const result = await this.images.materializeImages(range.inserted, targetPath, embedOptions.size, embedOptions.cssClass);
+                const result = await this.images.materializeImages(
+                    range.inserted,
+                    targetPath,
+                    embedOptions.size,
+                    embedOptions.cssClass,
+                    naming
+                );
                 if (!this.canEdit(info, targetFile)) {
                     void this.images.discardFiles(result.files);
                     return;
@@ -743,6 +774,28 @@ export class PasteService {
         const property = this.getSettings().imageSizeProperty;
         if (!property.trim()) return null;
         return resolveImageSize(this.frontmatterOf(editor.getValue()), property);
+    }
+
+    /**
+     * True when the file name format can produce a name for this bare clipboard image.
+     * The template is expanded synchronously here because taking the paste over
+     * suppresses the native handler; the caller has already checked the file itself is
+     * storable. A value this note cannot supply, such as a missing property, keeps the
+     * paste native instead of inventing a name.
+     */
+    private namesClipboardImage(file: File, editor: Editor, info: MarkdownView | MarkdownFileInfo, settings: BetterPasteSettings): boolean {
+        const tokens: FileNameTokens = {
+            ...buildFileNameTokens('', file.name || undefined),
+            noteName: baseNameFromPath(info.file?.path ?? ''),
+            property: this.imageNaming(editor).property
+        };
+        return expandFileNameTemplate(settings.imageNameTemplate, tokens, new Date()) !== null;
+    }
+
+    /** Naming values read when the paste happens, so a slow download cannot see later edits. */
+    private imageNaming(editor: Editor): ImageNamingContext {
+        const frontmatter = this.frontmatterOf(editor.getValue());
+        return { property: (key: string) => resolveNameProperty(frontmatter, key), now: new Date() };
     }
 
     /** True when the note or the embed settings add a size or class to saved embeds. */

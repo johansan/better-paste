@@ -17,7 +17,7 @@
  */
 
 import { describe, expect, it, vi } from 'vitest';
-import { PasteService } from '../src/paste/PasteService';
+import { PasteService, isSingleImageFile } from '../src/paste/PasteService';
 import type { ImageService } from '../src/paste/ImageService';
 import type { LinkTitleService } from '../src/paste/LinkTitleService';
 import { findImageReferences, replaceImageReferences } from '../src/paste/imageReferences';
@@ -37,6 +37,7 @@ interface SavedClipboardImages {
     sourcePath: string;
     size: string | null;
     cssClass: string | null;
+    naming?: { property: (key: string) => string | null; now: Date };
 }
 
 /** The embed suffix the real service produces: class as a subpath, size in the alias slot. */
@@ -60,9 +61,10 @@ function fakeImages(settings: BetterPasteSettings, failing = false, saved?: Save
             source: string,
             sourcePath: string,
             size: string | null = null,
-            cssClass: string | null = null
+            cssClass: string | null = null,
+            naming?: { property: (key: string) => string | null; now: Date }
         ) => {
-            saved?.push({ file, source, sourcePath, size, cssClass });
+            saved?.push({ file, source, sourcePath, size, cssClass, naming });
             if (failing) return null;
             // Name the saved file after the source picture, as the real service does
             const base = source ? (source.split('/').pop() ?? file.name).replace(/\.[a-z0-9]+$/i, '') : file.name;
@@ -193,7 +195,7 @@ describe('handleEditorPaste: plain text', () => {
         expect(editor.getValue()).toBe('');
     });
 
-    it('leaves bitmap clipboard data to Obsidian', () => {
+    it('leaves a named image file with accompanying text to Obsidian', () => {
         const { service } = build();
         const editor = new FakeEditor('');
         const event = fakeClipboardEvent({ plain: 'https://example.com/a?utm_source=x', fileCount: 1 });
@@ -287,13 +289,15 @@ describe('handleEditorPaste: Safari copy image', () => {
         expect(editor.getValue()).toBe('![](https://www.tokentek.ai/_astro/gaia-2026-talk.J2oaR4rx_sdIoa.webp)');
     });
 
-    it('leaves a plain bitmap paste with no HTML to Obsidian', () => {
-        const { service } = build();
+    it('takes over a plain bitmap paste with no HTML', async () => {
+        const { service, saved } = build();
         const editor = new FakeEditor('');
         const event = fakeClipboardEvent({ files: [fakeFile('image.png', 'image/png')] });
 
-        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
-        expect(editor.getValue()).toBe('');
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        await settle();
+        expect(saved).toHaveLength(1);
+        expect(editor.getValue()).toContain('![[');
     });
 
     it('leaves a non-image file paste to Obsidian', () => {
@@ -322,6 +326,85 @@ describe('handleEditorPaste: Safari copy image', () => {
 
         expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
         expect(editor.getValue()).toBe('');
+    });
+});
+
+describe('isSingleImageFile', () => {
+    it('accepts a blank type when the file name has an image extension', () => {
+        expect(isSingleImageFile([fakeFile('photo.png', '')])).toBe(true);
+        expect(isSingleImageFile([fakeFile('notes.pdf', '')])).toBe(false);
+    });
+});
+
+describe('handleEditorPaste: clipboard image naming', () => {
+    const naming: Partial<BetterPasteSettings> = {
+        imageNameTemplate: '{{noteName}}-{{counter}}'
+    };
+
+    function screenshotEvent(file = fakeFile('image.png', 'image/png')): ClipboardEvent {
+        return fakeClipboardEvent({ files: [file] });
+    }
+
+    it('takes over a bare screenshot and names it from the template', async () => {
+        const { service, saved } = build(naming);
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(screenshotEvent(), editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(saved).toHaveLength(1);
+        expect(editor.getValue()).toContain('![[');
+    });
+
+    it('keeps the paste native when the template needs a property the note lacks', () => {
+        const { service } = build({ ...naming, imageNameTemplate: '{{property:attachName}}-{{counter}}' });
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(screenshotEvent(), editor.asEditor(), INFO)).toBe(false);
+    });
+
+    it('takes over when the note supplies the template property, handing it to the save', async () => {
+        const { service, saved } = build({ ...naming, imageNameTemplate: '{{property:attachName}}-{{counter}}' });
+        const editor = new FakeEditor('---\nattachName: shots\n---\n');
+
+        expect(service.handleEditorPaste(screenshotEvent(), editor.asEditor(), INFO)).toBe(true);
+        await settle();
+        expect(saved[0].naming?.property('attachName')).toBe('shots');
+    });
+
+    it('leaves a file with its own name to Obsidian, unless a size or class applies', async () => {
+        const named = () => screenshotEvent(fakeFile('photo.png', 'image/png'));
+        const editor = new FakeEditor('');
+
+        expect(build(naming).service.handleEditorPaste(named(), editor.asEditor(), INFO)).toBe(false);
+        expect(build({ ...naming, imageSizeChoice: '400' }).service.handleEditorPaste(named(), editor.asEditor(), INFO)).toBe(true);
+        await settle();
+    });
+
+    it('keeps the paste native for an oversized or unsupported file', () => {
+        const { service } = build(naming);
+        const editor = new FakeEditor('');
+        const oversized = { name: 'big.png', type: 'image/png', size: 51 * 1024 * 1024 } as File;
+
+        expect(service.handleEditorPaste(screenshotEvent(oversized), editor.asEditor(), INFO)).toBe(false);
+        expect(service.handleEditorPaste(screenshotEvent(fakeFile('image.jxl', 'image/jxl')), editor.asEditor(), INFO)).toBe(false);
+    });
+
+    it('keeps a decorated but oversized bare bitmap native as well', () => {
+        const { service } = build({ imageSizeChoice: '400' });
+        const editor = new FakeEditor('');
+        const oversized = { name: 'big.png', type: 'image/png', size: 51 * 1024 * 1024 } as File;
+
+        expect(service.handleEditorPaste(screenshotEvent(oversized), editor.asEditor(), INFO)).toBe(false);
+    });
+
+    it('still takes over an oversized Safari copy, whose HTML offers a link fallback', () => {
+        const { service } = build({ imageSizeChoice: '400' }, true);
+        const editor = new FakeEditor('');
+        const oversized = { name: 'big.png', type: 'image/png', size: 51 * 1024 * 1024 } as File;
+        const event = fakeClipboardEvent({ html: '<img src="https://example.com/big.png">', files: [oversized] });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
     });
 });
 
@@ -389,12 +472,14 @@ describe('image width from frontmatter', () => {
         expect(saved[0].size).toBe('400');
     });
 
-    it('leaves a screenshot to Obsidian when the note asks for no width', () => {
-        const { service } = build();
+    it('takes over a screenshot without adding a width when the note asks for none', async () => {
+        const { service, saved } = build();
         const editor = new FakeEditor('---\ntitle: Notes\n---\n\n');
         const event = fakeClipboardEvent({ files: [fakeFile('image.png', 'image/png')] });
 
-        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        await settle();
+        expect(saved[0].size).toBeNull();
     });
 
     it('applies no width when the note has no frontmatter', async () => {

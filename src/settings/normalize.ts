@@ -19,7 +19,7 @@
 import { DEFAULT_SETTINGS } from './defaults';
 import { normalizeVersion } from '../releaseNotes';
 import { createTextSnippetId, parseSnippetRuleLine } from '../transforms/snippets';
-import type { BetterPasteSettings, ImageNameFormat, TextSnippet } from './types';
+import type { BetterPasteSettings, TextSnippet } from './types';
 
 function asBoolean(value: unknown, fallback: boolean): boolean {
     return typeof value === 'boolean' ? value : fallback;
@@ -62,10 +62,6 @@ function asTextSnippets(value: unknown): TextSnippet[] {
     return snippets;
 }
 
-function asEnum<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
-    return typeof value === 'string' && (allowed as readonly string[]).includes(value) ? (value as T) : fallback;
-}
-
 /** Splits a comma-separated options field into trimmed values, dropping blank ones. */
 export function parseCommaList(value: string): string[] {
     return value
@@ -82,8 +78,6 @@ function asEmbedChoice(value: unknown, options: string): string {
     if (value === '') return value;
     return parseCommaList(options).includes(value) ? value : '';
 }
-const NAME_FORMATS: readonly ImageNameFormat[] = ['source', 'custom'];
-
 /**
  * Builds a complete settings object from whatever was stored on disk. Every field is
  * validated so a hand-edited data.json cannot put the plugin in a broken state, and any
@@ -97,8 +91,13 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
         autoClean: asBoolean(data.autoClean, defaults.autoClean),
 
         imageEnabled: asBoolean(data.imageEnabled, defaults.imageEnabled),
-        imageNameFormat: asEnum(data.imageNameFormat, NAME_FORMATS, defaults.imageNameFormat),
-        imageNameTemplate: asString(data.imageNameTemplate, defaults.imageNameTemplate).trim() || defaults.imageNameTemplate,
+        // The former imageNameFormat dropdown gated the template. A vault that stored
+        // 'source' kept whatever template text was last typed there, so that leftover
+        // text must not spring to life now that the field alone decides the naming.
+        imageNameTemplate:
+            (data as Record<string, unknown>).imageNameFormat === 'source'
+                ? defaults.imageNameTemplate
+                : asString(data.imageNameTemplate, defaults.imageNameTemplate).trim() || defaults.imageNameTemplate,
         imageSizeOptions: asString(data.imageSizeOptions, defaults.imageSizeOptions),
         imageSizeChoice: asEmbedChoice(data.imageSizeChoice, asString(data.imageSizeOptions, defaults.imageSizeOptions)),
         imageClassOptions: asString(data.imageClassOptions, defaults.imageClassOptions),

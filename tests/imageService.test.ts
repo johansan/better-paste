@@ -23,9 +23,24 @@ import { ImageService } from '../src/paste/ImageService';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import type { BetterPasteSettings } from '../src/settings/types';
 
-function build(overrides: Partial<BetterPasteSettings> = {}) {
+function build(overrides: Partial<BetterPasteSettings> = {}, seededPaths: string[] = []) {
     const writes: { path: string; data: ArrayBuffer }[] = [];
     const existing = new Set<string>();
+    const files: TFile[] = [];
+
+    const addFile = (path: string): TFile => {
+        const file = new TFile();
+        file.path = path;
+        const name = path.split('/').pop() ?? '';
+        const dot = name.lastIndexOf('.');
+        file.basename = dot >= 0 ? name.slice(0, dot) : name;
+        file.extension = dot >= 0 ? name.slice(dot + 1) : '';
+        existing.add(path);
+        files.push(file);
+        return file;
+    };
+    for (const path of seededPaths) addFile(path);
+
     const app = {
         fileManager: {
             getAvailablePathForAttachment: async (fileName: string) => {
@@ -41,12 +56,12 @@ function build(overrides: Partial<BetterPasteSettings> = {}) {
         },
         vault: {
             createBinary: async (path: string, data: ArrayBuffer) => {
-                existing.add(path);
                 writes.push({ path, data });
-                const file = new TFile();
-                file.path = path;
-                return file;
-            }
+                return addFile(path);
+            },
+            getFolderByPath: (folderPath: string) => ({
+                children: files.filter(file => file.path.slice(0, file.path.lastIndexOf('/')) === folderPath)
+            })
         }
     } as unknown as App;
 
@@ -73,7 +88,7 @@ describe('ImageService', () => {
         vi.setSystemTime(new Date(2026, 7, 13, 14, 5, 6));
 
         try {
-            const { service, writes } = build({ imageNameFormat: 'custom', imageNameTemplate: '{{name}}-YYYY-MM-DD' });
+            const { service, writes } = build({ imageNameTemplate: '{{name}}-YYYY-MM-DD' });
             await service.materializeImages('![](data:image/png;base64,AA==)', 'Notes/Test.md');
 
             expect(writes[0].path).toBe('Attachments/pasted-image-2026-08-13.png');
@@ -105,6 +120,91 @@ describe('ImageService', () => {
 
         expect(result.downloaded).toBe(2);
         expect(new Set(writes.map(write => write.path)).size).toBe(2);
+    });
+
+    it('names an image after the note it is pasted into', async () => {
+        const { service, writes } = build({ imageNameTemplate: '{{noteName}}' });
+
+        await service.materializeImages('![](data:image/png;base64,AA==)', 'Notes/Trip report.md');
+
+        expect(writes[0].path).toBe('Attachments/Trip report.png');
+    });
+
+    it('numbers a counter template one above the highest existing image', async () => {
+        const { service, writes } = build({ imageNameTemplate: '{{noteName}}-{{counter}}' }, [
+            'Attachments/Test-2.jpg',
+            'Attachments/Test-7.png',
+            'Attachments/Other-9.png'
+        ]);
+
+        await service.materializeImages('![](data:image/png;base64,AA==)', 'Notes/Test.md');
+
+        // Test-7 wins over Test-2 across formats, and Other-9 belongs to another sequence
+        expect(writes[0].path).toBe('Attachments/Test-8.png');
+    });
+
+    it('matches existing counter files regardless of case', async () => {
+        const { service, writes } = build({ imageNameTemplate: '{{noteName}}-{{counter}}' }, ['Attachments/test-3.png']);
+
+        await service.materializeImages('![](data:image/png;base64,AA==)', 'Notes/Test.md');
+
+        expect(writes[0].path).toBe('Attachments/Test-4.png');
+    });
+
+    it('gives concurrent counter saves their own rising numbers', async () => {
+        const { service, writes } = build({ imageNameTemplate: '{{noteName}}-{{counter:2}}' });
+
+        await service.materializeImages('![](data:image/png;base64,AA==) ![](data:image/png;base64,AQ==)', 'Notes/Test.md');
+
+        expect(writes.map(write => write.path).sort()).toEqual(['Attachments/Test-01.png', 'Attachments/Test-02.png']);
+    });
+
+    it('reads a frontmatter property into the name', async () => {
+        const { service, writes } = build({ imageNameTemplate: '{{property:attachName}}-{{counter}}' });
+        const naming = { property: (key: string) => (key === 'attachName' ? 'Project X' : null), now: new Date() };
+
+        await service.materializeImages('![](data:image/png;base64,AA==)', 'Notes/Test.md', null, null, naming);
+
+        expect(writes[0].path).toBe('Attachments/Project X-1.png');
+    });
+
+    it('falls back to the default name when a template value is missing', async () => {
+        const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+        try {
+            const { service, writes } = build({ imageNameTemplate: '{{property:attachName}}-{{counter}}' });
+            await service.materializeImages('![](data:image/png;base64,AA==)', 'Notes/Test.md');
+
+            expect(writes[0].path).toBe('Attachments/pasted-image.png');
+            expect(warning).toHaveBeenCalled();
+        } finally {
+            warning.mockRestore();
+        }
+    });
+
+    it('names a nameless clipboard bitmap the way Obsidian does', async () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date(2026, 7, 13, 14, 5, 6));
+
+        try {
+            const { service, writes } = build();
+            const file = { name: 'image.png', type: 'image/png', size: 1, arrayBuffer: async () => new ArrayBuffer(1) } as File;
+
+            await service.saveClipboardImage(file, '', 'Notes/Test.md');
+
+            expect(writes[0].path).toBe('Attachments/Pasted image 20260813140506.png');
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it('keeps the real name of a clipboard file that has one', async () => {
+        const { service, writes } = build();
+        const file = { name: 'photo.png', type: 'image/png', size: 1, arrayBuffer: async () => new ArrayBuffer(1) } as File;
+
+        await service.saveClipboardImage(file, '', 'Notes/Test.md');
+
+        expect(writes[0].path).toBe('Attachments/photo.png');
     });
 
     it('rejects an oversized clipboard file before reading its bytes', async () => {

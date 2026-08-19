@@ -16,11 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { requestUrl } from 'obsidian';
-import type { App, TFile } from 'obsidian';
+import { TFile, requestUrl } from 'obsidian';
+import type { App } from 'obsidian';
 import { findImageReferences, isDataImageUri, isHttpUrl, replaceImageReferences } from './imageReferences';
 import type { ImageReference } from './imageReferences';
-import { applyFileNameTemplate, buildFileNameTokens, resolveExtension } from '../utils/filenames';
+import {
+    assembleFileName,
+    baseNameFromPath,
+    buildFileNameTokens,
+    counterPattern,
+    expandFileNameTemplate,
+    pastedImageName,
+    resolveExtension
+} from '../utils/filenames';
+import type { ExpandedFileName, FileNameTokens } from '../utils/filenames';
 import { DEFAULT_IMAGE_NAME_TEMPLATE, IMAGE_EXTENSIONS, IMAGE_TIMEOUT_SECONDS, MAX_IMAGE_SIZE_MB } from '../settings/constants';
 import { logWarning } from '../utils/logger';
 import type { BetterPasteSettings } from '../settings/types';
@@ -29,7 +38,7 @@ import type { BetterPasteSettings } from '../settings/types';
 const MAX_CONCURRENT_DOWNLOADS = 4;
 
 /** Byte form of the image limit, shared by checks that run before and after decoding. */
-const MAX_IMAGE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+export const MAX_IMAGE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
 
 interface FetchedImage {
     data: ArrayBuffer;
@@ -45,6 +54,19 @@ export type SourcePath = string | (() => string);
 
 function resolveSourcePath(source: SourcePath): string {
     return typeof source === 'function' ? source() : source;
+}
+
+/** Naming values captured when the paste happened, shared by every image that paste saves. */
+export interface ImageNamingContext {
+    /** Reads a frontmatter property of the target note, or null when it has no usable value. */
+    property: (key: string) => string | null;
+    /** One timestamp for the whole paste, so its images cannot straddle midnight. */
+    now: Date;
+}
+
+/** Stands in when a caller has no note context to offer, such as the tests. */
+function defaultNaming(): ImageNamingContext {
+    return { property: () => null, now: new Date() };
 }
 
 export interface ImageMaterializeResult {
@@ -91,7 +113,8 @@ export class ImageService {
         text: string,
         sourcePath: SourcePath,
         size: string | null = null,
-        cssClass: string | null = null
+        cssClass: string | null = null,
+        naming: ImageNamingContext = defaultNaming()
     ): Promise<ImageMaterializeResult> {
         if (this.disposed) return { text, downloaded: 0, failed: 0, files: [] };
         const settings = this.getSettings();
@@ -108,7 +131,7 @@ export class ImageService {
         const queue = [...references];
         const workers = Array.from({ length: Math.min(MAX_CONCURRENT_DOWNLOADS, queue.length) }, async () => {
             for (let reference = queue.shift(); !this.disposed && reference !== undefined; reference = queue.shift()) {
-                const saved = await this.materializeOne(reference, sourcePath, settings, size, cssClass);
+                const saved = await this.materializeOne(reference, sourcePath, settings, size, cssClass, naming);
                 if (saved === null) failed += 1;
                 else {
                     embeds.set(reference.index, saved.embed);
@@ -133,11 +156,12 @@ export class ImageService {
         source: string,
         sourcePath: SourcePath,
         size: string | null = null,
-        cssClass: string | null = null
+        cssClass: string | null = null,
+        naming: ImageNamingContext = defaultNaming()
     ): Promise<{ embed: string; file: TFile } | null> {
         if (this.disposed) return null;
         const settings = this.getSettings();
-        return this.storeClipboardImage(file, source, sourcePath, settings, size, cssClass);
+        return this.storeClipboardImage(file, source, sourcePath, settings, size, cssClass, naming);
     }
 
     /** Stores one clipboard bitmap and returns its embed, or null when it cannot be saved. */
@@ -147,7 +171,8 @@ export class ImageService {
         sourcePath: SourcePath,
         settings: BetterPasteSettings,
         size: string | null,
-        cssClass: string | null
+        cssClass: string | null,
+        naming: ImageNamingContext
     ): Promise<{ embed: string; file: TFile } | null> {
         try {
             // The clipboard bitmap is authoritative for the format: Safari re-encodes a
@@ -172,7 +197,12 @@ export class ImageService {
                 return null;
             }
 
-            const saved = await this.saveImage(source, data, extension, sourcePath, settings, file.name);
+            // A clipboard bitmap arrives under the browser's generic "image.png", so it
+            // gets the name Obsidian would give it. A file with a real name of its own,
+            // copied from a file manager, keeps that name.
+            const ownName = baseNameFromPath(file.name || '');
+            const fallbackName = ownName !== null && ownName.toLowerCase() !== 'image' ? file.name : pastedImageName(naming.now);
+            const saved = await this.saveImage(source, data, extension, sourcePath, settings, naming, fallbackName);
             if (!saved) return null;
 
             return { embed: this.embedFor(saved, sourcePath, size, '', cssClass), file: saved };
@@ -188,7 +218,8 @@ export class ImageService {
         sourcePath: SourcePath,
         settings: BetterPasteSettings,
         size: string | null,
-        cssClass: string | null
+        cssClass: string | null,
+        naming: ImageNamingContext
     ): Promise<{ embed: string; file: TFile } | null> {
         try {
             const fetched = await this.fetchImage(reference.url);
@@ -205,7 +236,7 @@ export class ImageService {
                 return null;
             }
 
-            const file = await this.saveImage(reference.url, fetched.data, extension, sourcePath, settings);
+            const file = await this.saveImage(reference.url, fetched.data, extension, sourcePath, settings, naming);
             if (!file) return null;
 
             return { embed: this.embedFor(file, sourcePath, size, reference.alt, cssClass), file };
@@ -317,18 +348,38 @@ export class ImageService {
         extension: string,
         sourcePath: SourcePath,
         settings: BetterPasteSettings,
+        naming: ImageNamingContext,
         fallbackName?: string
     ): Promise<TFile | null> {
-        const tokens = buildFileNameTokens(url, fallbackName);
-        const template = settings.imageNameFormat === 'custom' ? settings.imageNameTemplate : DEFAULT_IMAGE_NAME_TEMPLATE;
-        const baseName = applyFileNameTemplate(template, tokens, new Date());
-        const fileName = `${baseName}.${extension}`;
-
         const save = this.saveQueue.then(async () => {
-            // The availability check and create are one operation from this service's point
-            // of view, otherwise two concurrent downloads with the same name can race.
+            // Name expansion, the availability check and create are one operation from this
+            // service's point of view, otherwise two concurrent downloads with the same name
+            // or the same counter can race. The note name is read here rather than at paste
+            // time so a note renamed during the download names its attachment correctly.
             if (this.disposed) return null;
-            const path = await this.app.fileManager.getAvailablePathForAttachment(fileName, resolveSourcePath(sourcePath));
+            const tokens: FileNameTokens = {
+                ...buildFileNameTokens(url, fallbackName),
+                noteName: baseNameFromPath(resolveSourcePath(sourcePath)),
+                property: naming.property
+            };
+            const template = settings.imageNameTemplate;
+            let expanded = expandFileNameTemplate(template, tokens, naming.now);
+            if (!expanded) {
+                logWarning(`The name format "${template}" has no value for one of its tokens here, used the default name instead`);
+                expanded = expandFileNameTemplate(DEFAULT_IMAGE_NAME_TEMPLATE, tokens, naming.now);
+                if (!expanded) return null;
+            }
+
+            const baseName =
+                expanded.counterWidths.length === 0
+                    ? assembleFileName(expanded)
+                    : assembleFileName(expanded, await this.nextCounter(expanded, extension, sourcePath));
+            if (this.disposed) return null;
+
+            const path = await this.app.fileManager.getAvailablePathForAttachment(
+                `${baseName}.${extension}`,
+                resolveSourcePath(sourcePath)
+            );
             if (this.disposed) return null;
             const created = await this.app.vault.createBinary(path, data);
             if (this.disposed) {
@@ -344,6 +395,32 @@ export class ImageService {
             () => undefined
         );
         return save;
+    }
+
+    /**
+     * The number the template's counter should use: one above the highest number an
+     * existing image in the attachment folder carries in this template's shape. Counting
+     * up rather than filling gaps, because a freed number can still be referenced by an
+     * old note's embed, and reusing it would silently swap that note's picture.
+     */
+    private async nextCounter(expanded: ExpandedFileName, extension: string, sourcePath: SourcePath): Promise<number> {
+        // The attachment folder is wherever Obsidian would put this file
+        const probe = await this.app.fileManager.getAvailablePathForAttachment(
+            `${assembleFileName(expanded, 1)}.${extension}`,
+            resolveSourcePath(sourcePath)
+        );
+        const separator = probe.lastIndexOf('/');
+        const folder = this.app.vault.getFolderByPath(separator < 0 ? '/' : probe.slice(0, separator));
+
+        // One sequence across every image format, so shot-1.png and shot-2.jpg count as one series
+        const pattern = counterPattern(expanded);
+        let highest = 0;
+        for (const child of folder?.children ?? []) {
+            if (!(child instanceof TFile) || !IMAGE_EXTENSIONS.includes(child.extension.toLowerCase())) continue;
+            const match = pattern.exec(child.basename);
+            if (match) highest = Math.max(highest, Number(match[1]));
+        }
+        return highest + 1;
     }
 }
 

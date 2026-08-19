@@ -17,7 +17,18 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { applyFileNameTemplate, baseNameFromUrl, buildFileNameTokens, resolveExtension, sanitizeFileName } from '../src/utils/filenames';
+import {
+    applyFileNameTemplate,
+    assembleFileName,
+    baseNameFromPath,
+    baseNameFromUrl,
+    buildFileNameTokens,
+    counterPattern,
+    expandFileNameTemplate,
+    pastedImageName,
+    resolveExtension,
+    sanitizeFileName
+} from '../src/utils/filenames';
 import { IMAGE_EXTENSIONS } from '../src/settings/constants';
 
 describe('sanitizeFileName', () => {
@@ -133,5 +144,103 @@ describe('applyFileNameTemplate', () => {
 
     it('sanitizes the expanded result', () => {
         expect(applyFileNameTemplate('[copy]/{{name}}', tokens, now)).toBe('copyholiday');
+    });
+});
+
+describe('expandFileNameTemplate', () => {
+    const now = new Date(2026, 7, 12, 9, 5, 3);
+    const tokens = {
+        ...buildFileNameTokens('https://www.example.com/pics/holiday.png'),
+        noteName: 'Trip report',
+        property: (key: string) => (key === 'attachName' || key === 'attach name' ? 'shots' : null)
+    };
+
+    it('expands the note name token', () => {
+        expect(applyFileNameTemplate('{{noteName}}-YYYY', tokens, now)).toBe('Trip report-2026');
+    });
+
+    it('expands a property token, including a key with spaces', () => {
+        expect(applyFileNameTemplate('{{property:attachName}}', tokens, now)).toBe('shots');
+        expect(applyFileNameTemplate('{{property:attach name}}', tokens, now)).toBe('shots');
+    });
+
+    it('reports an unavailable value as null', () => {
+        expect(expandFileNameTemplate('{{property:missing}}', tokens, now)).toBeNull();
+        expect(expandFileNameTemplate('{{noteName}}', { name: 'x' }, now)).toBeNull();
+    });
+
+    it('keeps a property value from breaking the date formatting', () => {
+        const bracketed = { ...tokens, property: () => '[WIP] hero' };
+        expect(applyFileNameTemplate('{{property:x}}-YYYY', bracketed, now)).toBe('WIP hero-2026');
+    });
+
+    it('splits the template around its counter', () => {
+        expect(expandFileNameTemplate('{{noteName}}-{{counter:2}}', tokens, now)).toEqual({
+            segments: ['Trip report-', ''],
+            counterWidths: [2]
+        });
+    });
+
+    it('accepts a counter-only template and a note name without letters', () => {
+        expect(applyFileNameTemplate('{{counter}}', tokens, now)).toBe('1');
+        expect(applyFileNameTemplate('{{noteName}}-{{counter}}', { ...tokens, noteName: '\u{1F600}' }, now)).toBe('\u{1F600}-1');
+    });
+
+    it('caps the counter pad width', () => {
+        expect(expandFileNameTemplate('shot-{{counter:300}}', tokens, now)?.counterWidths).toEqual([6]);
+    });
+
+    it('literalizes a mistyped token instead of feeding it to Moment', () => {
+        expect(applyFileNameTemplate('{{proprty:key}}', tokens, now)).toBe('{{proprtykey}}');
+        expect(applyFileNameTemplate('{{counter:}}', tokens, now)).toBe('{{counter}}');
+    });
+
+    it('reserves room for the counter when capping a long name', () => {
+        const long = { ...tokens, noteName: 'x'.repeat(120) };
+        const expanded = expandFileNameTemplate('{{noteName}}-{{counter}}', long, now);
+        expect(expanded?.segments[0].length).toBe(76);
+        expect(expanded ? assembleFileName(expanded, 123).length : 0).toBeLessThanOrEqual(80);
+    });
+});
+
+describe('assembleFileName and counterPattern', () => {
+    const expanded = { segments: ['Trip report-', ''], counterWidths: [2] };
+
+    it('writes the padded number into the counter slot', () => {
+        expect(assembleFileName(expanded, 7)).toBe('Trip report-07');
+        expect(assembleFileName({ segments: ['shot'], counterWidths: [] })).toBe('shot');
+    });
+
+    it('matches existing names regardless of case, capturing the number', () => {
+        const pattern = counterPattern(expanded);
+        expect(pattern.exec('Trip report-12')?.[1]).toBe('12');
+        expect(pattern.exec('trip REPORT-3')?.[1]).toBe('3');
+        expect(pattern.exec('Trip report-12 1')).toBeNull();
+    });
+
+    it('keeps timestamp-named files out of the sequence', () => {
+        const pattern = counterPattern({ segments: ['Pasted image ', ''], counterWidths: [0] });
+        expect(pattern.exec('Pasted image 3')?.[1]).toBe('3');
+        expect(pattern.exec('Pasted image 20260818232550')).toBeNull();
+    });
+
+    it('escapes a Windows device name completed by the counter digit', () => {
+        expect(assembleFileName({ segments: ['com', ''], counterWidths: [0] }, 1)).toBe('_com1');
+    });
+});
+
+describe('pastedImageName', () => {
+    it('matches the name Obsidian gives a clipboard bitmap', () => {
+        expect(pastedImageName(new Date(2026, 7, 13, 14, 5, 6))).toBe('Pasted image 20260813140506');
+    });
+});
+
+describe('baseNameFromPath', () => {
+    it('takes the file name without folders or extension', () => {
+        expect(baseNameFromPath('Notes/Trip report.md')).toBe('Trip report');
+    });
+
+    it('returns null for an empty path', () => {
+        expect(baseNameFromPath('')).toBeNull();
     });
 });

@@ -19,13 +19,16 @@
 import type { App } from 'obsidian';
 
 /**
- * Plugins Better Paste replaces outright. Both intercept the same paste event, so
- * running them beside Better Paste means every paste is handled twice. The values are
- * fallback display names for when the installed manifest cannot be read.
+ * Plugins Better Paste replaces outright. The first two intercept the same paste event,
+ * and Paste image rename watches for new attachments, so it renames the very files
+ * Better Paste creates. Running them beside Better Paste means every paste is handled
+ * twice. The values are fallback display names for when the installed manifest cannot
+ * be read.
  */
 const OVERLAPPING_PLUGINS: Record<string, string> = {
     'url-into-selection': 'Paste URL into selection',
-    'obsidian-auto-link-title': 'Auto Link Title'
+    'obsidian-auto-link-title': 'Auto Link Title',
+    'obsidian-paste-image-rename': 'Paste image rename'
 };
 
 export interface OverlappingPlugin {
