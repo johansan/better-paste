@@ -58,6 +58,9 @@ export const STRINGS_KO: TranslationStrings = {
             whatsNewDesc: '최근 릴리스에서 달라진 점입니다.',
             whatsNewAliases: ['릴리스 노트', '변경 사항', '변경 기록', '버전', '업데이트', '기록'],
             whatsNewButton: '최근 업데이트 보기',
+            showReleaseNotesName: '업데이트 후 새로운 기능 표시',
+            showReleaseNotesDesc: '업데이트할 때마다 새로운 기능 대화상자를 한 번 엽니다.',
+            showReleaseNotesAliases: ['릴리스 노트', '새로운 기능', '업데이트', '대화상자', '팝업', '알림'],
             supportName: '개발 후원하기',
             supportDesc: 'Better Paste가 도움이 되었다면 개발을 후원해 주세요.',
             supportAliases: ['후원', '기부', '커피', 'github'],
@@ -280,6 +283,7 @@ export const STRINGS_KO: TranslationStrings = {
         categoryFixed: '수정',
         support: 'Better Paste가 도움이 되었다면 개발을 후원해 주세요.',
         coffeeButton: '☕️ 커피 한 잔 사주기',
-        thanksButton: '고마워요!'
+        thanksButton: '고마워요!',
+        dontShowAgain: '업데이트 후 다시 표시하지 않음'
     }
 };

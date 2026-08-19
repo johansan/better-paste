@@ -21,6 +21,7 @@ import type { Setting, SettingGroupItem } from 'obsidian';
 import { aliases, format, strings } from '../../i18n';
 import { communityPluginUrl, SUPPORT_BUY_ME_A_COFFEE_URL, SUPPORT_SPONSOR_URL } from '../../urls';
 import { NOTEBOOK_NAVIGATOR_ICON } from '../pluginIcons';
+import { toggle } from './context';
 import type { SettingsPageContext } from './context';
 
 /** The author's other plugins, shown as cards. The names are product names, so they are
@@ -57,6 +58,12 @@ export function createStartDefinitions(context: SettingsPageContext): SettingGro
                 );
             }
         },
+        toggle(
+            'showReleaseNotes',
+            text.showReleaseNotesName,
+            text.showReleaseNotesDesc,
+            aliases(source => source.settings.start.showReleaseNotesAliases)
+        ),
         {
             name: text.supportName,
             desc: text.supportDesc,

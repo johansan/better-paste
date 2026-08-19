@@ -58,6 +58,9 @@ export const STRINGS_TH: TranslationStrings = {
             whatsNewDesc: 'สิ่งที่เปลี่ยนไปในรุ่นล่าสุด',
             whatsNewAliases: ['บันทึกการเปลี่ยนแปลง', 'การเปลี่ยนแปลง', 'รุ่น', 'อัปเดต', 'ประวัติ'],
             whatsNewButton: 'ดูการอัปเดตล่าสุด',
+            showReleaseNotesName: 'แสดงหน้าต่างมีอะไรใหม่หลังอัปเดต',
+            showReleaseNotesDesc: 'เปิดหน้าต่างมีอะไรใหม่หนึ่งครั้งหลังการอัปเดตแต่ละครั้ง',
+            showReleaseNotesAliases: ['บันทึกรุ่น', 'มีอะไรใหม่', 'อัปเดต', 'หน้าต่าง', 'ป็อปอัป', 'การแจ้งเตือน'],
             supportName: 'สนับสนุนการพัฒนา',
             supportDesc: 'หาก Better Paste เป็นประโยชน์กับคุณ โปรดพิจารณาสนับสนุนการพัฒนา',
             supportAliases: ['สนับสนุน', 'บริจาค', 'กาแฟ', 'github'],
@@ -288,6 +291,7 @@ export const STRINGS_TH: TranslationStrings = {
         categoryFixed: 'แก้ไข',
         support: 'หาก Better Paste เป็นประโยชน์กับคุณ โปรดพิจารณาสนับสนุนการพัฒนา',
         coffeeButton: '☕️ เลี้ยงกาแฟ',
-        thanksButton: 'ขอบคุณ!'
+        thanksButton: 'ขอบคุณ!',
+        dontShowAgain: 'ไม่ต้องแสดงอีกหลังอัปเดต'
     }
 };

@@ -309,8 +309,9 @@ describe('settings tree', () => {
 
     it('puts the release notes and support rows below the rules', () => {
         const rows = flatten(tab.getSettingDefinitions());
-        expect(rows.slice(-3).map(row => row.name)).toEqual([
+        expect(rows.slice(-4).map(row => row.name)).toEqual([
             "What's new in Better Paste 1.0.0",
+            'Show release notes after updating',
             'Support development',
             'Check out my other plugins'
         ]);

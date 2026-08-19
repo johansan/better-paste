@@ -61,6 +61,9 @@ export const STRINGS_TR: TranslationStrings = {
             whatsNewDesc: 'Son sürümlerde nelerin değiştiği.',
             whatsNewAliases: ['sürüm notları', 'değişiklikler', 'değişiklik günlüğü', 'sürüm', 'güncelleme', 'geçmiş'],
             whatsNewButton: 'Son güncellemeleri gör',
+            showReleaseNotesName: 'Güncellemeden sonra yenilikleri göster',
+            showReleaseNotesDesc: 'Her güncellemeden sonra yenilikler penceresini bir kez açar.',
+            showReleaseNotesAliases: ['sürüm notları', 'yenilikler', 'güncelleme', 'pencere', 'popup', 'bildirim'],
             supportName: 'Geliştirmeyi destekle',
             supportDesc: 'Better Paste işinize yarıyorsa geliştirilmesini desteklemeyi düşünün.',
             supportAliases: ['sponsor', 'bağış', 'kahve', 'github'],
@@ -296,6 +299,7 @@ export const STRINGS_TR: TranslationStrings = {
         categoryFixed: 'Düzeltildi',
         support: 'Better Paste işinize yarıyorsa geliştirilmesini desteklemeyi düşünün.',
         coffeeButton: '☕️ Bana bir kahve ısmarla',
-        thanksButton: 'Teşekkürler!'
+        thanksButton: 'Teşekkürler!',
+        dontShowAgain: 'Güncellemelerden sonra bir daha gösterme'
     }
 };

@@ -61,6 +61,9 @@ export const STRINGS_FA: TranslationStrings = {
             whatsNewDesc: 'آنچه در نسخه‌های اخیر تغییر کرده است.',
             whatsNewAliases: ['یادداشت انتشار', 'تغییرات', 'فهرست تغییرات', 'نسخه', 'به‌روزرسانی', 'تاریخچه'],
             whatsNewButton: 'دیدن تازه‌ها',
+            showReleaseNotesName: 'نمایش تازه‌ها پس از به‌روزرسانی',
+            showReleaseNotesDesc: 'پس از هر به‌روزرسانی، پنجرهٔ تازه‌ها را یک بار باز می‌کند.',
+            showReleaseNotesAliases: ['یادداشت‌های انتشار', 'تازه‌ها', 'به‌روزرسانی', 'پنجره', 'پاپ‌آپ', 'اعلان'],
             supportName: 'پشتیبانی از توسعه',
             supportDesc: 'اگر Better Paste برایتان مفید است، از توسعه آن پشتیبانی کنید.',
             supportAliases: ['حمایت', 'کمک مالی', 'قهوه', 'github'],
@@ -289,6 +292,7 @@ export const STRINGS_FA: TranslationStrings = {
         categoryFixed: 'رفع‌شده',
         support: 'اگر Better Paste برایتان مفید است، از توسعه آن پشتیبانی کنید.',
         coffeeButton: '☕️ یک قهوه مهمانم کن',
-        thanksButton: 'ممنون!'
+        thanksButton: 'ممنون!',
+        dontShowAgain: 'پس از به‌روزرسانی‌ها دیگر نشان داده نشود'
     }
 };

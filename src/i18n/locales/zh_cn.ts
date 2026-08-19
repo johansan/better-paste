@@ -58,6 +58,9 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             whatsNewDesc: '最近几个版本的改动。',
             whatsNewAliases: ['发行说明', '更新内容', '更新日志', '版本', '更新', '历史'],
             whatsNewButton: '查看最近更新',
+            showReleaseNotesName: '更新后显示新功能',
+            showReleaseNotesDesc: '每次更新后打开一次新功能对话框。',
+            showReleaseNotesAliases: ['发行说明', '新功能', '更新', '对话框', '弹窗', '通知'],
             supportName: '支持开发',
             supportDesc: '如果 Better Paste 对你有帮助，欢迎支持它的开发。',
             supportAliases: ['赞助', '捐赠', '咖啡', 'github'],
@@ -277,6 +280,7 @@ export const STRINGS_ZH_CN: TranslationStrings = {
         categoryFixed: '修复',
         support: '如果 Better Paste 对你有帮助，欢迎支持它的开发。',
         coffeeButton: '☕️ 请我喝杯咖啡',
-        thanksButton: '谢谢！'
+        thanksButton: '谢谢！',
+        dontShowAgain: '更新后不再显示'
     }
 };

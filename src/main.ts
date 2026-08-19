@@ -315,19 +315,41 @@ export default class BetterPastePlugin extends Plugin {
         // A downgrade must not record the older version, because that would reopen the
         // dialog on whichever device is still running the newer one
         if (compareVersions(currentVersion, lastShownVersion) <= 0) return;
+
+        // With the dialog switched off the marker still advances, so switching it back
+        // on later starts from here instead of replaying every release missed meanwhile
+        if (!this.settings.showReleaseNotes) {
+            await this.advanceLastShownVersion(currentVersion);
+            return;
+        }
+
         if (!shouldAutoDisplayReleaseNotesForUpdate(lastShownVersion, currentVersion)) return;
 
-        this.openWhatsNew(getReleaseNotesForUpdate(lastShownVersion, currentVersion));
+        this.openWhatsNew(getReleaseNotesForUpdate(lastShownVersion, currentVersion), true);
     }
 
-    private openWhatsNew(releaseNotes: ReleaseNote[]): void {
-        this.startupModal = new WhatsNewModal(this.app, releaseNotes, () => {
-            // Closed by unload rather than by the user: leaving the marker alone means
-            // the dialog simply shows again next time, while advancing it here would
-            // write through a plugin instance that no longer owns its settings
-            if (this.unloaded) return;
-            this.advanceLastShownVersion(this.manifest.version).catch(error => logError('Could not record the shown release notes', error));
-        });
+    /** The don't-show-again checkbox appears only when the dialog opened by itself after an update. */
+    private openWhatsNew(releaseNotes: ReleaseNote[], offerDontShowAgain = false): void {
+        this.startupModal = new WhatsNewModal(
+            this.app,
+            releaseNotes,
+            () => {
+                // Closed by unload rather than by the user: leaving the marker alone means
+                // the dialog simply shows again next time, while advancing it here would
+                // write through a plugin instance that no longer owns its settings
+                if (this.unloaded) return;
+                this.advanceLastShownVersion(this.manifest.version).catch(error =>
+                    logError('Could not record the shown release notes', error)
+                );
+            },
+            offerDontShowAgain
+                ? () => {
+                      if (this.unloaded) return;
+                      this.settings.showReleaseNotes = false;
+                      this.saveSettings().catch(error => logError('Could not save the release notes setting', error));
+                  }
+                : null
+        );
         this.startupModal.open();
     }
 

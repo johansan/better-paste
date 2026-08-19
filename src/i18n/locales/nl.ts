@@ -61,6 +61,9 @@ export const STRINGS_NL: TranslationStrings = {
             whatsNewDesc: 'Wat er in de meest recente versies is veranderd.',
             whatsNewAliases: ['releaseopmerkingen', 'wijzigingen', 'changelog', 'versie', 'update', 'geschiedenis'],
             whatsNewButton: 'Bekijk wat er nieuw is',
+            showReleaseNotesName: 'Releasenotes tonen na een update',
+            showReleaseNotesDesc: 'Opent na elke update één keer het dialoogvenster met wat er nieuw is.',
+            showReleaseNotesAliases: ['release notes', 'nieuw', 'update', 'dialoogvenster', 'popup', 'melding'],
             supportName: 'Ontwikkeling steunen',
             supportDesc: 'Als Better Paste je van pas komt, overweeg dan de ontwikkeling te steunen.',
             supportAliases: ['sponsor', 'doneren', 'koffie', 'github'],
@@ -296,6 +299,7 @@ export const STRINGS_NL: TranslationStrings = {
         categoryFixed: 'Opgelost',
         support: 'Als Better Paste je van pas komt, overweeg dan de ontwikkeling te steunen.',
         coffeeButton: '☕️ Trakteer me op koffie',
-        thanksButton: 'Bedankt!'
+        thanksButton: 'Bedankt!',
+        dontShowAgain: 'Niet meer tonen na updates'
     }
 };

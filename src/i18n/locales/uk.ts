@@ -63,6 +63,9 @@ export const STRINGS_UK: TranslationStrings = {
             whatsNewDesc: 'Що змінилося в останніх випусках.',
             whatsNewAliases: ['примітки до випуску', 'зміни', 'список змін', 'версія', 'оновлення', 'історія'],
             whatsNewButton: 'Переглянути оновлення',
+            showReleaseNotesName: 'Показувати вікно «Що нового» після оновлення',
+            showReleaseNotesDesc: 'Відкриває вікно «Що нового» один раз після кожного оновлення.',
+            showReleaseNotesAliases: ['що нового', 'оновлення', 'вікно', 'сповіщення', 'новини', 'журнал змін'],
             supportName: 'Підтримати розробку',
             supportDesc: 'Якщо Better Paste вам корисний, підтримайте його розробку.',
             supportAliases: ['спонсор', 'пожертва', 'кава', 'github'],
@@ -331,6 +334,7 @@ export const STRINGS_UK: TranslationStrings = {
         categoryFixed: 'Виправлено',
         support: 'Якщо Better Paste вам корисний, підтримайте його розробку.',
         coffeeButton: '☕️ Пригостити кавою',
-        thanksButton: 'Дякую!'
+        thanksButton: 'Дякую!',
+        dontShowAgain: 'Більше не показувати після оновлень'
     }
 };

@@ -58,6 +58,9 @@ export const STRINGS_VI: TranslationStrings = {
             whatsNewDesc: 'Những thay đổi trong các bản phát hành gần đây.',
             whatsNewAliases: ['ghi chú phát hành', 'thay đổi', 'nhật ký thay đổi', 'phiên bản', 'cập nhật', 'lịch sử'],
             whatsNewButton: 'Xem cập nhật gần đây',
+            showReleaseNotesName: 'Hiển thị "Có gì mới" sau khi cập nhật',
+            showReleaseNotesDesc: 'Mở hộp thoại "Có gì mới" một lần sau mỗi lần cập nhật.',
+            showReleaseNotesAliases: ['ghi chú phát hành', 'có gì mới', 'cập nhật', 'hộp thoại', 'popup', 'thông báo'],
             supportName: 'Ủng hộ việc phát triển',
             supportDesc: 'Nếu Better Paste hữu ích với bạn, hãy cân nhắc ủng hộ việc phát triển.',
             supportAliases: ['tài trợ', 'quyên góp', 'cà phê', 'github'],
@@ -283,6 +286,7 @@ export const STRINGS_VI: TranslationStrings = {
         categoryFixed: 'Sửa lỗi',
         support: 'Nếu Better Paste hữu ích với bạn, hãy cân nhắc ủng hộ việc phát triển.',
         coffeeButton: '☕️ Mời tôi ly cà phê',
-        thanksButton: 'Cảm ơn!'
+        thanksButton: 'Cảm ơn!',
+        dontShowAgain: 'Không hiện lại sau khi cập nhật'
     }
 };

@@ -58,6 +58,9 @@ export const STRINGS_ID: TranslationStrings = {
             whatsNewDesc: 'Apa yang berubah pada rilis terbaru.',
             whatsNewAliases: ['catatan rilis', 'perubahan', 'log perubahan', 'versi', 'pembaruan', 'riwayat'],
             whatsNewButton: 'Lihat pembaruan terbaru',
+            showReleaseNotesName: 'Tampilkan yang baru setelah pembaruan',
+            showReleaseNotesDesc: 'Membuka dialog "Yang baru" satu kali setelah setiap pembaruan.',
+            showReleaseNotesAliases: ['catatan rilis', 'yang baru', 'pembaruan', 'dialog', 'popup', 'notifikasi'],
             supportName: 'Dukung pengembangan',
             supportDesc: 'Jika Better Paste bermanfaat bagi Anda, pertimbangkan untuk mendukung pengembangannya.',
             supportAliases: ['sponsor', 'donasi', 'kopi', 'github'],
@@ -292,6 +295,7 @@ export const STRINGS_ID: TranslationStrings = {
         categoryFixed: 'Diperbaiki',
         support: 'Jika Better Paste bermanfaat bagi Anda, pertimbangkan untuk mendukung pengembangannya.',
         coffeeButton: '☕️ Traktir saya kopi',
-        thanksButton: 'Terima kasih!'
+        thanksButton: 'Terima kasih!',
+        dontShowAgain: 'Jangan tampilkan lagi setelah pembaruan'
     }
 };

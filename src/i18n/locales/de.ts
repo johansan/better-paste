@@ -61,6 +61,9 @@ export const STRINGS_DE: TranslationStrings = {
             whatsNewDesc: 'Was sich in den letzten Versionen geändert hat.',
             whatsNewAliases: ['versionshinweise', 'änderungen', 'changelog', 'version', 'aktualisierung', 'verlauf'],
             whatsNewButton: 'Neuerungen ansehen',
+            showReleaseNotesName: 'Versionshinweise nach Updates anzeigen',
+            showReleaseNotesDesc: 'Öffnet den Dialog mit den Neuerungen einmal nach jedem Update.',
+            showReleaseNotesAliases: ['versionshinweise', 'neuerungen', 'update', 'dialog', 'popup', 'benachrichtigung'],
             supportName: 'Entwicklung unterstützen',
             supportDesc: 'Wenn dir Better Paste nützlich ist, unterstütze bitte seine Entwicklung.',
             supportAliases: ['sponsor', 'spende', 'kaffee', 'github'],
@@ -315,6 +318,7 @@ export const STRINGS_DE: TranslationStrings = {
         categoryFixed: 'Behoben',
         support: 'Wenn dir Better Paste nützlich ist, unterstütze bitte seine Entwicklung.',
         coffeeButton: '☕️ Spendier mir einen Kaffee',
-        thanksButton: 'Danke!'
+        thanksButton: 'Danke!',
+        dontShowAgain: 'Nach Updates nicht mehr anzeigen'
     }
 };

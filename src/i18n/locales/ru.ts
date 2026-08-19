@@ -63,6 +63,9 @@ export const STRINGS_RU: TranslationStrings = {
             whatsNewDesc: 'Что изменилось в последних выпусках.',
             whatsNewAliases: ['примечания к выпуску', 'изменения', 'список изменений', 'версия', 'обновление', 'история'],
             whatsNewButton: 'Посмотреть обновления',
+            showReleaseNotesName: 'Показывать окно «Что нового» после обновления',
+            showReleaseNotesDesc: 'Открывает окно «Что нового» один раз после каждого обновления.',
+            showReleaseNotesAliases: ['что нового', 'обновление', 'окно', 'уведомление', 'новости', 'журнал изменений'],
             supportName: 'Поддержать разработку',
             supportDesc: 'Если Better Paste вам полезен, поддержите его разработку.',
             supportAliases: ['спонсор', 'пожертвование', 'кофе', 'github'],
@@ -331,6 +334,7 @@ export const STRINGS_RU: TranslationStrings = {
         categoryFixed: 'Исправлено',
         support: 'Если Better Paste вам полезен, поддержите его разработку.',
         coffeeButton: '☕️ Купить мне кофе',
-        thanksButton: 'Спасибо!'
+        thanksButton: 'Спасибо!',
+        dontShowAgain: 'Больше не показывать после обновлений'
     }
 };

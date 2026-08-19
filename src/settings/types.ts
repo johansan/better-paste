@@ -29,6 +29,8 @@ export interface BetterPasteSettings {
 
     /** Run the rules automatically on paste. When off, only the commands apply them. */
     autoClean: boolean;
+    /** Open the What's new dialog once after an update. The settings button shows it either way. */
+    showReleaseNotes: boolean;
     /**
      * Reindent a pasted list relative to the list item at the cursor, so its hierarchy
      * survives the paste. A document transform, so it has its own toggle: its result

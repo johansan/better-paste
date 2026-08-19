@@ -74,6 +74,9 @@ export const STRINGS_EN = {
             whatsNewDesc: 'What changed in the most recent releases.',
             whatsNewAliases: ['release notes', 'changelog', 'version', 'update', 'history'],
             whatsNewButton: 'View recent updates',
+            showReleaseNotesName: 'Show release notes after updating',
+            showReleaseNotesDesc: "Opens the What's new dialog once after each update.",
+            showReleaseNotesAliases: ['release notes', "what's new", 'update', 'dialog', 'popup', 'notify', 'announce'],
             supportName: 'Support development',
             supportDesc: 'If you find Better Paste useful, please consider supporting its development.',
             supportAliases: ['sponsor', 'donate', 'coffee', 'github'],
@@ -311,6 +314,7 @@ export const STRINGS_EN = {
         categoryFixed: 'Fixed',
         support: 'If you find Better Paste useful, please consider supporting its development.',
         coffeeButton: '☕️ Buy me a coffee',
-        thanksButton: 'Thanks!'
+        thanksButton: 'Thanks!',
+        dontShowAgain: "Don't show this again after updates"
     }
 };

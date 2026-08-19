@@ -58,6 +58,9 @@ export const STRINGS_JA: TranslationStrings = {
             whatsNewDesc: '直近のリリースで変わった点。',
             whatsNewAliases: ['リリースノート', '変更点', '変更履歴', 'バージョン', '更新', '履歴'],
             whatsNewButton: '最近の更新を見る',
+            showReleaseNotesName: '更新後に新機能を表示',
+            showReleaseNotesDesc: '更新のたびに新機能のダイアログを一度表示します。',
+            showReleaseNotesAliases: ['リリースノート', '新機能', '更新', 'ダイアログ', 'ポップアップ', '通知'],
             supportName: '開発を支援する',
             supportDesc: 'Better Paste が役に立ったら、開発の支援をご検討ください。',
             supportAliases: ['スポンサー', '寄付', 'コーヒー', 'github'],
@@ -291,6 +294,7 @@ export const STRINGS_JA: TranslationStrings = {
         categoryFixed: '修正',
         support: 'Better Paste が役に立ったら、開発の支援をご検討ください。',
         coffeeButton: '☕️ コーヒーをおごる',
-        thanksButton: 'ありがとう!'
+        thanksButton: 'ありがとう!',
+        dontShowAgain: '更新後に表示しない'
     }
 };
