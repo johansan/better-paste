@@ -51,9 +51,9 @@ export interface ReleaseNote {
 /** Newest first. A new release goes at the top. */
 const RELEASE_NOTES: ReleaseNote[] = [
     {
-        version: '1.0.8',
+        version: '1.0.9',
         date: '2026-08-19',
-        banner: '1.0.8.jpg',
+        banner: '1.0.9.jpg',
         new: [
             'You can now name pasted images with a ==custom format==! Build file names from the note name, a frontmatter property, a rising counter or a date.',
             'New setting: ==Keep list nesting on paste==. Pasted lists now keep their nesting! Paste a list onto a list item and every level is indented to match, with bullets, numbers and checkboxes intact.',
