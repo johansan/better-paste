@@ -273,7 +273,6 @@ export const STRINGS_IT: TranslationStrings = {
 
     whatsNew: {
         title: 'Novità di Better Paste',
-        scrollLabel: 'Note di rilascio',
         releaseHeading: 'Versione {version} ({date})',
         categoryNew: 'Novità',
         categoryImproved: 'Migliorato',

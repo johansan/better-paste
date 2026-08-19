@@ -274,7 +274,6 @@ export const STRINGS_TH: TranslationStrings = {
 
     whatsNew: {
         title: 'มีอะไรใหม่ใน Better Paste',
-        scrollLabel: 'หมายเหตุประจำรุ่น',
         releaseHeading: 'รุ่น {version} ({date})',
         categoryNew: 'ใหม่',
         categoryImproved: 'ปรับปรุง',

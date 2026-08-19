@@ -269,7 +269,6 @@ export const STRINGS_VI: TranslationStrings = {
 
     whatsNew: {
         title: 'Có gì mới trong Better Paste',
-        scrollLabel: 'Ghi chú phát hành',
         releaseHeading: 'Phiên bản {version} ({date})',
         categoryNew: 'Mới',
         categoryImproved: 'Cải tiến',

@@ -152,3 +152,4 @@ Real trackers with a documented functional collision, so removing them can break
 - `elqTrackId`: Eloqua link ID, but Eloqua-hosted redirect links break without it.
 - `sp` on bing.com: suggestion telemetry in search, but it defines the pins in shared Bing Maps links.
 - `midToken` on linkedin.com: email attribution, but confirmation and unsubscribe actions pair it with `midSig`.
+- `npnl`: Newspack newsletter link signature, but it is the HMAC-signed pass that lets a newsletter reader through the site's content gate, so gated articles stop opening without it.

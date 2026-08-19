@@ -274,7 +274,6 @@ export const STRINGS_FA: TranslationStrings = {
 
     whatsNew: {
         title: 'تازه‌های Better Paste',
-        scrollLabel: 'یادداشت‌های انتشار',
         releaseHeading: 'نسخه {version} ({date})',
         categoryNew: 'تازه',
         categoryImproved: 'بهبودیافته',

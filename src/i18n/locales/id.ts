@@ -277,7 +277,6 @@ export const STRINGS_ID: TranslationStrings = {
 
     whatsNew: {
         title: 'Yang baru di Better Paste',
-        scrollLabel: 'Catatan rilis',
         releaseHeading: 'Versi {version} ({date})',
         categoryNew: 'Baru',
         categoryImproved: 'Ditingkatkan',

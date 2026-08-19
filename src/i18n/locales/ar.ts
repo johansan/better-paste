@@ -319,7 +319,6 @@ export const STRINGS_AR: TranslationStrings = {
 
     whatsNew: {
         title: 'الجديد في Better Paste',
-        scrollLabel: 'ملاحظات الإصدار',
         releaseHeading: 'الإصدار {version} ({date})',
         categoryNew: 'جديد',
         categoryImproved: 'محسّن',

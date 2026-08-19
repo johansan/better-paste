@@ -281,7 +281,6 @@ export const STRINGS_TR: TranslationStrings = {
 
     whatsNew: {
         title: 'Better Paste’te yenilikler',
-        scrollLabel: 'Sürüm notları',
         releaseHeading: 'Sürüm {version} ({date})',
         categoryNew: 'Yeni',
         categoryImproved: 'İyileştirildi',

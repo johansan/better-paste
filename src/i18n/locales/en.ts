@@ -297,7 +297,6 @@ export const STRINGS_EN = {
 
     whatsNew: {
         title: "What's new in Better Paste",
-        scrollLabel: 'Release notes',
         releaseHeading: 'Version {version} ({date})',
         categoryNew: 'New',
         categoryImproved: 'Improved',

@@ -266,7 +266,6 @@ export const STRINGS_KO: TranslationStrings = {
 
     whatsNew: {
         title: 'Better Paste의 새로운 기능',
-        scrollLabel: '릴리스 노트',
         releaseHeading: '버전 {version} ({date})',
         categoryNew: '새 기능',
         categoryImproved: '개선',

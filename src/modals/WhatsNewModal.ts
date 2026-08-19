@@ -108,7 +108,10 @@ export class WhatsNewModal extends Modal {
         this.titleEl.setText(strings.whatsNew.title);
 
         const scroll = this.contentEl.createDiv({ cls: 'better-paste-release-scroll' });
-        scroll.setAttrs({ tabindex: '0', role: 'region', 'aria-label': strings.whatsNew.scrollLabel });
+        // Named by the modal title through aria-labelledby, because Obsidian shows an
+        // aria-label as a hover tooltip and the scroll area does not want one
+        this.titleEl.id = 'better-paste-whats-new-title';
+        scroll.setAttrs({ tabindex: '0', role: 'region', 'aria-labelledby': 'better-paste-whats-new-title' });
         for (const note of this.releaseNotes) this.renderRelease(scroll, note);
 
         this.contentEl.createDiv({ cls: 'better-paste-modal-divider' });

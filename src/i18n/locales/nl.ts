@@ -281,7 +281,6 @@ export const STRINGS_NL: TranslationStrings = {
 
     whatsNew: {
         title: 'Nieuw in Better Paste',
-        scrollLabel: 'Releaseopmerkingen',
         releaseHeading: 'Versie {version} ({date})',
         categoryNew: 'Nieuw',
         categoryImproved: 'Verbeterd',

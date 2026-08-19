@@ -263,7 +263,6 @@ export const STRINGS_ZH_CN: TranslationStrings = {
 
     whatsNew: {
         title: 'Better Paste 的新功能',
-        scrollLabel: '发行说明',
         releaseHeading: '版本 {version}（{date}）',
         categoryNew: '新增',
         categoryImproved: '改进',

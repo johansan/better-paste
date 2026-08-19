@@ -267,7 +267,6 @@ export const STRINGS_JA: TranslationStrings = {
 
     whatsNew: {
         title: 'Better Paste の新機能',
-        scrollLabel: 'リリースノート',
         releaseHeading: 'バージョン {version} ({date})',
         categoryNew: '新機能',
         categoryImproved: '改善',

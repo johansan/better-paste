@@ -316,7 +316,6 @@ export const STRINGS_UK: TranslationStrings = {
 
     whatsNew: {
         title: 'Що нового в Better Paste',
-        scrollLabel: 'Примітки до випуску',
         releaseHeading: 'Версія {version} ({date})',
         categoryNew: 'Нове',
         categoryImproved: 'Покращено',
