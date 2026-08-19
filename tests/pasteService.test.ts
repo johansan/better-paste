@@ -165,6 +165,16 @@ describe('handleEditorPaste: plain text', () => {
         expect(editor.getValue()).toBe('- main\n\t- sub\n\t\t- [ ] A\n\t\t\t- [ ] A1\n\t\t\t\t- [ ] A1a');
     });
 
+    it('replaces the destination checkbox when pasted tasks carry a different state', () => {
+        const { service } = build();
+        const doc = '- [ ] ';
+        const editor = new FakeEditor(doc, doc.length);
+        const event = fakeClipboardEvent({ plain: '- [x] done one\n- [x] done two' });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe('- [x] done one\n- [x] done two');
+    });
+
     it('pastes a list unchanged when list nesting is off', () => {
         const { service } = build({ listNesting: false, textTrim: false });
         const doc = '- main\n\t- ';

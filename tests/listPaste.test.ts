@@ -22,7 +22,7 @@ import { rebaseListPaste } from '../src/transforms/listPaste';
 /** Runs the rebase with the cursor at the | marker, which is removed before the call. */
 function paste(pasted: string, document: string): string | null {
     const offset = document.indexOf('|');
-    return rebaseListPaste(pasted, document.replace('|', ''), offset, offset);
+    return rebaseListPaste(pasted, document.replace('|', ''), offset, offset)?.inserted ?? null;
 }
 
 describe('rebaseListPaste', () => {
@@ -52,12 +52,30 @@ describe('rebaseListPaste', () => {
         expect(paste('- a\n- b', '- main\n\t- |')).toBe('a\n\t- b');
     });
 
+    it('carries the destination marker onto every root, numbering ordered ones onward', () => {
+        expect(paste('- a\n- b\n- c', '1. one\n2. |')).toBe('a\n3. b\n4. c');
+        expect(paste('1. a\n2. b', '- main\n- |')).toBe('a\n- b');
+        expect(paste('- a\n- [x] b', '1. |')).toBe('a\n2. [x] b');
+    });
+
+    it('indents children of a renumbered root past its marker', () => {
+        expect(paste('- a\n- b\n    - b1', '9. |')).toBe('a\n10. b\n    - b1');
+    });
+
     it('keeps the pasted checkbox when the destination item is plain', () => {
         expect(paste('- [x] a\n\t- [ ] b', '- |')).toBe('[x] a\n\t- [ ] b');
     });
 
-    it('drops the pasted checkbox when the destination item already has one', () => {
-        expect(paste('- [x] a\n\t- [ ] b', '- [ ] |')).toBe('a\n\t- [ ] b');
+    it('drops the pasted checkbox when the destination already has one in the same state', () => {
+        expect(paste('- [ ] a\n\t- [x] b', '- [ ] |')).toBe('a\n\t- [x] b');
+    });
+
+    it('replaces the destination checkbox when the pasted state differs', () => {
+        const document = '- [ ] ';
+        const result = rebaseListPaste('- [x] a\n- [x] b', document, document.length, document.length);
+
+        // The replacement starts at the checkbox, so both tasks keep their copied state
+        expect(result).toEqual({ inserted: '[x] a\n- [x] b', from: 2 });
     });
 
     it('inserts below a destination item that already has content, as its children', () => {
@@ -92,6 +110,26 @@ describe('rebaseListPaste', () => {
         expect(paste('1. a\n    100. b\n        - c', '- |')).toBe('a\n    100. b\n            - c');
     });
 
+    it('reads depth per branch, so content-aligned steps of different widths stay siblings', () => {
+        const copied = '1. alpha\n   - note a\n10. tenth\n    - note t';
+        expect(paste(copied, '- item\n\t- |')).toBe('alpha\n\t\t- note a\n\t- tenth\n\t\t- note t');
+        expect(paste('- a\n  - a1\n- b\n    - b1', '- x\n\t- |')).toBe('a\n\t\t- a1\n\t- b\n\t\t- b1');
+    });
+
+    it('keeps spaces for the step behind a space-indented destination', () => {
+        // A tab behind two spaces stops at column four, short of the ordered marker
+        expect(paste('- a\n\t- b', 'Shopping:\n  1. |')).toBe('a\n      - b');
+    });
+
+    it('leaves a root from a different list family unconverted', () => {
+        expect(paste('- a\n1. b', '- |')).toBe('a\n1. b');
+    });
+
+    it('declines a clipboard containing a horizontal rule', () => {
+        expect(paste('- - -\n- item', '1. |')).toBeNull();
+        expect(paste('- item\n* * *', '- |')).toBeNull();
+    });
+
     it('normalises an irregular source against its smallest step', () => {
         const copied = '- a\n        - b\n            - c\n                - d';
         expect(paste(copied, '- main\n\t- |')).toBe('a\n\t\t- b\n\t\t\t- c\n\t\t\t\t- d');
@@ -102,7 +140,7 @@ describe('rebaseListPaste', () => {
         const start = document.indexOf('old');
         const result = rebaseListPaste('- a\n\t- b', document, start, document.length);
 
-        expect(result).toBe('a\n\t\t- b');
+        expect(result).toEqual({ inserted: 'a\n\t\t- b', from: start });
     });
 
     it('declines a clipboard that is not purely a list', () => {

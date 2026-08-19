@@ -41,10 +41,18 @@ interface ListItemLine {
 /** A list item: indentation, bullet or ordered marker, optional checkbox, content. */
 const ITEM_PATTERN = /^([ \t]*)((?:[-*+]|\d{1,9}[.)])[ \t]+)(\[.\][ \t]+)?(.*)$/;
 
+/** A horizontal rule, which ITEM_PATTERN would otherwise read as a list item. */
+const THEMATIC_BREAK = /^[ \t]*(?:(?:-[ \t]*){3,}|(?:\*[ \t]*){3,}|(?:_[ \t]*){3,})$/;
+
 function parseItem(line: string): ListItemLine | null {
     const match = ITEM_PATTERN.exec(line);
     if (!match) return null;
     return { indent: match[1], marker: match[2], checkbox: match[3] ?? '', content: match[4] };
+}
+
+/** The list family a marker belongs to: its bullet character, or its ordered delimiter. */
+function markerFamily(marker: string): string {
+    return marker.replace(/^\d+/, '').trim();
 }
 
 /**
@@ -71,6 +79,10 @@ function destinationUnit(
             if (item.indent.length < destIndent.length && destIndent.startsWith(item.indent)) return destIndent.slice(item.indent.length);
             lineEndAbove = startAbove - 1;
         }
+
+        // The destination indents with spaces, and a tab behind them would stop at the
+        // next tab stop instead of adding four columns, so the step stays in spaces
+        return ' '.repeat(unitWidth > 0 ? unitWidth : 4);
     }
 
     if (sourceItems.some(item => item.indent.includes('\t'))) return '\t';
@@ -87,7 +99,14 @@ function destinationUnit(
  * item as its own content, so the destination's marker decides the root. A destination
  * with content receives the whole pasted tree as its children on the following lines.
  */
-export function rebaseListPaste(pasted: string, noteText: string, selectionStart: number, selectionEnd: number): string | null {
+export interface RebasedListPaste {
+    /** The text to write over the note from `from` to the selection end. */
+    inserted: string;
+    /** Usually the selection start; earlier when the destination's checkbox is replaced. */
+    from: number;
+}
+
+export function rebaseListPaste(pasted: string, noteText: string, selectionStart: number, selectionEnd: number): RebasedListPaste | null {
     const lines = pasted.split(/\r?\n/);
     if (lines.length < 2 || lines[0].trim() === '') return null;
 
@@ -100,6 +119,7 @@ export function rebaseListPaste(pasted: string, noteText: string, selectionStart
             parsedLines.push(null);
             continue;
         }
+        if (THEMATIC_BREAK.test(line)) return null;
         const item = parseItem(line);
         if (item === null) return null;
         parsedLines.push(item);
@@ -110,19 +130,31 @@ export function rebaseListPaste(pasted: string, noteText: string, selectionStart
     const items = parsedLines.filter((item): item is ListItemLine => item !== null);
     const first = items[0];
 
-    // Each distinct indentation width is one nesting level, which is how Markdown reads
-    // a list regardless of the size of its steps. An item shallower than the first
-    // would need a place outside the destination subtree, so the rule declines there.
-    const widths = [...new Set(items.map(item => indentWidthOf(item.indent)))].sort((a, b) => a - b);
-    if (widths[0] !== indentWidthOf(first.indent)) return null;
-    const depthOf = (item: ListItemLine): number => widths.indexOf(indentWidthOf(item.indent));
-
-    // The smallest step between levels, kept as the fallback indentation unit
+    // Depth from a stack of ancestor widths, the way Markdown itself nests: wider than
+    // the last item is one level deeper, a repeated width rejoins that ancestor's
+    // level. Branches may use different step widths, as content-aligned lists do, so a
+    // width ranks nothing globally. An item shallower than the first would need a place
+    // outside the destination subtree, so the rule declines there.
+    const stack: number[] = [];
+    const depths = new Map<ListItemLine, number>();
+    // The smallest step between a parent and its child, kept as the fallback unit
     let unitWidth = 0;
-    for (let index = 1; index < widths.length; index++) {
-        const gap = widths[index] - widths[index - 1];
-        if (unitWidth === 0 || gap < unitWidth) unitWidth = gap;
+    for (const item of items) {
+        const width = indentWidthOf(item.indent);
+        while (stack.length > 0 && width < stack[stack.length - 1]) stack.pop();
+        if (stack.length === 0 && item !== first) return null;
+        if (stack.length > 0 && width === stack[stack.length - 1]) {
+            depths.set(item, stack.length - 1);
+            continue;
+        }
+        if (stack.length > 0) {
+            const gap = width - stack[stack.length - 1];
+            if (unitWidth === 0 || gap < unitWidth) unitWidth = gap;
+        }
+        depths.set(item, stack.length);
+        stack.push(width);
     }
+    const depthOf = (item: ListItemLine): number => depths.get(item) ?? 0;
 
     const lineStart = selectionStart === 0 ? 0 : noteText.lastIndexOf('\n', selectionStart - 1) + 1;
     const newlineIndex = noteText.indexOf('\n', selectionStart);
@@ -146,25 +178,50 @@ export function rebaseListPaste(pasted: string, noteText: string, selectionStart
     const out: string[] = [];
     // Indent per depth, each entry set when its parent is emitted
     const indents: string[] = [];
-    const emit = (item: ListItemLine, depth: number): void => {
+    const emit = (item: ListItemLine, depth: number, marker = item.marker): void => {
         for (let level = 1; level <= depth; level++) {
             if (indents[level] === undefined) indents[level] = indents[level - 1] + unit;
         }
         const indent = indents[depth];
-        out.push(indent + item.marker + item.checkbox + item.content);
+        out.push(indent + marker + item.checkbox + item.content);
         indents.length = depth + 1;
-        indents[depth + 1] = indent + unit.repeat(stepsPast(item.marker));
+        indents[depth + 1] = indent + unit.repeat(stepsPast(marker));
     };
 
+    let from = selectionStart;
     if (emptyItem) {
         // The first item becomes the destination item's content, so the destination's
-        // marker decides the root and a bullet pasted onto "1. " stays ordered. A
-        // checkbox already on the destination wins over the pasted one.
-        out.push((dest.checkbox === '' ? first.checkbox : '') + first.content);
+        // marker decides the root and a bullet pasted onto "1. " stays ordered. When
+        // both carry a checkbox in different states the pasted state wins, reaching
+        // back over the destination's checkbox, because tasks copied in one state must
+        // not land in mixed ones. Otherwise the destination's checkbox stands.
+        if (dest.checkbox !== '' && first.checkbox !== '' && first.checkbox !== dest.checkbox) {
+            from = lineStart + dest.indent.length + dest.marker.length;
+            out.push(first.checkbox + first.content);
+        } else {
+            out.push((dest.checkbox === '' ? first.checkbox : '') + first.content);
+        }
         indents[0] = dest.indent;
         indents[1] = dest.indent + unit.repeat(stepsPast(dest.marker));
+
+        // Further roots from the first root's list follow the destination's marker as
+        // well, because mixing marker families at one level splits the list in two. An
+        // ordered destination numbers them onward from its own value. A root from a
+        // different family stays itself: the clipboard held two adjacent lists, and
+        // joining them would merge what the source kept separate.
+        const ordered = /^(\d{1,9})([.)])([ \t]+)$/.exec(dest.marker);
+        let rootNumber = ordered ? Number(ordered[1]) : 0;
+        const firstFamily = markerFamily(first.marker);
+        const rootMarker = (item: ListItemLine): string => {
+            if (markerFamily(item.marker) !== firstFamily) return item.marker;
+            if (!ordered) return dest.marker;
+            rootNumber += 1;
+            return `${rootNumber}${ordered[2]}${ordered[3]}`;
+        };
+
         for (const line of parsedLines.slice(1)) {
             if (line === null) out.push('');
+            else if (depthOf(line) === 0) emit(line, 0, rootMarker(line));
             else emit(line, depthOf(line));
         }
     } else {
@@ -178,5 +235,5 @@ export function rebaseListPaste(pasted: string, noteText: string, selectionStart
         }
     }
 
-    return out.join('\n');
+    return { inserted: out.join('\n'), from };
 }

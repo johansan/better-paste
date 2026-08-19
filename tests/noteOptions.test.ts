@@ -217,6 +217,11 @@ describe('isInsideVerbatimContext', () => {
         expect(atCursor('- item\n\n      code |')).toBe(true);
     });
 
+    it('is false in a loose list, where a blank line separates the nested item', () => {
+        expect(atCursor('- item\n\n\t- nested |')).toBe(false);
+        expect(atCursor('- item\n\n    - nested |')).toBe(false);
+    });
+
     it('classifies a whitespace-only line by what a paste would turn it into', () => {
         expect(atCursor('Intro\n\n    |')).toBe(true);
         expect(atCursor('- item\n\t|')).toBe(false);

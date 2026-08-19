@@ -279,12 +279,15 @@ export class PasteService {
 
         const targetFile = info.file;
         const selectedLink = needsTitle ? linkFromSelection(editor.getSelection(), plain, result.text) : null;
-        const inserted = selectedLink ?? rebased ?? result.text;
-        editor.replaceSelection(inserted);
+        const inserted = selectedLink ?? rebased?.inserted ?? result.text;
+        // The rebase may reach back before the selection, to replace the destination's checkbox
+        const from = selectedLink === null && rebased !== null ? rebased.from : startOffset;
+        editor.replaceRange(inserted, editor.offsetToPos(from), editor.offsetToPos(endOffset));
+        editor.setCursor(editor.offsetToPos(from + inserted.length));
         // An earlier paste may still be downloading; its snapshots must learn about this
         // insert, otherwise its rewrite is abandoned as stale when it completes
-        this.realignPendingRanges(null, startOffset, valueBefore.slice(startOffset, endOffset), inserted);
-        const range = asyncPasteRange(startOffset, inserted, valueBefore, editor.getValue());
+        this.realignPendingRanges(null, from, valueBefore.slice(from, endOffset), inserted);
+        const range = asyncPasteRange(from, inserted, valueBefore, editor.getValue());
 
         if (needsImages) void this.runImagePass(editor, info, targetFile, () => targetFile?.path ?? '', range);
         else if (needsTitle && selectedLink === null) void this.runTitlePass(editor, info, targetFile, range);
@@ -400,8 +403,10 @@ export class PasteService {
         const invocationSelection = valueAtInvocation.slice(fromOffset, toOffset);
         const selectedLink =
             needsTitle && valueBefore === valueAtInvocation ? linkFromSelection(invocationSelection, clipboardText, result.text) : null;
-        const inserted = selectedLink ?? rebased ?? result.text;
-        const startOffset = this.insertAfterClipboardRead(editor, valueAtInvocation, fromOffset, toOffset, inserted);
+        const inserted = selectedLink ?? rebased?.inserted ?? result.text;
+        // The rebase may reach back before the selection, to replace the destination's checkbox
+        const insertFrom = selectedLink === null && rebased !== null ? rebased.from : fromOffset;
+        const startOffset = this.insertAfterClipboardRead(editor, valueAtInvocation, insertFrom, toOffset, inserted);
         const range = asyncPasteRange(startOffset, inserted, valueBefore, editor.getValue());
 
         if (needsImages) {

@@ -186,8 +186,10 @@ export function markdownCodeRanges(text: string): TextRange[] {
                 paragraphOpen = false;
             } else if (/^(?: {4}|\t)/.test(content)) {
                 // The flag carries through the block: lines of a code block stay code,
-                // continuation lines of a paragraph stay prose and keep their backtick spans
-                if (indentedCodeAllowed) {
+                // continuation lines of a paragraph stay prose and keep their backtick spans.
+                // Inside a list item, code starts four columns past the item's content
+                // indent, so a nested item after a blank line stays a list item.
+                if (indentedCodeAllowed && (listContentIndent < 0 || indentWidthOf(content) >= listContentIndent + 4)) {
                     ranges.push({ start: lineStart, end: lineEnd });
                     paragraphOpen = false;
                 } else if (listContentIndent >= 0 && indentWidthOf(content) < listContentIndent) {
