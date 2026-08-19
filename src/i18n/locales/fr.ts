@@ -190,6 +190,13 @@ export const STRINGS_FR: TranslationStrings = {
             dashesExample: 'Le résultat — contre toute attente — était bon.'
         },
 
+        structure: {
+            heading: 'Structure',
+            listNestingName: 'Conserver l’imbrication des listes au collage',
+            listNestingDesc: 'Colle une liste copiée avec sa hiérarchie intacte, indentée selon l’élément de liste sur lequel vous collez.',
+            listNestingAliases: ['liste', 'imbriquée', 'indentation', 'hiérarchie', 'plan', 'puces', 'case', 'arborescence']
+        },
+
         custom: {
             heading: 'Traitement personnalisé',
             pipelineName: 'Appliquer des extraits regex personnalisés au texte',

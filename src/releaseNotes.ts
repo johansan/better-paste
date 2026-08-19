@@ -55,9 +55,12 @@ const RELEASE_NOTES: ReleaseNote[] = [
         date: '2026-08-19',
         banner: '1.0.8.jpg',
         new: [
-            'You can now name pasted images with a ==custom format==! Build file names from the note name, a frontmatter property, a rising counter or a date.'
+            'You can now name pasted images with a ==custom format==! Build file names from the note name, a frontmatter property, a rising counter or a date.',
+            'New setting: ==Keep list nesting on paste==. Pasted lists now keep their nesting! Paste a list onto a list item and every level is indented to match, with bullets, numbers and checkboxes intact.',
+            'You can now paste an image address into a note property. The image is saved into your vault and linked from the property, ready as a cover image in Bases.'
         ],
-        changed: ['Restructured the Images settings into three parts: saving web images, file names, and size and style.']
+        changed: ['Restructured the Images settings into three parts: saving web images, file names, and size and style.'],
+        fixed: ['Fixed an issue where pasting into nested list items skipped processing.']
     },
     {
         version: '1.0.7',

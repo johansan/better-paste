@@ -23,6 +23,7 @@ import { frontmatterRanges, normalizeInvisibleCharacters, straightenDashes, stra
 import { applyCommaPlacement } from '../transforms/textProcessing';
 import type { TextCommaPlacement } from '../transforms/textProcessing';
 import { cleanTerminalText } from '../transforms/terminalText';
+import { rebaseListPaste } from '../transforms/listPaste';
 import { applyTextSnippets } from '../transforms/snippets';
 import { cleanPdfText } from '../transforms/pdfText';
 import type { PdfCleanupOptions } from '../transforms/pdfText';
@@ -30,14 +31,21 @@ import { buildUrlCleanupOptions, cleanUrlsInText, httpUrlRanges } from '../trans
 import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './imageReferences';
 import { parseCommaList } from '../settings/normalize';
 import type { ImageEmbedChoice } from '../modals/ImageEmbedModal';
-import { extractFrontmatterBlock, isInsideVerbatimContext, notePasteOverride, resolveImageSize, resolveNameProperty } from './noteOptions';
+import {
+    extractFrontmatterBlock,
+    isInsideFrontmatterBlock,
+    isInsideVerbatimContext,
+    notePasteOverride,
+    resolveImageSize,
+    resolveNameProperty
+} from './noteOptions';
 import { format, plural, strings } from '../i18n';
 import { baseNameFromPath, buildFileNameTokens, expandFileNameTemplate, resolveExtension } from '../utils/filenames';
 import type { FileNameTokens } from '../utils/filenames';
 import { IMAGE_EXTENSIONS } from '../settings/constants';
 import { MAX_IMAGE_BYTES } from './ImageService';
 import type { ImageNamingContext, ImageService } from './ImageService';
-import { escapeLinkDestination, escapeLinkTitle } from './LinkTitleService';
+import { escapeLinkDestination, escapeLinkTitle, isObviousImageUrl, standaloneWebUrl } from './LinkTitleService';
 import type { LinkTitleService } from './LinkTitleService';
 import { logError } from '../utils/logger';
 import { showNotice } from '../utils/notices';
@@ -77,6 +85,23 @@ function asyncPasteRange(startOffset: number, inserted: string, valueBefore: str
         beforeContext: valueAfter.slice(Math.max(0, startOffset - RANGE_CONTEXT), startOffset),
         afterContext: valueAfter.slice(startOffset + inserted.length, startOffset + inserted.length + RANGE_CONTEXT)
     };
+}
+
+/**
+ * True when [start, end) sits in an empty frontmatter value slot: on a line inside the
+ * block, after "key: " or a "- " sequence item, with nothing but whitespace behind it.
+ * Checked when the paste is claimed and again before the downloaded link is written,
+ * because a value typed beside the address during the download changes what the slot
+ * holds, and rewriting only the address would corrupt the YAML around it.
+ */
+function isFrontmatterValueSlot(content: string, start: number, end: number): boolean {
+    if (!isInsideFrontmatterBlock(content, start) || !isInsideFrontmatterBlock(content, end)) return false;
+
+    const lineStart = content.lastIndexOf('\n', start - 1) + 1;
+    const newlineIndex = content.indexOf('\n', start);
+    const lineEnd = newlineIndex < 0 ? content.length : newlineIndex;
+    if (end > lineEnd || content.slice(end, lineEnd).trim() !== '') return false;
+    return /^[ \t]*(?:-|[^#].*?:)[ \t]+$/.test(content.slice(lineStart, start));
 }
 
 /** Builds a link from selected text, unless the selection is the pasted address itself. */
@@ -184,13 +209,21 @@ export class PasteService {
         // every cursor receives the native paste instead of only one range being rewritten.
         if (editor.listSelections().length !== 1) return false;
 
-        // A note or Markdown code can opt out, and a note can opt in while automatic cleanup
-        // is off. Explicit commands deliberately ignore both: if the user asks for the rules
-        // by name, they get them.
-        if (!this.shouldCleanAutomatically(editor, settings)) return false;
+        // A note can opt out, or opt in while automatic cleanup is off. Explicit commands
+        // deliberately ignore this: if the user asks for the rules by name, they get them.
+        const content = editor.getValue();
+        if (!this.automaticPasteEnabled(content, settings)) return false;
 
         const clipboard = event.clipboardData;
         if (!clipboard) return false;
+
+        // Markdown code and frontmatter are left verbatim. Pasting terminal output into a
+        // fence is an act of preservation, so rejoining its lines there would destroy the
+        // thing the user was protecting. The one exception is an image address pasted into
+        // an empty frontmatter value, which is saved like a body paste.
+        if (isInsideVerbatimContext(content, editor.posToOffset(editor.getCursor('from')))) {
+            return this.claimFrontmatterImagePaste(clipboard, editor, info, content);
+        }
 
         const html = clipboard.getData('text/html');
 
@@ -235,16 +268,18 @@ export class PasteService {
         if (!plain) return false;
 
         const result = runTextPipeline(plain, settings);
-        const needsImages = this.images.hasWork(result.text);
-        const needsTitle = this.titles.hasWork(result.text);
-        if (!result.changed && !needsImages && !needsTitle) return false;
-
-        const targetFile = info.file;
         const valueBefore = editor.getValue();
         const startOffset = editor.posToOffset(editor.getCursor('from'));
-        const selectedLink = needsTitle ? linkFromSelection(editor.getSelection(), plain, result.text) : null;
-        const inserted = selectedLink ?? result.text;
         const endOffset = editor.posToOffset(editor.getCursor('to'));
+        const rebased = settings.listNesting ? rebaseListPaste(result.text, valueBefore, startOffset, endOffset) : null;
+        const needsImages = this.images.hasWork(result.text);
+        const needsTitle = this.titles.hasWork(result.text);
+        // A rebase takes the paste over on its own, even when the text rules changed nothing
+        if (rebased === null && !result.changed && !needsImages && !needsTitle) return false;
+
+        const targetFile = info.file;
+        const selectedLink = needsTitle ? linkFromSelection(editor.getSelection(), plain, result.text) : null;
+        const inserted = selectedLink ?? rebased ?? result.text;
         editor.replaceSelection(inserted);
         // An earlier paste may still be downloading; its snapshots must learn about this
         // insert, otherwise its rewrite is abandoned as stale when it completes
@@ -351,14 +386,21 @@ export class PasteService {
         const clipboardText = await this.readClipboardText();
         if (clipboardText === null || !this.canEdit(info, targetFile)) return;
 
-        const result = runTextPipeline(clipboardText, this.getSettings());
+        const settings = this.getSettings();
+        const result = runTextPipeline(clipboardText, settings);
         const valueBefore = editor.getValue();
+        // The rebase needs the destination as it was aimed at, so an edit made while the
+        // clipboard was being read leaves the paste unrebased rather than misindented
+        const rebased =
+            settings.listNesting && valueBefore === valueAtInvocation
+                ? rebaseListPaste(result.text, valueAtInvocation, fromOffset, toOffset)
+                : null;
         const needsImages = this.images.hasWork(result.text);
         const needsTitle = this.titles.hasWork(result.text);
         const invocationSelection = valueAtInvocation.slice(fromOffset, toOffset);
         const selectedLink =
             needsTitle && valueBefore === valueAtInvocation ? linkFromSelection(invocationSelection, clipboardText, result.text) : null;
-        const inserted = selectedLink ?? result.text;
+        const inserted = selectedLink ?? rebased ?? result.text;
         const startOffset = this.insertAfterClipboardRead(editor, valueAtInvocation, fromOffset, toOffset, inserted);
         const range = asyncPasteRange(startOffset, inserted, valueBefore, editor.getValue());
 
@@ -638,6 +680,87 @@ export class PasteService {
         }
     }
 
+    /**
+     * Claims a paste of exactly one image address into an empty frontmatter value, after
+     * "key: " or a "- " sequence item with nothing else on the line. Anywhere else in
+     * frontmatter the YAML around the paste could break, so the paste stays native.
+     * Obsidian Bases reads a cover image from such a property, and a saved copy works
+     * offline where the web address does not.
+     */
+    private claimFrontmatterImagePaste(
+        clipboard: DataTransfer,
+        editor: Editor,
+        info: MarkdownView | MarkdownFileInfo,
+        content: string
+    ): boolean {
+        if (clipboard.files.length > 0) return false;
+
+        const url = standaloneWebUrl(clipboard.getData('text/plain').trim());
+        if (url === null || !isObviousImageUrl(url) || !this.images.hasWork(url)) return false;
+
+        const from = editor.posToOffset(editor.getCursor('from'));
+        const to = editor.posToOffset(editor.getCursor('to'));
+        if (!isFrontmatterValueSlot(content, from, to)) return false;
+
+        const targetFile = info.file;
+        editor.replaceSelection(url);
+        this.realignPendingRanges(null, from, content.slice(from, to), url);
+        void this.runFrontmatterImagePass(editor, info, targetFile, asyncPasteRange(from, url, content, editor.getValue()));
+        return true;
+    }
+
+    /**
+     * Downloads the image address pasted into a frontmatter value and swaps it for a
+     * quoted plain wikilink, the shape a property accepts: an embed does not work there,
+     * and size and class suffixes would change the link's display text instead. The
+     * address is already inserted, so a failed download simply leaves it standing.
+     */
+    private async runFrontmatterImagePass(
+        editor: Editor,
+        info: MarkdownView | MarkdownFileInfo,
+        targetFile: TFile | null,
+        range: AsyncPasteRange
+    ): Promise<void> {
+        this.pendingRanges.add(range);
+        try {
+            let files: TFile[] = [];
+            try {
+                const result = await this.images.materializeImages(
+                    range.inserted,
+                    () => targetFile?.path ?? '',
+                    null,
+                    null,
+                    this.imageNaming(editor)
+                );
+                files = result.files;
+            } catch (error) {
+                logError('Image download failed', error);
+            }
+
+            if (!this.canEdit(info, targetFile)) {
+                void this.images.discardFiles(files);
+                return;
+            }
+            if (files.length === 0) {
+                this.reportImageFailures(1);
+                return;
+            }
+
+            // The address must still fill its whole value slot, not just stand between
+            // its neighbouring characters: text typed anywhere on the line during the
+            // download means the slot changed, and rewriting only the address would
+            // corrupt the YAML around it
+            const slotIntact = (value: string, offset: number): boolean =>
+                isFrontmatterValueSlot(value, offset, offset + range.inserted.length);
+            const link = this.images.propertyLink(files[0], targetFile?.path ?? '');
+            if (!this.replaceRange(editor, range, link, slotIntact)) {
+                void this.images.discardFiles(files);
+            }
+        } finally {
+            this.pendingRanges.delete(range);
+        }
+    }
+
     /** Shows a spinner notice for title work, delayed so a quick fetch never flashes it. */
     private showTitleProgress(): TitleProgressNotice {
         const progress: TitleProgressNotice = { notice: null, timer: 0 };
@@ -839,25 +962,17 @@ export class PasteService {
     }
 
     /**
-     * True when an automatic paste should be cleaned.
+     * True when the settings allow automatic paste handling in this note.
      *
      * The note property overrides the global setting in both directions, so it is read even
      * when automatic cleanup is off: that is exactly when a note asking to be cleaned has
      * something to say. A note that asks for nothing follows the global setting.
-     *
-     * Markdown code and the frontmatter block are never touched either way. Pasting terminal
-     * output into a fence is an act of preservation, so rejoining its lines there would
-     * destroy the thing the user was protecting.
      */
-    private shouldCleanAutomatically(editor: Editor, settings: BetterPasteSettings): boolean {
-        // One read of the document serves every check; this runs on every paste
-        const content = editor.getValue();
+    private automaticPasteEnabled(content: string, settings: BetterPasteSettings): boolean {
         const override = notePasteOverride(this.frontmatterOf(content), settings.noteProperty);
 
         if (override === 'off') return false;
-        if (override === null && !settings.autoClean) return false;
-
-        return !isInsideVerbatimContext(content, editor.posToOffset(editor.getCursor('from')));
+        return override !== null || settings.autoClean;
     }
 
     /** Parses the note's frontmatter from the editor buffer, or null when there is none. */

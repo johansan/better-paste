@@ -190,6 +190,14 @@ export const STRINGS_ES: TranslationStrings = {
             dashesExample: 'El resultado — contra todo pronóstico — fue bueno.'
         },
 
+        structure: {
+            heading: 'Estructura',
+            listNestingName: 'Mantener el anidamiento de listas al pegar',
+            listNestingDesc:
+                'Pega una lista copiada con su jerarquía intacta, con la sangría ajustada al elemento de lista sobre el que pegas.',
+            listNestingAliases: ['lista', 'anidada', 'sangría', 'jerarquía', 'esquema', 'viñetas', 'casilla', 'árbol']
+        },
+
         custom: {
             heading: 'Procesamiento personalizado',
             pipelineName: 'Aplicar fragmentos personalizados de expresiones regulares al texto',

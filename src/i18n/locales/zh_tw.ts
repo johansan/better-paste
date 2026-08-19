@@ -183,6 +183,13 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             dashesExample: '這個結果 — 出乎意料 — 很好。'
         },
 
+        structure: {
+            heading: '結構',
+            listNestingName: '貼上時保留清單層級',
+            listNestingDesc: '貼上複製的清單時保持其層級結構，並依貼上位置的清單項目調整縮排。',
+            listNestingAliases: ['清單', '巢狀', '縮排', '層級', '大綱', '項目符號', '核取方塊', '樹狀']
+        },
+
         custom: {
             heading: '自訂處理',
             pipelineName: '將自訂正規表示式片段套用至文字',

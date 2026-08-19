@@ -74,11 +74,18 @@ function renderPipeline(setting: Setting): void {
     const text = strings.settings.custom;
     setting.settingEl.addClass('better-paste-pipeline-setting');
     const pipeline = setting.settingEl.createDiv({ cls: 'better-paste-pipeline' });
-    const steps = [text.pastedText, text.builtInRules, text.customSnippets, text.note];
+    // The structure rules run after the text rules, because they read the note around
+    // the cursor and reshape the already-cleaned text to fit it
+    const steps = [text.pastedText, text.builtInRules, text.customSnippets, strings.settings.structure.heading, text.note];
 
     steps.forEach((step, index) => {
         if (index > 0) pipeline.createSpan({ cls: 'better-paste-pipeline-arrow', text: '\u2192' });
-        pipeline.createDiv({ cls: 'better-paste-pipeline-step', text: step });
+        // The snippets step is inverted, marking the stage this section configures
+        const cls =
+            step === text.customSnippets
+                ? ['better-paste-pipeline-step', 'better-paste-pipeline-step-current']
+                : 'better-paste-pipeline-step';
+        pipeline.createDiv({ cls, text: step });
     });
 
     const buttons = setting.settingEl.createDiv({ cls: 'better-paste-pipeline-buttons' });

@@ -216,6 +216,13 @@ export const STRINGS_EN = {
             dashesExample: 'The result — against all odds — was fine.'
         },
 
+        structure: {
+            heading: 'Structure',
+            listNestingName: 'Keep list nesting on paste',
+            listNestingDesc: 'Pastes a copied list with its hierarchy intact, indented to match the list item you paste on.',
+            listNestingAliases: ['list', 'nested', 'indent', 'indentation', 'hierarchy', 'outline', 'bullets', 'checkbox', 'tree']
+        },
+
         custom: {
             heading: 'Custom processing',
             pipelineName: 'Apply custom regex snippets to text',

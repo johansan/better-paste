@@ -27,6 +27,7 @@ import type { DynamicDescriptionKey, SettingsPageContext } from './pages/context
 import { createImageLandingDefinitions } from './pages/imagesPage';
 import { createLinkLandingDefinitions } from './pages/linksPage';
 import { createTextProcessingDefinitions } from './pages/textProcessingPage';
+import { createStructureDefinitions } from './pages/structurePage';
 import { createCustomProcessingDefinitions, openSnippetEditor } from './pages/customProcessingPage';
 import { createStartDefinitions } from './pages/startPage';
 
@@ -132,6 +133,7 @@ export class BetterPasteSettingTab extends PluginSettingTab {
                 heading: strings.settings.custom.heading,
                 items: createCustomProcessingDefinitions(context, ownerDocument => this.registerSnippetEditListener(ownerDocument))
             },
+            { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.structure.heading, items: createStructureDefinitions() },
             // Last, because release notes, support links and the other plugins are not settings
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.start.heading, items: createStartDefinitions(context) }
         ];

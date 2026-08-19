@@ -39,7 +39,7 @@ function fenceDelimiterOf(line: string): FenceDelimiter | null {
 }
 
 /** Blockquote markers in front of a line, stripped before classifying its shape. */
-const BLOCKQUOTE_PREFIX = /^(?: {0,3}>[ \t]?)*/;
+export const BLOCKQUOTE_PREFIX = /^(?: {0,3}>[ \t]?)*/;
 
 /** A list item opened by a Markdown marker or one of the bullets the terminal rule converts. */
 const LIST_ITEM_LINE = /^ {0,3}(?:[-*+\u2022\u2023\u25AA\u25AB\u25B8\u25E6\u00B7]|\d{1,9}[.)])[ \t]/;
@@ -48,7 +48,7 @@ const LIST_ITEM_LINE = /^ {0,3}(?:[-*+\u2022\u2023\u25AA\u25AB\u25B8\u25E6\u00B7
 const SELF_CLOSING_BLOCK = /^ {0,3}(?:#{1,6}(?:[ \t]|$)|(?:-[ \t]*){3,}$|(?:\*[ \t]*){3,}$|(?:_[ \t]*){3,}$)/;
 
 /** Indentation width in columns, counting a tab as four. */
-function indentWidthOf(line: string): number {
+export function indentWidthOf(line: string): number {
     let width = 0;
     for (const char of line) {
         if (char === ' ') width += 1;

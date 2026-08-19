@@ -19,11 +19,35 @@
 import { describe, expect, it } from 'vitest';
 import {
     extractFrontmatterBlock,
+    isInsideFrontmatterBlock,
     isInsideVerbatimContext,
     notePasteOverride,
     normalizeImageSize,
     resolveImageSize
 } from '../src/paste/noteOptions';
+
+describe('isInsideFrontmatterBlock', () => {
+    /** Places the cursor at the marker, which is removed before the check. */
+    function atCursor(document: string): boolean {
+        const offset = document.indexOf('|');
+        return isInsideFrontmatterBlock(document.replace('|', ''), offset);
+    }
+
+    it('is true between the delimiters', () => {
+        expect(atCursor('---\ncover: |\n---\n\nBody')).toBe(true);
+        expect(atCursor('---\n|cover: \n---\n')).toBe(true);
+    });
+
+    it('is false on the delimiter lines and outside', () => {
+        expect(atCursor('---|\ncover: \n---\n')).toBe(false);
+        expect(atCursor('---\ncover: \n|---\n')).toBe(false);
+        expect(atCursor('---\ncover: \n---\n|Body')).toBe(false);
+    });
+
+    it('is false in an unterminated block', () => {
+        expect(atCursor('---\ncover: |\n')).toBe(false);
+    });
+});
 
 describe('extractFrontmatterBlock', () => {
     it('reads the block at the top of a note', () => {
@@ -172,6 +196,49 @@ describe('isInsideVerbatimContext', () => {
     it('is true on an indented code line', () => {
         expect(atCursor('Intro\n\n    curl |here\n')).toBe(true);
         expect(atCursor('Intro\n\n\tgrep |here\n')).toBe(true);
+    });
+
+    it('is true at the end of an indented code line', () => {
+        expect(atCursor('Intro\n\n    curl here|\n')).toBe(true);
+    });
+
+    it('is false in a nested list item', () => {
+        expect(atCursor('- item\n\t- nested |')).toBe(false);
+        expect(atCursor('- item\n    - nested |')).toBe(false);
+        expect(atCursor('1. item\n\t1. nested |')).toBe(false);
+        expect(atCursor('- a\n  - b\n    - c |')).toBe(false);
+    });
+
+    it('is false in a nested list item inside a blockquote', () => {
+        expect(atCursor('> - item\n> \t- nested |')).toBe(false);
+    });
+
+    it('is true on indented code inside a list item after a blank line', () => {
+        expect(atCursor('- item\n\n      code |')).toBe(true);
+    });
+
+    it('classifies a whitespace-only line by what a paste would turn it into', () => {
+        expect(atCursor('Intro\n\n    |')).toBe(true);
+        expect(atCursor('- item\n\t|')).toBe(false);
+    });
+
+    it('classifies a whitespace-only line inside a blockquote the same way', () => {
+        expect(atCursor('> Intro\n>\n>     |')).toBe(true);
+        expect(atCursor('> - item\n> \t|')).toBe(false);
+    });
+
+    it('is false after a code span that fills its whole line', () => {
+        expect(atCursor('`code`|')).toBe(false);
+        expect(atCursor('Intro\n\n`code`|\n')).toBe(false);
+        expect(atCursor('`co|de`')).toBe(true);
+    });
+
+    it('is true inside a code span on a list continuation line', () => {
+        expect(atCursor('- item\n\t- run `ls |here` now')).toBe(true);
+    });
+
+    it('is not fooled by a fence-shaped line inside a frontmatter value', () => {
+        expect(atCursor('---\nexample: >\n  ```\n---\n\nBody |text\n')).toBe(false);
     });
 
     it('is false after the fence closes', () => {

@@ -217,6 +217,14 @@ export const STRINGS_DE: TranslationStrings = {
             dashesExample: 'Das Ergebnis — allen Widerständen zum Trotz — war gut.'
         },
 
+        structure: {
+            heading: 'Struktur',
+            listNestingName: 'Listenverschachtelung beim Einfügen erhalten',
+            listNestingDesc:
+                'Fügt eine kopierte Liste mit intakter Hierarchie ein, eingerückt passend zum Listenpunkt, auf dem eingefügt wird.',
+            listNestingAliases: ['liste', 'verschachtelt', 'einrückung', 'hierarchie', 'gliederung', 'aufzählung', 'checkbox', 'baum']
+        },
+
         custom: {
             heading: 'Eigene Verarbeitung',
             pipelineName: 'Eigene Regex-Snippets auf Text anwenden',

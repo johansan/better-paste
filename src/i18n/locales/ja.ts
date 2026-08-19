@@ -186,6 +186,23 @@ export const STRINGS_JA: TranslationStrings = {
             dashesExample: 'その結果は — 予想に反して — 良かった。'
         },
 
+        structure: {
+            heading: '構造',
+            listNestingName: '貼り付け時にリストの入れ子を保つ',
+            listNestingDesc: 'コピーしたリストを階層を保ったまま貼り付け、貼り付け先のリスト項目に合わせてインデントします。',
+            listNestingAliases: [
+                'リスト',
+                '入れ子',
+                'ネスト',
+                'インデント',
+                '階層',
+                'アウトライン',
+                '箇条書き',
+                'チェックボックス',
+                'ツリー'
+            ]
+        },
+
         custom: {
             heading: 'カスタム処理',
             pipelineName: 'カスタム正規表現スニペットをテキストに適用',

@@ -24,7 +24,8 @@
  * cache, so a property the user just typed takes effect on the very next paste.
  */
 
-import { markdownCodeRanges } from '../transforms/markdownRanges';
+import { getFrontMatterInfo } from 'obsidian';
+import { BLOCKQUOTE_PREFIX, markdownCodeRanges } from '../transforms/markdownRanges';
 
 /** Accepts "400", "400x300", "400 x 300" and the multiplication sign variant. */
 const SIZE_PATTERN = /^(\d+)(?:\s*[x×]\s*(\d+))?$/i;
@@ -99,16 +100,56 @@ function isBetweenPairedBackticks(line: string, cursor: number): boolean {
     return slashes % 2 === 0;
 }
 
-/** True when an insertion point is inside same-line or indented Markdown code. */
-function isInsideLineCode(line: string, cursor: number): boolean {
-    if (line.startsWith('\t')) return cursor >= 1;
-    if (line.startsWith('    ')) return cursor >= 4;
+/**
+ * True when an insertion point is inside same-line or block Markdown code.
+ *
+ * Indentation alone cannot make the call: a tab-indented line is a nested list item when
+ * a list item stands above it and indented code otherwise. The shared document parser
+ * decides, so pastes into nested lists are processed while code keeps its protection,
+ * and the transforms agree with this check about which lines are code.
+ */
+function isInsideLineCode(body: string, lineStart: number, line: string, cursor: number): boolean {
     if (isBetweenPairedBackticks(line, cursor)) return true;
 
-    // An opening fence line changes state only after its newline. On every other line the
-    // shared Markdown range parser supplies the same backtick-span rules as the transforms.
+    // An opening fence line changes state only after its newline
     if (fenceDelimiterOf(line) !== null) return false;
-    return markdownCodeRanges(line).some(range => cursor > range.start && cursor < range.end);
+
+    // The parser reads a whitespace-only line as blank, but the paste is about to give
+    // it content, so it is classified as if it already had some: pasting after a lone
+    // four-space indent creates indented code, while pasting after a tab under a list
+    // item continues the list. Blockquote markers are stripped first so a quoted
+    // indent gets the same treatment.
+    const lineEnd = lineStart + line.length;
+    const stripped = line.replace(BLOCKQUOTE_PREFIX, '');
+    const indented = /^(?: {4}|\t)/.test(stripped);
+    const probed = indented && stripped.trim() === '';
+    const text = probed ? body.slice(0, lineEnd) + 'x' : body;
+    const end = probed ? lineEnd + 1 : lineEnd;
+
+    const offset = lineStart + cursor;
+    for (const range of markdownCodeRanges(text)) {
+        // A range covering the whole line is block code only when it reaches past the
+        // line or the line is indented: an indented code line, or the content of a
+        // fence nested in a list item. Appending at such a line's end is still a paste
+        // into code, so only the position before the line stays outside. A backtick
+        // span that happens to fill the line stays inline, where the position after
+        // the closing backtick is already outside the code.
+        if (range.start <= lineStart && end <= range.end && (indented || range.start < lineStart || range.end > end)) {
+            return cursor > 0;
+        }
+        if (offset > range.start && offset < range.end) return true;
+    }
+    return false;
+}
+
+/**
+ * True when the cursor sits inside the body of a closed frontmatter block, between the
+ * delimiter lines. Uses Obsidian's own reading of the syntax so the answer matches what
+ * the app treats as frontmatter.
+ */
+export function isInsideFrontmatterBlock(content: string, cursorOffset: number): boolean {
+    const info = getFrontMatterInfo(content);
+    return info.exists && cursorOffset >= info.from && cursorOffset <= info.to;
 }
 
 /** Extracts the YAML text of a note's frontmatter block, or null when there is none. */
@@ -216,15 +257,19 @@ export function isInsideVerbatimContext(content: string, cursorOffset: number): 
     const frontmatterEnd = frontmatterEndLine(lines);
 
     let offset = 0;
+    let bodyStart = 0;
     let fence: FenceDelimiter | null = null;
 
     for (let index = 0; index < lines.length; index++) {
         const lineEnd = offset + lines[index].length;
         const inFrontmatter = frontmatterEnd >= 0 && index <= frontmatterEnd;
+        if (inFrontmatter) bodyStart = lineEnd + 1;
 
         if (cursorOffset <= lineEnd) {
-            const cursorInLine = cursorOffset - offset;
-            return inFrontmatter || fence !== null || isInsideLineCode(lines[index], cursorInLine);
+            if (inFrontmatter || fence !== null) return true;
+            // The document parser only sees the body, because a fence-shaped line in a
+            // YAML value would otherwise open a phantom code block over the whole note
+            return isInsideLineCode(content.slice(bodyStart), offset - bodyStart, lines[index], cursorOffset - offset);
         }
 
         // Fence state changes after the cursor check, so a cursor on the opening line is not

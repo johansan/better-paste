@@ -54,8 +54,10 @@ function fakeImages(settings: BetterPasteSettings, failing = false, saved?: Save
             if (failing) return { text, downloaded: 0, failed: references.length, files: [] };
             const suffix = embedSuffix(size, cssClass);
             const embeds = new Map(references.map((reference, index) => [reference.index, `![[image-${index}.png${suffix}]]`]));
-            return { text: replaceImageReferences(text, references, embeds), downloaded: embeds.size, failed: 0, files: [] };
+            const files = references.map((_, index) => ({ path: `image-${index}.png` }));
+            return { text: replaceImageReferences(text, references, embeds), downloaded: embeds.size, failed: 0, files };
         },
+        propertyLink: (file: { path: string }) => `"[[${file.path}]]"`,
         saveClipboardImage: async (
             file: File,
             source: string,
@@ -151,6 +153,26 @@ describe('handleEditorPaste: plain text', () => {
 
         service.handleEditorPaste(event, editor.asEditor(), INFO);
         expect(editor.getValue()).toBe('start https://example.com/a end');
+    });
+
+    it('rebases a pasted list onto the list item at the cursor', () => {
+        const { service } = build();
+        const doc = '- main\n\t- sub\n\t\t- ';
+        const editor = new FakeEditor(doc, doc.length);
+        const event = fakeClipboardEvent({ plain: '- [ ] A\n    - [ ] A1\n        - [ ] A1a' });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe('- main\n\t- sub\n\t\t- [ ] A\n\t\t\t- [ ] A1\n\t\t\t\t- [ ] A1a');
+    });
+
+    it('pastes a list unchanged when list nesting is off', () => {
+        const { service } = build({ listNesting: false, textTrim: false });
+        const doc = '- main\n\t- ';
+        const editor = new FakeEditor(doc, doc.length);
+        const event = fakeClipboardEvent({ plain: '- A\n    - A1' });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe(doc);
     });
 
     it('leaves a multi-cursor paste to Obsidian', () => {
@@ -695,6 +717,17 @@ describe('handleEditorPaste: link titles', () => {
         await settle();
 
         expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
+    });
+
+    it('fetches a title in a tab-indented nested list item', async () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false });
+        const doc = '- item\n\t- ';
+        const editor = new FakeEditor(doc, doc.length);
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(editor.getValue()).toBe('- item\n\t- [Example page](https://example.com/page)');
     });
 
     it('shows title fetching progress and keeps the URL when fetching fails', async () => {
@@ -1325,5 +1358,127 @@ describe('runSnippet', () => {
         expect(editor.getValue()).toBe('cat\nbird');
         expect(Notice.instances).toHaveLength(noticeCount + 1);
         expect(Notice.instances[noticeCount].message).toBe('Better Paste: select some text first');
+    });
+});
+
+describe('handleEditorPaste: image URL in frontmatter', () => {
+    const URL = 'https://example.com/pic.png';
+    const urlEvent = (): ClipboardEvent => fakeClipboardEvent({ plain: URL });
+
+    it('saves the image and writes a quoted plain wikilink', async () => {
+        const { service } = build();
+        const doc = '---\ncover: \n---\n\nBody';
+        const editor = new FakeEditor(doc, '---\ncover: '.length);
+
+        expect(service.handleEditorPaste(urlEvent(), editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe(`---\ncover: ${URL}\n---\n\nBody`);
+        await settle();
+
+        expect(editor.getValue()).toBe('---\ncover: "[[image-0.png]]"\n---\n\nBody');
+    });
+
+    it('fills a sequence item under a property', async () => {
+        const { service } = build();
+        const doc = '---\ncovers:\n  - \n---\n';
+        const editor = new FakeEditor(doc, '---\ncovers:\n  - '.length);
+
+        expect(service.handleEditorPaste(urlEvent(), editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(editor.getValue()).toBe('---\ncovers:\n  - "[[image-0.png]]"\n---\n');
+    });
+
+    it('replaces a selected existing value', async () => {
+        const { service } = build();
+        const editor = selecting('---\ncover: https://old.example.com/old.png\n---\n', 'https://old.example.com/old.png');
+
+        expect(service.handleEditorPaste(urlEvent(), editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(editor.getValue()).toBe('---\ncover: "[[image-0.png]]"\n---\n');
+    });
+
+    it('keeps the address when the download fails', async () => {
+        const { service } = build({}, true);
+        const doc = '---\ncover: \n---\n';
+        const editor = new FakeEditor(doc, '---\ncover: '.length);
+        const noticeCount = Notice.instances.length;
+
+        expect(service.handleEditorPaste(urlEvent(), editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(editor.getValue()).toBe(`---\ncover: ${URL}\n---\n`);
+        expect(Notice.instances[noticeCount].message).toBe('Better Paste: 1 image could not be saved, the original link was kept');
+    });
+
+    it('keeps the address and discards the file when the user typed in the slot during the download', async () => {
+        const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS };
+        let finishDownload: (result: unknown) => void = () => undefined;
+        const discarded: unknown[] = [];
+        const images = {
+            hasWork: () => true,
+            materializeImages: () =>
+                new Promise(resolve => {
+                    finishDownload = resolve;
+                }),
+            propertyLink: (file: { path: string }) => `"[[${file.path}]]"`,
+            discardFiles: async (files: unknown[]) => {
+                discarded.push(...files);
+            },
+            dispose: () => undefined
+        } as unknown as ImageService;
+        const service = new PasteService(() => settings, images, fakeTitles(settings, []));
+        const doc = '---\ncover: \n---\n';
+        const editor = new FakeEditor(doc, '---\ncover: '.length);
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: URL }), editor.asEditor(), INFO)).toBe(true);
+        editor.replaceSelection(' caption');
+        finishDownload({ text: '![[image-0.png]]', downloaded: 1, failed: 0, files: [{ path: 'image-0.png' }] });
+        await settle();
+
+        expect(editor.getValue()).toBe(`---\ncover: ${URL} caption\n---\n`);
+        expect(discarded).toEqual([{ path: 'image-0.png' }]);
+    });
+
+    it('stays native in the middle of an existing value', () => {
+        const { service } = build();
+        const doc = '---\ncover: existing value\n---\n';
+        const editor = new FakeEditor(doc, '---\ncover: existing'.length);
+
+        expect(service.handleEditorPaste(urlEvent(), editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe(doc);
+    });
+
+    it('stays native for a URL that is not an image', () => {
+        const { service } = build();
+        const doc = '---\ncover: \n---\n';
+        const editor = new FakeEditor(doc, '---\ncover: '.length);
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe(doc);
+    });
+
+    it('stays native when image saving is off', () => {
+        const { service } = build({ imageEnabled: false });
+        const doc = '---\ncover: \n---\n';
+        const editor = new FakeEditor(doc, '---\ncover: '.length);
+
+        expect(service.handleEditorPaste(urlEvent(), editor.asEditor(), INFO)).toBe(false);
+    });
+
+    it('stays native when the note opts out', () => {
+        const { service } = build();
+        const doc = '---\nbp: false\ncover: \n---\n';
+        const editor = new FakeEditor(doc, '---\nbp: false\ncover: '.length);
+
+        expect(service.handleEditorPaste(urlEvent(), editor.asEditor(), INFO)).toBe(false);
+    });
+
+    it('stays native on the frontmatter delimiter lines', () => {
+        const { service } = build();
+        const doc = '---\ncover: \n---\n';
+        const editor = new FakeEditor(doc, doc.indexOf('\n'));
+
+        expect(service.handleEditorPaste(urlEvent(), editor.asEditor(), INFO)).toBe(false);
     });
 });

@@ -199,6 +199,14 @@ export const STRINGS_TR: TranslationStrings = {
             dashesExample: 'Sonuç — her şeye rağmen — iyiydi.'
         },
 
+        structure: {
+            heading: 'Yapı',
+            listNestingName: 'Yapıştırırken liste hiyerarşisini koru',
+            listNestingDesc:
+                'Kopyalanan listeyi hiyerarşisi bozulmadan yapıştırır, girintiyi üzerine yapıştırdığınız liste ögesine göre ayarlar.',
+            listNestingAliases: ['liste', 'iç içe', 'girinti', 'hiyerarşi', 'anahat', 'madde', 'onay kutusu', 'ağaç']
+        },
+
         custom: {
             heading: 'Özel işleme',
             pipelineName: 'Özel düzenli ifade parçacıklarını metne uygula',

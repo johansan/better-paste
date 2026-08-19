@@ -199,6 +199,14 @@ export const STRINGS_NL: TranslationStrings = {
             dashesExample: 'Het resultaat — tegen alle verwachtingen in — was goed.'
         },
 
+        structure: {
+            heading: 'Structuur',
+            listNestingName: 'Geneste lijsten behouden bij plakken',
+            listNestingDesc:
+                'Plakt een gekopieerde lijst met de hiërarchie intact, ingesprongen op het niveau van het lijstitem waarop je plakt.',
+            listNestingAliases: ['lijst', 'genest', 'inspringen', 'hiërarchie', 'structuur', 'opsomming', 'selectievakje', 'boom']
+        },
+
         custom: {
             heading: 'Aangepaste verwerking',
             pipelineName: 'Aangepaste regex-snippets op tekst toepassen',

@@ -89,6 +89,7 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
 
     return {
         autoClean: asBoolean(data.autoClean, defaults.autoClean),
+        listNesting: asBoolean(data.listNesting, defaults.listNesting),
 
         imageEnabled: asBoolean(data.imageEnabled, defaults.imageEnabled),
         // The former imageNameFormat dropdown gated the template. A vault that stored

@@ -188,6 +188,13 @@ export const STRINGS_VI: TranslationStrings = {
             dashesExample: 'Kết quả — bất chấp mọi thứ — rất tốt.'
         },
 
+        structure: {
+            heading: 'Cấu trúc',
+            listNestingName: 'Giữ cấu trúc lồng nhau của danh sách khi dán',
+            listNestingDesc: 'Dán danh sách đã sao chép với phân cấp nguyên vẹn, thụt lề theo mục danh sách bạn dán vào.',
+            listNestingAliases: ['danh sách', 'lồng nhau', 'thụt lề', 'phân cấp', 'dàn ý', 'gạch đầu dòng', 'hộp kiểm', 'cây']
+        },
+
         custom: {
             heading: 'Xử lý tùy chỉnh',
             pipelineName: 'Áp dụng các đoạn mã regex tùy chỉnh cho văn bản',

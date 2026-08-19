@@ -54,6 +54,14 @@ function build(overrides: Partial<BetterPasteSettings> = {}, seededPaths: string
             generateMarkdownLink: (file: TFile, _sourcePath: string, subpath?: string, alias?: string) =>
                 `[[${file.path}${subpath ?? ''}${alias ? `|${alias}` : ''}]]`
         },
+        metadataCache: {
+            // The real resolver returns the shortest unambiguous link text
+            fileToLinktext: (file: TFile) => {
+                const name = `${file.basename}.${file.extension}`;
+                const clash = files.some(other => other !== file && `${other.basename}.${other.extension}` === name);
+                return clash ? file.path : name;
+            }
+        },
         vault: {
             createBinary: async (path: string, data: ArrayBuffer) => {
                 writes.push({ path, data });
@@ -249,5 +257,19 @@ describe('ImageService', () => {
 
         expect(await save).toBeNull();
         expect(writes).toHaveLength(0);
+    });
+
+    it('builds a quoted property link from the shortest unambiguous name', async () => {
+        const { service } = build();
+        const result = await service.materializeImages('![](data:image/png;base64,AA==)', 'Notes/Test.md');
+
+        expect(service.propertyLink(result.files[0], 'Notes/Test.md')).toBe('"[[pasted-image.png]]"');
+    });
+
+    it('path-qualifies the property link when another file shares the name', async () => {
+        const { service } = build({}, ['Elsewhere/pasted-image.png']);
+        const result = await service.materializeImages('![](data:image/png;base64,AA==)', 'Notes/Test.md');
+
+        expect(service.propertyLink(result.files[0], 'Notes/Test.md')).toBe('"[[Attachments/pasted-image.png]]"');
     });
 });

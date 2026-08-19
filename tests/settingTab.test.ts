@@ -321,7 +321,15 @@ describe('settings tree', () => {
             .getSettingDefinitions()
             .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
 
-        expect(groups.map(group => group.heading)).toEqual([undefined, 'Images', 'Links', 'Text processing', 'Custom processing', 'About']);
+        expect(groups.map(group => group.heading)).toEqual([
+            undefined,
+            'Images',
+            'Links',
+            'Text processing',
+            'Custom processing',
+            'Structure',
+            'About'
+        ]);
     });
 
     it('puts the note property under the master toggle and the width property under Images', () => {

@@ -191,6 +191,14 @@ export const STRINGS_IT: TranslationStrings = {
             dashesExample: 'Il risultato — contro ogni previsione — era buono.'
         },
 
+        structure: {
+            heading: 'Struttura',
+            listNestingName: 'Mantieni la nidificazione degli elenchi quando incolli',
+            listNestingDesc:
+                'Incolla un elenco copiato con la sua gerarchia intatta, con il rientro adattato alla voce di elenco su cui incolli.',
+            listNestingAliases: ['elenco', 'lista', 'nidificato', 'rientro', 'gerarchia', 'struttura', 'puntato', 'casella', 'albero']
+        },
+
         custom: {
             heading: 'Elaborazione personalizzata',
             pipelineName: 'Applica snippet regex personalizzati al testo',

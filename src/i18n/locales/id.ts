@@ -196,6 +196,14 @@ export const STRINGS_ID: TranslationStrings = {
             dashesExample: 'Hasilnya — di luar dugaan — bagus.'
         },
 
+        structure: {
+            heading: 'Struktur',
+            listNestingName: 'Pertahankan hierarki daftar saat menempel',
+            listNestingDesc:
+                'Menempelkan daftar yang disalin dengan hierarkinya utuh, dan indentasinya disesuaikan dengan butir daftar tempat Anda menempel.',
+            listNestingAliases: ['daftar', 'bersarang', 'indentasi', 'hierarki', 'kerangka', 'butir', 'kotak centang', 'pohon']
+        },
+
         custom: {
             heading: 'Pemrosesan khusus',
             pipelineName: 'Terapkan cuplikan regex khusus pada teks',

@@ -116,6 +116,13 @@
     font-size: var(--font-ui-smaller);
 }
 
+/* Inverted, so the stage this section configures stands out in both themes */
+.better-paste-pipeline-step-current {
+    border-color: var(--text-normal);
+    background-color: var(--text-normal);
+    color: var(--background-primary);
+}
+
 .better-paste-pipeline-arrow {
     color: var(--text-muted);
 }

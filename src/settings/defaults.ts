@@ -21,6 +21,7 @@ import { DEFAULT_IMAGE_NAME_TEMPLATE } from './constants';
 
 export const DEFAULT_SETTINGS: BetterPasteSettings = {
     autoClean: true,
+    listNesting: true,
 
     imageEnabled: true,
     // Capped below Obsidian's 700 px readable line length, where larger widths do nothing

@@ -258,6 +258,15 @@ export class ImageService {
         return `!${this.app.fileManager.generateMarkdownLink(file, resolveSourcePath(sourcePath), subpath, label)}`;
     }
 
+    /**
+     * A double-quoted plain wikilink for a saved image in a frontmatter property. The
+     * shortest unambiguous link text keeps a duplicate file name in another folder from
+     * linking the wrong image, and JSON quoting is valid YAML for any path character.
+     */
+    propertyLink(file: TFile, sourcePath: string): string {
+        return JSON.stringify(`[[${this.app.metadataCache.fileToLinktext(file, sourcePath)}]]`);
+    }
+
     /** Retrieves image bytes from an http(s) URL or decodes them from a data: URI. */
     private async fetchImage(url: string): Promise<FetchedImage | null> {
         if (isDataImageUri(url)) return decodeDataUri(url);

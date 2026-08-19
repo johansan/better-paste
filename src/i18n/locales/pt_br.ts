@@ -190,6 +190,23 @@ export const STRINGS_PT_BR: TranslationStrings = {
             dashesExample: 'O resultado — contra todas as expectativas — ficou bom.'
         },
 
+        structure: {
+            heading: 'Estrutura',
+            listNestingName: 'Manter o aninhamento de listas ao colar',
+            listNestingDesc: 'Cola uma lista copiada com a hierarquia intacta, com o recuo ajustado ao item de lista em que você cola.',
+            listNestingAliases: [
+                'lista',
+                'aninhada',
+                'recuo',
+                'indentação',
+                'hierarquia',
+                'esquema',
+                'marcadores',
+                'caixa de seleção',
+                'árvore'
+            ]
+        },
+
         custom: {
             heading: 'Processamento personalizado',
             pipelineName: 'Aplicar trechos personalizados de expressões regulares ao texto',

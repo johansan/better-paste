@@ -186,6 +186,13 @@ export const STRINGS_KO: TranslationStrings = {
             dashesExample: '그 결과는 — 모든 예상을 깨고 — 좋았다.'
         },
 
+        structure: {
+            heading: '구조',
+            listNestingName: '붙여넣을 때 목록 중첩 유지',
+            listNestingDesc: '복사한 목록을 계층 구조를 유지한 채 붙여넣고, 붙여넣는 위치의 목록 항목에 맞춰 들여쓰기합니다.',
+            listNestingAliases: ['목록', '중첩', '들여쓰기', '계층', '개요', '글머리 기호', '체크박스', '트리']
+        },
+
         custom: {
             heading: '사용자 지정 처리',
             pipelineName: '사용자 지정 정규 표현식 스니펫을 텍스트에 적용',

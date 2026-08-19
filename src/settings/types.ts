@@ -29,6 +29,12 @@ export interface BetterPasteSettings {
 
     /** Run the rules automatically on paste. When off, only the commands apply them. */
     autoClean: boolean;
+    /**
+     * Reindent a pasted list relative to the list item at the cursor, so its hierarchy
+     * survives the paste. A document transform, so it has its own toggle: its result
+     * depends on where the paste lands, not only on what was copied.
+     */
+    listNesting: boolean;
 
     /* Images */
 

@@ -183,6 +183,13 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             dashesExample: '这个结果 — 出乎意料 — 很好。'
         },
 
+        structure: {
+            heading: '结构',
+            listNestingName: '粘贴时保留列表层级',
+            listNestingDesc: '粘贴复制的列表时保持其层级结构，并按粘贴位置的列表项调整缩进。',
+            listNestingAliases: ['列表', '嵌套', '缩进', '层级', '大纲', '项目符号', '复选框', '树']
+        },
+
         custom: {
             heading: '自定义处理',
             pipelineName: '将自定义正则表达式片段应用于文本',

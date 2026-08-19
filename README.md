@@ -20,7 +20,7 @@ If you love using Better Paste, please consider [☕️ Buying me a coffee](http
 
 ## 2 What it does
 
-Eight examples. Some run on every paste, others are commands you run when you need them.
+Nine examples. Some run on every paste, others are commands you run when you need them.
 
 ### 2.1 Custom snippets
 
@@ -84,7 +84,39 @@ The URL is pasted right away and updates when the title arrives, so nothing bloc
 
 Reddit, YouTube, TikTok and Loom block ordinary page lookups, so their titles are fetched from each site's own embed service instead.
 
-### 2.5 Terminal output
+### 2.5 Nested lists
+
+Copy a nested list, paste it deep inside another list, and the old indentation comes along, breaking the tree apart. Better Paste reindents the whole list to fit the item you paste on. This:
+
+```
+- [ ] Trip planning
+    - [ ] Book hotel
+    - [ ] Pack
+        - [ ] Chargers
+```
+
+pasted onto the empty item in
+
+```
+- Projects
+    - Summer
+        -
+```
+
+becomes
+
+```
+- Projects
+    - Summer
+        - [ ] Trip planning
+            - [ ] Book hotel
+            - [ ] Pack
+                - [ ] Chargers
+```
+
+It works with bullets, numbered lists and checkboxes, however deep the destination is, and whether the copy uses tabs or spaces. A paste that is not purely a list, or does not land on a list item, comes through exactly as before.
+
+### 2.6 Terminal output
 
 Terminals break long lines at the window edge. Escape codes are stripped on every paste, and when you select the pasted output and run **Clean up terminal output**, the lines are joined back together:
 
@@ -99,7 +131,7 @@ becomes
 npm warn deprecated inflight@1.0.6: This module is not supported and leaks memory. Do not use it. Check out lru-cache instead.
 ```
 
-### 2.6 Text from PDFs
+### 2.7 Text from PDFs
 
 PDFs wrap paragraphs into short lines and break words with hyphens. Select the pasted text and run **Clean up PDF text**:
 
@@ -119,7 +151,7 @@ Ligatures like ﬁ become real letters too, so search finds the words again.
 
 The command opens a dialog with a preview, so you see the result before it lands. Two switches handle what no rule can guess: remove page numbers, or join everything into one paragraph. Your picks are remembered for the next time.
 
-### 2.7 Cleanup of AI-generated text
+### 2.8 Cleanup of AI-generated text
 
 Chatbot text comes with curly quotes, long dashes and invisible characters. The invisible ones are removed on every paste, and with **Quotes** and **Dashes** turned on the rest becomes plain text too:
 
@@ -133,7 +165,7 @@ becomes
 "It works," she said - finally.
 ```
 
-### 2.8 Commas and quotes
+### 2.9 Commas and quotes
 
 Prefer your commas outside the quotation marks? Select the text and run **Move commas outside quotes**:
 
@@ -224,6 +256,10 @@ s/\[\d+\]//g
 - **Import snippets** and **Export snippets**: move snippets between vaults through the clipboard. Ready-made ones are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets); copy one there and paste it in.
 - **Open regex playground**: opens [regex101](https://regex101.com/) set up the way the rules work, for building and testing a find pattern.
 
+### 3.6 Structure
+
+- **Keep list nesting on paste**: on by default, see example 2.5 above. Structure rules run after the text rules, because they read the note around the cursor and reshape the cleaned text to fit it.
+
 <br/>
 
 ## 4 Per-note control
@@ -272,7 +308,7 @@ Nine commands, ready for your own hotkeys (Settings, Hotkeys). The ids are for U
 
 ## 6 Good to know
 
-- Pasting into code blocks, inline code or frontmatter changes nothing, and fenced code inside a paste comes through untouched.
+- Pasting into code blocks, inline code or frontmatter changes nothing, and fenced code inside a paste comes through untouched. One exception: paste an image address into an empty property in source mode, and the image is saved into your vault with the property set to `"[[skyline-8f21a.jpg]]"`. Obsidian Bases can show that as a cover image, and a local copy works offline.
 - Screenshots and other bitmap-only pastes are left to Obsidian, which already saves them fine.
 - Rich content (HTML) is converted to Markdown by Obsidian first; Better Paste then cleans the links and downloads the images in the result.
 

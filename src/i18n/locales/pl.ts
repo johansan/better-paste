@@ -197,6 +197,14 @@ export const STRINGS_PL: TranslationStrings = {
             dashesExample: 'Wynik — wbrew wszystkiemu — był dobry.'
         },
 
+        structure: {
+            heading: 'Struktura',
+            listNestingName: 'Zachowuj zagnieżdżenie list przy wklejaniu',
+            listNestingDesc:
+                'Wkleja skopiowaną listę z zachowaną hierarchią, z wcięciem dopasowanym do elementu listy, na którym wklejasz.',
+            listNestingAliases: ['lista', 'zagnieżdżona', 'wcięcie', 'hierarchia', 'konspekt', 'punktory', 'pole wyboru', 'drzewo']
+        },
+
         custom: {
             heading: 'Przetwarzanie niestandardowe',
             pipelineName: 'Stosuj niestandardowe fragmenty wyrażeń regularnych do tekstu',
