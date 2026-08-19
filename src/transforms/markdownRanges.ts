@@ -205,7 +205,8 @@ export function markdownCodeRanges(text: string): TextRange[] {
                 } else {
                     // A fence indented as a list continuation opens a code block even
                     // though a fence at the left margin allows at most three spaces
-                    const nested = listContentIndent >= 0 ? fenceDelimiterOf(content.replace(/^[ \t]+/, '')) : null;
+                    const stripped = content.replace(/^[ \t]+/, '');
+                    const nested = listContentIndent >= 0 ? fenceDelimiterOf(stripped) : null;
                     if (nested) {
                         fence = {
                             delimiter: nested,
@@ -216,7 +217,18 @@ export function markdownCodeRanges(text: string): TextRange[] {
                         paragraphOpen = false;
                     } else {
                         collectInlineCode(line, lineStart, ranges);
-                        paragraphOpen = true;
+                        // A nested list item deepens the content indent, so the
+                        // indented-code threshold follows the list down; otherwise a
+                        // depth-two item after a blank line reads as code
+                        const item = listContentIndent >= 0 ? LIST_ITEM_LINE.exec(stripped) : null;
+                        paragraphOpen = item === null;
+                        if (item) {
+                            let extra = 0;
+                            while (stripped[item[0].length + extra] === ' ') extra += 1;
+                            listContentIndent = indentWidthOf(content) + item[0].length + (extra <= 3 ? extra : 0);
+                            indentedCodeAllowed = false;
+                            itemStartsWithCode = false;
+                        }
                     }
                 }
             } else {

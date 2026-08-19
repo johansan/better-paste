@@ -114,7 +114,7 @@ becomes
                 - [ ] Chargers
 ```
 
-It works with bullets, numbered lists and checkboxes, however deep the destination is, and whether the copy uses tabs or spaces. A paste that is not purely a list, or does not land on a list item, comes through exactly as before.
+It works with bullets, numbered lists and checkboxes, however deep the destination is, and whether the copy uses tabs or spaces. A paste that is not purely a list, or does not land on a list item, comes through exactly as before. Rich copies from web pages go through Obsidian's HTML conversion instead.
 
 ### 2.6 Terminal output
 

@@ -84,6 +84,16 @@ describe('rebaseListPaste', () => {
         expect(result).toBe('\n\t\t- a\n\t\t\t- b');
     });
 
+    it('renumbers an ordered run pasted as children from one', () => {
+        // A list directly below the parent's text only opens when it starts at one
+        expect(paste('5. a\n6. b', '- parent|')).toBe('\n\t1. a\n\t2. b');
+        expect(paste('5. a\n- b\n7. c', '- parent|')).toBe('\n\t1. a\n\t- b\n\t1. c');
+    });
+
+    it('gives checkbox-less roots the destination checkbox on an empty task', () => {
+        expect(paste('- a\n- b', '- [ ] |')).toBe('a\n- [ ] b');
+    });
+
     it('passes blank lines through, keeping a loose list loose', () => {
         expect(paste('- a\n\n\t- b', '- main\n\t- |')).toBe('a\n\n\t\t- b');
     });
@@ -107,7 +117,19 @@ describe('rebaseListPaste', () => {
     });
 
     it('indents grandchildren past a wide ordered marker inside the paste', () => {
-        expect(paste('1. a\n    100. b\n        - c', '- |')).toBe('a\n    100. b\n            - c');
+        expect(paste('1. a\n    100. b\n         - c', '- |')).toBe('a\n    100. b\n            - c');
+    });
+
+    it('caps a wide source step to the emitted marker window', () => {
+        // The source unit is six columns, aligned under "1000. ", but a child of the
+        // emitted "- " marker must start within five
+        expect(paste('1000. root\n      - child', '- |')).toBe('root\n     - child');
+        expect(paste('1000. root\n      - child', '- parent|')).toBe('\n     1. root\n           - child');
+    });
+
+    it('keeps a sibling wobbled one space deeper a sibling', () => {
+        // A child would need to reach the parent's content indent, two columns further
+        expect(paste('- root\n  - child a\n   - child b', '- |')).toBe('root\n  - child a\n  - child b');
     });
 
     it('reads depth per branch, so content-aligned steps of different widths stay siblings', () => {
@@ -125,9 +147,50 @@ describe('rebaseListPaste', () => {
         expect(paste('- a\n1. b', '- |')).toBe('a\n1. b');
     });
 
+    it('converts a colliding family onward, so written numbers match rendered ones', () => {
+        // The renderer merges same-delimiter neighbours regardless, and a literal
+        // "1." rendering as "5." would mislead
+        expect(paste('- oven\n- pan\n1. mix\n2. eggs', '1. prepare\n2. gather\n3. |')).toBe('oven\n4. pan\n5. mix\n6. eggs');
+    });
+
     it('declines a clipboard containing a horizontal rule', () => {
         expect(paste('- - -\n- item', '1. |')).toBeNull();
         expect(paste('- item\n* * *', '- |')).toBeNull();
+    });
+
+    it('takes the step from the destination item, whose own child keeps its depth', () => {
+        const result = paste('- x\n  - x1\n- y', '* parent|\n    - old1\n    - old2');
+
+        expect(result).toBe('\n    - x\n        - x1\n    - y');
+    });
+
+    it('declines a kept root of another width when children follow, keeping both structures', () => {
+        expect(paste('- x\n100. y', '- |\n    - old')).toBeNull();
+        expect(paste('- x\n100. y', '- |')).toBe('x\n100. y');
+        expect(paste('- x\n+ y', '100. |\n      - old')).toBeNull();
+        expect(paste('- x\n+ y', '100. |')).toBe('x\n+ y');
+    });
+
+    it('reads children of a padded empty item one column past its bare marker', () => {
+        expect(paste('-   \n  - child\n- sibling', '- item\n\t- |')).toBe('\n\t\t- child\n\t- sibling');
+    });
+
+    it('declines filling a padded empty destination whose child sits inside the padding', () => {
+        expect(paste('- a\n- b', '-   |\n  - old')).toBeNull();
+    });
+
+    it('repeats the destination marker across a digit boundary when children follow', () => {
+        // "100. " would be one column wider and push the existing child out of its window
+        expect(paste('- x\n- y', '99. |\n    - child')).toBe('x\n99. y');
+    });
+
+    it('caps renumbering at nine digits', () => {
+        expect(paste('- a\n- b', '999999999. |')).toBe('a\n999999999. b');
+    });
+
+    it('declines a horizontal rule as the destination line', () => {
+        expect(paste('- a\n- b', '- - -|')).toBeNull();
+        expect(paste('- a\n- b', '- item\n* * *|')).toBeNull();
     });
 
     it('normalises an irregular source against its smallest step', () => {

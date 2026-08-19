@@ -222,6 +222,15 @@ describe('isInsideVerbatimContext', () => {
         expect(atCursor('- item\n\n    - nested |')).toBe(false);
     });
 
+    it('is false at depth two of a loose list', () => {
+        expect(atCursor('- item\n\t- sub\n\n\t\t- deep |')).toBe(false);
+        expect(atCursor('- item\n    - sub\n\n        - deep |')).toBe(false);
+    });
+
+    it('is true on indented code under a nested item after a blank line', () => {
+        expect(atCursor('- item\n\t- sub\n\n          code |')).toBe(true);
+    });
+
     it('classifies a whitespace-only line by what a paste would turn it into', () => {
         expect(atCursor('Intro\n\n    |')).toBe(true);
         expect(atCursor('- item\n\t|')).toBe(false);

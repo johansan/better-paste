@@ -55,20 +55,46 @@ function markerFamily(marker: string): string {
     return marker.replace(/^\d+/, '').trim();
 }
 
+/** The first non-blank line after `lineEnd`, or null at the end of the note. */
+function lineBelow(noteText: string, lineEnd: number): string | null {
+    let start = lineEnd + 1;
+    while (start <= noteText.length) {
+        const newlineIndex = noteText.indexOf('\n', start);
+        const stop = newlineIndex < 0 ? noteText.length : newlineIndex;
+        const line = noteText.slice(start, stop);
+        if (line.trim() !== '') return line;
+        if (newlineIndex < 0) break;
+        start = newlineIndex + 1;
+    }
+    return null;
+}
+
 /**
  * One indentation step in the destination's own style. The destination indent answers
- * directly when it uses tabs. For spaces, the nearest line above whose indent is a
+ * directly when it uses tabs. The destination's own first child is the most direct
+ * evidence and comes next, because the pasted lines land right above the existing
+ * children, whose depth must survive. Then the nearest line above whose indent is a
  * proper prefix of the destination's supplies the step. Otherwise the source's own step
  * is kept, and a tab stands in when even the source is flat.
  */
 function destinationUnit(
     noteText: string,
     destLineStart: number,
+    destLineEnd: number,
     destIndent: string,
     sourceItems: readonly ListItemLine[],
     unitWidth: number
 ): string {
     if (destIndent.includes('\t')) return '\t';
+
+    const below = lineBelow(noteText, destLineEnd);
+    if (below !== null) {
+        const item = parseItem(below);
+        if (item !== null && item.indent.length > destIndent.length && item.indent.startsWith(destIndent)) {
+            const suffix = item.indent.slice(destIndent.length);
+            return suffix.includes('\t') ? '\t' : suffix;
+        }
+    }
 
     if (destIndent.length > 0) {
         let lineEndAbove = destLineStart - 1;
@@ -130,29 +156,37 @@ export function rebaseListPaste(pasted: string, noteText: string, selectionStart
     const items = parsedLines.filter((item): item is ListItemLine => item !== null);
     const first = items[0];
 
-    // Depth from a stack of ancestor widths, the way Markdown itself nests: wider than
-    // the last item is one level deeper, a repeated width rejoins that ancestor's
-    // level. Branches may use different step widths, as content-aligned lists do, so a
-    // width ranks nothing globally. An item shallower than the first would need a place
-    // outside the destination subtree, so the rule declines there.
-    const stack: number[] = [];
+    // Depth from a stack of ancestors, the way Markdown itself nests: a child starts at
+    // or past its parent's content indent (indent plus marker), anything shallower down
+    // to the level's own indent is a sibling, and shallower still climbs the stack.
+    // Branches may use different step widths, as content-aligned lists do, so a width
+    // ranks nothing globally, and a one-space sibling wobble stays a sibling. An item
+    // shallower than the first would need a place outside the destination subtree, so
+    // the rule declines there.
+    const stack: { width: number; content: number }[] = [];
     const depths = new Map<ListItemLine, number>();
+    // An empty item anchors its children one column past the bare marker, ignoring
+    // trailing padding, which is Markdown's empty-item rule
+    const contentIndentOf = (item: ListItemLine): number =>
+        item.content === '' && item.checkbox === '' ? item.marker.trimEnd().length + 1 : item.marker.length;
     // The smallest step between a parent and its child, kept as the fallback unit
     let unitWidth = 0;
     for (const item of items) {
         const width = indentWidthOf(item.indent);
-        while (stack.length > 0 && width < stack[stack.length - 1]) stack.pop();
+        while (stack.length > 0 && width < stack[stack.length - 1].width) stack.pop();
         if (stack.length === 0 && item !== first) return null;
-        if (stack.length > 0 && width === stack[stack.length - 1]) {
+        const top = stack[stack.length - 1];
+        if (top !== undefined && width < top.content) {
             depths.set(item, stack.length - 1);
+            top.content = width + contentIndentOf(item);
             continue;
         }
-        if (stack.length > 0) {
-            const gap = width - stack[stack.length - 1];
+        if (top !== undefined) {
+            const gap = width - top.width;
             if (unitWidth === 0 || gap < unitWidth) unitWidth = gap;
         }
         depths.set(item, stack.length);
-        stack.push(width);
+        stack.push({ width, content: width + contentIndentOf(item) });
     }
     const depthOf = (item: ListItemLine): number => depths.get(item) ?? 0;
 
@@ -161,7 +195,11 @@ export function rebaseListPaste(pasted: string, noteText: string, selectionStart
     const lineEnd = newlineIndex < 0 ? noteText.length : newlineIndex;
     if (selectionEnd > lineEnd) return null;
 
-    const dest = parseItem(noteText.slice(lineStart, lineEnd));
+    // A spaced horizontal rule such as "- - -" parses as an item but is a divider, and
+    // claiming a paste there would file the list under it as indented code
+    const destLine = noteText.slice(lineStart, lineEnd);
+    if (THEMATIC_BREAK.test(destLine)) return null;
+    const dest = parseItem(destLine);
     if (dest === null) return null;
 
     const prefixLength = dest.indent.length + dest.marker.length + dest.checkbox.length;
@@ -169,23 +207,47 @@ export function rebaseListPaste(pasted: string, noteText: string, selectionStart
     if (noteText.slice(selectionEnd, lineEnd).trim() !== '') return null;
 
     const emptyItem = noteText.slice(lineStart + prefixLength, selectionStart).trim() === '';
-    const unit = destinationUnit(noteText, lineStart, dest.indent, items, unitWidth);
+    const unit = destinationUnit(noteText, lineStart, lineEnd, dest.indent, items, unitWidth);
+
+    // True when the destination item already has lines of its own below, whose depth
+    // relative to the pasted tail must survive the paste
+    const followingLine = lineBelow(noteText, lineEnd);
+    const hasChildBelow = followingLine !== null && indentWidthOf(followingLine) > indentWidthOf(dest.indent);
+
+    // A child of a padded empty item such as "-   " sits one column past the bare
+    // marker. Filling the item re-anchors its children at the padded content indent,
+    // where they no longer reach, so such a paste stays flat.
+    if (
+        emptyItem &&
+        hasChildBelow &&
+        followingLine !== null &&
+        indentWidthOf(followingLine) < indentWidthOf(dest.indent) + dest.marker.length
+    ) {
+        return null;
+    }
     const unitColumns = unit === '\t' ? 4 : unit.length;
-    // A child's content must start past its parent's marker, so a wide marker such as
-    // "100. " needs more than one four-column step before the child
-    const stepsPast = (marker: string): number => Math.max(1, Math.ceil(marker.length / unitColumns));
+    // A child's content must start past its parent's marker but within three columns
+    // of it, so the step both clears a wide marker such as "100. " and is capped: a
+    // wide source-derived unit under a narrow emitted marker would otherwise push the
+    // child past the nesting window and out of the list. Tab steps always land inside
+    // the window, so only space steps need the cap.
+    const stepPast = (marker: string): string => {
+        const steps = Math.max(1, Math.ceil(marker.length / unitColumns));
+        if (unit === '\t') return unit.repeat(steps);
+        return ' '.repeat(Math.min(unitColumns * steps, marker.length + 3));
+    };
 
     const out: string[] = [];
     // Indent per depth, each entry set when its parent is emitted
     const indents: string[] = [];
-    const emit = (item: ListItemLine, depth: number, marker = item.marker): void => {
+    const emit = (item: ListItemLine, depth: number, marker = item.marker, checkbox = item.checkbox): void => {
         for (let level = 1; level <= depth; level++) {
             if (indents[level] === undefined) indents[level] = indents[level - 1] + unit;
         }
         const indent = indents[depth];
-        out.push(indent + marker + item.checkbox + item.content);
+        out.push(indent + marker + checkbox + item.content);
         indents.length = depth + 1;
-        indents[depth + 1] = indent + unit.repeat(stepsPast(marker));
+        indents[depth + 1] = indent + stepPast(marker);
     };
 
     let from = selectionStart;
@@ -202,36 +264,83 @@ export function rebaseListPaste(pasted: string, noteText: string, selectionStart
             out.push((dest.checkbox === '' ? first.checkbox : '') + first.content);
         }
         indents[0] = dest.indent;
-        indents[1] = dest.indent + unit.repeat(stepsPast(dest.marker));
+        indents[1] = dest.indent + stepPast(dest.marker);
 
         // Further roots from the first root's list follow the destination's marker as
         // well, because mixing marker families at one level splits the list in two. An
         // ordered destination numbers them onward from its own value. A root from a
-        // different family stays itself: the clipboard held two adjacent lists, and
-        // joining them would merge what the source kept separate.
+        // different family stays itself only while that also differs from the
+        // destination's family: the clipboard held two adjacent lists, and where the
+        // families collide the renderer merges them anyway, so converting keeps the
+        // written numbers matching the rendered ones.
         const ordered = /^(\d{1,9})([.)])([ \t]+)$/.exec(dest.marker);
         let rootNumber = ordered ? Number(ordered[1]) : 0;
         const firstFamily = markerFamily(first.marker);
+        const destFamily = markerFamily(dest.marker);
+
+        // A kept root's own marker escapes the width rules below; any width other
+        // than the destination's shifts the nesting window and with children
+        // following would capture them as continuation text or drop them from the
+        // list, so the paste stays flat instead
+        if (hasChildBelow) {
+            for (const item of items) {
+                if (item === first || depths.get(item) !== 0) continue;
+                const family = markerFamily(item.marker);
+                if (family !== firstFamily && family !== destFamily && item.marker.length !== dest.marker.length) return null;
+            }
+        }
+
         const rootMarker = (item: ListItemLine): string => {
-            if (markerFamily(item.marker) !== firstFamily) return item.marker;
+            const family = markerFamily(item.marker);
+            if (family !== firstFamily && family !== destFamily) return item.marker;
             if (!ordered) return dest.marker;
-            rootNumber += 1;
+            // With children below, a number crossing a digit boundary would widen the
+            // marker and push those children out of their nesting window, so the
+            // destination's literal repeats and the renderer numbers onward by itself
+            if (hasChildBelow) return dest.marker;
+            // Markdown markers carry at most nine digits, and a renderer numbers a
+            // repeated literal onward by itself
+            rootNumber = Math.min(rootNumber + 1, 999999999);
             return `${rootNumber}${ordered[2]}${ordered[3]}`;
         };
 
         for (const line of parsedLines.slice(1)) {
             if (line === null) out.push('');
-            else if (depthOf(line) === 0) emit(line, 0, rootMarker(line));
-            else emit(line, depthOf(line));
+            else if (depthOf(line) === 0) {
+                // A root without its own checkbox takes the destination's, so pasting
+                // a plain list onto an empty task yields tasks throughout, not one
+                const checkbox = line.checkbox !== '' ? line.checkbox : dest.checkbox;
+                emit(line, 0, rootMarker(line), checkbox);
+            } else emit(line, depthOf(line));
         }
     } else {
         // The destination item already has content, so the pasted tree becomes its
-        // children, starting on the next line with every marker kept.
+        // children, starting on the next line. A run of ordered roots is renumbered
+        // from one, because a list directly below the parent's text only opens when it
+        // starts there; deeper levels keep their markers.
         out.push('');
-        indents[0] = dest.indent + unit.repeat(stepsPast(dest.marker));
+        indents[0] = dest.indent + stepPast(dest.marker);
+        let childNumber = 0;
+        let runDelimiter: string | null = null;
         for (const line of parsedLines) {
-            if (line === null) out.push('');
-            else emit(line, depthOf(line));
+            if (line === null) {
+                out.push('');
+                continue;
+            }
+            const depth = depthOf(line);
+            if (depth !== 0) {
+                emit(line, depth);
+                continue;
+            }
+            const ordered = /^\d{1,9}([.)])([ \t]+)$/.exec(line.marker);
+            if (ordered === null) {
+                runDelimiter = null;
+                emit(line, 0);
+                continue;
+            }
+            childNumber = runDelimiter === ordered[1] ? childNumber + 1 : 1;
+            runDelimiter = ordered[1];
+            emit(line, 0, `${childNumber}${ordered[1]}${ordered[2]}`);
         }
     }
 

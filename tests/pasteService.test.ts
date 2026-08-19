@@ -175,6 +175,56 @@ describe('handleEditorPaste: plain text', () => {
         expect(editor.getValue()).toBe('- [x] done one\n- [x] done two');
     });
 
+    it('rebases through the paste command as well', async () => {
+        const { service } = build();
+        const doc = '- main\n\t- ';
+        const editor = new FakeEditor(doc, doc.length);
+        vi.stubGlobal('navigator', { clipboard: { readText: async () => '- A\n    - A1' } });
+
+        try {
+            await service.pasteProcessed(editor.asEditor(), INFO);
+            expect(editor.getValue()).toBe('- main\n\t- A\n\t\t- A1');
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
+    it('skips the rebase when the note changed during the clipboard read', async () => {
+        const { service } = build({ textTrim: false });
+        const doc = '- main\n\t- ';
+        const editor = new FakeEditor(doc, doc.length);
+        let finishRead: (text: string) => void = () => undefined;
+        const clipboardText = new Promise<string>(resolve => {
+            finishRead = resolve;
+        });
+        vi.stubGlobal('navigator', { clipboard: { readText: () => clipboardText } });
+
+        try {
+            const paste = service.pasteProcessed(editor.asEditor(), INFO);
+            editor.setSelection(0, 0);
+            editor.replaceSelection('edit ');
+            finishRead('- A\n    - A1');
+            await paste;
+
+            // The destination the rebase was aimed at is gone, so the text lands flat
+            expect(editor.getValue()).toContain('- A\n    - A1');
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
+    it('downloads an image inside a rebased list at its rebased position', async () => {
+        const { service } = build();
+        const doc = '- main\n\t- ';
+        const editor = new FakeEditor(doc, doc.length);
+        const event = fakeClipboardEvent({ plain: '- https://example.com/cat.png\n- item' });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(editor.getValue()).toBe('- main\n\t- ![[image-0.png]]\n\t- item');
+    });
+
     it('pastes a list unchanged when list nesting is off', () => {
         const { service } = build({ listNesting: false, textTrim: false });
         const doc = '- main\n\t- ';
