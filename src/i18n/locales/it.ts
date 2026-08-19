@@ -84,10 +84,17 @@ export const STRINGS_IT: TranslationStrings = {
 
         images: {
             heading: 'Immagini',
-            savingName: 'Salva nel vault le immagini incollate',
+            savingName: 'Salva nel vault le immagini dal web',
             savingDesc:
-                'Salva le immagini incollate nella cartella allegati e collega il file locale invece dell’indirizzo web. Riguarda "Copia immagine" di Safari, le immagini dentro contenuti web copiati e gli indirizzi di immagine incollati. Per impostazione predefinita il nome del file viene dall’indirizzo:',
-            savingAliases: ['scarica', 'allegato', 'safari', 'schermata', 'immagine', 'cartella', 'nome file', 'larghezza', 'dimensione'],
+                'Salva le immagini dal web nella cartella allegati e collega il file locale invece dell’indirizzo web. Riguarda "Copia immagine" di Safari, le immagini dentro contenuti web copiati e gli indirizzi di immagine incollati. Per impostazione predefinita il nome del file viene dall’indirizzo:',
+            savingAliases: ['scarica', 'url', 'web', 'allegato', 'safari', 'locale', 'immagine', 'cartella'],
+            sizeStyleName: 'Dimensione e stile',
+            sizeStyleDesc:
+                'Aggiungi una larghezza o una classe CSS alle immagini incollate, in automatico o tramite una finestra di scelta.',
+            sizeStyleAliases: ['dimensione', 'larghezza', 'css', 'classe', 'stile', 'ridimensiona', 'invert'],
+            summarySize: 'Dimensione: {value}',
+            summaryStyle: 'Stile: {value}',
+            summaryAsk: 'Chiedi',
             sizeChoiceName: 'Applica dimensione quando incolli',
             sizeChoiceDesc:
                 'Aggiunge una larghezza a ogni immagine salvata, ad esempio ![[photo.jpg|400]]. La proprietà di larghezza della nota ha la precedenza.',
@@ -104,7 +111,9 @@ export const STRINGS_IT: TranslationStrings = {
             choiceAsk: 'Chiedi a ogni incollaggio',
             nameFormatName: 'Nomi dei file',
             customDesc:
-                'Usa {{name}} per il nome della fonte, {{noteName}} per il nome della nota, {{property:xyz}} per una proprietà del frontmatter, {{counter}} o {{counter:2}} per un numero crescente e i formati data di Moment come YYYY-MM-DD. Uno screenshot non ha una fonte da cui prendere il nome, quindi il suo {{name}} diventa "Pasted image" con data e ora, come in Obsidian.',
+                'Usa {{name}} per il nome della fonte, {{noteName}} per il nome della nota, {{property:xyz}} per una proprietà del frontmatter, {{counter}} o {{counter:2}} per un numero crescente e i formati data di Moment come YYYY-MM-DD.',
+            customScreenshotDesc:
+                'Uno screenshot non ha una fonte da cui prendere il nome, quindi il suo {{name}} diventa "Pasted image" con data e ora, come in Obsidian.',
             customMomentLink: 'Formato Moment',
             customExample: 'Esempio: {value}',
             customExampleNote: 'La mia nota',

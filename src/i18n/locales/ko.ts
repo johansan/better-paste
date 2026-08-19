@@ -81,10 +81,16 @@ export const STRINGS_KO: TranslationStrings = {
 
         images: {
             heading: '이미지',
-            savingName: '붙여넣은 이미지를 보관함에 저장',
+            savingName: '웹 이미지를 보관함에 저장',
             savingDesc:
-                '붙여넣은 이미지를 첨부 파일 폴더에 저장하고 웹 주소 대신 로컬 파일을 링크합니다. Safari의 "이미지 복사", 복사한 웹 콘텐츠 속 이미지, 붙여넣은 이미지 주소가 여기에 해당합니다. 파일 이름은 기본적으로 주소에서 가져옵니다:',
-            savingAliases: ['다운로드', '첨부 파일', 'safari', '스크린샷', '이미지', '폴더', '파일 이름', '너비', '크기'],
+                '웹 이미지를 첨부 파일 폴더에 저장하고 웹 주소 대신 로컬 파일을 링크합니다. Safari의 "이미지 복사", 복사한 웹 콘텐츠 속 이미지, 붙여넣은 이미지 주소가 여기에 해당합니다. 파일 이름은 기본적으로 주소에서 가져옵니다:',
+            savingAliases: ['다운로드', 'url', '웹', '첨부 파일', 'safari', '로컬', '이미지', '폴더'],
+            sizeStyleName: '크기와 스타일',
+            sizeStyleDesc: '붙여넣은 이미지에 너비나 CSS 클래스를 추가합니다. 자동으로 적용하거나 매번 선택할 수 있습니다.',
+            sizeStyleAliases: ['크기', '너비', 'css', '클래스', '스타일', '크기 조절', 'invert'],
+            summarySize: '크기: {value}',
+            summaryStyle: '스타일: {value}',
+            summaryAsk: '묻기',
             sizeChoiceName: '붙여넣을 때 크기 적용',
             sizeChoiceDesc: '저장되는 모든 이미지 임베드에 너비를 추가합니다. 예: ![[photo.jpg|400]]. 노트 자체의 너비 속성이 우선합니다.',
             sizeChoiceAliases: ['크기', '너비', '이미지 크기', '크기 조절', '임베드', '400'],
@@ -100,7 +106,9 @@ export const STRINGS_KO: TranslationStrings = {
             choiceAsk: '붙여넣을 때마다 묻기',
             nameFormatName: '파일 이름',
             customDesc:
-                '원본 이름에는 {{name}}을, 노트 이름에는 {{noteName}}을, 프론트매터 속성에는 {{property:xyz}}를, 증가하는 번호에는 {{counter}} 또는 {{counter:2}}를, 날짜에는 YYYY-MM-DD 같은 Moment 형식을 사용하세요. 스크린샷에는 원본 이름이 없으므로 {{name}}은 Obsidian에서처럼 타임스탬프가 붙은 "Pasted image"가 됩니다.',
+                '원본 이름에는 {{name}}을, 노트 이름에는 {{noteName}}을, 프론트매터 속성에는 {{property:xyz}}를, 증가하는 번호에는 {{counter}} 또는 {{counter:2}}를, 날짜에는 YYYY-MM-DD 같은 Moment 형식을 사용하세요.',
+            customScreenshotDesc:
+                '스크린샷에는 원본 이름이 없으므로 {{name}}은 Obsidian에서처럼 타임스탬프가 붙은 "Pasted image"가 됩니다.',
             customMomentLink: 'Moment 형식',
             customExample: '예: {value}',
             customExampleNote: '내 노트',

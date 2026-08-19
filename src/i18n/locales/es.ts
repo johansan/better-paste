@@ -84,20 +84,16 @@ export const STRINGS_ES: TranslationStrings = {
 
         images: {
             heading: 'Imágenes',
-            savingName: 'Guardar en la bóveda las imágenes pegadas',
+            savingName: 'Guardar en la bóveda las imágenes de la web',
             savingDesc:
-                'Guarda las imágenes pegadas en tu carpeta de adjuntos y enlaza el archivo local en lugar de la dirección web. Abarca "Copiar imagen" de Safari, las imágenes dentro de contenido web copiado y las direcciones de imagen pegadas. Por defecto, el nombre del archivo procede de la dirección:',
-            savingAliases: [
-                'descargar',
-                'adjunto',
-                'safari',
-                'captura de pantalla',
-                'imagen',
-                'carpeta',
-                'nombre de archivo',
-                'ancho',
-                'tamaño'
-            ],
+                'Guarda las imágenes de la web en tu carpeta de adjuntos y enlaza el archivo local en lugar de la dirección web. Abarca "Copiar imagen" de Safari, las imágenes dentro de contenido web copiado y las direcciones de imagen pegadas. Por defecto, el nombre del archivo procede de la dirección:',
+            savingAliases: ['descargar', 'url', 'web', 'adjunto', 'safari', 'local', 'imagen', 'carpeta'],
+            sizeStyleName: 'Tamaño y estilo',
+            sizeStyleDesc: 'Añade un ancho o una clase CSS a las imágenes pegadas, de forma automática o mediante un selector.',
+            sizeStyleAliases: ['tamaño', 'ancho', 'css', 'clase', 'estilo', 'redimensionar', 'invert'],
+            summarySize: 'Tamaño: {value}',
+            summaryStyle: 'Estilo: {value}',
+            summaryAsk: 'Preguntar',
             sizeChoiceName: 'Aplicar tamaño al pegar',
             sizeChoiceDesc:
                 'Añade un ancho a cada imagen incrustada que se guarda, como ![[photo.jpg|400]]. La propiedad de ancho de la nota tiene prioridad.',
@@ -114,7 +110,9 @@ export const STRINGS_ES: TranslationStrings = {
             choiceAsk: 'Preguntar en cada pegado',
             nameFormatName: 'Nombres de archivo',
             customDesc:
-                'Usa {{name}} para el nombre de origen, {{noteName}} para el nombre de la nota, {{property:xyz}} para una propiedad del frontmatter, {{counter}} o {{counter:2}} para un número creciente y formatos de fecha de Moment como YYYY-MM-DD. Una captura de pantalla no tiene nombre de origen, así que su {{name}} se convierte en "Pasted image" con marca de tiempo, como en Obsidian.',
+                'Usa {{name}} para el nombre de origen, {{noteName}} para el nombre de la nota, {{property:xyz}} para una propiedad del frontmatter, {{counter}} o {{counter:2}} para un número creciente y formatos de fecha de Moment como YYYY-MM-DD.',
+            customScreenshotDesc:
+                'Una captura de pantalla no tiene nombre de origen, así que su {{name}} se convierte en "Pasted image" con marca de tiempo, como en Obsidian.',
             customMomentLink: 'Formato de Moment',
             customExample: 'Ejemplo: {value}',
             customExampleNote: 'Mi nota',

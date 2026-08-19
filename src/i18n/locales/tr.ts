@@ -84,10 +84,16 @@ export const STRINGS_TR: TranslationStrings = {
 
         images: {
             heading: 'Görseller',
-            savingName: 'Yapıştırılan görselleri kasaya kaydet',
+            savingName: 'Web görsellerini kasaya kaydet',
             savingDesc:
-                'Yapıştırılan görselleri ek klasörünüze kaydeder ve web adresi yerine yerel dosyaya bağlantı verir. Safari’deki "Görseli kopyala", kopyalanan web içeriğindeki görseller ve yapıştırılan görsel adresleri buna dahildir. Dosya adı öntanımlı olarak adresten gelir:',
-            savingAliases: ['indir', 'ek', 'safari', 'ekran görüntüsü', 'görsel', 'klasör', 'dosya adı', 'genişlik', 'boyut'],
+                'Web’deki görselleri ek klasörünüze kaydeder ve web adresi yerine yerel dosyaya bağlantı verir. Safari’deki "Görseli kopyala", kopyalanan web içeriğindeki görseller ve yapıştırılan görsel adresleri buna dahildir. Dosya adı öntanımlı olarak adresten gelir:',
+            savingAliases: ['indir', 'url', 'web', 'ek', 'safari', 'yerel', 'görsel', 'klasör'],
+            sizeStyleName: 'Boyut ve stil',
+            sizeStyleDesc: 'Yapıştırılan görsellere bir genişlik veya CSS sınıfı ekleyin, otomatik olarak ya da bir seçiciyle.',
+            sizeStyleAliases: ['boyut', 'genişlik', 'css', 'sınıf', 'stil', 'yeniden boyutlandır', 'invert'],
+            summarySize: 'Boyut: {value}',
+            summaryStyle: 'Stil: {value}',
+            summaryAsk: 'Sor',
             sizeChoiceName: 'Yapıştırırken boyut uygula',
             sizeChoiceDesc:
                 'Kaydedilen her gömülü görsele bir genişlik ekler, örneğin ![[photo.jpg|400]]. Notun kendi genişlik özelliği önceliklidir.',
@@ -104,7 +110,9 @@ export const STRINGS_TR: TranslationStrings = {
             choiceAsk: 'Her yapıştırmada sor',
             nameFormatName: 'Dosya adları',
             customDesc:
-                'Kaynak adı için {{name}}, not adı için {{noteName}}, bir frontmatter özelliği için {{property:xyz}}, artan bir numara için {{counter}} veya {{counter:2}} ve YYYY-MM-DD gibi Moment tarih biçimlerini kullanın. Ekran görüntüsünün kaynak adı olmadığından {{name}} değeri, Obsidian’daki gibi zaman damgalı "Pasted image" olur.',
+                'Kaynak adı için {{name}}, not adı için {{noteName}}, bir frontmatter özelliği için {{property:xyz}}, artan bir numara için {{counter}} veya {{counter:2}} ve YYYY-MM-DD gibi Moment tarih biçimlerini kullanın.',
+            customScreenshotDesc:
+                'Ekran görüntüsünün kaynak adı olmadığından {{name}} değeri, Obsidian’daki gibi zaman damgalı "Pasted image" olur.',
             customMomentLink: 'Moment biçimi',
             customExample: 'Örnek: {value}',
             customExampleNote: 'Notum',

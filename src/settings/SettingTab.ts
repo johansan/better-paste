@@ -236,7 +236,8 @@ export class BetterPasteSettingTab extends PluginSettingTab {
     /** Rewrites a rendered description in place after the setting it names changes. */
     private updateDynamicDescription(key: DynamicDescriptionKey): void {
         const entry = this.dynamicDescriptions[key];
-        const spans = this.containerEl?.querySelectorAll<HTMLElement>(`.${entry.cls}`) ?? [];
+        // The whole document, because subsection pages render outside the tab container
+        const spans = this.containerEl?.ownerDocument.querySelectorAll<HTMLElement>(`.${entry.cls}`) ?? [];
         for (const span of spans) span.setText(entry.text());
     }
 

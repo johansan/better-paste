@@ -84,20 +84,16 @@ export const STRINGS_PT: TranslationStrings = {
 
         images: {
             heading: 'Imagens',
-            savingName: 'Guardar no cofre as imagens coladas',
+            savingName: 'Guardar no cofre as imagens da web',
             savingDesc:
-                'Guarda as imagens coladas na sua pasta de anexos e liga ao ficheiro local em vez do endereço web. Abrange o "Copiar imagem" do Safari, as imagens dentro de conteúdo web copiado e os endereços de imagem colados. Por predefinição, o nome do ficheiro vem do endereço:',
-            savingAliases: [
-                'descarregar',
-                'anexo',
-                'safari',
-                'captura de ecrã',
-                'imagem',
-                'pasta',
-                'nome do ficheiro',
-                'largura',
-                'tamanho'
-            ],
+                'Guarda as imagens da web na sua pasta de anexos e liga ao ficheiro local em vez do endereço web. Abrange o "Copiar imagem" do Safari, as imagens dentro de conteúdo web copiado e os endereços de imagem colados. Por predefinição, o nome do ficheiro vem do endereço:',
+            savingAliases: ['descarregar', 'url', 'web', 'anexo', 'safari', 'local', 'imagem', 'pasta'],
+            sizeStyleName: 'Tamanho e estilo',
+            sizeStyleDesc: 'Adicione uma largura ou uma classe CSS às imagens coladas, automaticamente ou através de um seletor.',
+            sizeStyleAliases: ['tamanho', 'largura', 'css', 'classe', 'estilo', 'redimensionar', 'invert'],
+            summarySize: 'Tamanho: {value}',
+            summaryStyle: 'Estilo: {value}',
+            summaryAsk: 'Perguntar',
             sizeChoiceName: 'Aplicar tamanho ao colar',
             sizeChoiceDesc:
                 'Adiciona uma largura a cada imagem guardada, como ![[photo.jpg|400]]. A propriedade de largura da nota tem prioridade.',
@@ -114,7 +110,9 @@ export const STRINGS_PT: TranslationStrings = {
             choiceAsk: 'Perguntar em cada colagem',
             nameFormatName: 'Nomes de ficheiro',
             customDesc:
-                'Use {{name}} para o nome de origem, {{noteName}} para o nome da nota, {{property:xyz}} para uma propriedade do frontmatter, {{counter}} ou {{counter:2}} para um número crescente e formatos de data do Moment como YYYY-MM-DD. Uma captura de ecrã não tem nome de origem, por isso o seu {{name}} passa a "Pasted image" com data e hora, como no Obsidian.',
+                'Use {{name}} para o nome de origem, {{noteName}} para o nome da nota, {{property:xyz}} para uma propriedade do frontmatter, {{counter}} ou {{counter:2}} para um número crescente e formatos de data do Moment como YYYY-MM-DD.',
+            customScreenshotDesc:
+                'Uma captura de ecrã não tem nome de origem, por isso o seu {{name}} passa a "Pasted image" com data e hora, como no Obsidian.',
             customMomentLink: 'Formato Moment',
             customExample: 'Exemplo: {value}',
             customExampleNote: 'A minha nota',

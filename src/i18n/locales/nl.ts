@@ -84,20 +84,16 @@ export const STRINGS_NL: TranslationStrings = {
 
         images: {
             heading: 'Afbeeldingen',
-            savingName: 'Geplakte afbeeldingen in de kluis opslaan',
+            savingName: 'Webafbeeldingen in de kluis opslaan',
             savingDesc:
-                'Slaat geplakte afbeeldingen op in je bijlagemap en linkt naar het lokale bestand in plaats van naar het webadres. Geldt voor "Afbeelding kopiëren" in Safari, afbeeldingen in gekopieerde webinhoud en geplakte afbeeldingsadressen. Standaard komt de bestandsnaam uit het adres:',
-            savingAliases: [
-                'downloaden',
-                'bijlage',
-                'safari',
-                'schermafbeelding',
-                'afbeelding',
-                'map',
-                'bestandsnaam',
-                'breedte',
-                'grootte'
-            ],
+                'Slaat webafbeeldingen op in je bijlagemap en linkt naar het lokale bestand in plaats van naar het webadres. Geldt voor "Afbeelding kopiëren" in Safari, afbeeldingen in gekopieerde webinhoud en geplakte afbeeldingsadressen. Standaard komt de bestandsnaam uit het adres:',
+            savingAliases: ['downloaden', 'url', 'web', 'bijlage', 'safari', 'lokaal', 'afbeelding', 'map'],
+            sizeStyleName: 'Grootte en stijl',
+            sizeStyleDesc: 'Geef geplakte afbeeldingen een breedte of een CSS-klasse mee, automatisch of via een keuzevenster.',
+            sizeStyleAliases: ['grootte', 'breedte', 'css', 'klasse', 'stijl', 'schalen', 'invert'],
+            summarySize: 'Grootte: {value}',
+            summaryStyle: 'Stijl: {value}',
+            summaryAsk: 'Vragen',
             sizeChoiceName: 'Grootte toepassen bij plakken',
             sizeChoiceDesc:
                 'Geeft elke opgeslagen afbeelding bij het insluiten een breedte mee, zoals ![[photo.jpg|400]]. De breedte-eigenschap van een notitie heeft voorrang.',
@@ -114,7 +110,9 @@ export const STRINGS_NL: TranslationStrings = {
             choiceAsk: 'Bij elke plakactie vragen',
             nameFormatName: 'Bestandsnamen',
             customDesc:
-                'Gebruik {{name}} voor de bronnaam, {{noteName}} voor de notitienaam, {{property:xyz}} voor een frontmatter-eigenschap, {{counter}} of {{counter:2}} voor een oplopend nummer en Moment-datumnotaties zoals YYYY-MM-DD. Een schermafbeelding heeft geen bronnaam, dus wordt {{name}} "Pasted image" met een tijdstempel, net als in Obsidian.',
+                'Gebruik {{name}} voor de bronnaam, {{noteName}} voor de notitienaam, {{property:xyz}} voor een frontmatter-eigenschap, {{counter}} of {{counter:2}} voor een oplopend nummer en Moment-datumnotaties zoals YYYY-MM-DD.',
+            customScreenshotDesc:
+                'Een schermafbeelding heeft geen bronnaam, dus wordt {{name}} "Pasted image" met een tijdstempel, net als in Obsidian.',
             customMomentLink: 'Moment-notatie',
             customExample: 'Voorbeeld: {value}',
             customExampleNote: 'Mijn notitie',

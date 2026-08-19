@@ -81,10 +81,16 @@ export const STRINGS_ID: TranslationStrings = {
 
         images: {
             heading: 'Gambar',
-            savingName: 'Simpan gambar yang ditempel ke dalam brankas',
+            savingName: 'Simpan gambar web ke dalam brankas',
             savingDesc:
-                'Menyimpan gambar yang ditempel ke folder lampiran Anda dan menaut ke berkas lokal alih-alih alamat web. Mencakup "Salin gambar" di Safari, gambar di dalam konten web yang disalin, dan alamat gambar yang ditempel. Secara baku nama berkas diambil dari alamatnya:',
-            savingAliases: ['unduh', 'lampiran', 'safari', 'tangkapan layar', 'gambar', 'folder', 'nama berkas', 'lebar', 'ukuran'],
+                'Menyimpan gambar dari web ke folder lampiran Anda dan menautkan berkas lokal alih-alih alamat web. Mencakup "Salin gambar" di Safari, gambar di dalam konten web yang disalin, dan alamat gambar yang ditempel. Secara bawaan nama berkas diambil dari alamatnya:',
+            savingAliases: ['unduh', 'url', 'web', 'lampiran', 'safari', 'lokal', 'gambar', 'folder'],
+            sizeStyleName: 'Ukuran dan gaya',
+            sizeStyleDesc: 'Tambahkan lebar atau kelas CSS ke gambar yang ditempel, secara otomatis atau melalui dialog pemilihan.',
+            sizeStyleAliases: ['ukuran', 'lebar', 'css', 'kelas', 'gaya', 'ubah ukuran', 'invert'],
+            summarySize: 'Ukuran: {value}',
+            summaryStyle: 'Gaya: {value}',
+            summaryAsk: 'Tanya',
             sizeChoiceName: 'Terapkan ukuran saat menempel',
             sizeChoiceDesc:
                 'Menambahkan lebar ke setiap sematan gambar yang disimpan, misalnya ![[photo.jpg|400]]. Properti lebar milik catatan lebih diutamakan.',
@@ -101,7 +107,9 @@ export const STRINGS_ID: TranslationStrings = {
             choiceAsk: 'Tanyakan setiap kali menempel',
             nameFormatName: 'Nama berkas',
             customDesc:
-                'Gunakan {{name}} untuk nama sumber, {{noteName}} untuk nama catatan, {{property:xyz}} untuk properti frontmatter, {{counter}} atau {{counter:2}} untuk nomor yang terus bertambah, dan format tanggal Moment seperti YYYY-MM-DD. Tangkapan layar tidak punya nama sumber, sehingga {{name}}-nya menjadi "Pasted image" dengan stempel waktu, seperti di Obsidian.',
+                'Gunakan {{name}} untuk nama sumber, {{noteName}} untuk nama catatan, {{property:xyz}} untuk properti frontmatter, {{counter}} atau {{counter:2}} untuk nomor yang terus bertambah, dan format tanggal Moment seperti YYYY-MM-DD.',
+            customScreenshotDesc:
+                'Tangkapan layar tidak punya nama sumber, sehingga {{name}}-nya menjadi "Pasted image" dengan stempel waktu, seperti di Obsidian.',
             customMomentLink: 'Format Moment',
             customExample: 'Contoh: {value}',
             customExampleNote: 'Catatan saya',

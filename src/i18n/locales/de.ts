@@ -93,10 +93,16 @@ export const STRINGS_DE: TranslationStrings = {
 
         images: {
             heading: 'Bilder',
-            savingName: 'Eingefügte Bilder im Tresor speichern',
+            savingName: 'Webbilder im Tresor speichern',
             savingDesc:
-                'Speichert eingefügte Bilder im Anhangordner und verlinkt die lokale Datei statt der Webadresse. Gilt für "Bild kopieren" in Safari, Bilder in kopierten Webinhalten und eingefügte Bildadressen. Standardmäßig stammt der Dateiname aus der Adresse:',
-            savingAliases: ['herunterladen', 'anhang', 'safari', 'bildschirmfoto', 'bild', 'ordner', 'dateiname', 'breite', 'größe'],
+                'Speichert Bilder aus dem Web im Anhangordner und verlinkt die lokale Datei statt der Webadresse. Gilt für "Bild kopieren" in Safari, Bilder in kopierten Webinhalten und eingefügte Bildadressen. Standardmäßig stammt der Dateiname aus der Adresse:',
+            savingAliases: ['herunterladen', 'url', 'web', 'anhang', 'safari', 'lokal', 'bild', 'ordner'],
+            sizeStyleName: 'Größe und Stil',
+            sizeStyleDesc: 'Füge eingefügten Bildern eine Breite oder eine CSS-Klasse hinzu, automatisch oder über einen Dialog.',
+            sizeStyleAliases: ['größe', 'breite', 'css', 'klasse', 'stil', 'skalieren', 'invert'],
+            summarySize: 'Größe: {value}',
+            summaryStyle: 'Stil: {value}',
+            summaryAsk: 'Fragen',
             sizeChoiceName: 'Größe beim Einfügen anwenden',
             sizeChoiceDesc:
                 'Fügt jeder gespeicherten Bildeinbettung eine Breite hinzu, etwa ![[photo.jpg|400]]. Die Breiteneigenschaft einer Notiz hat Vorrang.',
@@ -113,7 +119,9 @@ export const STRINGS_DE: TranslationStrings = {
             choiceAsk: 'Bei jedem Einfügen fragen',
             nameFormatName: 'Dateinamen',
             customDesc:
-                'Verwende {{name}} für den Quellnamen, {{noteName}} für den Notiznamen, {{property:xyz}} für eine Frontmatter-Eigenschaft, {{counter}} oder {{counter:2}} für eine fortlaufende Nummer und Moment-Datumsformate wie YYYY-MM-DD. Ein Screenshot hat keinen Quellnamen, sein {{name}} wird deshalb zu "Pasted image" mit Zeitstempel, wie in Obsidian.',
+                'Verwende {{name}} für den Quellnamen, {{noteName}} für den Notiznamen, {{property:xyz}} für eine Frontmatter-Eigenschaft, {{counter}} oder {{counter:2}} für eine fortlaufende Nummer und Moment-Datumsformate wie YYYY-MM-DD.',
+            customScreenshotDesc:
+                'Ein Screenshot hat keinen Quellnamen, sein {{name}} wird deshalb zu "Pasted image" mit Zeitstempel, wie in Obsidian.',
             customMomentLink: 'Moment-Format',
             customExample: 'Beispiel: {value}',
             customExampleNote: 'Meine Notiz',

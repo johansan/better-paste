@@ -390,6 +390,15 @@ describe('handleEditorPaste: clipboard image naming', () => {
         expect(service.handleEditorPaste(screenshotEvent(fakeFile('image.jxl', 'image/jxl')), editor.asEditor(), INFO)).toBe(false);
     });
 
+    it('takes over a screenshot even when web image saving is off', async () => {
+        const { service, saved } = build({ ...naming, imageEnabled: false });
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(screenshotEvent(), editor.asEditor(), INFO)).toBe(true);
+        await settle();
+        expect(saved).toHaveLength(1);
+    });
+
     it('keeps a decorated but oversized bare bitmap native as well', () => {
         const { service } = build({ imageSizeChoice: '400' });
         const editor = new FakeEditor('');

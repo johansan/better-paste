@@ -81,20 +81,16 @@ export const STRINGS_JA: TranslationStrings = {
 
         images: {
             heading: '画像',
-            savingName: '貼り付けた画像を保管庫に保存',
+            savingName: 'ウェブ画像を保管庫に保存',
             savingDesc:
-                '貼り付けた画像を添付ファイルフォルダーに保存し、ウェブアドレスではなくローカルファイルにリンクします。Safari の「画像をコピー」、コピーしたウェブ内容に含まれる画像、貼り付けた画像アドレスが対象です。ファイル名は既定でアドレスから取ります:',
-            savingAliases: [
-                'ダウンロード',
-                '添付ファイル',
-                'safari',
-                'スクリーンショット',
-                '画像',
-                'フォルダー',
-                'ファイル名',
-                '幅',
-                'サイズ'
-            ],
+                'ウェブ上の画像を添付ファイルフォルダーに保存し、ウェブアドレスではなくローカルファイルにリンクします。Safari の「イメージをコピー」、コピーしたウェブコンテンツに含まれる画像、貼り付けた画像アドレスが対象です。ファイル名は既定でアドレスから取ります:',
+            savingAliases: ['ダウンロード', 'url', 'ウェブ', '添付ファイル', 'safari', 'ローカル', '画像', 'フォルダー'],
+            sizeStyleName: 'サイズとスタイル',
+            sizeStyleDesc: '貼り付けた画像に幅や CSS クラスを付けます。自動で適用することも、毎回選ぶこともできます。',
+            sizeStyleAliases: ['サイズ', '幅', 'css', 'クラス', 'スタイル', 'リサイズ', 'invert'],
+            summarySize: 'サイズ: {value}',
+            summaryStyle: 'スタイル: {value}',
+            summaryAsk: '毎回確認',
             sizeChoiceName: '貼り付け時にサイズを適用',
             sizeChoiceDesc: '保存した画像の埋め込みに幅を付けます。例: ![[photo.jpg|400]]。ノート自身の幅プロパティが優先されます。',
             sizeChoiceAliases: ['サイズ', '幅', '画像サイズ', 'リサイズ', '埋め込み', '400'],
@@ -110,7 +106,9 @@ export const STRINGS_JA: TranslationStrings = {
             choiceAsk: '毎回確認する',
             nameFormatName: 'ファイル名',
             customDesc:
-                '元の名前には {{name}} を、ノート名には {{noteName}} を、フロントマターのプロパティには {{property:xyz}} を、連番には {{counter}} や {{counter:2}} を、日付には YYYY-MM-DD のような Moment の書式を使います。スクリーンショットには元の名前がないため、{{name}} は Obsidian と同じくタイムスタンプ付きの「Pasted image」になります。',
+                '元の名前には {{name}} を、ノート名には {{noteName}} を、フロントマターのプロパティには {{property:xyz}} を、連番には {{counter}} や {{counter:2}} を、日付には YYYY-MM-DD のような Moment の書式を使います。',
+            customScreenshotDesc:
+                'スクリーンショットには元の名前がないため、{{name}} は Obsidian と同じくタイムスタンプ付きの「Pasted image」になります。',
             customMomentLink: 'Moment の書式',
             customExample: '例: {value}',
             customExampleNote: 'マイノート',

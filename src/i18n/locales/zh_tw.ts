@@ -81,10 +81,16 @@ export const STRINGS_ZH_TW: TranslationStrings = {
 
         images: {
             heading: '圖片',
-            savingName: '把貼上的圖片儲存到儲存庫',
+            savingName: '把網路圖片儲存到儲存庫',
             savingDesc:
-                '把貼上的圖片儲存到附件資料夾，並連結本機檔案而不是網址。涵蓋 Safari 的「拷貝影像」、複製的網頁內容中的圖片，以及貼上的圖片網址。檔案名稱預設取自網址：',
-            savingAliases: ['下載', '附件', 'safari', '螢幕截圖', '圖片', '資料夾', '檔案名稱', '寬度', '尺寸'],
+                '把網路圖片儲存到附件資料夾，並連結本機檔案而不是網址。涵蓋 Safari 的「拷貝影像」、複製的網頁內容中的圖片，以及貼上的圖片網址。檔案名稱預設取自網址：',
+            savingAliases: ['下載', 'url', '網路', '附件', 'safari', '本機', '圖片', '資料夾'],
+            sizeStyleName: '尺寸與樣式',
+            sizeStyleDesc: '為貼上的圖片加上寬度或 CSS 類別，可自動套用，也可每次選擇。',
+            sizeStyleAliases: ['尺寸', '寬度', 'css', '類別', '樣式', '縮放', 'invert'],
+            summarySize: '尺寸：{value}',
+            summaryStyle: '樣式：{value}',
+            summaryAsk: '詢問',
             sizeChoiceName: '貼上時套用尺寸',
             sizeChoiceDesc: '為每張儲存的圖片加上寬度，例如 ![[photo.jpg|400]]。筆記自己的寬度屬性優先。',
             sizeChoiceAliases: ['尺寸', '寬度', '圖片尺寸', '縮放', '嵌入', '400'],
@@ -99,7 +105,8 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             choiceAsk: '每次貼上時詢問',
             nameFormatName: '檔案名稱',
             customDesc:
-                '用 {{name}} 代表來源名稱，{{noteName}} 代表筆記名稱，{{property:xyz}} 代表 frontmatter 屬性，{{counter}} 或 {{counter:2}} 代表遞增編號，日期可用 YYYY-MM-DD 這類 Moment 格式。螢幕截圖沒有來源名稱，因此它的 {{name}} 會像 Obsidian 一樣變成帶時間戳記的「Pasted image」。',
+                '用 {{name}} 代表來源名稱，{{noteName}} 代表筆記名稱，{{property:xyz}} 代表 frontmatter 屬性，{{counter}} 或 {{counter:2}} 代表遞增編號，日期可用 YYYY-MM-DD 這類 Moment 格式。',
+            customScreenshotDesc: '螢幕截圖沒有來源名稱，因此它的 {{name}} 會像 Obsidian 一樣變成帶時間戳記的「Pasted image」。',
             customMomentLink: 'Moment 格式',
             customExample: '範例：{value}',
             customExampleNote: '我的筆記',

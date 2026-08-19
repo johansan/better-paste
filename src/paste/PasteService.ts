@@ -195,18 +195,20 @@ export class PasteService {
         const html = clipboard.getData('text/html');
 
         if (clipboard.files.length > 0) {
-            // Obsidian owns multi-file pastes. This path only handles one bitmap, either to
-            // avoid the HTML flavour or apply a note-specific width.
-            if (!settings.imageEnabled || !isSingleImageFile(clipboard.files)) return false;
+            // Obsidian owns multi-file pastes. This path only handles one bitmap.
+            if (!isSingleImageFile(clipboard.files)) return false;
 
             // Two clipboard shapes reach this branch. Safari's "Copy image" puts the bitmap
             // AND an <img> tag on the clipboard, and Obsidian prefers the HTML there, which
-            // turns a copied picture into an external link, so that flavour is always taken
-            // over. A bare nameless bitmap, such as a screenshot, is taken over to run it
-            // through the file name format and any size or class; it gets the same name
-            // Obsidian would give it, so a default setup pastes identically to the app.
+            // turns a copied picture into an external link; that is a web image, so the
+            // saving toggle governs it. A bare nameless bitmap, such as a screenshot, is
+            // local content and is always taken over, to run it through the file name
+            // format and any size or class; it gets the same name Obsidian would give it,
+            // so a default setup pastes identically to the app.
             const file = clipboard.files[0];
-            if (!htmlHasImages(html)) {
+            if (htmlHasImages(html)) {
+                if (!settings.imageEnabled) return false;
+            } else {
                 // A bitmap the save would reject stays with Obsidian: taking it over
                 // suppresses the native paste, and without an HTML flavour there is no
                 // URL to fall back on, so the failed save would swallow the screenshot

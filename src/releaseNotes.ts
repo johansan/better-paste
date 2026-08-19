@@ -51,6 +51,15 @@ export interface ReleaseNote {
 /** Newest first. A new release goes at the top. */
 const RELEASE_NOTES: ReleaseNote[] = [
     {
+        version: '1.0.8',
+        date: '2026-08-19',
+        banner: '1.0.8.jpg',
+        new: [
+            'You can now name pasted images with a ==custom format==! Build file names from the note name, a frontmatter property, a rising counter or a date.'
+        ],
+        changed: ['Restructured the Images settings into three parts: saving web images, file names, and size and style.']
+    },
+    {
         version: '1.0.7',
         date: '2026-08-18',
         banner: '1.0.7.jpg',

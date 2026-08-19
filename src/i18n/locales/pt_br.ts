@@ -84,10 +84,16 @@ export const STRINGS_PT_BR: TranslationStrings = {
 
         images: {
             heading: 'Imagens',
-            savingName: 'Salvar no cofre as imagens coladas',
+            savingName: 'Salvar no cofre as imagens da web',
             savingDesc:
-                'Salva as imagens coladas na sua pasta de anexos e aponta para o arquivo local em vez do endereço da web. Abrange o "Copiar imagem" do Safari, as imagens dentro de conteúdo da web copiado e os endereços de imagem colados. Por padrão, o nome do arquivo vem do endereço:',
-            savingAliases: ['baixar', 'anexo', 'safari', 'captura de tela', 'imagem', 'pasta', 'nome do arquivo', 'largura', 'tamanho'],
+                'Salva as imagens da web na sua pasta de anexos e aponta para o arquivo local em vez do endereço da web. Abrange o "Copiar imagem" do Safari, as imagens dentro de conteúdo da web copiado e os endereços de imagem colados. Por padrão, o nome do arquivo vem do endereço:',
+            savingAliases: ['baixar', 'url', 'web', 'anexo', 'safari', 'local', 'imagem', 'pasta'],
+            sizeStyleName: 'Tamanho e estilo',
+            sizeStyleDesc: 'Adicione uma largura ou uma classe CSS às imagens coladas, automaticamente ou por um seletor.',
+            sizeStyleAliases: ['tamanho', 'largura', 'css', 'classe', 'estilo', 'redimensionar', 'invert'],
+            summarySize: 'Tamanho: {value}',
+            summaryStyle: 'Estilo: {value}',
+            summaryAsk: 'Perguntar',
             sizeChoiceName: 'Aplicar tamanho ao colar',
             sizeChoiceDesc:
                 'Adiciona uma largura a cada imagem salva, como ![[photo.jpg|400]]. A propriedade de largura da nota tem prioridade.',
@@ -104,7 +110,9 @@ export const STRINGS_PT_BR: TranslationStrings = {
             choiceAsk: 'Perguntar em cada colagem',
             nameFormatName: 'Nomes de arquivo',
             customDesc:
-                'Use {{name}} para o nome de origem, {{noteName}} para o nome da nota, {{property:xyz}} para uma propriedade do frontmatter, {{counter}} ou {{counter:2}} para um número crescente e formatos de data do Moment como YYYY-MM-DD. Uma captura de tela não tem nome de origem, então o {{name}} dela vira "Pasted image" com data e hora, como no Obsidian.',
+                'Use {{name}} para o nome de origem, {{noteName}} para o nome da nota, {{property:xyz}} para uma propriedade do frontmatter, {{counter}} ou {{counter:2}} para um número crescente e formatos de data do Moment como YYYY-MM-DD.',
+            customScreenshotDesc:
+                'Uma captura de tela não tem nome de origem, então o {{name}} dela vira "Pasted image" com data e hora, como no Obsidian.',
             customMomentLink: 'Formato Moment',
             customExample: 'Exemplo: {value}',
             customExampleNote: 'Minha nota',

@@ -81,20 +81,16 @@ export const STRINGS_VI: TranslationStrings = {
 
         images: {
             heading: 'Hình ảnh',
-            savingName: 'Lưu ảnh đã dán vào kho',
+            savingName: 'Lưu ảnh từ web vào kho',
             savingDesc:
-                'Lưu ảnh đã dán vào thư mục tệp đính kèm của bạn và liên kết tới tệp cục bộ thay vì địa chỉ web. Bao gồm "Sao chép hình ảnh" của Safari, ảnh trong nội dung web đã sao chép và địa chỉ ảnh được dán. Theo mặc định, tên tệp lấy từ địa chỉ:',
-            savingAliases: [
-                'tải xuống',
-                'tệp đính kèm',
-                'safari',
-                'ảnh chụp màn hình',
-                'hình ảnh',
-                'thư mục',
-                'tên tệp',
-                'chiều rộng',
-                'kích thước'
-            ],
+                'Lưu ảnh từ web vào thư mục tệp đính kèm của bạn và liên kết tới tệp cục bộ thay vì địa chỉ web. Bao gồm "Sao chép hình ảnh" của Safari, ảnh trong nội dung web đã sao chép và địa chỉ ảnh được dán. Theo mặc định, tên tệp lấy từ địa chỉ:',
+            savingAliases: ['tải xuống', 'url', 'web', 'tệp đính kèm', 'safari', 'cục bộ', 'hình ảnh', 'thư mục'],
+            sizeStyleName: 'Kích thước và kiểu',
+            sizeStyleDesc: 'Thêm chiều rộng hoặc lớp CSS cho ảnh đã dán, tự động hoặc qua hộp thoại chọn.',
+            sizeStyleAliases: ['kích thước', 'chiều rộng', 'css', 'lớp', 'kiểu', 'đổi kích thước', 'invert'],
+            summarySize: 'Kích thước: {value}',
+            summaryStyle: 'Kiểu: {value}',
+            summaryAsk: 'Hỏi',
             sizeChoiceName: 'Áp dụng kích thước khi dán',
             sizeChoiceDesc:
                 'Thêm chiều rộng cho mỗi ảnh nhúng được lưu, ví dụ ![[photo.jpg|400]]. Thuộc tính chiều rộng của ghi chú được ưu tiên.',
@@ -111,7 +107,9 @@ export const STRINGS_VI: TranslationStrings = {
             choiceAsk: 'Hỏi mỗi lần dán',
             nameFormatName: 'Tên tệp',
             customDesc:
-                'Dùng {{name}} cho tên nguồn, {{noteName}} cho tên ghi chú, {{property:xyz}} cho một thuộc tính frontmatter, {{counter}} hoặc {{counter:2}} cho số tăng dần, và các định dạng ngày của Moment như YYYY-MM-DD. Ảnh chụp màn hình không có tên nguồn, nên {{name}} của nó trở thành "Pasted image" kèm dấu thời gian, như trong Obsidian.',
+                'Dùng {{name}} cho tên nguồn, {{noteName}} cho tên ghi chú, {{property:xyz}} cho một thuộc tính frontmatter, {{counter}} hoặc {{counter:2}} cho số tăng dần, và các định dạng ngày của Moment như YYYY-MM-DD.',
+            customScreenshotDesc:
+                'Ảnh chụp màn hình không có tên nguồn, nên {{name}} của nó trở thành "Pasted image" kèm dấu thời gian, như trong Obsidian.',
             customMomentLink: 'Định dạng Moment',
             customExample: 'Ví dụ: {value}',
             customExampleNote: 'Ghi chú của tôi',

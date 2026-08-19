@@ -88,10 +88,16 @@ export const STRINGS_AR: TranslationStrings = {
 
         images: {
             heading: 'الصور',
-            savingName: 'حفظ الصور الملصقة في الخزنة',
+            savingName: 'حفظ صور الويب في الخزنة',
             savingDesc:
-                'يحفظ الصور الملصقة في مجلد المرفقات ويربط الملف المحلي بدل عنوان الويب. يشمل «نسخ الصورة» في Safari، والصور داخل محتوى ويب منسوخ، وعناوين الصور الملصقة. يأتي اسم الملف من العنوان افتراضيًا:',
-            savingAliases: ['تنزيل', 'مرفق', 'safari', 'لقطة شاشة', 'صورة', 'مجلد', 'اسم الملف', 'عرض', 'حجم'],
+                'يحفظ صور الويب في مجلد المرفقات ويربط الملف المحلي بدل عنوان الويب. يشمل «نسخ الصورة» في Safari، والصور داخل محتوى ويب منسوخ، وعناوين الصور الملصقة. يأتي اسم الملف من العنوان افتراضيًا:',
+            savingAliases: ['تنزيل', 'url', 'ويب', 'مرفق', 'safari', 'محلي', 'صورة', 'مجلد'],
+            sizeStyleName: 'الحجم والمظهر',
+            sizeStyleDesc: 'أضف عرضًا أو فئة CSS إلى الصور الملصقة، إما تلقائيًا أو عبر نافذة اختيار.',
+            sizeStyleAliases: ['حجم', 'عرض', 'css', 'فئة', 'مظهر', 'تغيير الحجم', 'invert'],
+            summarySize: 'الحجم: {value}',
+            summaryStyle: 'المظهر: {value}',
+            summaryAsk: 'اسأل',
             sizeChoiceName: 'تطبيق الحجم عند اللصق',
             sizeChoiceDesc: 'يضيف عرضًا إلى كل صورة مضمّنة تُحفظ، مثل ![[photo.jpg|400]]. خاصية العرض في الملاحظة لها الأولوية.',
             sizeChoiceAliases: ['حجم', 'عرض', 'حجم الصورة', 'تغيير الحجم', 'تضمين', '400'],
@@ -106,7 +112,8 @@ export const STRINGS_AR: TranslationStrings = {
             choiceAsk: 'اسأل عند كل لصق',
             nameFormatName: 'أسماء الملفات',
             customDesc:
-                'استخدم {{name}} لاسم المصدر، و{{noteName}} لاسم الملاحظة، و{{property:xyz}} لخاصية frontmatter، و{{counter}} أو {{counter:2}} لرقم متزايد، وتنسيقات تاريخ Moment مثل YYYY-MM-DD. لقطة الشاشة لا تملك اسم مصدر، لذلك يصبح {{name}} فيها «Pasted image» مع طابع زمني، كما في Obsidian.',
+                'استخدم {{name}} لاسم المصدر، و{{noteName}} لاسم الملاحظة، و{{property:xyz}} لخاصية frontmatter، و{{counter}} أو {{counter:2}} لرقم متزايد، وتنسيقات تاريخ Moment مثل YYYY-MM-DD.',
+            customScreenshotDesc: 'لقطة الشاشة لا تملك اسم مصدر، لذلك يصبح {{name}} فيها «Pasted image» مع طابع زمني، كما في Obsidian.',
             customMomentLink: 'تنسيق Moment',
             customExample: 'مثال: {value}',
             customExampleNote: 'ملاحظتي',

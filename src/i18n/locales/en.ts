@@ -97,21 +97,16 @@ export const STRINGS_EN = {
 
         images: {
             heading: 'Images',
-            savingName: 'Save pasted images into the vault',
+            savingName: 'Save web images into the vault',
             savingDesc:
-                'Saves pasted images into your attachment folder and links the local file instead of the web address. Covers Safari\'s "Copy image", images inside copied web content, and pasted image addresses. By default the file name comes from the address:',
-            savingAliases: [
-                'download',
-                'attachment',
-                'safari',
-                'screenshot',
-                'picture',
-                'folder',
-                'file name',
-                'filename',
-                'width',
-                'size'
-            ],
+                'Saves images from the web into your attachment folder and links the local file instead of the web address. Covers Safari\'s "Copy image", images inside copied web content, and pasted image addresses. By default the file name comes from the address:',
+            savingAliases: ['download', 'url', 'web', 'attachment', 'safari', 'local', 'picture', 'folder'],
+            sizeStyleName: 'Size and style',
+            sizeStyleDesc: 'Add a width or a CSS class to pasted images, either automatically or through a picker.',
+            sizeStyleAliases: ['size', 'width', 'css', 'class', 'style', 'resize', 'invert'],
+            summarySize: 'Size: {value}',
+            summaryStyle: 'Style: {value}',
+            summaryAsk: 'Ask',
             sizeChoiceName: 'Apply size on paste',
             sizeChoiceDesc:
                 "Adds a width to every saved image embed, such as ![[photo.jpg|400]]. A note's own width property overrides this.",
@@ -128,13 +123,16 @@ export const STRINGS_EN = {
             choiceAsk: 'Ask on every paste',
             nameFormatName: 'File names',
             customDesc:
-                'Use {{name}} for the source name, {{noteName}} for the note name, {{property:xyz}} for a frontmatter property, {{counter}} or {{counter:2}} for a rising number, and Moment date formats such as YYYY-MM-DD. A screenshot has no source name, so its {{name}} becomes "Pasted image" with a timestamp, as in Obsidian.',
+                'Use {{name}} for the source name, {{noteName}} for the note name, {{property:xyz}} for a frontmatter property, {{counter}} or {{counter:2}} for a rising number, and Moment date formats such as YYYY-MM-DD.',
+            customScreenshotDesc:
+                'A screenshot has no source name, so its {{name}} becomes "Pasted image" with a timestamp, as in Obsidian.',
             customMomentLink: 'Moment format',
             customExample: 'Example: {value}',
             customExampleNote: 'My note',
             customAliases: [
                 'name',
                 'filename',
+                'file name',
                 'date',
                 'moment',
                 'YYYY',

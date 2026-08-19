@@ -84,20 +84,16 @@ export const STRINGS_FR: TranslationStrings = {
 
         images: {
             heading: 'Images',
-            savingName: 'Enregistrer les images collées dans le coffre',
+            savingName: 'Enregistrer les images du web dans le coffre',
             savingDesc:
-                'Enregistre les images collées dans votre dossier de pièces jointes et crée un lien vers le fichier local plutôt que vers l’adresse web. Concerne « Copier l’image » de Safari, les images contenues dans du contenu web copié et les adresses d’image collées. Par défaut, le nom du fichier vient de l’adresse :',
-            savingAliases: [
-                'télécharger',
-                'pièce jointe',
-                'safari',
-                'capture d’écran',
-                'image',
-                'dossier',
-                'nom de fichier',
-                'largeur',
-                'taille'
-            ],
+                'Enregistre les images du web dans votre dossier de pièces jointes et crée un lien vers le fichier local plutôt que vers l’adresse web. Concerne « Copier l’image » de Safari, les images présentes dans du contenu web copié et les adresses d’image collées. Par défaut, le nom du fichier vient de l’adresse :',
+            savingAliases: ['télécharger', 'url', 'web', 'pièce jointe', 'safari', 'local', 'image', 'dossier'],
+            sizeStyleName: 'Taille et style',
+            sizeStyleDesc: 'Ajoutez une largeur ou une classe CSS aux images collées, automatiquement ou via une boîte de dialogue.',
+            sizeStyleAliases: ['taille', 'largeur', 'css', 'classe', 'style', 'redimensionner', 'invert'],
+            summarySize: 'Taille : {value}',
+            summaryStyle: 'Style : {value}',
+            summaryAsk: 'Demander',
             sizeChoiceName: 'Appliquer une taille au collage',
             sizeChoiceDesc:
                 'Ajoute une largeur à chaque image enregistrée, par exemple ![[photo.jpg|400]]. La propriété de largeur de la note est prioritaire.',
@@ -114,7 +110,9 @@ export const STRINGS_FR: TranslationStrings = {
             choiceAsk: 'Demander à chaque collage',
             nameFormatName: 'Noms de fichiers',
             customDesc:
-                'Utilisez {{name}} pour le nom de la source, {{noteName}} pour le nom de la note, {{property:xyz}} pour une propriété du frontmatter, {{counter}} ou {{counter:2}} pour un numéro croissant, et les formats de date Moment comme YYYY-MM-DD. Une capture d’écran n’a pas de nom de source, son {{name}} devient donc « Pasted image » avec un horodatage, comme dans Obsidian.',
+                'Utilisez {{name}} pour le nom de la source, {{noteName}} pour le nom de la note, {{property:xyz}} pour une propriété du frontmatter, {{counter}} ou {{counter:2}} pour un numéro croissant, et les formats de date Moment comme YYYY-MM-DD.',
+            customScreenshotDesc:
+                'Une capture d’écran n’a pas de nom de source, son {{name}} devient donc « Pasted image » avec un horodatage, comme dans Obsidian.',
             customMomentLink: 'Format Moment',
             customExample: 'Exemple : {value}',
             customExampleNote: 'Ma note',

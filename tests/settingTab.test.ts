@@ -385,7 +385,7 @@ describe('settings tree', () => {
 
     it('puts the detail on sub-pages, declared so search can still reach it', () => {
         const found = pages(tab.getSettingDefinitions());
-        expect(found.map(page => page.name)).toEqual(['Link removals', 'Snippets']);
+        expect(found.map(page => page.name)).toEqual(['Size and style', 'Link removals', 'Snippets']);
         // `items` keeps a page in the searchable tree; the imperative `page` form does not
         for (const page of found) {
             expect(page.items, `"${page.name}" has no items`).toBeDefined();
@@ -398,6 +398,25 @@ describe('settings tree', () => {
         const removals = found.find(page => page.name === 'Link removals');
 
         expect(typeof removals?.displayValue === 'function' ? removals.displayValue() : removals?.displayValue).toMatch(/^\d+ entries$/);
+    });
+
+    it('summarizes the size and style picks on the landing row', () => {
+        const summary = (settings: Partial<BetterPasteSettings>) => {
+            const page = pages(makeTab(fakePlugin(settings)).getSettingDefinitions()).find(
+                candidate => candidate.name === 'Size and style'
+            );
+            return typeof page?.displayValue === 'function' ? page.displayValue() : page?.displayValue;
+        };
+
+        expect(summary({})).toBe('Do nothing');
+        expect(summary({ imageSizeChoice: '400' })).toBe('Size: 400');
+        expect(summary({ imageSizeChoice: '400', imageClassOptions: 'invert', imageClassChoice: 'invert' })).toBe(
+            'Size: 400, Style: invert'
+        );
+        expect(summary({ imageSizeChoice: 'ask' })).toBe('Size: Ask');
+        // A stored choice that left the options list, and ask with nothing to offer, read as none
+        expect(summary({ imageSizeChoice: '999' })).toBe('Do nothing');
+        expect(summary({ imageClassOptions: '', imageClassChoice: 'ask' })).toBe('Do nothing');
     });
 
     it('gives every master toggle search terms for what it hides', () => {
@@ -679,12 +698,13 @@ describe('dependent settings', () => {
         return pages(makeTab(fakePlugin(settings)).getSettingDefinitions()).find(page => page.name === name);
     }
 
-    it('hides the image detail when the rule is off', () => {
-        const fileNames = (settings: Partial<BetterPasteSettings>) =>
-            flatten(makeTab(fakePlugin(settings)).getSettingDefinitions()).find(row => row.name === 'File names');
+    it('keeps the naming and style rows independent of the web saving toggle', () => {
+        const rowNamed = (name: string, settings: Partial<BetterPasteSettings>) =>
+            flatten(makeTab(fakePlugin(settings)).getSettingDefinitions()).find(row => row.name === name);
 
-        expect(isVisible(fileNames({ imageEnabled: false }))).toBe(false);
-        expect(isVisible(fileNames({ imageEnabled: true }))).toBe(true);
+        // The template and decoration also reach clipboard images, so they never hide
+        expect(isVisible(rowNamed('File names', { imageEnabled: false }))).toBeUndefined();
+        expect(isVisible(rowNamed('Apply size on paste', { imageEnabled: false }))).toBeUndefined();
     });
 
     it('hides the link detail when the rule is off', () => {

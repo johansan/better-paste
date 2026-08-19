@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { DropdownComponent, Setting, SettingGroupItem } from 'obsidian';
+import type { DropdownComponent, Setting, SettingDefinitionItem, SettingGroupItem } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../defaults';
 import { DEFAULT_IMAGE_NAME_TEMPLATE } from '../constants';
 import { applyFileNameTemplate, buildFileNameTokens } from '../../utils/filenames';
@@ -74,6 +74,10 @@ function renderCustomFilenameFormat(setting: Setting, context: SettingsPageConte
     const momentLink = setting.descEl.createEl('a', { text: text.customMomentLink, href: MOMENT_FORMAT_DOCS_URL });
     momentLink.setAttr('rel', 'noopener noreferrer');
     momentLink.setAttr('target', '_blank');
+    // The screenshot rule stands apart from the token list, so it gets its own paragraph
+    setting.descEl.createEl('br');
+    setting.descEl.createEl('br');
+    setting.descEl.appendText(text.customScreenshotDesc);
     const example = setting.descEl.createDiv({ cls: 'better-paste-example' });
 
     const renderExample = (template: string): void => {
@@ -116,16 +120,19 @@ function populateChoiceDropdown(dropdown: DropdownComponent, options: string, ch
     dropdown.setValue((choice === 'ask' && values.length > 0) || values.includes(choice) ? choice : '');
 }
 
-/** Rows shown under the Images heading. Naming only applies once saving is on. */
+/** The label a stored choice shows on the landing row, or '' when it resolves to none. */
+function choiceLabel(choice: string, options: string): string {
+    const values = parseCommaList(options);
+    if (choice === 'ask' && values.length > 0) return strings.settings.images.summaryAsk;
+    return values.includes(choice) ? choice : '';
+}
+
+/**
+ * Rows shown under the Images heading. The saving toggle governs web images only;
+ * naming and decoration also reach clipboard images, so those rows are always visible.
+ */
 export function createImageLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
-    const enabled = (): boolean => context.settings().imageEnabled;
-
     const text = strings.settings.images;
-
-    // Each options field rebuilds its dropdown while it is edited, so a value can be
-    // picked right after it is typed without reopening the settings tab
-    let refreshSizeChoices: (() => void) | undefined;
-    let refreshClassChoices: (() => void) | undefined;
 
     return [
         {
@@ -137,19 +144,49 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
         {
             name: text.nameFormatName,
             aliases: aliases(source => source.settings.images.customAliases),
-            visible: enabled,
             render: setting => renderCustomFilenameFormat(setting, context)
         },
         {
+            type: 'page',
+            name: text.sizeStyleName,
+            desc: text.sizeStyleDesc,
+            aliases: aliases(source => source.settings.images.sizeStyleAliases),
+            displayValue: () => {
+                const settings = context.settings();
+                const size = choiceLabel(settings.imageSizeChoice, settings.imageSizeOptions);
+                const style = choiceLabel(settings.imageClassChoice, settings.imageClassOptions);
+                const parts = [
+                    size ? format(text.summarySize, { value: size }) : '',
+                    style ? format(text.summaryStyle, { value: style }) : ''
+                ].filter(part => part !== '');
+                return parts.length > 0 ? parts.join(', ') : text.choiceNone;
+            },
+            items: createSizeStylePageDefinitions(context)
+        }
+    ];
+}
+
+/** The width and CSS class rows, on their own page because most vaults never touch them. */
+function createSizeStylePageDefinitions(context: SettingsPageContext): SettingDefinitionItem[] {
+    const text = strings.settings.images;
+
+    // Each options field rebuilds its dropdown while it is edited, so a value can be
+    // picked right after it is typed without reopening the settings tab
+    let refreshSizeChoices: (() => void) | undefined;
+    let refreshClassChoices: (() => void) | undefined;
+
+    return [
+        {
             name: text.sizeChoiceName,
             aliases: aliases(source => source.settings.images.sizeChoiceAliases),
-            visible: enabled,
             render: setting => {
                 setting.setName(text.sizeChoiceName);
                 setting.setDesc(text.sizeChoiceDesc);
                 setting.addDropdown(dropdown => {
                     dropdown.onChange(value => {
                         context.settings().imageSizeChoice = value;
+                        // The landing row's summary names this choice, so it must rebuild
+                        context.update();
                         return context.saveSettings();
                     });
                     const populate = (): void =>
@@ -162,7 +199,6 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
         {
             name: text.sizeOptionsName,
             aliases: aliases(source => source.settings.images.sizeChoiceAliases),
-            visible: enabled,
             render: setting => {
                 setting.setName(text.sizeOptionsName);
                 setting.setDesc(text.sizeOptionsDesc);
@@ -185,7 +221,6 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
             name: text.sizePropertyName,
             desc: context.dynamicDescription('imageSizeProperty'),
             aliases: aliases(source => source.settings.images.sizePropertyAliases),
-            visible: enabled,
             control: {
                 type: 'text',
                 key: 'imageSizeProperty',
@@ -196,13 +231,14 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
         {
             name: text.classChoiceName,
             aliases: aliases(source => source.settings.images.classChoiceAliases),
-            visible: enabled,
             render: setting => {
                 setting.setName(text.classChoiceName);
                 setting.setDesc(text.classChoiceDesc);
                 setting.addDropdown(dropdown => {
                     dropdown.onChange(value => {
                         context.settings().imageClassChoice = value;
+                        // The landing row's summary names this choice, so it must rebuild
+                        context.update();
                         return context.saveSettings();
                     });
                     const populate = (): void =>
@@ -215,7 +251,6 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
         {
             name: text.classOptionsName,
             aliases: aliases(source => source.settings.images.classChoiceAliases),
-            visible: enabled,
             render: setting => {
                 setting.setName(text.classOptionsName);
                 setting.setDesc(text.classOptionsDesc);

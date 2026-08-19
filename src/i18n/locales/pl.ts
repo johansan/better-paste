@@ -86,10 +86,16 @@ export const STRINGS_PL: TranslationStrings = {
 
         images: {
             heading: 'Obrazy',
-            savingName: 'Zapisuj wklejone obrazy w sejfie',
+            savingName: 'Zapisuj obrazy z sieci w sejfie',
             savingDesc:
-                'Zapisuje wklejone obrazy w folderze załączników i wstawia odnośnik do pliku lokalnego zamiast adresu internetowego. Dotyczy opcji „Kopiuj obraz” w Safari, obrazów w skopiowanej treści z sieci oraz wklejanych adresów obrazów. Domyślnie nazwa pliku pochodzi z adresu:',
-            savingAliases: ['pobieranie', 'załącznik', 'safari', 'zrzut ekranu', 'obraz', 'folder', 'nazwa pliku', 'szerokość', 'rozmiar'],
+                'Zapisuje obrazy z sieci w folderze załączników i wstawia odnośnik do pliku lokalnego zamiast adresu internetowego. Dotyczy opcji „Kopiuj obraz” w Safari, obrazów w skopiowanej treści z sieci oraz wklejanych adresów obrazów. Domyślnie nazwa pliku pochodzi z adresu:',
+            savingAliases: ['pobieranie', 'url', 'sieć', 'załącznik', 'safari', 'lokalny', 'obraz', 'folder'],
+            sizeStyleName: 'Rozmiar i styl',
+            sizeStyleDesc: 'Dodawaj do wklejanych obrazów szerokość lub klasę CSS, automatycznie albo przez okno wyboru.',
+            sizeStyleAliases: ['rozmiar', 'szerokość', 'css', 'klasa', 'styl', 'skalowanie', 'invert'],
+            summarySize: 'Rozmiar: {value}',
+            summaryStyle: 'Styl: {value}',
+            summaryAsk: 'Pytaj',
             sizeChoiceName: 'Stosuj rozmiar przy wklejaniu',
             sizeChoiceDesc:
                 'Dodaje szerokość do każdego zapisanego osadzenia obrazu, np. ![[photo.jpg|400]]. Właściwość szerokości notatki ma pierwszeństwo.',
@@ -106,7 +112,9 @@ export const STRINGS_PL: TranslationStrings = {
             choiceAsk: 'Pytaj przy każdym wklejeniu',
             nameFormatName: 'Nazwy plików',
             customDesc:
-                'Użyj {{name}} dla nazwy źródła, {{noteName}} dla nazwy notatki, {{property:xyz}} dla właściwości frontmattera, {{counter}} lub {{counter:2}} dla rosnącego numeru oraz formatów daty Moment, takich jak YYYY-MM-DD. Zrzut ekranu nie ma nazwy źródła, więc jego {{name}} staje się „Pasted image” ze znacznikiem czasu, jak w Obsidianie.',
+                'Użyj {{name}} dla nazwy źródła, {{noteName}} dla nazwy notatki, {{property:xyz}} dla właściwości frontmattera, {{counter}} lub {{counter:2}} dla rosnącego numeru oraz formatów daty Moment, takich jak YYYY-MM-DD.',
+            customScreenshotDesc:
+                'Zrzut ekranu nie ma nazwy źródła, więc jego {{name}} staje się „Pasted image” ze znacznikiem czasu, jak w Obsidianie.',
             customMomentLink: 'Format Moment',
             customExample: 'Przykład: {value}',
             customExampleNote: 'Moja notatka',

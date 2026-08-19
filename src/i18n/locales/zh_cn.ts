@@ -81,10 +81,16 @@ export const STRINGS_ZH_CN: TranslationStrings = {
 
         images: {
             heading: '图片',
-            savingName: '把粘贴的图片保存到仓库',
+            savingName: '把网络图片保存到仓库',
             savingDesc:
-                '把粘贴的图片保存到附件文件夹，并链接本地文件而不是网址。涵盖 Safari 的“拷贝图像”、复制的网页内容中的图片，以及粘贴的图片地址。文件名默认取自地址：',
-            savingAliases: ['下载', '附件', 'safari', '截图', '图片', '文件夹', '文件名', '宽度', '尺寸'],
+                '把网络图片保存到附件文件夹，并链接本地文件而不是网址。涵盖 Safari 的“拷贝图像”、复制的网页内容中的图片，以及粘贴的图片地址。文件名默认取自地址：',
+            savingAliases: ['下载', 'url', '网络', '附件', 'safari', '本地', '图片', '文件夹'],
+            sizeStyleName: '尺寸与样式',
+            sizeStyleDesc: '为粘贴的图片添加宽度或 CSS 类，可自动应用，也可每次选择。',
+            sizeStyleAliases: ['尺寸', '宽度', 'css', '类', '样式', '缩放', 'invert'],
+            summarySize: '尺寸：{value}',
+            summaryStyle: '样式：{value}',
+            summaryAsk: '询问',
             sizeChoiceName: '粘贴时应用尺寸',
             sizeChoiceDesc: '为每张保存的图片添加宽度，例如 ![[photo.jpg|400]]。笔记自己的宽度属性优先。',
             sizeChoiceAliases: ['尺寸', '宽度', '图片尺寸', '缩放', '嵌入', '400'],
@@ -99,7 +105,8 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             choiceAsk: '每次粘贴时询问',
             nameFormatName: '文件名',
             customDesc:
-                '用 {{name}} 表示来源名称，{{noteName}} 表示笔记名称，{{property:xyz}} 表示 frontmatter 属性，{{counter}} 或 {{counter:2}} 表示递增编号，日期可用 YYYY-MM-DD 这类 Moment 格式。截图没有来源名称，因此它的 {{name}} 会像 Obsidian 一样变成带时间戳的“Pasted image”。',
+                '用 {{name}} 表示来源名称，{{noteName}} 表示笔记名称，{{property:xyz}} 表示 frontmatter 属性，{{counter}} 或 {{counter:2}} 表示递增编号，日期可用 YYYY-MM-DD 这类 Moment 格式。',
+            customScreenshotDesc: '截图没有来源名称，因此它的 {{name}} 会像 Obsidian 一样变成带时间戳的“Pasted image”。',
             customMomentLink: 'Moment 格式',
             customExample: '示例：{value}',
             customExampleNote: '我的笔记',
