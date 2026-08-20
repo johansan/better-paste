@@ -223,7 +223,11 @@ export const STRINGS_EN = {
             heading: 'Structure',
             listNestingName: 'Keep list nesting on paste',
             listNestingDesc: 'Pastes a copied list with its hierarchy intact, indented to match the list item you paste on.',
-            listNestingAliases: ['list', 'nested', 'indent', 'indentation', 'hierarchy', 'outline', 'bullets', 'checkbox', 'tree']
+            listNestingAliases: ['list', 'nested', 'indent', 'indentation', 'hierarchy', 'outline', 'bullets', 'checkbox', 'tree'],
+            quoteContinuationName: 'Continue block quotes on paste',
+            quoteContinuationDesc:
+                'Pastes multi-line text on a quoted line with every line quoted, so the whole paste stays inside the block quote or callout.',
+            quoteContinuationAliases: ['quote', 'blockquote', 'callout', 'citation', 'admonition', 'paragraph']
         },
 
         custom: {

@@ -207,7 +207,11 @@ export const STRINGS_TR: TranslationStrings = {
             listNestingName: 'Yapıştırırken liste hiyerarşisini koru',
             listNestingDesc:
                 'Kopyalanan listeyi hiyerarşisi bozulmadan yapıştırır, girintiyi üzerine yapıştırdığınız liste ögesine göre ayarlar.',
-            listNestingAliases: ['liste', 'iç içe', 'girinti', 'hiyerarşi', 'anahat', 'madde', 'onay kutusu', 'ağaç']
+            listNestingAliases: ['liste', 'iç içe', 'girinti', 'hiyerarşi', 'anahat', 'madde', 'onay kutusu', 'ağaç'],
+            quoteContinuationName: 'Yapıştırırken blok alıntıları devam ettir',
+            quoteContinuationDesc:
+                'Çok satırlı metni alıntılanmış bir satıra yapıştırırken her satırı alıntıya dönüştürür, böylece yapıştırılan metnin tamamı blok alıntının veya bilgi kutusunun içinde kalır.',
+            quoteContinuationAliases: ['alıntı', 'blok alıntı', 'bilgi kutusu', 'atıf', 'uyarı', 'paragraf']
         },
 
         custom: {

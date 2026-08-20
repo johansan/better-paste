@@ -90,6 +90,7 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
     return {
         autoClean: asBoolean(data.autoClean, defaults.autoClean),
         listNesting: asBoolean(data.listNesting, defaults.listNesting),
+        quoteContinuation: asBoolean(data.quoteContinuation, defaults.quoteContinuation),
         showReleaseNotes: asBoolean(data.showReleaseNotes, defaults.showReleaseNotes),
 
         imageEnabled: asBoolean(data.imageEnabled, defaults.imageEnabled),

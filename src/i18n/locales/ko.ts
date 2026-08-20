@@ -193,7 +193,11 @@ export const STRINGS_KO: TranslationStrings = {
             heading: '구조',
             listNestingName: '붙여넣을 때 목록 중첩 유지',
             listNestingDesc: '복사한 목록을 계층 구조를 유지한 채 붙여넣고, 붙여넣는 위치의 목록 항목에 맞춰 들여쓰기합니다.',
-            listNestingAliases: ['목록', '중첩', '들여쓰기', '계층', '개요', '글머리 기호', '체크박스', '트리']
+            listNestingAliases: ['목록', '중첩', '들여쓰기', '계층', '개요', '글머리 기호', '체크박스', '트리'],
+            quoteContinuationName: '붙여넣을 때 인용문 계속',
+            quoteContinuationDesc:
+                '여러 줄 텍스트를 인용된 줄에 붙여넣을 때 모든 줄에 인용 기호를 붙여 전체 내용이 인용문이나 콜아웃 안에 유지되도록 합니다.',
+            quoteContinuationAliases: ['인용', '인용문', '콜아웃', '인용구', '주의', '문단']
         },
 
         custom: {

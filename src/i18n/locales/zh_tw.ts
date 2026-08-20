@@ -190,7 +190,10 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             heading: '結構',
             listNestingName: '貼上時保留清單層級',
             listNestingDesc: '貼上複製的清單時保持其層級結構，並依貼上位置的清單項目調整縮排。',
-            listNestingAliases: ['清單', '巢狀', '縮排', '層級', '大綱', '項目符號', '核取方塊', '樹狀']
+            listNestingAliases: ['清單', '巢狀', '縮排', '層級', '大綱', '項目符號', '核取方塊', '樹狀'],
+            quoteContinuationName: '貼上時延續區塊引用',
+            quoteContinuationDesc: '將多行文字貼到引用行時，為每一行加上引用標記，讓貼上的內容全部保留在區塊引用或標註區塊內。',
+            quoteContinuationAliases: ['引用', '區塊引用', '標註', '引文', '警告', '段落']
         },
 
         custom: {

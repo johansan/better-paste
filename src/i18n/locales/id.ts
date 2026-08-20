@@ -204,7 +204,11 @@ export const STRINGS_ID: TranslationStrings = {
             listNestingName: 'Pertahankan hierarki daftar saat menempel',
             listNestingDesc:
                 'Menempelkan daftar yang disalin dengan hierarkinya utuh, dan indentasinya disesuaikan dengan butir daftar tempat Anda menempel.',
-            listNestingAliases: ['daftar', 'bersarang', 'indentasi', 'hierarki', 'kerangka', 'butir', 'kotak centang', 'pohon']
+            listNestingAliases: ['daftar', 'bersarang', 'indentasi', 'hierarki', 'kerangka', 'butir', 'kotak centang', 'pohon'],
+            quoteContinuationName: 'Lanjutkan blok kutipan saat menempel',
+            quoteContinuationDesc:
+                'Menempelkan teks multibaris pada baris kutipan dan menjadikan setiap baris sebagai kutipan, sehingga seluruh teks yang ditempelkan tetap berada di dalam blok kutipan atau callout.',
+            quoteContinuationAliases: ['kutipan', 'blok kutipan', 'callout', 'sitasi', 'peringatan', 'paragraf']
         },
 
         custom: {

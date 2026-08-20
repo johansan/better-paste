@@ -195,7 +195,11 @@ export const STRINGS_VI: TranslationStrings = {
             heading: 'Cấu trúc',
             listNestingName: 'Giữ cấu trúc lồng nhau của danh sách khi dán',
             listNestingDesc: 'Dán danh sách đã sao chép với phân cấp nguyên vẹn, thụt lề theo mục danh sách bạn dán vào.',
-            listNestingAliases: ['danh sách', 'lồng nhau', 'thụt lề', 'phân cấp', 'dàn ý', 'gạch đầu dòng', 'hộp kiểm', 'cây']
+            listNestingAliases: ['danh sách', 'lồng nhau', 'thụt lề', 'phân cấp', 'dàn ý', 'gạch đầu dòng', 'hộp kiểm', 'cây'],
+            quoteContinuationName: 'Tiếp tục trích dẫn khối khi dán',
+            quoteContinuationDesc:
+                'Dán văn bản nhiều dòng vào một dòng trích dẫn và biến mọi dòng thành dòng trích dẫn, để toàn bộ nội dung dán vẫn nằm trong trích dẫn khối hoặc callout.',
+            quoteContinuationAliases: ['trích dẫn', 'trích dẫn khối', 'chú thích', 'dẫn nguồn', 'cảnh báo', 'đoạn văn']
         },
 
         custom: {

@@ -24,6 +24,7 @@ import { applyCommaPlacement } from '../transforms/textProcessing';
 import type { TextCommaPlacement } from '../transforms/textProcessing';
 import { cleanTerminalText } from '../transforms/terminalText';
 import { rebaseListPaste } from '../transforms/listPaste';
+import { continueQuotePaste } from '../transforms/quotePaste';
 import { applyTextSnippets } from '../transforms/snippets';
 import { cleanPdfText } from '../transforms/pdfText';
 import type { PdfCleanupOptions } from '../transforms/pdfText';
@@ -272,14 +273,16 @@ export class PasteService {
         const startOffset = editor.posToOffset(editor.getCursor('from'));
         const endOffset = editor.posToOffset(editor.getCursor('to'));
         const rebased = settings.listNesting ? rebaseListPaste(result.text, valueBefore, startOffset, endOffset) : null;
+        const quoted =
+            rebased === null && settings.quoteContinuation ? continueQuotePaste(result.text, valueBefore, startOffset, endOffset) : null;
         const needsImages = this.images.hasWork(result.text);
         const needsTitle = this.titles.hasWork(result.text);
-        // A rebase takes the paste over on its own, even when the text rules changed nothing
-        if (rebased === null && !result.changed && !needsImages && !needsTitle) return false;
+        // A document transform takes the paste over because it can change clean text on its own
+        if (rebased === null && quoted === null && !result.changed && !needsImages && !needsTitle) return false;
 
         const targetFile = info.file;
         const selectedLink = needsTitle ? linkFromSelection(editor.getSelection(), plain, result.text) : null;
-        const inserted = selectedLink ?? rebased?.inserted ?? result.text;
+        const inserted = selectedLink ?? rebased?.inserted ?? quoted ?? result.text;
         // The rebase may reach back before the selection, to replace the destination's checkbox
         const from = selectedLink === null && rebased !== null ? rebased.from : startOffset;
         editor.replaceRange(inserted, editor.offsetToPos(from), editor.offsetToPos(endOffset));
@@ -398,12 +401,16 @@ export class PasteService {
             settings.listNesting && valueBefore === valueAtInvocation
                 ? rebaseListPaste(result.text, valueAtInvocation, fromOffset, toOffset)
                 : null;
+        const quoted =
+            rebased === null && settings.quoteContinuation && valueBefore === valueAtInvocation
+                ? continueQuotePaste(result.text, valueAtInvocation, fromOffset, toOffset)
+                : null;
         const needsImages = this.images.hasWork(result.text);
         const needsTitle = this.titles.hasWork(result.text);
         const invocationSelection = valueAtInvocation.slice(fromOffset, toOffset);
         const selectedLink =
             needsTitle && valueBefore === valueAtInvocation ? linkFromSelection(invocationSelection, clipboardText, result.text) : null;
-        const inserted = selectedLink ?? rebased?.inserted ?? result.text;
+        const inserted = selectedLink ?? rebased?.inserted ?? quoted ?? result.text;
         // The rebase may reach back before the selection, to replace the destination's checkbox
         const insertFrom = selectedLink === null && rebased !== null ? rebased.from : fromOffset;
         const startOffset = this.insertAfterClipboardRead(editor, valueAtInvocation, insertFrom, toOffset, inserted);

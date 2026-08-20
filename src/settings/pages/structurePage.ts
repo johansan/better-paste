@@ -33,6 +33,12 @@ export function createStructureDefinitions(): SettingGroupItem[] {
             text.listNestingName,
             text.listNestingDesc,
             aliases(source => source.settings.structure.listNestingAliases)
+        ),
+        toggle(
+            'quoteContinuation',
+            text.quoteContinuationName,
+            text.quoteContinuationDesc,
+            aliases(source => source.settings.structure.quoteContinuationAliases)
         )
     ];
 }

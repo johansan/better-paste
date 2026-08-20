@@ -44,6 +44,11 @@ const ITEM_PATTERN = /^([ \t]*)((?:[-*+]|\d{1,9}[.)])[ \t]+)(\[.\][ \t]+)?(.*)$/
 /** A horizontal rule, which ITEM_PATTERN would otherwise read as a list item. */
 const THEMATIC_BREAK = /^[ \t]*(?:(?:-[ \t]*){3,}|(?:\*[ \t]*){3,}|(?:_[ \t]*){3,})$/;
 
+/** Rejects thematic breaks because their opening shape also matches ITEM_PATTERN. */
+export function isListItemLine(line: string): boolean {
+    return ITEM_PATTERN.test(line) && !THEMATIC_BREAK.test(line);
+}
+
 function parseItem(line: string): ListItemLine | null {
     const match = ITEM_PATTERN.exec(line);
     if (!match) return null;

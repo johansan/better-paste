@@ -51,6 +51,11 @@ export interface ReleaseNote {
 /** Newest first. A new release goes at the top. */
 const RELEASE_NOTES: ReleaseNote[] = [
     {
+        version: '1.0.10',
+        date: '2026-08-20',
+        new: ['You can now paste multiple paragraphs into a block quote or callout. Every pasted line stays quoted.']
+    },
+    {
         version: '1.0.9',
         date: '2026-08-19',
         banner: '1.0.9.jpg',

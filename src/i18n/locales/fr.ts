@@ -197,7 +197,11 @@ export const STRINGS_FR: TranslationStrings = {
             heading: 'Structure',
             listNestingName: 'Conserver l’imbrication des listes au collage',
             listNestingDesc: 'Colle une liste copiée avec sa hiérarchie intacte, indentée selon l’élément de liste sur lequel vous collez.',
-            listNestingAliases: ['liste', 'imbriquée', 'indentation', 'hiérarchie', 'plan', 'puces', 'case', 'arborescence']
+            listNestingAliases: ['liste', 'imbriquée', 'indentation', 'hiérarchie', 'plan', 'puces', 'case', 'arborescence'],
+            quoteContinuationName: 'Continuer les blocs de citation au collage',
+            quoteContinuationDesc:
+                'Colle un texte multiligne sur une ligne citée en citant chaque ligne, afin que tout le contenu collé reste dans le bloc de citation ou l’encadré.',
+            quoteContinuationAliases: ['citation', 'bloc de citation', 'encadré', 'mise en avant', 'source', 'avertissement', 'paragraphe']
         },
 
         custom: {

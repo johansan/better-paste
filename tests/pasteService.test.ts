@@ -235,6 +235,81 @@ describe('handleEditorPaste: plain text', () => {
         expect(editor.getValue()).toBe(doc);
     });
 
+    it('continues a clean multi-line paste inside a block quote', () => {
+        const { service } = build();
+        const editor = new FakeEditor('> ');
+        const event = fakeClipboardEvent({ plain: 'First paragraph\n\nSecond paragraph' });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe('> First paragraph\n>\n> Second paragraph');
+    });
+
+    it('pastes multi-line text natively when quote continuation is off', () => {
+        const { service } = build({ quoteContinuation: false });
+        const doc = '> ';
+        const editor = new FakeEditor(doc);
+        const event = fakeClipboardEvent({ plain: 'First paragraph\n\nSecond paragraph' });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe(doc);
+    });
+
+    it('continues a block quote through the paste command', async () => {
+        const { service } = build();
+        const editor = new FakeEditor('> ');
+        vi.stubGlobal('navigator', { clipboard: { readText: async () => 'First paragraph\n\nSecond paragraph' } });
+
+        try {
+            await service.pasteProcessed(editor.asEditor(), INFO);
+            expect(editor.getValue()).toBe('> First paragraph\n>\n> Second paragraph');
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
+    it('skips quote continuation when the note changed during the clipboard read', async () => {
+        const { service } = build({ textTrim: false });
+        const editor = new FakeEditor('> ');
+        let finishRead: (text: string) => void = () => undefined;
+        const clipboardText = new Promise<string>(resolve => {
+            finishRead = resolve;
+        });
+        vi.stubGlobal('navigator', { clipboard: { readText: () => clipboardText } });
+
+        try {
+            const paste = service.pasteProcessed(editor.asEditor(), INFO);
+            editor.setSelection(0, 0);
+            editor.replaceSelection('edit ');
+            finishRead('First\nSecond');
+            await paste;
+
+            expect(editor.getValue()).toBe('edit First\nSecond> ');
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
+    it('keeps the cursor inside a quote after a trailing line break when edge trimming is off', () => {
+        const { service } = build({ textTrim: false });
+        const editor = new FakeEditor('> ');
+        const event = fakeClipboardEvent({ plain: 'First\n' });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe('> First\n>');
+        expect(editor.getCursor()).toEqual({ line: 1, ch: 1 });
+    });
+
+    it('downloads an image URL inside a continued block quote', async () => {
+        const { service } = build();
+        const editor = new FakeEditor('> ');
+        const event = fakeClipboardEvent({ plain: 'First\nhttps://example.com/cat.png' });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(editor.getValue()).toBe('> First\n> ![[image-0.png]]');
+    });
+
     it('leaves a multi-cursor paste to Obsidian', () => {
         const { service } = build();
         const editor = new FakeEditor('first\nsecond');

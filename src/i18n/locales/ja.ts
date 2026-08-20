@@ -203,7 +203,11 @@ export const STRINGS_JA: TranslationStrings = {
                 '箇条書き',
                 'チェックボックス',
                 'ツリー'
-            ]
+            ],
+            quoteContinuationName: '貼り付け時にブロック引用を継続',
+            quoteContinuationDesc:
+                '複数行のテキストを引用行に貼り付けると、すべての行に引用記号を付け、貼り付けた内容全体をブロック引用またはコールアウト内に保ちます。',
+            quoteContinuationAliases: ['引用', 'ブロック引用', 'コールアウト', '引用文', '警告', '段落']
         },
 
         custom: {

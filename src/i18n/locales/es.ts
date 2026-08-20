@@ -198,7 +198,11 @@ export const STRINGS_ES: TranslationStrings = {
             listNestingName: 'Mantener el anidamiento de listas al pegar',
             listNestingDesc:
                 'Pega una lista copiada con su jerarquía intacta, con la sangría ajustada al elemento de lista sobre el que pegas.',
-            listNestingAliases: ['lista', 'anidada', 'sangría', 'jerarquía', 'esquema', 'viñetas', 'casilla', 'árbol']
+            listNestingAliases: ['lista', 'anidada', 'sangría', 'jerarquía', 'esquema', 'viñetas', 'casilla', 'árbol'],
+            quoteContinuationName: 'Continuar citas en bloque al pegar',
+            quoteContinuationDesc:
+                'Pega texto de varias líneas en una línea citada y cita cada línea, para que todo el contenido pegado permanezca dentro de la cita en bloque o del destacado.',
+            quoteContinuationAliases: ['cita', 'cita en bloque', 'destacado', 'advertencia', 'párrafo']
         },
 
         custom: {

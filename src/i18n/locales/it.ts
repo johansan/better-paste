@@ -199,7 +199,11 @@ export const STRINGS_IT: TranslationStrings = {
             listNestingName: 'Mantieni la nidificazione degli elenchi quando incolli',
             listNestingDesc:
                 'Incolla un elenco copiato con la sua gerarchia intatta, con il rientro adattato alla voce di elenco su cui incolli.',
-            listNestingAliases: ['elenco', 'lista', 'nidificato', 'rientro', 'gerarchia', 'struttura', 'puntato', 'casella', 'albero']
+            listNestingAliases: ['elenco', 'lista', 'nidificato', 'rientro', 'gerarchia', 'struttura', 'puntato', 'casella', 'albero'],
+            quoteContinuationName: 'Continua i blocchi di citazione quando incolli',
+            quoteContinuationDesc:
+                'Incolla testo su più righe in una riga citata, citando ogni riga, così l’intero contenuto incollato resta nel blocco di citazione o nel callout.',
+            quoteContinuationAliases: ['citazione', 'blocco di citazione', 'callout', 'fonte', 'avviso', 'paragrafo']
         },
 
         custom: {

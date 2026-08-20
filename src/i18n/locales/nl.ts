@@ -207,7 +207,11 @@ export const STRINGS_NL: TranslationStrings = {
             listNestingName: 'Geneste lijsten behouden bij plakken',
             listNestingDesc:
                 'Plakt een gekopieerde lijst met de hiërarchie intact, ingesprongen op het niveau van het lijstitem waarop je plakt.',
-            listNestingAliases: ['lijst', 'genest', 'inspringen', 'hiërarchie', 'structuur', 'opsomming', 'selectievakje', 'boom']
+            listNestingAliases: ['lijst', 'genest', 'inspringen', 'hiërarchie', 'structuur', 'opsomming', 'selectievakje', 'boom'],
+            quoteContinuationName: 'Blokcitaten voortzetten bij plakken',
+            quoteContinuationDesc:
+                'Plakt tekst met meerdere regels op een geciteerde regel en citeert elke regel, zodat alle geplakte tekst binnen het blokcitaat of de callout blijft.',
+            quoteContinuationAliases: ['citaat', 'blokcitaat', 'callout', 'kader', 'bronvermelding', 'waarschuwing', 'alinea']
         },
 
         custom: {

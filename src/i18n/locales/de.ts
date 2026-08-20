@@ -225,7 +225,11 @@ export const STRINGS_DE: TranslationStrings = {
             listNestingName: 'Listenverschachtelung beim Einfügen erhalten',
             listNestingDesc:
                 'Fügt eine kopierte Liste mit intakter Hierarchie ein, eingerückt passend zum Listenpunkt, auf dem eingefügt wird.',
-            listNestingAliases: ['liste', 'verschachtelt', 'einrückung', 'hierarchie', 'gliederung', 'aufzählung', 'checkbox', 'baum']
+            listNestingAliases: ['liste', 'verschachtelt', 'einrückung', 'hierarchie', 'gliederung', 'aufzählung', 'checkbox', 'baum'],
+            quoteContinuationName: 'Blockzitate beim Einfügen fortsetzen',
+            quoteContinuationDesc:
+                'Fügt mehrzeiligen Text in eine zitierte Zeile ein und zitiert jede Zeile, sodass der gesamte eingefügte Text im Blockzitat oder Callout bleibt.',
+            quoteContinuationAliases: ['zitat', 'blockzitat', 'callout', 'zitierung', 'hinweis', 'absatz']
         },
 
         custom: {

@@ -207,7 +207,11 @@ export const STRINGS_PT: TranslationStrings = {
                 'marcas',
                 'caixa de verificação',
                 'árvore'
-            ]
+            ],
+            quoteContinuationName: 'Continuar citações em bloco ao colar',
+            quoteContinuationDesc:
+                'Cola texto com várias linhas numa linha citada e cita todas as linhas, para que todo o conteúdo colado permaneça dentro da citação em bloco ou do destaque.',
+            quoteContinuationAliases: ['citação', 'citação em bloco', 'destaque', 'referência', 'advertência', 'parágrafo']
         },
 
         custom: {

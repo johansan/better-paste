@@ -37,6 +37,8 @@ export interface BetterPasteSettings {
      * depends on where the paste lands, not only on what was copied.
      */
     listNesting: boolean;
+    /** Continue every line of a multi-line paste inside the destination block quote. */
+    quoteContinuation: boolean;
 
     /* Images */
 

@@ -205,7 +205,11 @@ export const STRINGS_PL: TranslationStrings = {
             listNestingName: 'Zachowuj zagnieżdżenie list przy wklejaniu',
             listNestingDesc:
                 'Wkleja skopiowaną listę z zachowaną hierarchią, z wcięciem dopasowanym do elementu listy, na którym wklejasz.',
-            listNestingAliases: ['lista', 'zagnieżdżona', 'wcięcie', 'hierarchia', 'konspekt', 'punktory', 'pole wyboru', 'drzewo']
+            listNestingAliases: ['lista', 'zagnieżdżona', 'wcięcie', 'hierarchia', 'konspekt', 'punktory', 'pole wyboru', 'drzewo'],
+            quoteContinuationName: 'Kontynuuj cytaty blokowe przy wklejaniu',
+            quoteContinuationDesc:
+                'Wkleja tekst wielowierszowy w cytowanym wierszu i oznacza każdy wiersz jako cytat, dzięki czemu cała wklejona treść pozostaje w cytacie blokowym lub objaśnieniu.',
+            quoteContinuationAliases: ['cytat', 'cytat blokowy', 'objaśnienie', 'przytoczenie', 'uwaga', 'akapit']
         },
 
         custom: {

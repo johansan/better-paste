@@ -190,7 +190,10 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             heading: '结构',
             listNestingName: '粘贴时保留列表层级',
             listNestingDesc: '粘贴复制的列表时保持其层级结构，并按粘贴位置的列表项调整缩进。',
-            listNestingAliases: ['列表', '嵌套', '缩进', '层级', '大纲', '项目符号', '复选框', '树']
+            listNestingAliases: ['列表', '嵌套', '缩进', '层级', '大纲', '项目符号', '复选框', '树'],
+            quoteContinuationName: '粘贴时延续块引用',
+            quoteContinuationDesc: '将多行文本粘贴到引用行时，为每一行添加引用标记，使粘贴内容全部保留在块引用或标注框中。',
+            quoteContinuationAliases: ['引用', '块引用', '引用块', '标注', '引文', '警告框', '段落']
         },
 
         custom: {

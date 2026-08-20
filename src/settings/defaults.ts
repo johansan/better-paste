@@ -22,6 +22,7 @@ import { DEFAULT_IMAGE_NAME_TEMPLATE } from './constants';
 export const DEFAULT_SETTINGS: BetterPasteSettings = {
     autoClean: true,
     listNesting: true,
+    quoteContinuation: true,
     showReleaseNotes: true,
 
     imageEnabled: true,
