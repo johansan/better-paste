@@ -297,8 +297,8 @@ export const STRINGS_TR: TranslationStrings = {
         title: 'Better Paste: çakışan eklentiler',
         thanks: 'Better Paste’i kurup kullandığınız için teşekkürler!',
         intro: {
-            one: 'Şu anda aşağı yukarı aynı işi yapan {count} eklentiniz kurulu, bu yüzden aşağıdakileri devre dışı bırakın veya kaldırın:',
-            other: 'Şu anda aşağı yukarı aynı işi yapan {count} eklentiniz kurulu, bu yüzden aşağıdakileri devre dışı bırakın veya kaldırın:'
+            one: 'Şu anda Better Paste ile aşağı yukarı aynı işi yapan {count} eklentiniz kurulu, bu yüzden aşağıdakini devre dışı bırakın veya kaldırın:',
+            other: 'Şu anda Better Paste ile aşağı yukarı aynı işi yapan {count} eklentiniz kurulu, bu yüzden aşağıdakileri devre dışı bırakın veya kaldırın:'
         },
         outro: 'Ayarlar > Topluluk eklentileri bölümünden devre dışı bırakabilirsiniz.',
         dontRemind: 'Bir daha hatırlatmayın',

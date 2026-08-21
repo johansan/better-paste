@@ -59,7 +59,8 @@ const RELEASE_NOTES: ReleaseNote[] = [
             'You can now paste multiple paragraphs into a block quote or callout. Every pasted line stays quoted.'
         ],
         fixed: [
-            'Fixed link titles for Stack Overflow and the Stack Exchange sites. Question pages block normal lookups, so the title is now fetched from the Stack Exchange API.'
+            'Fixed link titles for Stack Overflow and the Stack Exchange sites. Question pages block normal lookups, so the title is now fetched from the Stack Exchange API.',
+            'Fixed the overlapping plugins dialog counting Better Paste itself among the overlapping plugins.'
         ]
     },
     {

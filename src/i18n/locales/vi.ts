@@ -281,7 +281,7 @@ export const STRINGS_VI: TranslationStrings = {
         title: 'Better Paste: plugin trùng chức năng',
         thanks: 'Cảm ơn bạn đã cài và dùng Better Paste!',
         intro: {
-            other: 'Hiện bạn đã cài {count} plugin làm gần như cùng một việc, hãy tắt hoặc gỡ các plugin sau:'
+            other: 'Hiện bạn đã cài {count} plugin làm gần như cùng một việc với Better Paste, hãy tắt hoặc gỡ plugin sau:'
         },
         outro: 'Tắt trong Cài đặt > Phần mở rộng của bên thứ ba.',
         dontRemind: 'Không hiển thị lại',

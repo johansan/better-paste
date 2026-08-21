@@ -289,8 +289,8 @@ export const STRINGS_IT: TranslationStrings = {
         title: 'Better Paste: plugin che si sovrappongono',
         thanks: 'Grazie per aver installato Better Paste!',
         intro: {
-            one: 'Al momento hai {count} plugin installato che fa più o meno la stessa cosa, quindi disattiva o disinstalla:',
-            other: 'Al momento hai {count} plugin installati che fanno più o meno la stessa cosa, quindi disattiva o disinstalla:'
+            one: 'Al momento hai {count} plugin installato che fa più o meno la stessa cosa di Better Paste, quindi disattiva o disinstalla:',
+            other: 'Al momento hai {count} plugin installati che fanno più o meno la stessa cosa di Better Paste, quindi disattiva o disinstalla:'
         },
         outro: 'Si disattivano in Impostazioni > Plugin di terze parti.',
         dontRemind: 'Non mostrare più questo messaggio',

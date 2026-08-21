@@ -287,8 +287,8 @@ export const STRINGS_FR: TranslationStrings = {
         title: 'Better Paste : plugins redondants',
         thanks: 'Merci d’avoir installé Better Paste et de l’utiliser !',
         intro: {
-            one: 'Vous avez actuellement {count} plugin installé qui fait plus ou moins la même chose, alors désactivez ou désinstallez :',
-            other: 'Vous avez actuellement {count} plugins installés qui font plus ou moins la même chose, alors désactivez ou désinstallez :'
+            one: 'Vous avez actuellement {count} plugin installé qui fait plus ou moins la même chose que Better Paste, alors désactivez ou désinstallez :',
+            other: 'Vous avez actuellement {count} plugins installés qui font plus ou moins la même chose que Better Paste, alors désactivez ou désinstallez :'
         },
         outro: 'À désactiver dans Paramètres > Modules complémentaires.',
         dontRemind: 'Ne plus afficher ce message',

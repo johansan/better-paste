@@ -291,7 +291,7 @@ export const STRINGS_ID: TranslationStrings = {
         title: 'Better Paste: plugin yang tumpang tindih',
         thanks: 'Terima kasih telah memasang dan menggunakan Better Paste!',
         intro: {
-            other: 'Saat ini ada {count} plugin terpasang yang fungsinya kurang lebih sama, jadi nonaktifkan atau hapus plugin berikut:'
+            other: 'Saat ini ada {count} plugin terpasang yang fungsinya kurang lebih sama dengan Better Paste, jadi nonaktifkan atau hapus plugin berikut:'
         },
         outro: 'Nonaktifkan di Pengaturan > Plugin komunitas.',
         dontRemind: 'Jangan tampilkan lagi',

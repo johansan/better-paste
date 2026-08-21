@@ -297,8 +297,8 @@ export const STRINGS_NL: TranslationStrings = {
         title: 'Better Paste: overlappende plugins',
         thanks: 'Bedankt dat je Better Paste hebt geïnstalleerd en gebruikt!',
         intro: {
-            one: 'Je hebt nu {count} plugin geïnstalleerd die min of meer hetzelfde doet, dus schakel de volgende plugin uit of verwijder die:',
-            other: 'Je hebt nu {count} plugins geïnstalleerd die min of meer hetzelfde doen, dus schakel de volgende plugins uit of verwijder ze:'
+            one: 'Je hebt nu {count} plugin geïnstalleerd die min of meer hetzelfde doet als Better Paste, dus schakel de volgende plugin uit of verwijder die:',
+            other: 'Je hebt nu {count} plugins geïnstalleerd die min of meer hetzelfde doen als Better Paste, dus schakel de volgende plugins uit of verwijder ze:'
         },
         outro: 'Uitschakelen kan onder Instellingen > Community-plugins.',
         dontRemind: 'Niet meer tonen',

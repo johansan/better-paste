@@ -321,10 +321,10 @@ export const STRINGS_PL: TranslationStrings = {
         title: 'Better Paste: dublujące się wtyczki',
         thanks: 'Dziękujemy za zainstalowanie i używanie Better Paste!',
         intro: {
-            one: 'Masz teraz {count} wtyczkę, która robi mniej więcej to samo, więc wyłącz lub odinstaluj:',
-            few: 'Masz teraz {count} wtyczki, które robią mniej więcej to samo, więc wyłącz lub odinstaluj:',
-            many: 'Masz teraz {count} wtyczek, które robią mniej więcej to samo, więc wyłącz lub odinstaluj:',
-            other: 'Masz teraz {count} wtyczki, które robią mniej więcej to samo, więc wyłącz lub odinstaluj:'
+            one: 'Masz teraz {count} wtyczkę, która robi mniej więcej to samo co Better Paste, więc wyłącz lub odinstaluj:',
+            few: 'Masz teraz {count} wtyczki, które robią mniej więcej to samo co Better Paste, więc wyłącz lub odinstaluj:',
+            many: 'Masz teraz {count} wtyczek, które robią mniej więcej to samo co Better Paste, więc wyłącz lub odinstaluj:',
+            other: 'Masz teraz {count} wtyczki, które robią mniej więcej to samo co Better Paste, więc wyłącz lub odinstaluj:'
         },
         outro: 'Wyłączysz je w sekcji Ustawienia > Wtyczki społeczności.',
         dontRemind: 'Nie przypominaj mi więcej',

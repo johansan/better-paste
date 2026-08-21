@@ -315,8 +315,8 @@ export const STRINGS_DE: TranslationStrings = {
         title: 'Better Paste: Plugins mit ähnlicher Funktion',
         thanks: 'Danke, dass du Better Paste installiert hast und nutzt!',
         intro: {
-            one: 'Du hast aktuell {count} Plugin installiert, das mehr oder weniger dasselbe tut, also deaktiviere oder deinstalliere Folgendes:',
-            other: 'Du hast aktuell {count} Plugins installiert, die mehr oder weniger dasselbe tun, also deaktiviere oder deinstalliere Folgendes:'
+            one: 'Du hast aktuell {count} Plugin installiert, das mehr oder weniger dasselbe tut wie Better Paste, also deaktiviere oder deinstalliere Folgendes:',
+            other: 'Du hast aktuell {count} Plugins installiert, die mehr oder weniger dasselbe tun wie Better Paste, also deaktiviere oder deinstalliere Folgendes:'
         },
         outro: 'Deaktivieren unter Einstellungen > Externe Erweiterungen.',
         dontRemind: 'Nicht mehr anzeigen',

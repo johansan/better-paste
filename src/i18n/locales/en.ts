@@ -308,8 +308,8 @@ export const STRINGS_EN = {
         title: 'Better Paste: overlapping plugins',
         thanks: 'Thank you for installing and using Better Paste!',
         intro: {
-            one: 'Right now you have {count} plugin installed that does more or less the same thing, so disable or uninstall:',
-            other: 'Right now you have {count} plugins installed that do more or less the same thing, so disable or uninstall:'
+            one: 'Right now you have {count} plugin installed that does more or less the same thing as Better Paste, so disable or uninstall:',
+            other: 'Right now you have {count} plugins installed that do more or less the same thing as Better Paste, so disable or uninstall:'
         } as PluralForms,
         outro: 'Disable in Settings > Community plugins.',
         dontRemind: "Don't remind me again",

@@ -289,7 +289,7 @@ export const STRINGS_JA: TranslationStrings = {
         title: 'Better Paste: 機能が重複するプラグイン',
         thanks: 'Better Paste をインストールしてお使いいただき、ありがとうございます！',
         intro: {
-            other: '現在、ほぼ同じ機能のプラグインが {count} 個インストールされています。次のプラグインを無効化するか、アンインストールしてください：'
+            other: '現在、Better Paste とほぼ同じ機能のプラグインが {count} 個インストールされています。次のプラグインを無効化するか、アンインストールしてください:'
         },
         outro: '設定 > コミュニティプラグインで無効化できます。',
         dontRemind: '今後表示しない',

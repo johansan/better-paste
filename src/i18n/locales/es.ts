@@ -287,8 +287,8 @@ export const STRINGS_ES: TranslationStrings = {
         title: 'Better Paste: plugins que se solapan',
         thanks: '¡Gracias por instalar y usar Better Paste!',
         intro: {
-            one: 'Ahora mismo tienes {count} plugin instalado que hace más o menos lo mismo, así que desactiva o desinstala:',
-            other: 'Ahora mismo tienes {count} plugins instalados que hacen más o menos lo mismo, así que desactiva o desinstala:'
+            one: 'Ahora mismo tienes {count} plugin instalado que hace más o menos lo mismo que Better Paste, así que desactiva o desinstala:',
+            other: 'Ahora mismo tienes {count} plugins instalados que hacen más o menos lo mismo que Better Paste, así que desactiva o desinstala:'
         },
         outro: 'Se desactivan en Ajustes > Complementos comunitarios.',
         dontRemind: 'No volver a mostrar este mensaje',

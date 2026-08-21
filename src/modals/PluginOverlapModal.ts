@@ -40,9 +40,8 @@ export class PluginOverlapModal extends Modal {
 
         const body = this.contentEl.createDiv({ cls: 'better-paste-welcome-body' });
         body.createEl('p', { text: strings.overlap.thanks });
-        // The count includes Better Paste itself, because it is one of the plugins
-        // doing the same thing. The list below names only the ones to remove.
-        body.createEl('p', { text: plural(strings.overlap.intro, this.overlaps.length + 1) });
+        // The count matches the list below, so it names only the plugins to remove
+        body.createEl('p', { text: plural(strings.overlap.intro, this.overlaps.length) });
         const list = body.createEl('ul');
         for (const plugin of this.overlaps) list.createEl('li', { text: plugin.name });
         body.createEl('p', { text: strings.overlap.outro });

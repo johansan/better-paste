@@ -278,7 +278,7 @@ export const STRINGS_KO: TranslationStrings = {
         title: 'Better Paste: 기능이 겹치는 플러그인',
         thanks: 'Better Paste를 설치하고 사용해 주셔서 감사합니다!',
         intro: {
-            other: '기능이 거의 같은 플러그인이 {count}개 설치되어 있습니다. 다음 플러그인을 비활성화하거나 삭제해 주세요:'
+            other: 'Better Paste와 기능이 거의 같은 플러그인이 {count}개 설치되어 있습니다. 다음 플러그인을 비활성화하거나 삭제해 주세요:'
         },
         outro: '설정 > 커뮤니티 플러그인에서 비활성화할 수 있습니다.',
         dontRemind: '다시 보지 않기',
