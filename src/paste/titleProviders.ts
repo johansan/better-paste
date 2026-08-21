@@ -17,66 +17,138 @@
  */
 
 /*
- * Some sites block or redirect ordinary page loads but publish an oEmbed endpoint that
- * answers a plain JSON request with the page title. Addresses these providers handle are
- * asked there before the page itself is fetched.
+ * Some sites block or redirect ordinary page loads but publish an endpoint that answers
+ * with the page title. Addresses these providers handle are asked there before the page
+ * itself is fetched.
  */
 
 interface TitleProvider {
-    /** True when the provider publishes titles for this address. */
-    handles(url: URL): boolean;
-    /** The oEmbed endpoint, ready for the encoded page address to be appended. */
-    endpoint: string;
+    /** The provider request for this address, or null when the provider does not handle it. */
+    requestFor(url: URL): string | null;
+    /** Reads the title from this provider's response. */
+    titleFromResponse: (body: string) => string | null;
+}
+
+export interface TitleProviderRequest {
+    url: string;
+    titleFromResponse: (body: string) => string | null;
 }
 
 function underDomain(hostname: string, domain: string): boolean {
     return hostname === domain || hostname.endsWith(`.${domain}`);
 }
 
+function normaliseTitle(title: unknown): string | null {
+    if (typeof title !== 'string') return null;
+    const cleaned = title.replace(/\s+/g, ' ').trim();
+    return cleaned || null;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isUnknownArray(value: unknown): value is unknown[] {
+    return Array.isArray(value);
+}
+
+function objectFromJson(body: string): Record<string, unknown> | null {
+    try {
+        const parsed: unknown = JSON.parse(body);
+        return isRecord(parsed) ? parsed : null;
+    } catch {
+        return null;
+    }
+}
+
+function titleFromOEmbedResponse(body: string): string | null {
+    return normaliseTitle(objectFromJson(body)?.title);
+}
+
+const STACK_EXCHANGE_DOMAINS = [
+    'stackexchange.com',
+    'stackoverflow.com',
+    'superuser.com',
+    'serverfault.com',
+    'askubuntu.com',
+    'stackapps.com',
+    'mathoverflow.net'
+] as const;
+
+function stackExchangeQuestionId(url: URL): string | null {
+    if (!STACK_EXCHANGE_DOMAINS.some(domain => underDomain(url.hostname, domain))) return null;
+    return /^\/(?:questions|q)\/([0-9]+)(?:\/|$)/.exec(url.pathname)?.[1] ?? null;
+}
+
+function titleFromStackExchangeResponse(body: string): string | null {
+    const items = objectFromJson(body)?.items;
+    if (!isUnknownArray(items)) return null;
+
+    const first = items[0];
+    if (!isRecord(first)) return null;
+    const title = first.title;
+    if (typeof title !== 'string' || !title.trim()) return null;
+
+    const decoded = new DOMParser().parseFromString(title, 'text/html').body.textContent;
+    return normaliseTitle(decoded);
+}
+
 const TITLE_PROVIDERS: readonly TitleProvider[] = [
     {
         // Videos, short links, Shorts and playlists answer. Channel and other pages
         // return 404 and fall through to the page fetch.
-        handles: url => url.hostname === 'youtu.be' || underDomain(url.hostname, 'youtube.com'),
-        endpoint: 'https://www.youtube.com/oembed?format=json&url='
+        requestFor: url =>
+            url.hostname === 'youtu.be' || underDomain(url.hostname, 'youtube.com')
+                ? `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(url.href)}`
+                : null,
+        titleFromResponse: titleFromOEmbedResponse
     },
     {
         // Posts and comment permalinks both answer with the post title. Addresses
         // without a post id return 400, so only these are sent.
-        handles: url => underDomain(url.hostname, 'reddit.com') && url.pathname.includes('/comments/'),
-        endpoint: 'https://www.reddit.com/oembed?url='
+        requestFor: url =>
+            underDomain(url.hostname, 'reddit.com') && url.pathname.includes('/comments/')
+                ? `https://www.reddit.com/oembed?url=${encodeURIComponent(url.href)}`
+                : null,
+        titleFromResponse: titleFromOEmbedResponse
     },
     {
         // Videos answer with the caption and profiles with the profile name. The page
         // fetch only ever sees the app shell, so every TikTok address is sent. Broken
         // addresses return 400 and fall through.
-        handles: url => underDomain(url.hostname, 'tiktok.com'),
-        endpoint: 'https://www.tiktok.com/oembed?url='
+        requestFor: url =>
+            underDomain(url.hostname, 'tiktok.com') ? `https://www.tiktok.com/oembed?url=${encodeURIComponent(url.href)}` : null,
+        titleFromResponse: titleFromOEmbedResponse
     },
     {
         // Share pages serve a login shell to plain fetches, so this is the only source
         // of a title. Unknown recordings return 404 and fall through.
-        handles: url => underDomain(url.hostname, 'loom.com') && url.pathname.startsWith('/share/'),
-        endpoint: 'https://www.loom.com/v1/oembed?url='
+        requestFor: url =>
+            underDomain(url.hostname, 'loom.com') && url.pathname.startsWith('/share/')
+                ? `https://www.loom.com/v1/oembed?url=${encodeURIComponent(url.href)}`
+                : null,
+        titleFromResponse: titleFromOEmbedResponse
+    },
+    {
+        // Question pages block ordinary requests, so the API is used only when the path
+        // supplies the question id required by its endpoint.
+        requestFor: url => {
+            const questionId = stackExchangeQuestionId(url);
+            return questionId === null
+                ? null
+                : `https://api.stackexchange.com/2.3/questions/${questionId}?site=${encodeURIComponent(url.hostname)}`;
+        },
+        titleFromResponse: titleFromStackExchangeResponse
     }
 ];
 
 /** Returns the request that answers with this page's title, or null when no provider handles it. */
-export function titleProviderRequest(url: URL): string | null {
-    const provider = TITLE_PROVIDERS.find(candidate => candidate.handles(url));
-    return provider ? provider.endpoint + encodeURIComponent(url.href) : null;
-}
-
-/** Reads and normalises the title from a provider's JSON response. */
-export function titleFromProviderResponse(body: string): string | null {
-    try {
-        const parsed: unknown = JSON.parse(body);
-        if (typeof parsed !== 'object' || parsed === null) return null;
-        const title = (parsed as Record<string, unknown>).title;
-        if (typeof title !== 'string') return null;
-        const cleaned = title.replace(/\s+/g, ' ').trim();
-        return cleaned || null;
-    } catch {
-        return null;
+export function titleProviderRequest(url: URL): TitleProviderRequest | null {
+    for (const provider of TITLE_PROVIDERS) {
+        const requestUrl = provider.requestFor(url);
+        if (requestUrl !== null) {
+            return { url: requestUrl, titleFromResponse: provider.titleFromResponse };
+        }
     }
+    return null;
 }

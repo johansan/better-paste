@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { RequestUrlResponse } from 'obsidian';
 import {
     composeTitledLink,
@@ -27,6 +27,10 @@ import {
     standaloneWebUrl
 } from '../src/paste/LinkTitleService';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
+
+afterEach(() => {
+    vi.unstubAllGlobals();
+});
 
 function response(overrides: Partial<RequestUrlResponse> = {}): RequestUrlResponse {
     return {
@@ -136,6 +140,40 @@ describe('LinkTitleService', () => {
         const pasted = 'https://www.youtube.com/watch?v=m2maDNtho7Y';
         expect(await service.materializeTitle(pasted)).toEqual({ title: 'A video', url: pasted });
         expect(requests).toEqual([`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(pasted)}`]);
+    });
+
+    it('uses the Stack Exchange provider response parser for question titles', async () => {
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
+        const requests: string[] = [];
+        const encoded = 'What does if __name__ == &quot;__main__&quot;: do?';
+        vi.stubGlobal(
+            'DOMParser',
+            class {
+                parseFromString(source: string, type: string) {
+                    expect(source).toBe(encoded);
+                    expect(type).toBe('text/html');
+                    return { body: { textContent: 'What does if __name__ == "__main__": do?' } };
+                }
+            }
+        );
+        const service = new LinkTitleService(
+            () => settings,
+            async request => {
+                requests.push(typeof request === 'string' ? request : request.url);
+                return response({
+                    headers: { 'content-type': 'application/json' },
+                    text: JSON.stringify({ items: [{ title: encoded }] })
+                });
+            },
+            () => null
+        );
+
+        const pasted = 'https://diy.stackexchange.com/questions/331790/a-question';
+        expect(await service.materializeTitle(pasted)).toEqual({
+            title: 'What does if __name__ == "__main__": do?',
+            url: pasted
+        });
+        expect(requests).toEqual(['https://api.stackexchange.com/2.3/questions/331790?site=diy.stackexchange.com']);
     });
 
     it('falls back to the page fetch when the provider fails', async () => {

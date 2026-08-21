@@ -19,7 +19,8 @@
 import { requestUrl } from 'obsidian';
 import type { RequestUrlParam, RequestUrlResponse } from 'obsidian';
 import { extensionOfUrl } from './imageReferences';
-import { titleFromProviderResponse, titleProviderRequest } from './titleProviders';
+import { titleProviderRequest } from './titleProviders';
+import type { TitleProviderRequest } from './titleProviders';
 import { IMAGE_EXTENSIONS, LINK_TITLE_TIMEOUT_SECONDS } from '../settings/constants';
 
 /** Pages declaring more than this are skipped: no title is worth buffering them. */
@@ -174,18 +175,18 @@ export class LinkTitleService {
      * Asks a site's own title endpoint, because some sites answer it while blocking
      * ordinary page loads. Every failure returns null so the page fetch still runs.
      */
-    private async titleFromProvider(request: string, timeoutMs: number): Promise<string | null> {
+    private async titleFromProvider(provider: TitleProviderRequest, timeoutMs: number): Promise<string | null> {
         let timer: ReturnType<typeof setTimeout> | undefined;
         try {
             const response = await Promise.race([
-                this.requestPage({ url: request, method: 'GET', throw: false }),
+                this.requestPage({ url: provider.url, method: 'GET', throw: false }),
                 new Promise<null>(resolve => {
                     timer = window.setTimeout(() => resolve(null), timeoutMs);
                 })
             ]);
             if (this.disposed || response === null) return null;
             if (response.status < 200 || response.status >= 300) return null;
-            return titleFromProviderResponse(response.text);
+            return provider.titleFromResponse(response.text);
         } catch {
             return null;
         } finally {

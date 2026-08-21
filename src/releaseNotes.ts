@@ -56,6 +56,9 @@ const RELEASE_NOTES: ReleaseNote[] = [
         new: [
             'You can now clean up fetched link titles with ==Link snippets==! Your own regex rules rewrite the title, and the address always stays intact. Ready-made rules for GitHub, X, YouTube, Wikipedia and more are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets#link-snippets).',
             'You can now paste multiple paragraphs into a block quote or callout. Every pasted line stays quoted.'
+        ],
+        fixed: [
+            'Fixed link titles for Stack Overflow and the Stack Exchange sites. Question pages block normal lookups, so the title is now fetched from the Stack Exchange API.'
         ]
     },
     {
