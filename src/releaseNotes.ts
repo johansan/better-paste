@@ -53,7 +53,7 @@ const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.10',
         date: '2026-08-21',
-        info: 'This release changes how pasted web images work. Better Paste now links them straight from the web instead of downloading a copy into your vault. If you want local copies like before, set ==Web images== to ==Download with preview==.',
+        info: 'This release changes how pasted web images work. Better Paste now links web images straight to the web instead of downloading a copy into your vault. If you want local copies like before of every image link (e.g. copying images from Safari), set ==Web images== to ==Download with preview==.\n\nAnd finally, if you enjoy using Better Paste, please help me spread the word to help others discover it!',
         new: [
             'You can now choose how web images are pasted: ==Do nothing==, ==Link with preview== or ==Download with preview==. Link with preview is the new default.',
             'You can now clean up fetched link titles with ==Link snippets==! Your own regex rules rewrite the title, and the address always stays intact. Ready-made rules for GitHub, X, YouTube, Wikipedia and more are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets#link-snippets).',
