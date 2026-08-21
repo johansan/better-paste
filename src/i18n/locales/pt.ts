@@ -94,7 +94,8 @@ export const STRINGS_PT: TranslationStrings = {
             heading: 'Imagens',
             savingName: 'Imagens da web',
             savingDesc:
-                'Escolha entre ligar as imagens diretamente da web ou descarregá-las para a sua pasta de anexos. Abrange o "Copiar imagem" do Safari, as imagens dentro de conteúdo web copiado e os endereços de imagem colados. Por predefinição, o nome do ficheiro vem do endereço:',
+                'Escolha o que acontece quando cola imagens da web. "Não fazer nada" deixa a colagem como está, "Ligar com pré-visualização" mostra a imagem diretamente da web e "Descarregar com pré-visualização" guarda uma cópia no seu cofre, incluindo imagens copiadas no Safari.',
+            savingDownloadDesc: 'Por predefinição, o nome do ficheiro vem do endereço:',
             savingChoiceOff: 'Não fazer nada',
             savingChoiceLink: 'Ligar com pré-visualização',
             savingChoiceDownload: 'Descarregar com pré-visualização',

@@ -88,7 +88,8 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             heading: '圖片',
             savingName: '網路圖片',
             savingDesc:
-                '選擇直接連結網路圖片，還是把它們下載到附件資料夾。涵蓋 Safari 的「拷貝影像」、複製的網頁內容中的圖片，以及貼上的圖片網址。檔案名稱預設取自網址：',
+                '選擇貼上網路圖片時的處理方式。「什麼都不做」保持貼上內容原樣，「連結並預覽」直接從網路顯示圖片，「下載並預覽」則把副本儲存到你的儲存庫，包括在 Safari 中複製的圖片。',
+            savingDownloadDesc: '檔案名稱預設取自網址：',
             savingChoiceOff: '什麼都不做',
             savingChoiceLink: '連結並預覽',
             savingChoiceDownload: '下載並預覽',

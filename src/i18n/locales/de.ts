@@ -103,7 +103,8 @@ export const STRINGS_DE: TranslationStrings = {
             heading: 'Bilder',
             savingName: 'Webbilder',
             savingDesc:
-                'Legt fest, ob Bilder direkt aus dem Web verlinkt oder in den Anhangsordner heruntergeladen werden. Gilt für "Bild kopieren" in Safari, Bilder in kopierten Webinhalten und eingefügte Bildadressen. Standardmäßig stammt der Dateiname aus der Adresse:',
+                'Wähle, was mit eingefügten Bildern aus dem Web geschieht. "Nichts tun" lässt das Eingefügte unverändert, "Verlinken mit Vorschau" zeigt das Bild direkt aus dem Web, und "Herunterladen mit Vorschau" speichert eine Kopie in deinem Tresor, auch von in Safari kopierten Bildern.',
+            savingDownloadDesc: 'Standardmäßig stammt der Dateiname aus der Adresse:',
             savingChoiceOff: 'Nichts tun',
             savingChoiceLink: 'Verlinken mit Vorschau',
             savingChoiceDownload: 'Herunterladen mit Vorschau',

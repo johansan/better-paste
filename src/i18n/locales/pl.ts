@@ -98,7 +98,8 @@ export const STRINGS_PL: TranslationStrings = {
             heading: 'Obrazy',
             savingName: 'Obrazy z sieci',
             savingDesc:
-                'Wybierz, czy obrazy mają być linkowane bezpośrednio z sieci, czy pobierane do folderu załączników. Dotyczy opcji „Skopiuj obraz” w Safari, obrazów w skopiowanej treści z sieci oraz wklejanych adresów obrazów. Domyślnie nazwa pliku pochodzi z adresu:',
+                'Wybierz, co się dzieje, gdy wklejasz obrazy z sieci. „Nic nie rób” zostawia wklejoną treść bez zmian, „Linkuj z podglądem” pokazuje obraz prosto z sieci, a „Pobierz z podglądem” zapisuje kopię w twoim sejfie, także w przypadku obrazów skopiowanych w Safari.',
+            savingDownloadDesc: 'Domyślnie nazwa pliku pochodzi z adresu:',
             savingChoiceOff: 'Nic nie rób',
             savingChoiceLink: 'Linkuj z podglądem',
             savingChoiceDownload: 'Pobierz z podglądem',

@@ -94,7 +94,8 @@ export const STRINGS_IT: TranslationStrings = {
             heading: 'Immagini',
             savingName: 'Immagini dal web',
             savingDesc:
-                'Scegli se collegare le immagini direttamente dal web o scaricarle nella cartella allegati. Riguarda "Copia immagine" di Safari, le immagini dentro contenuti web copiati e gli indirizzi di immagine incollati. Per impostazione predefinita il nome del file viene dall’indirizzo:',
+                'Scegli cosa succede quando incolli immagini dal web. "Non fare nulla" lascia il contenuto incollato com’è, "Collega con anteprima" mostra l’immagine direttamente dal web e "Scarica con anteprima" salva una copia nel tuo vault, incluse le immagini copiate in Safari.',
+            savingDownloadDesc: 'Per impostazione predefinita il nome del file viene dall’indirizzo:',
             savingChoiceOff: 'Non fare nulla',
             savingChoiceLink: 'Collega con anteprima',
             savingChoiceDownload: 'Scarica con anteprima',

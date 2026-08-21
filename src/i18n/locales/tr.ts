@@ -94,7 +94,8 @@ export const STRINGS_TR: TranslationStrings = {
             heading: 'Görseller',
             savingName: 'Web görselleri',
             savingDesc:
-                'Görsellere doğrudan web’den bağlantı vermeyi veya onları ek klasörünüze indirmeyi seçin. Safari’deki "Görseli kopyala", kopyalanan web içeriğindeki görseller ve yapıştırılan görsel adresleri buna dahildir. Dosya adı varsayılan olarak adresten gelir:',
+                'Webden görsel yapıştırdığınızda ne olacağını seçin. "Hiçbir şey yapma" yapıştırılanı olduğu gibi bırakır, "Önizlemeyle bağlantı ver" görseli doğrudan webden gösterir, "Önizlemeyle indir" ise Safari’de kopyalanan görseller dahil kasanıza bir kopya kaydeder.',
+            savingDownloadDesc: 'Dosya adı varsayılan olarak adresten gelir:',
             savingChoiceOff: 'Hiçbir şey yapma',
             savingChoiceLink: 'Önizlemeyle bağlantı ver',
             savingChoiceDownload: 'Önizlemeyle indir',

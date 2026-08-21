@@ -88,7 +88,8 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             heading: '图片',
             savingName: '网络图片',
             savingDesc:
-                '选择直接链接网络图片，还是把它们下载到附件文件夹。涵盖 Safari 的“拷贝图像”、复制的网页内容中的图片，以及粘贴的图片网址。文件名默认取自网址：',
+                '选择粘贴网络图片时的处理方式。“什么都不做”保持粘贴内容原样，“链接并预览”直接从网络显示图片，“下载并预览”则把副本保存到你的仓库，包括在 Safari 中复制的图片。',
+            savingDownloadDesc: '文件名默认取自网址：',
             savingChoiceOff: '什么都不做',
             savingChoiceLink: '链接并预览',
             savingChoiceDownload: '下载并预览',

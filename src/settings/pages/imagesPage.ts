@@ -38,28 +38,37 @@ const SAVING_EXAMPLE_FILE = 'skyline-8f21a.jpg';
 const SAVING_EXAMPLE_QUERY = '?auto=format&w=2400';
 
 /**
- * Shows the rule by example, with the part of the address that is dropped struck through.
- * What is left is the file name, which is what the default naming format saves it as.
+ * Shows what the selected mode leaves in the note. Download derives the file name from
+ * the address, so the dropped parts are struck through and what remains is the name
+ * inside the embed.
  *
  * Built with plain DOM calls and guarded, because the settings definitions are also read
  * outside a browser by the tests.
  */
-function savingExample(): string | DocumentFragment {
-    const lead = strings.settings.images.savingDesc;
+function savingExample(mode: 'off' | 'link' | 'download'): string | DocumentFragment {
+    const text = strings.settings.images;
+    const address = `${SAVING_EXAMPLE_ADDRESS}${SAVING_EXAMPLE_FILE}${SAVING_EXAMPLE_QUERY}`;
+    const lead = mode === 'download' ? `${text.savingDesc} ${text.savingDownloadDesc}` : text.savingDesc;
 
     if (typeof createFragment === 'undefined') {
         return format(strings.settings.plainFallback, {
             description: lead,
-            example: `${SAVING_EXAMPLE_ADDRESS}${SAVING_EXAMPLE_FILE}${SAVING_EXAMPLE_QUERY}`
+            example: mode === 'link' ? `![](${address})` : mode === 'download' ? `![[${SAVING_EXAMPLE_FILE}]]` : address
         });
     }
 
     return createFragment(fragment => {
         fragment.appendText(lead);
         const example = fragment.createDiv({ cls: 'better-paste-example' });
-        example.createSpan({ cls: 'better-paste-example-removed', text: SAVING_EXAMPLE_ADDRESS });
-        example.createSpan({ text: SAVING_EXAMPLE_FILE });
-        example.createSpan({ cls: 'better-paste-example-removed', text: SAVING_EXAMPLE_QUERY });
+        if (mode === 'download') {
+            example.createSpan({ text: '![[' });
+            example.createSpan({ cls: 'better-paste-example-removed', text: SAVING_EXAMPLE_ADDRESS });
+            example.createSpan({ text: SAVING_EXAMPLE_FILE });
+            example.createSpan({ cls: 'better-paste-example-removed', text: SAVING_EXAMPLE_QUERY });
+            example.createSpan({ text: ']]' });
+        } else {
+            example.createSpan({ text: mode === 'link' ? `![](${address})` : address });
+        }
     });
 }
 
@@ -137,11 +146,11 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
     return [
         {
             name: text.savingName,
-            desc: savingExample(),
+            desc: savingExample(context.settings().imageMode),
             aliases: aliases(source => source.settings.images.savingAliases),
             render: setting => {
                 setting.setName(text.savingName);
-                setting.setDesc(savingExample());
+                setting.setDesc(savingExample(context.settings().imageMode));
                 setting.addDropdown(dropdown => {
                     dropdown.addOption('off', text.savingChoiceOff);
                     dropdown.addOption('link', text.savingChoiceLink);
@@ -150,6 +159,7 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
                     dropdown.onChange(value => {
                         if (value !== 'off' && value !== 'link' && value !== 'download') return;
                         context.settings().imageMode = value;
+                        setting.setDesc(savingExample(value));
                         return context.saveSettings();
                     });
                 });

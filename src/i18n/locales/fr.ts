@@ -94,7 +94,8 @@ export const STRINGS_FR: TranslationStrings = {
             heading: 'Images',
             savingName: 'Images du web',
             savingDesc:
-                'Choisissez de lier les images directement depuis le web ou de les télécharger dans votre dossier de pièces jointes. Concerne « Copier l’image » de Safari, les images présentes dans du contenu web copié et les adresses d’image collées. Par défaut, le nom du fichier vient de l’adresse :',
+                'Choisissez ce qui se passe quand vous collez des images du web. « Ne rien faire » laisse le collage tel quel, « Lier avec aperçu » affiche l’image directement depuis le web, et « Télécharger avec aperçu » enregistre une copie dans votre coffre, y compris pour les images copiées dans Safari.',
+            savingDownloadDesc: 'Par défaut, le nom du fichier vient de l’adresse :',
             savingChoiceOff: 'Ne rien faire',
             savingChoiceLink: 'Lier avec aperçu',
             savingChoiceDownload: 'Télécharger avec aperçu',

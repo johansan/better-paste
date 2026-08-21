@@ -94,7 +94,8 @@ export const STRINGS_ES: TranslationStrings = {
             heading: 'Imágenes',
             savingName: 'Imágenes de la web',
             savingDesc:
-                'Elige si quieres enlazar las imágenes directamente desde la web o descargarlas en tu carpeta de adjuntos. Abarca "Copiar imagen" de Safari, las imágenes dentro de contenido web copiado y las direcciones de imagen pegadas. Por defecto, el nombre del archivo procede de la dirección:',
+                'Elige qué pasa cuando pegas imágenes de la web. "No hacer nada" deja lo pegado tal cual, "Enlazar con vista previa" muestra la imagen directamente desde la web y "Descargar con vista previa" guarda una copia en tu bóveda, incluidas las imágenes copiadas en Safari.',
+            savingDownloadDesc: 'Por defecto, el nombre del archivo procede de la dirección:',
             savingChoiceOff: 'No hacer nada',
             savingChoiceLink: 'Enlazar con vista previa',
             savingChoiceDownload: 'Descargar con vista previa',

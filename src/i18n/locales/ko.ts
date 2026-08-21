@@ -88,7 +88,8 @@ export const STRINGS_KO: TranslationStrings = {
             heading: '이미지',
             savingName: '웹 이미지',
             savingDesc:
-                '이미지를 웹에서 바로 링크할지, 첨부 파일 폴더에 다운로드할지 선택하세요. Safari의 "이미지 복사", 복사한 웹 콘텐츠 속 이미지, 붙여넣은 이미지 주소가 여기에 해당합니다. 파일 이름은 기본적으로 주소에서 가져옵니다:',
+                '웹 이미지를 붙여넣을 때 어떻게 처리할지 선택하세요. "아무것도 안 함"은 붙여넣은 내용을 그대로 두고, "미리보기와 함께 링크"는 웹에서 바로 이미지를 표시하며, "미리보기와 함께 다운로드"는 Safari에서 복사한 이미지를 포함해 보관함에 사본을 저장합니다.',
+            savingDownloadDesc: '파일 이름은 기본적으로 주소에서 가져옵니다:',
             savingChoiceOff: '아무것도 안 함',
             savingChoiceLink: '미리보기와 함께 링크',
             savingChoiceDownload: '미리보기와 함께 다운로드',

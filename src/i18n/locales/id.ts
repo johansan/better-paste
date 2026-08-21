@@ -88,7 +88,8 @@ export const STRINGS_ID: TranslationStrings = {
             heading: 'Gambar',
             savingName: 'Gambar web',
             savingDesc:
-                'Pilih apakah gambar ditautkan langsung dari web atau diunduh ke folder lampiran Anda. Mencakup "Salin gambar" di Safari, gambar di dalam konten web yang disalin, dan alamat gambar yang ditempel. Secara bawaan nama berkas diambil dari alamatnya:',
+                'Pilih apa yang terjadi saat Anda menempel gambar dari web. "Jangan lakukan apa-apa" membiarkan tempelan apa adanya, "Tautkan dengan pratinjau" menampilkan gambar langsung dari web, dan "Unduh dengan pratinjau" menyimpan salinannya ke brankas Anda, termasuk gambar yang disalin di Safari.',
+            savingDownloadDesc: 'Secara bawaan, nama berkas diambil dari alamatnya:',
             savingChoiceOff: 'Jangan lakukan apa-apa',
             savingChoiceLink: 'Tautkan dengan pratinjau',
             savingChoiceDownload: 'Unduh dengan pratinjau',

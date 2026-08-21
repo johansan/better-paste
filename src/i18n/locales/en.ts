@@ -104,7 +104,8 @@ export const STRINGS_EN = {
             heading: 'Images',
             savingName: 'Web images',
             savingDesc:
-                'Choose whether to link images straight from the web or download them into your attachment folder. Covers Safari\'s "Copy image", images inside copied web content, and pasted image addresses. By default the file name comes from the address:',
+                'Choose what happens when you paste images from the web. "Do nothing" keeps the paste as it is, "Link with preview" shows the image straight from the web, and "Download with preview" saves a copy to your vault, including images copied in Safari.',
+            savingDownloadDesc: 'By default the file name comes from the address:',
             savingChoiceOff: 'Do nothing',
             savingChoiceLink: 'Link with preview',
             savingChoiceDownload: 'Download with preview',
