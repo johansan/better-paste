@@ -19,11 +19,73 @@
 import { describe, expect, it } from 'vitest';
 import {
     extensionOfUrl,
+    escapeMarkdownDestination,
     findImageReferences,
     imageSourcesFromHtml,
     isDataImageUri,
+    remoteMarkdownEmbed,
     replaceImageReferences
 } from '../src/paste/imageReferences';
+
+describe('remoteMarkdownEmbed', () => {
+    it('removes label delimiters before appending the size', () => {
+        expect(remoteMarkdownEmbed('A [cat] | photo', 'https://example.com/cat.png', '400')).toBe(
+            '![A cat photo|400](https://example.com/cat.png)'
+        );
+    });
+
+    it('encodes spaces and balanced or unbalanced parentheses', () => {
+        expect(remoteMarkdownEmbed('', 'https://example.com/a (b).png?q=x+y&raw=%2F', null)).toBe(
+            '![](https://example.com/a%20%28b%29.png?q=x+y&raw=%2F)'
+        );
+        expect(remoteMarkdownEmbed('', 'https://example.com/a(b.png', null)).toBe('![](https://example.com/a%28b.png)');
+        expect(remoteMarkdownEmbed('', 'https://example.com/a)b.png', null)).toBe('![](https://example.com/a%29b.png)');
+    });
+
+    it('removes a trailing backslash from the label and remains parseable', () => {
+        const embed = remoteMarkdownEmbed('A cat\\', 'https://example.com/cat.png', null);
+
+        expect(embed).toBe('![A cat](https://example.com/cat.png)');
+        expect(findImageReferences(embed)).toMatchObject([{ token: embed, alt: 'A cat', kind: 'markdown' }]);
+    });
+
+    it('collapses a literal newline in the label and remains parseable', () => {
+        const embed = remoteMarkdownEmbed('A\n  cat', 'https://example.com/cat.png', null);
+
+        expect(embed).toBe('![A cat](https://example.com/cat.png)');
+        expect(findImageReferences(embed)).toMatchObject([{ token: embed, alt: 'A cat', kind: 'markdown' }]);
+    });
+
+    it('sanitizes an encoded newline from an HTML alt and remains parseable', () => {
+        const [htmlImage] = findImageReferences('<img src="https://example.com/cat.png" alt="A&#10;cat">');
+        const embed = remoteMarkdownEmbed(htmlImage.alt, htmlImage.url, null);
+
+        expect(embed).toBe('![A cat](https://example.com/cat.png)');
+        expect(findImageReferences(embed)).toMatchObject([{ token: embed, alt: 'A cat', kind: 'markdown' }]);
+    });
+
+    it('encodes an HTML source newline in the destination and remains parseable', () => {
+        const [htmlImage] = findImageReferences('<img src="https://example.com/a&#10;b.png">');
+        const embed = remoteMarkdownEmbed(htmlImage.alt, htmlImage.url, null);
+
+        expect(embed).toBe('![](https://example.com/a%0Ab.png)');
+        expect(findImageReferences(embed)).toMatchObject([{ token: embed, url: 'https://example.com/a%0Ab.png', kind: 'markdown' }]);
+    });
+
+    it('encodes angle brackets decoded from an HTML source and remains parseable', () => {
+        const [htmlImage] = findImageReferences('<img src="https://example.com/a&lt;b&gt;.png">');
+        const embed = remoteMarkdownEmbed(htmlImage.alt, htmlImage.url, null);
+
+        expect(embed).toBe('![](https://example.com/a%3Cb%3E.png)');
+        expect(findImageReferences(embed)).toMatchObject([{ token: embed, url: 'https://example.com/a%3Cb%3E.png', kind: 'markdown' }]);
+    });
+});
+
+describe('escapeMarkdownDestination', () => {
+    it('encodes Markdown delimiters and whitespace', () => {
+        expect(escapeMarkdownDestination('a\\()<> \r\n\tb')).toBe('a%5C%28%29%3C%3E%20%0D%0A%09b');
+    });
+});
 
 describe('isDataImageUri', () => {
     it('recognises image data URIs', () => {
@@ -79,6 +141,21 @@ describe('findImageReferences', () => {
         expect(found[0]).toMatchObject({ url: 'https://example.com/a.jpg', alt: 'hello', kind: 'html' });
     });
 
+    it('decodes character references in HTML image attributes', () => {
+        const text =
+            '<img src="https://example.com/a.jpg?one=1&amp;two=2" ' +
+            'alt="A &amp; B &lt; C &gt; D &quot;E&quot; &apos;F&apos; &#65; &#x42; &nbsp; G">';
+        const found = findImageReferences(text);
+
+        expect(found[0]).toMatchObject({
+            token: text,
+            url: 'https://example.com/a.jpg?one=1&two=2',
+            alt: 'A & B < C > D "E" \'F\' A B \u00a0 G',
+            kind: 'html'
+        });
+        expect(imageSourcesFromHtml(text)).toEqual(['https://example.com/a.jpg?one=1&two=2']);
+    });
+
     it('keeps greater-than signs inside quoted HTML attributes', () => {
         const text = '<img src="https://example.com/a.jpg" alt="A > B">';
         const found = findImageReferences(text);
@@ -105,6 +182,13 @@ describe('findImageReferences', () => {
         const found = findImageReferences('https://example.com/photo.jpg');
         expect(found).toHaveLength(1);
         expect(found[0].kind).toBe('bare');
+    });
+
+    it('leaves character reference text in a bare URL untouched', () => {
+        const url = 'https://example.com/photo.jpg?one=1&amp;two=2';
+        const found = findImageReferences(url);
+
+        expect(found[0]).toMatchObject({ token: url, url, kind: 'bare' });
     });
 
     it('finds a bare image URL with a CJK filename', () => {

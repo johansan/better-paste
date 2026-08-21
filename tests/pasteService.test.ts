@@ -54,7 +54,7 @@ function embedSuffix(size: string | null, cssClass: string | null): string {
 /** Image service double that resolves every reference to a predictable embed. */
 function fakeImages(settings: BetterPasteSettings, failing = false, saved?: SavedClipboardImages[]): ImageService {
     return {
-        hasWork: (text: string) => settings.imageEnabled && findImageReferences(text).length > 0,
+        hasWork: (text: string) => settings.imageMode !== 'off' && findImageReferences(text).length > 0,
         materializeImages: async (text: string, _sourcePath: string, size: string | null = null, cssClass: string | null = null) => {
             const references = findImageReferences(text);
             if (failing) return { text, downloaded: 0, failed: references.length, files: [] };
@@ -121,7 +121,7 @@ interface PromptDouble {
 }
 
 function build(overrides: Partial<BetterPasteSettings> = {}, failing = false, prompt?: PromptDouble, pageTitle = 'Example page') {
-    const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, ...overrides };
+    const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, imageMode: 'download', ...overrides };
     const saved: SavedClipboardImages[] = [];
     const fetchedTitles: string[] = [];
     const service = new PasteService(
@@ -441,6 +441,51 @@ describe('handleEditorPaste: Safari copy image', () => {
         expect(typeof sourcePath === 'function' ? sourcePath() : sourcePath).toBe('Notes/Test.md');
     });
 
+    it('links the HTML source instead of saving clipboard bytes in link mode', async () => {
+        const { service, saved } = build({ imageMode: 'link', imageSizeChoice: '400' });
+        const editor = new FakeEditor('');
+        const noticeCount = Notice.instances.length;
+
+        expect(service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(saved).toHaveLength(0);
+        expect(Notice.instances).toHaveLength(noticeCount);
+        expect(editor.getValue()).toBe(
+            '![Johan Sanneblad talar om agentisk utveckling|400](https://www.tokentek.ai/_astro/gaia-2026-talk.J2oaR4rx_sdIoa.webp)'
+        );
+    });
+
+    it('decodes the source URL from Chrome copy image HTML in link mode', async () => {
+        const html =
+            "<meta charset='utf-8'><img src=\"https://static.bonniernews.se/ba/" +
+            'b199b344-6661-4663-90b8-6496bcea47f3.jpeg?' +
+            'crop=3200%2C1600%2Cx0%2Cy100&amp;auto=webp&amp;width=620&amp;quality=70"/>';
+        const event = fakeClipboardEvent({ html, files: [fakeFile('image.png', 'image/png')] });
+        const { service } = build({ imageMode: 'link' });
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(editor.getValue()).toBe(
+            '![](https://static.bonniernews.se/ba/b199b344-6661-4663-90b8-6496bcea47f3.jpeg?' +
+                'crop=3200%2C1600%2Cx0%2Cy100&auto=webp&width=620&quality=70)'
+        );
+    });
+
+    it('makes the linked HTML source safe for Markdown', async () => {
+        const html = '<img src="https://example.com/a (b.png" alt="A [cat] | photo">';
+        const event = fakeClipboardEvent({ html, files: [fakeFile('image.png', 'image/png')] });
+        const { service } = build({ imageMode: 'link', imageSizeChoice: '400' });
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(editor.getValue()).toBe('![A cat photo|400](https://example.com/a%20%28b.png)');
+    });
+
     it('ignores srcset so only the real source is used', async () => {
         const { service, saved } = build();
         service.handleEditorPaste(safariEvent(), new FakeEditor('').asEditor(), INFO);
@@ -458,12 +503,31 @@ describe('handleEditorPaste: Safari copy image', () => {
     });
 
     it('falls back to linking the picture when it cannot be saved', async () => {
+        const html = '<img src="https://example.com/a (b).png">';
+        const event = fakeClipboardEvent({ html, files: [fakeFile('image.png', 'image/png')] });
         const { service } = build({}, true);
         const editor = new FakeEditor('');
+        const noticeCount = Notice.instances.length;
 
-        service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO);
+        service.handleEditorPaste(event, editor.asEditor(), INFO);
         await settle();
-        expect(editor.getValue()).toBe('![](https://www.tokentek.ai/_astro/gaia-2026-talk.J2oaR4rx_sdIoa.webp)');
+        expect(editor.getValue()).toBe('![](https://example.com/a%20%28b%29.png)');
+        expect(Notice.instances).toHaveLength(noticeCount + 1);
+        expect(Notice.instances[noticeCount].message).toBe('Better Paste: 1 image could not be saved, the original link was kept');
+    });
+
+    it('reports a failed byte save for a data URI in link mode', async () => {
+        const html = '<img src="data:image/png;base64,AA==">';
+        const event = fakeClipboardEvent({ html, files: [fakeFile('image.png', 'image/png')] });
+        const { service } = build({ imageMode: 'link' }, true);
+        const editor = new FakeEditor('');
+        const noticeCount = Notice.instances.length;
+
+        service.handleEditorPaste(event, editor.asEditor(), INFO);
+        await settle();
+
+        expect(Notice.instances).toHaveLength(noticeCount + 1);
+        expect(Notice.instances[noticeCount].message).toBe('Better Paste: 1 image could not be saved, the original link was kept');
     });
 
     it('takes over a plain bitmap paste with no HTML', async () => {
@@ -486,7 +550,7 @@ describe('handleEditorPaste: Safari copy image', () => {
     });
 
     it('leaves the paste alone when image handling is off', () => {
-        const { service } = build({ imageEnabled: false });
+        const { service } = build({ imageMode: 'off' });
         const editor = new FakeEditor('');
 
         expect(service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO)).toBe(false);
@@ -568,7 +632,7 @@ describe('handleEditorPaste: clipboard image naming', () => {
     });
 
     it('takes over a screenshot even when web image saving is off', async () => {
-        const { service, saved } = build({ ...naming, imageEnabled: false });
+        const { service, saved } = build({ ...naming, imageMode: 'off' });
         const editor = new FakeEditor('');
 
         expect(service.handleEditorPaste(screenshotEvent(), editor.asEditor(), INFO)).toBe(true);
@@ -720,7 +784,7 @@ describe('handleEditorPaste: images in plain text', () => {
     });
 
     it('leaves a pasted image URL alone when image saving is off', () => {
-        const { service } = build({ imageEnabled: false });
+        const { service } = build({ imageMode: 'off' });
         const editor = new FakeEditor('');
         const event = fakeClipboardEvent({ plain: 'https://example.com/cat.png' });
 
@@ -818,6 +882,22 @@ describe('image embed options', () => {
         await settle();
         expect(prompt.calls).toEqual([{ sizes: ['200', '400', '600'], classes: ['invert', 'invertW'] }]);
         expect(editor.getValue()).toBe('![[image-0.png#invertW|800]]');
+    });
+
+    it('asks for size but not class when link mode saves no file', async () => {
+        const prompt: PromptDouble = { response: { size: '400', cssClass: null }, calls: [] };
+        const { service } = build(
+            { imageMode: 'link', imageSizeChoice: 'ask', imageClassChoice: 'ask', imageClassOptions: 'invert' },
+            false,
+            prompt
+        );
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(bitmapEvent(), editor.asEditor(), INFO);
+        await settle();
+
+        expect(prompt.calls).toEqual([{ sizes: ['200', '400', '600'], classes: null }]);
+        expect(editor.getValue()).toBe('![a photo|400](https://example.com/photo.webp)');
     });
 
     it('applies nothing when the dialog is dismissed', async () => {
@@ -1417,7 +1497,7 @@ describe('handleEditorPaste: rich content', () => {
     });
 
     it('does no work when both rich-content rules are off', async () => {
-        const { service } = build({ linkEnabled: false, imageEnabled: false });
+        const { service } = build({ linkEnabled: false, imageMode: 'off' });
         const editor = new FakeEditor('');
 
         await pasteRich(service, editor, RICH_HTML, '[link](https://example.com/b?utm_source=x)');
@@ -1426,7 +1506,7 @@ describe('handleEditorPaste: rich content', () => {
     });
 
     it('still cleans AI typography when the other rich-content rules are off', async () => {
-        const { service } = build({ linkEnabled: false, imageEnabled: false, textQuotes: true });
+        const { service } = build({ linkEnabled: false, imageMode: 'off', textQuotes: true });
         const editor = new FakeEditor('');
 
         await pasteRich(service, editor, '<p>quoted</p>', '“quoted”');
@@ -1438,7 +1518,7 @@ describe('handleEditorPaste: rich content', () => {
         const { service } = build({
             textInvisible: false,
             linkEnabled: false,
-            imageEnabled: false,
+            imageMode: 'off',
             textQuotes: true
         });
         const editor = new FakeEditor('');
@@ -1452,7 +1532,7 @@ describe('handleEditorPaste: rich content', () => {
         const { service } = build({
             textInvisible: false,
             linkEnabled: false,
-            imageEnabled: false,
+            imageMode: 'off',
             textSnippets: [
                 {
                     id: 'citations',
@@ -1563,7 +1643,7 @@ describe('a second paste while the first is still downloading', () => {
     function deferredImages(settings: BetterPasteSettings) {
         const pending: Array<() => void> = [];
         const images = {
-            hasWork: (text: string) => settings.imageEnabled && findImageReferences(text).length > 0,
+            hasWork: (text: string) => settings.imageMode !== 'off' && findImageReferences(text).length > 0,
             materializeImages: (text: string) =>
                 new Promise(resolve => {
                     pending.push(() => {
@@ -1586,7 +1666,7 @@ describe('a second paste while the first is still downloading', () => {
     const URL = 'https://example.com/cat.png';
 
     it('rewrites both pastes when the second lands earlier in the note', async () => {
-        const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS };
+        const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, imageMode: 'download' };
         const { images, pending } = deferredImages(settings);
         const service = new PasteService(() => settings, images, fakeTitles(settings, []));
         const doc = 'top\n\nbottom\n';
@@ -1948,7 +2028,7 @@ describe('handleEditorPaste: image URL in frontmatter', () => {
     });
 
     it('keeps the address and discards the file when the user typed in the slot during the download', async () => {
-        const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS };
+        const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, imageMode: 'download' };
         let finishDownload: (result: unknown) => void = () => undefined;
         const discarded: unknown[] = [];
         const images = {
@@ -1995,7 +2075,7 @@ describe('handleEditorPaste: image URL in frontmatter', () => {
     });
 
     it('stays native when image saving is off', () => {
-        const { service } = build({ imageEnabled: false });
+        const { service } = build({ imageMode: 'off' });
         const doc = '---\ncover: \n---\n';
         const editor = new FakeEditor(doc, '---\ncover: '.length);
 

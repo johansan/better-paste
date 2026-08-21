@@ -128,7 +128,7 @@ function choiceLabel(choice: string, options: string): string {
 }
 
 /**
- * Rows shown under the Images heading. The saving toggle governs web images only;
+ * Rows shown under the Images heading. The saving choice governs web images only;
  * naming and decoration also reach clipboard images, so those rows are always visible.
  */
 export function createImageLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
@@ -139,7 +139,21 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
             name: text.savingName,
             desc: savingExample(),
             aliases: aliases(source => source.settings.images.savingAliases),
-            control: { type: 'toggle', key: 'imageEnabled', defaultValue: DEFAULT_SETTINGS.imageEnabled }
+            render: setting => {
+                setting.setName(text.savingName);
+                setting.setDesc(savingExample());
+                setting.addDropdown(dropdown => {
+                    dropdown.addOption('off', text.savingChoiceOff);
+                    dropdown.addOption('link', text.savingChoiceLink);
+                    dropdown.addOption('download', text.savingChoiceDownload);
+                    dropdown.setValue(context.settings().imageMode);
+                    dropdown.onChange(value => {
+                        if (value !== 'off' && value !== 'link' && value !== 'download') return;
+                        context.settings().imageMode = value;
+                        return context.saveSettings();
+                    });
+                });
+            }
         },
         {
             name: text.nameFormatName,

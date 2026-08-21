@@ -92,10 +92,13 @@ export const STRINGS_TR: TranslationStrings = {
 
         images: {
             heading: 'Görseller',
-            savingName: 'Web görsellerini kasaya kaydet',
+            savingName: 'Web görselleri',
             savingDesc:
-                'Web’deki görselleri ek klasörünüze kaydeder ve web adresi yerine yerel dosyaya bağlantı verir. Safari’deki "Görseli kopyala", kopyalanan web içeriğindeki görseller ve yapıştırılan görsel adresleri buna dahildir. Dosya adı öntanımlı olarak adresten gelir:',
-            savingAliases: ['indir', 'url', 'web', 'ek', 'safari', 'yerel', 'görsel', 'klasör'],
+                'Görsellere doğrudan web’den bağlantı vermeyi veya onları ek klasörünüze indirmeyi seçin. Safari’deki "Görseli kopyala", kopyalanan web içeriğindeki görseller ve yapıştırılan görsel adresleri buna dahildir. Dosya adı varsayılan olarak adresten gelir:',
+            savingChoiceOff: 'Hiçbir şey yapma',
+            savingChoiceLink: 'Önizlemeyle bağlantı ver',
+            savingChoiceDownload: 'Önizlemeyle indir',
+            savingAliases: ['indir', 'bağlantı', 'göm', 'önizleme', 'url', 'web', 'ek', 'safari', 'yerel', 'görsel', 'klasör'],
             sizeStyleName: 'Boyut ve stil',
             sizeStyleDesc: 'Yapıştırılan görsellere bir genişlik veya CSS sınıfı ekleyin, otomatik olarak ya da bir seçiciyle.',
             sizeStyleAliases: ['boyut', 'genişlik', 'css', 'sınıf', 'stil', 'yeniden boyutlandır', 'invert'],

@@ -54,11 +54,23 @@ const BARE_URL = /https?:\/\/[^\s<>"`\\\u201c\u201d]+/gi;
 /** Tags and autolinks claimed before bare URLs, so an href is never rewritten as an image. */
 const HTML_TAG = /<(?:[^"'<>]|"[^"]*"|'[^']*')+>/g;
 
+/** Decodes the character references supported in clipboard HTML attributes. */
+function decodeHtmlAttribute(value: string): string {
+    const named: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: '\u00a0' };
+
+    return value.replace(/&(amp|lt|gt|quot|apos|nbsp|#\d+|#x[\da-f]+);/gi, (reference, entity: string) => {
+        if (!entity.startsWith('#')) return named[entity.toLowerCase()];
+        const hexadecimal = entity[1].toLowerCase() === 'x';
+        const codePoint = Number.parseInt(entity.slice(hexadecimal ? 2 : 1), hexadecimal ? 16 : 10);
+        return codePoint <= 0x10ffff && (codePoint < 0xd800 || codePoint > 0xdfff) ? String.fromCodePoint(codePoint) : reference;
+    });
+}
+
 /** Reads an exact HTML attribute, without mistaking data-src or data-alt for it. */
 function htmlAttribute(tag: string, name: 'src' | 'alt'): string | null {
     const pattern = new RegExp(`\\s${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i');
     const match = pattern.exec(tag);
-    return match ? (match[1] ?? match[2] ?? match[3] ?? '') : null;
+    return match ? decodeHtmlAttribute(match[1] ?? match[2] ?? match[3] ?? '') : null;
 }
 
 /**
@@ -91,6 +103,21 @@ export function isDataImageUri(url: string): boolean {
 /** True when the URL uses a scheme we are willing to download from. */
 export function isHttpUrl(url: string): boolean {
     return /^https?:\/\//i.test(url);
+}
+
+/** Percent-encodes characters that cannot safely appear in a Markdown link destination. */
+export function escapeMarkdownDestination(destination: string): string {
+    return destination.replace(/[\\()<> \r\n\t]/g, char => `%${char.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')}`);
+}
+
+/** Builds a remote image embed whose label and destination cannot break Markdown syntax. */
+export function remoteMarkdownEmbed(alt: string, url: string, size: string | null): string {
+    const safeAlt = alt
+        .replace(/[[\]|\\]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    const label = size ? (safeAlt ? `${safeAlt}|${size}` : size) : safeAlt;
+    return `![${label}](${escapeMarkdownDestination(url)})`;
 }
 
 /** Returns the lowercase file extension of a URL's path, or null when it has none. */

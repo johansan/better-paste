@@ -86,10 +86,13 @@ export const STRINGS_ID: TranslationStrings = {
 
         images: {
             heading: 'Gambar',
-            savingName: 'Simpan gambar web ke dalam brankas',
+            savingName: 'Gambar web',
             savingDesc:
-                'Menyimpan gambar dari web ke folder lampiran Anda dan menautkan berkas lokal alih-alih alamat web. Mencakup "Salin gambar" di Safari, gambar di dalam konten web yang disalin, dan alamat gambar yang ditempel. Secara bawaan nama berkas diambil dari alamatnya:',
-            savingAliases: ['unduh', 'url', 'web', 'lampiran', 'safari', 'lokal', 'gambar', 'folder'],
+                'Pilih apakah gambar ditautkan langsung dari web atau diunduh ke folder lampiran Anda. Mencakup "Salin gambar" di Safari, gambar di dalam konten web yang disalin, dan alamat gambar yang ditempel. Secara bawaan nama berkas diambil dari alamatnya:',
+            savingChoiceOff: 'Jangan lakukan apa-apa',
+            savingChoiceLink: 'Tautkan dengan pratinjau',
+            savingChoiceDownload: 'Unduh dengan pratinjau',
+            savingAliases: ['unduh', 'tautan', 'sematkan', 'pratinjau', 'url', 'web', 'lampiran', 'safari', 'lokal', 'gambar', 'folder'],
             sizeStyleName: 'Ukuran dan gaya',
             sizeStyleDesc: 'Tambahkan lebar atau kelas CSS ke gambar yang ditempel, secara otomatis atau melalui dialog pemilihan.',
             sizeStyleAliases: ['ukuran', 'lebar', 'css', 'kelas', 'gaya', 'ubah ukuran', 'invert'],

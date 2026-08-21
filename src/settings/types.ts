@@ -42,14 +42,14 @@ export interface BetterPasteSettings {
 
     /* Images */
 
-    /** Save pasted pictures into the vault instead of leaving them as links. */
-    imageEnabled: boolean;
+    /** Web image handling: off leaves references alone, link embeds URLs, download saves files. */
+    imageMode: 'off' | 'link' | 'download';
     /** File name format for saved images: source-name, note and property tokens, counters and Moment dates. */
     imageNameTemplate: string;
-    /** Comma-separated widths offered for saved image embeds, such as "400, 600, 800". */
+    /** Comma-separated widths offered for image embeds, such as "400, 600, 800". */
     imageSizeOptions: string;
     /**
-     * Width applied to every saved image embed: '' for none, 'ask' for a dialog on each
+     * Width applied to every image embed: '' for none, 'ask' for a dialog on each
      * paste, otherwise one of the values in `imageSizeOptions`. A note's own width
      * property overrides this.
      */

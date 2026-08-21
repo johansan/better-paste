@@ -92,10 +92,25 @@ export const STRINGS_NL: TranslationStrings = {
 
         images: {
             heading: 'Afbeeldingen',
-            savingName: 'Webafbeeldingen in de kluis opslaan',
+            savingName: 'Webafbeeldingen',
             savingDesc:
-                'Slaat webafbeeldingen op in je bijlagemap en linkt naar het lokale bestand in plaats van naar het webadres. Geldt voor "Afbeelding kopiëren" in Safari, afbeeldingen in gekopieerde webinhoud en geplakte afbeeldingsadressen. Standaard komt de bestandsnaam uit het adres:',
-            savingAliases: ['downloaden', 'url', 'web', 'bijlage', 'safari', 'lokaal', 'afbeelding', 'map'],
+                'Kies of afbeeldingen rechtstreeks vanaf het web worden gelinkt of naar je bijlagemap worden gedownload. Geldt voor "Kopieer afbeelding" in Safari, afbeeldingen in gekopieerde webinhoud en geplakte afbeeldingsadressen. Standaard komt de bestandsnaam uit het adres:',
+            savingChoiceOff: 'Niets doen',
+            savingChoiceLink: 'Linken met voorvertoning',
+            savingChoiceDownload: 'Downloaden met voorvertoning',
+            savingAliases: [
+                'downloaden',
+                'linken',
+                'insluiten',
+                'voorvertoning',
+                'url',
+                'web',
+                'bijlage',
+                'safari',
+                'lokaal',
+                'afbeelding',
+                'map'
+            ],
             sizeStyleName: 'Grootte en stijl',
             sizeStyleDesc: 'Geef geplakte afbeeldingen een breedte of een CSS-klasse mee, automatisch of via een keuzevenster.',
             sizeStyleAliases: ['grootte', 'breedte', 'css', 'klasse', 'stijl', 'schalen', 'invert'],

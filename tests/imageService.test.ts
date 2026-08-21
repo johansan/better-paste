@@ -73,11 +73,63 @@ function build(overrides: Partial<BetterPasteSettings> = {}, seededPaths: string
         }
     } as unknown as App;
 
-    const settings = { ...DEFAULT_SETTINGS, ...overrides };
+    const settings = { ...DEFAULT_SETTINGS, imageMode: 'download' as const, ...overrides };
     return { service: new ImageService(app, () => settings), writes };
 }
 
 describe('ImageService', () => {
+    it('links bare and HTML web images without fetching them', async () => {
+        const { service, writes } = build({ imageMode: 'link' });
+        const url = 'https://example.com/photo.png?token=abc';
+
+        const result = await service.materializeImages(`${url} <img src="${url}" alt="A cat">`, 'Notes/Test.md');
+
+        expect(result.text).toBe(`![](${url}) ![A cat](${url})`);
+        expect(writes).toHaveLength(0);
+    });
+
+    it('keeps a remote Markdown image untouched in link mode', async () => {
+        const { service } = build({ imageMode: 'link' });
+        const text = '![A cat](https://example.com/photo.png?token=abc)';
+
+        expect(service.hasWork(text)).toBe(false);
+        expect((await service.materializeImages(text, 'Notes/Test.md')).text).toBe(text);
+    });
+
+    it('applies size but not class to remote embeds in link mode', async () => {
+        const { service } = build({ imageMode: 'link' });
+
+        const result = await service.materializeImages(
+            '<img src="https://example.com/photo.png" alt="A cat">',
+            'Notes/Test.md',
+            '400',
+            'invert'
+        );
+
+        expect(result.text).toBe('![A cat|400](https://example.com/photo.png)');
+    });
+
+    it('makes remote HTML image embeds safe for Markdown', async () => {
+        const { service } = build({ imageMode: 'link' });
+
+        const result = await service.materializeImages(
+            '<img src="https://example.com/a (b).png" alt="A [cat] | photo">',
+            'Notes/Test.md',
+            '400'
+        );
+
+        expect(result.text).toBe('![A cat photo|400](https://example.com/a%20%28b%29.png)');
+    });
+
+    it('still saves data URIs with size and class in link mode', async () => {
+        const { service, writes } = build({ imageMode: 'link' });
+
+        const result = await service.materializeImages('![](data:image/png;base64,AA==)', 'Notes/Test.md', '400', 'invert');
+
+        expect(result.text).toBe('![[Attachments/pasted-image.png#invert|400]]');
+        expect(writes).toHaveLength(1);
+    });
+
     it('stores an inline image and preserves its alt text', async () => {
         const { service, writes } = build();
 

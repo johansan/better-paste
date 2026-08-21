@@ -18,7 +18,7 @@
 
 import { requestUrl } from 'obsidian';
 import type { RequestUrlParam, RequestUrlResponse } from 'obsidian';
-import { extensionOfUrl } from './imageReferences';
+import { escapeMarkdownDestination, extensionOfUrl } from './imageReferences';
 import { titleProviderRequest } from './titleProviders';
 import type { TitleProviderRequest } from './titleProviders';
 import { IMAGE_EXTENSIONS, LINK_TITLE_MAX_PARALLEL, LINK_TITLE_TIMEOUT_SECONDS } from '../settings/constants';
@@ -94,18 +94,9 @@ export function escapeLinkTitle(title: string): string {
     return title.replace(/[\\`*_[\]<>~|]/g, '\\$&');
 }
 
-/**
- * Percent-encodes the characters that would let a URL break out of a Markdown link
- * destination. A crafted address ending in a parenthesis could otherwise close the link
- * early and turn the rest of itself into active Markdown, such as a remote image.
- */
-export function escapeLinkDestination(url: string): string {
-    return url.replace(/[\\()<>]/g, char => `%${char.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')}`);
-}
-
 /** Formats the exact Markdown subject that link snippets and the note both see. */
 export function formatTitledLink(title: string, url: string): string {
-    return `[${escapeLinkTitle(title)}](${escapeLinkDestination(url)})`;
+    return `[${escapeLinkTitle(title)}](${escapeMarkdownDestination(url)})`;
 }
 
 /** Finds the first unescaped Markdown link destination delimiter. */

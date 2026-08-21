@@ -29,6 +29,11 @@ function asString(value: unknown, fallback: string): string {
     return typeof value === 'string' ? value : fallback;
 }
 
+function asImageMode(value: unknown, legacyEnabled: unknown): BetterPasteSettings['imageMode'] {
+    if (value === 'off' || value === 'link' || value === 'download') return value;
+    return legacyEnabled === false ? 'off' : DEFAULT_SETTINGS.imageMode;
+}
+
 function asStringArray(value: unknown): string[] {
     if (!Array.isArray(value)) return [];
     return value.filter((entry): entry is string => typeof entry === 'string');
@@ -94,7 +99,7 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
         quoteContinuation: asBoolean(data.quoteContinuation, defaults.quoteContinuation),
         showReleaseNotes: asBoolean(data.showReleaseNotes, defaults.showReleaseNotes),
 
-        imageEnabled: asBoolean(data.imageEnabled, defaults.imageEnabled),
+        imageMode: asImageMode(data.imageMode, (data as Record<string, unknown>).imageEnabled),
         // The former imageNameFormat dropdown gated the template. A vault that stored
         // 'source' kept whatever template text was last typed there, so that leftover
         // text must not spring to life now that the field alone decides the naming.

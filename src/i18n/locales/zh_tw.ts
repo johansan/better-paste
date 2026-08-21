@@ -86,10 +86,13 @@ export const STRINGS_ZH_TW: TranslationStrings = {
 
         images: {
             heading: '圖片',
-            savingName: '把網路圖片儲存到儲存庫',
+            savingName: '網路圖片',
             savingDesc:
-                '把網路圖片儲存到附件資料夾，並連結本機檔案而不是網址。涵蓋 Safari 的「拷貝影像」、複製的網頁內容中的圖片，以及貼上的圖片網址。檔案名稱預設取自網址：',
-            savingAliases: ['下載', 'url', '網路', '附件', 'safari', '本機', '圖片', '資料夾'],
+                '選擇直接連結網路圖片，還是把它們下載到附件資料夾。涵蓋 Safari 的「拷貝影像」、複製的網頁內容中的圖片，以及貼上的圖片網址。檔案名稱預設取自網址：',
+            savingChoiceOff: '什麼都不做',
+            savingChoiceLink: '連結並預覽',
+            savingChoiceDownload: '下載並預覽',
+            savingAliases: ['下載', '連結', '嵌入', '預覽', 'url', '網路', '附件', 'safari', '本機', '圖片', '資料夾'],
             sizeStyleName: '尺寸與樣式',
             sizeStyleDesc: '為貼上的圖片加上寬度或 CSS 類別，可自動套用，也可每次選擇。',
             sizeStyleAliases: ['尺寸', '寬度', 'css', '類別', '樣式', '縮放', 'invert'],

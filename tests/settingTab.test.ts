@@ -42,6 +42,7 @@ const STORED_STATE_KEYS = ['lastShownVersion', 'imageLastSize', 'imageLastClass'
 
 /** Settings owned by a custom-rendered row rather than a declarative control. */
 const CUSTOM_RENDER_SETTING_KEYS = [
+    'imageMode',
     'imageNameTemplate',
     'imageSizeChoice',
     'imageSizeOptions',
@@ -448,9 +449,9 @@ describe('settings tree', () => {
         expect(summary({ imageClassOptions: '', imageClassChoice: 'ask' })).toBe('Do nothing');
     });
 
-    it('gives every master toggle search terms for what it hides', () => {
+    it('gives every master control search terms for what it hides', () => {
         // A rule that is off hides its own settings, and a hidden row is dropped from search
-        const masters = ['imageEnabled', 'linkEnabled', 'textInvisible'];
+        const masters = ['linkEnabled', 'textInvisible'];
         for (const key of masters) {
             const row = controlRows(tab).find(candidate => candidate.control.key === key);
             expect(row?.aliases?.length, `"${key}" has no aliases`).toBeGreaterThan(0);
@@ -770,8 +771,8 @@ describe('dependent settings', () => {
             flatten(makeTab(fakePlugin(settings)).getSettingDefinitions()).find(row => row.name === name);
 
         // The template and decoration also reach clipboard images, so they never hide
-        expect(isVisible(rowNamed('File names', { imageEnabled: false }))).toBeUndefined();
-        expect(isVisible(rowNamed('Apply size on paste', { imageEnabled: false }))).toBeUndefined();
+        expect(isVisible(rowNamed('File names', { imageMode: 'off' }))).toBeUndefined();
+        expect(isVisible(rowNamed('Apply size on paste', { imageMode: 'off' }))).toBeUndefined();
     });
 
     it('hides the link detail when the rule is off', () => {
@@ -787,7 +788,7 @@ describe('dependent settings', () => {
     it('re-evaluates dependent settings after a change', async () => {
         const tab = makeTab(fakePlugin());
         const before = (tab as unknown as { refreshCount: number }).refreshCount;
-        await tab.setControlValue('imageEnabled', false);
+        await tab.setControlValue('linkEnabled', false);
         expect((tab as unknown as { refreshCount: number }).refreshCount).toBe(before + 1);
     });
 });

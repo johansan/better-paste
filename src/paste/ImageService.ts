@@ -18,7 +18,7 @@
 
 import { TFile, requestUrl } from 'obsidian';
 import type { App } from 'obsidian';
-import { findImageReferences, isDataImageUri, isHttpUrl, replaceImageReferences } from './imageReferences';
+import { findImageReferences, isDataImageUri, isHttpUrl, remoteMarkdownEmbed, replaceImageReferences } from './imageReferences';
 import type { ImageReference } from './imageReferences';
 import {
     assembleFileName,
@@ -79,7 +79,7 @@ export interface ImageMaterializeResult {
     files: TFile[];
 }
 
-/** Downloads images referenced by pasted content and stores them in the vault. */
+/** Saves images referenced by pasted content into the vault, or rewrites them to remote embeds in link mode. */
 export class ImageService {
     private readonly app: App;
     private readonly getSettings: () => BetterPasteSettings;
@@ -97,17 +97,19 @@ export class ImageService {
         this.disposed = true;
     }
 
-    /** True when the text contains at least one image the plugin is configured to download. */
+    /** True when the text contains at least one image the configured mode will change. */
     hasWork(text: string): boolean {
         if (this.disposed) return false;
         const settings = this.getSettings();
-        if (!settings.imageEnabled) return false;
-        return findImageReferences(text).length > 0;
+        if (settings.imageMode === 'off') return false;
+        const references = findImageReferences(text);
+        if (settings.imageMode === 'download') return references.length > 0;
+        return references.some(reference => isDataImageUri(reference.url) || reference.kind !== 'markdown');
     }
 
     /**
-     * Replaces every downloadable image reference in `text` with a vault embed.
-     * References that fail to download are left untouched so nothing is lost.
+     * Replaces image references according to the configured mode. References that fail
+     * to save are left untouched so nothing is lost.
      */
     async materializeImages(
         text: string,
@@ -118,7 +120,7 @@ export class ImageService {
     ): Promise<ImageMaterializeResult> {
         if (this.disposed) return { text, downloaded: 0, failed: 0, files: [] };
         const settings = this.getSettings();
-        if (!settings.imageEnabled) return { text, downloaded: 0, failed: 0, files: [] };
+        if (settings.imageMode === 'off') return { text, downloaded: 0, failed: 0, files: [] };
 
         const references = findImageReferences(text);
         if (references.length === 0) return { text, downloaded: 0, failed: 0, files: [] };
@@ -127,8 +129,16 @@ export class ImageService {
         const files: TFile[] = [];
         let failed = 0;
 
+        const queue: ImageReference[] = [];
+        for (const reference of references) {
+            if (settings.imageMode === 'link' && !isDataImageUri(reference.url)) {
+                if (reference.kind !== 'markdown') embeds.set(reference.index, this.remoteEmbed(reference, size));
+            } else {
+                queue.push(reference);
+            }
+        }
+
         // A small worker pool keeps a page full of images from opening dozens of sockets
-        const queue = [...references];
         const workers = Array.from({ length: Math.min(MAX_CONCURRENT_DOWNLOADS, queue.length) }, async () => {
             for (let reference = queue.shift(); !this.disposed && reference !== undefined; reference = queue.shift()) {
                 const saved = await this.materializeOne(reference, sourcePath, settings, size, cssClass, naming);
@@ -142,7 +152,12 @@ export class ImageService {
 
         await Promise.all(workers);
 
-        return { text: replaceImageReferences(text, references, embeds), downloaded: embeds.size, failed, files };
+        return { text: replaceImageReferences(text, references, embeds), downloaded: files.length, failed, files };
+    }
+
+    /** Builds a remote Markdown embed, with width in the alias slot used by Obsidian. */
+    private remoteEmbed(reference: ImageReference, size: string | null): string {
+        return remoteMarkdownEmbed(reference.alt, reference.url, size);
     }
 
     /**

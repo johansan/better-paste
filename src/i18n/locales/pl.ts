@@ -96,10 +96,13 @@ export const STRINGS_PL: TranslationStrings = {
 
         images: {
             heading: 'Obrazy',
-            savingName: 'Zapisuj obrazy z sieci w sejfie',
+            savingName: 'Obrazy z sieci',
             savingDesc:
-                'Zapisuje obrazy z sieci w folderze załączników i wstawia odnośnik do pliku lokalnego zamiast adresu internetowego. Dotyczy opcji „Kopiuj obraz” w Safari, obrazów w skopiowanej treści z sieci oraz wklejanych adresów obrazów. Domyślnie nazwa pliku pochodzi z adresu:',
-            savingAliases: ['pobieranie', 'url', 'sieć', 'załącznik', 'safari', 'lokalny', 'obraz', 'folder'],
+                'Wybierz, czy obrazy mają być linkowane bezpośrednio z sieci, czy pobierane do folderu załączników. Dotyczy opcji „Skopiuj obraz” w Safari, obrazów w skopiowanej treści z sieci oraz wklejanych adresów obrazów. Domyślnie nazwa pliku pochodzi z adresu:',
+            savingChoiceOff: 'Nic nie rób',
+            savingChoiceLink: 'Linkuj z podglądem',
+            savingChoiceDownload: 'Pobierz z podglądem',
+            savingAliases: ['pobieranie', 'link', 'osadź', 'podgląd', 'url', 'sieć', 'załącznik', 'safari', 'lokalny', 'obraz', 'folder'],
             sizeStyleName: 'Rozmiar i styl',
             sizeStyleDesc: 'Dodawaj do wklejanych obrazów szerokość lub klasę CSS, automatycznie albo przez okno wyboru.',
             sizeStyleAliases: ['rozmiar', 'szerokość', 'css', 'klasa', 'styl', 'skalowanie', 'invert'],

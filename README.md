@@ -40,7 +40,7 @@ Ready-made snippets to import are on the [wiki](https://github.com/johansan/bett
 
 ### 2.2 Images from Safari
 
-Copy an image in Safari, paste it into Obsidian, and you get a web link instead of the image. Annoying! Better Paste saves the actual image into your vault:
+Copy an image in Safari, paste it into Obsidian, and you get a web link. The picture shows up in your note, but it loads from the web every time and breaks if the address stops working. Want the real file? Set **Web images** to **Download with preview** and Better Paste saves it into your vault:
 
 ```
 ![](https://images.example.com/2026/05/skyline-8f21a.jpg?auto=format&w=2400)
@@ -196,11 +196,11 @@ Here are the settings you will actually look for.
 
 ### 3.2 Images
 
-- **Save web images into the vault**: covers Safari's "Copy image", pictures inside copied web content, and pasted image URLs. Images land wherever your attachment settings point, named after the source file, so no more `image.png`.
-- **File names**: add your own format, like `{{name}}-YYYY-MM-DD`. You can also use `{{noteName}}` for the note name, `{{property:xyz}}` for any frontmatter property, and `{{counter}}` or `{{counter:2}}` for a number that counts up. A screenshot has no source name, so it gets `Pasted image` plus a timestamp, the same name Obsidian gives it. With `attachName: demo` in a note and the format `{{property:attachName}}-{{counter}}`, pasted screenshots become `demo-1.png`, `demo-2.png`, `demo-3.png`. The format applies to every image Better Paste saves, screenshots included, whether or not web saving is on.
+- **Web images**: covers Safari's "Copy image", pictures inside copied web content, and pasted image URLs. **Link with preview**, the default, pastes an embed that shows the picture straight from the web. **Download with preview** saves the image into your vault, wherever your attachment settings point, named after the source file, so no more `image.png`. **Do nothing** leaves the paste alone.
+- **File names**: add your own format, like `{{name}}-YYYY-MM-DD`. You can also use `{{noteName}}` for the note name, `{{property:xyz}}` for any frontmatter property, and `{{counter}}` or `{{counter:2}}` for a number that counts up. A screenshot has no source name, so it gets `Pasted image` plus a timestamp, the same name Obsidian gives it. With `attachName: demo` in a note and the format `{{property:attachName}}-{{counter}}`, pasted screenshots become `demo-1.png`, `demo-2.png`, `demo-3.png`. The format applies to every image Better Paste saves, screenshots included.
 - **Size and style**: give every saved image a width, a class, or both, so a paste comes out as `![[photo.jpg#invert|400]]`. Define your own comma-separated lists like `200, 400, 600` and `invert, invertW`, then apply one value everywhere or pick **Ask on every paste** to choose in a small dialog each time (Enter applies, and your last pick is preselected). Classes like `#invert` are defined by themes and CSS snippets, for example to invert an image in dark mode. The **Image width property** (default `image-width`) sets a per-note width, see [section 4](#4-per-note-control).
 
-Alt text survives the download, and if a download fails the original link stays in your note. Images over 50 MB or slower than 30 seconds are left as links. A note with its own `image-width` property (see [section 4](#4-per-note-control)) overrides the size setting.
+Alt text survives, and if a download fails the original link stays in your note. Images over 50 MB or slower than 30 seconds are left as links. A note with its own `image-width` property (see [section 4](#4-per-note-control)) overrides the size setting.
 
 ### 3.3 Links
 
@@ -310,9 +310,9 @@ Nine commands, ready for your own hotkeys (Settings, Hotkeys). The ids are for U
 
 ## 6 Good to know
 
-- Pasting into code blocks, inline code or frontmatter changes nothing, and fenced code inside a paste comes through untouched. One exception: paste an image address into an empty property in source mode, and the image is saved into your vault with the property set to `"[[skyline-8f21a.jpg]]"`. Obsidian Bases can show that as a cover image, and a local copy works offline.
+- Pasting into code blocks, inline code or frontmatter changes nothing, and fenced code inside a paste comes through untouched. One exception: with **Web images** set to **Download with preview**, pasting an image address into an empty property in source mode saves the image into your vault with the property set to `"[[skyline-8f21a.jpg]]"`. Obsidian Bases can show that as a cover image, and a local copy works offline.
 - Screenshots and other bitmap-only pastes are left to Obsidian, which already saves them fine.
-- Rich content (HTML) is converted to Markdown by Obsidian first; Better Paste then cleans the links and downloads the images in the result.
+- Rich content (HTML) is converted to Markdown by Obsidian first; Better Paste then cleans the links and applies the **Web images** setting to the pictures in the result.
 
 <br/>
 

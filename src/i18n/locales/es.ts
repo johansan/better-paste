@@ -92,10 +92,25 @@ export const STRINGS_ES: TranslationStrings = {
 
         images: {
             heading: 'Imágenes',
-            savingName: 'Guardar en la bóveda las imágenes de la web',
+            savingName: 'Imágenes de la web',
             savingDesc:
-                'Guarda las imágenes de la web en tu carpeta de adjuntos y enlaza el archivo local en lugar de la dirección web. Abarca "Copiar imagen" de Safari, las imágenes dentro de contenido web copiado y las direcciones de imagen pegadas. Por defecto, el nombre del archivo procede de la dirección:',
-            savingAliases: ['descargar', 'url', 'web', 'adjunto', 'safari', 'local', 'imagen', 'carpeta'],
+                'Elige si quieres enlazar las imágenes directamente desde la web o descargarlas en tu carpeta de adjuntos. Abarca "Copiar imagen" de Safari, las imágenes dentro de contenido web copiado y las direcciones de imagen pegadas. Por defecto, el nombre del archivo procede de la dirección:',
+            savingChoiceOff: 'No hacer nada',
+            savingChoiceLink: 'Enlazar con vista previa',
+            savingChoiceDownload: 'Descargar con vista previa',
+            savingAliases: [
+                'descargar',
+                'enlazar',
+                'incrustar',
+                'vista previa',
+                'url',
+                'web',
+                'adjunto',
+                'safari',
+                'local',
+                'imagen',
+                'carpeta'
+            ],
             sizeStyleName: 'Tamaño y estilo',
             sizeStyleDesc: 'Añade un ancho o una clase CSS a las imágenes pegadas, de forma automática o mediante un selector.',
             sizeStyleAliases: ['tamaño', 'ancho', 'css', 'clase', 'estilo', 'redimensionar', 'invert'],

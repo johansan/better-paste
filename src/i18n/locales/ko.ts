@@ -86,10 +86,13 @@ export const STRINGS_KO: TranslationStrings = {
 
         images: {
             heading: '이미지',
-            savingName: '웹 이미지를 보관함에 저장',
+            savingName: '웹 이미지',
             savingDesc:
-                '웹 이미지를 첨부 파일 폴더에 저장하고 웹 주소 대신 로컬 파일을 링크합니다. Safari의 "이미지 복사", 복사한 웹 콘텐츠 속 이미지, 붙여넣은 이미지 주소가 여기에 해당합니다. 파일 이름은 기본적으로 주소에서 가져옵니다:',
-            savingAliases: ['다운로드', 'url', '웹', '첨부 파일', 'safari', '로컬', '이미지', '폴더'],
+                '이미지를 웹에서 바로 링크할지, 첨부 파일 폴더에 다운로드할지 선택하세요. Safari의 "이미지 복사", 복사한 웹 콘텐츠 속 이미지, 붙여넣은 이미지 주소가 여기에 해당합니다. 파일 이름은 기본적으로 주소에서 가져옵니다:',
+            savingChoiceOff: '아무것도 안 함',
+            savingChoiceLink: '미리보기와 함께 링크',
+            savingChoiceDownload: '미리보기와 함께 다운로드',
+            savingAliases: ['다운로드', '링크', '임베드', '미리보기', 'url', '웹', '첨부 파일', 'safari', '로컬', '이미지', '폴더'],
             sizeStyleName: '크기와 스타일',
             sizeStyleDesc: '붙여넣은 이미지에 너비나 CSS 클래스를 추가합니다. 자동으로 적용하거나 매번 선택할 수 있습니다.',
             sizeStyleAliases: ['크기', '너비', 'css', '클래스', '스타일', '크기 조절', 'invert'],

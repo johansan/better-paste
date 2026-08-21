@@ -102,10 +102,13 @@ export const STRINGS_EN = {
 
         images: {
             heading: 'Images',
-            savingName: 'Save web images into the vault',
+            savingName: 'Web images',
             savingDesc:
-                'Saves images from the web into your attachment folder and links the local file instead of the web address. Covers Safari\'s "Copy image", images inside copied web content, and pasted image addresses. By default the file name comes from the address:',
-            savingAliases: ['download', 'url', 'web', 'attachment', 'safari', 'local', 'picture', 'folder'],
+                'Choose whether to link images straight from the web or download them into your attachment folder. Covers Safari\'s "Copy image", images inside copied web content, and pasted image addresses. By default the file name comes from the address:',
+            savingChoiceOff: 'Do nothing',
+            savingChoiceLink: 'Link with preview',
+            savingChoiceDownload: 'Download with preview',
+            savingAliases: ['download', 'link', 'embed', 'preview', 'url', 'web', 'attachment', 'safari', 'local', 'picture', 'folder'],
             sizeStyleName: 'Size and style',
             sizeStyleDesc: 'Add a width or a CSS class to pasted images, either automatically or through a picker.',
             sizeStyleAliases: ['size', 'width', 'css', 'class', 'style', 'resize', 'invert'],

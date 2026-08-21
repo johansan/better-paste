@@ -86,10 +86,13 @@ export const STRINGS_ZH_CN: TranslationStrings = {
 
         images: {
             heading: '图片',
-            savingName: '把网络图片保存到仓库',
+            savingName: '网络图片',
             savingDesc:
-                '把网络图片保存到附件文件夹，并链接本地文件而不是网址。涵盖 Safari 的“拷贝图像”、复制的网页内容中的图片，以及粘贴的图片地址。文件名默认取自地址：',
-            savingAliases: ['下载', 'url', '网络', '附件', 'safari', '本地', '图片', '文件夹'],
+                '选择直接链接网络图片，还是把它们下载到附件文件夹。涵盖 Safari 的“拷贝图像”、复制的网页内容中的图片，以及粘贴的图片网址。文件名默认取自网址：',
+            savingChoiceOff: '什么都不做',
+            savingChoiceLink: '链接并预览',
+            savingChoiceDownload: '下载并预览',
+            savingAliases: ['下载', '链接', '嵌入', '预览', 'url', '网络', '附件', 'safari', '本地', '图片', '文件夹'],
             sizeStyleName: '尺寸与样式',
             sizeStyleDesc: '为粘贴的图片添加宽度或 CSS 类，可自动应用，也可每次选择。',
             sizeStyleAliases: ['尺寸', '宽度', 'css', '类', '样式', '缩放', 'invert'],

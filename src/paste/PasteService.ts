@@ -30,7 +30,16 @@ import { applyTextSnippets } from '../transforms/snippets';
 import { cleanPdfText } from '../transforms/pdfText';
 import type { PdfCleanupOptions } from '../transforms/pdfText';
 import { buildUrlCleanupOptions, cleanUrlsInText, httpUrlRanges } from '../transforms/urlCleanup';
-import { htmlHasImages, imageReferenceRanges, imageSourcesFromHtml } from './imageReferences';
+import {
+    findImageReferences,
+    escapeMarkdownDestination,
+    htmlHasImages,
+    imageReferenceRanges,
+    imageSourcesFromHtml,
+    isDataImageUri,
+    isHttpUrl,
+    remoteMarkdownEmbed
+} from './imageReferences';
 import { parseCommaList } from '../settings/normalize';
 import type { ImageEmbedChoice } from '../modals/ImageEmbedModal';
 import {
@@ -49,7 +58,6 @@ import { MAX_IMAGE_BYTES } from './ImageService';
 import type { ImageNamingContext, ImageService } from './ImageService';
 import {
     composeTitledLink,
-    escapeLinkDestination,
     escapeLinkTitle,
     formatTitledLink,
     isObviousImageUrl,
@@ -117,7 +125,7 @@ function isFrontmatterValueSlot(content: string, start: number, end: number): bo
 /** Builds a link from selected text, unless the selection is the pasted address itself. */
 function linkFromSelection(selection: string, clipboardText: string, url: string): string | null {
     if (!selection.trim() || selection === clipboardText || selection === url) return null;
-    return `[${escapeLinkTitle(selection)}](${escapeLinkDestination(url)})`;
+    return `[${escapeLinkTitle(selection)}](${escapeMarkdownDestination(url)})`;
 }
 
 /** True when a neighbouring character would become part of a pasted web address. */
@@ -249,13 +257,14 @@ export class PasteService {
             // Two clipboard shapes reach this branch. Safari's "Copy image" puts the bitmap
             // AND an <img> tag on the clipboard, and Obsidian prefers the HTML there, which
             // turns a copied picture into an external link; that is a web image, so the
-            // saving toggle governs it. A bare nameless bitmap, such as a screenshot, is
+            // image mode decides between saving the bytes, linking the address and leaving
+            // it to Obsidian. A bare nameless bitmap, such as a screenshot, is
             // local content and is always taken over, to run it through the file name
             // format and any size or class; it gets the same name Obsidian would give it,
             // so a default setup pastes identically to the app.
             const file = clipboard.files[0];
             if (htmlHasImages(html)) {
-                if (!settings.imageEnabled) return false;
+                if (settings.imageMode === 'off') return false;
             } else {
                 // A bitmap the save would reject stays with Obsidian: taking it over
                 // suppresses the native paste, and without an HTML flavour there is no
@@ -334,22 +343,31 @@ export class PasteService {
         const valueBefore = editor.getValue();
         const file = clipboard.files[0];
         const sources = imageSourcesFromHtml(html);
+        const source = sources[0] ?? '';
+        const remote = isHttpUrl(source)
+            ? findImageReferences(html).find(reference => reference.kind === 'html' && reference.url === source)
+            : undefined;
         const naming = this.imageNaming(editor);
 
-        const { size, cssClass } = await this.resolveEmbedOptions(editor);
+        const linksRemote = this.getSettings().imageMode === 'link' && remote !== undefined;
+        const { size, cssClass } = await this.resolveEmbedOptions(editor, !linksRemote);
         let stored: { embed: string; file: TFile } | null = null;
 
-        try {
-            stored = await this.images.saveClipboardImage(file, sources[0] ?? '', () => targetFile?.path ?? '', size, cssClass, naming);
-        } catch (error) {
-            logError('Could not save a pasted image', error);
+        if (!linksRemote) {
+            try {
+                stored = await this.images.saveClipboardImage(file, sources[0] ?? '', () => targetFile?.path ?? '', size, cssClass, naming);
+            } catch (error) {
+                logError('Could not save a pasted image', error);
+            }
         }
         const embed = stored?.embed ?? null;
 
         // Nothing was saved, so fall back to linking the original picture rather than
         // swallowing the paste entirely.
-        const source = sources[0] ?? '';
-        const text = embed ?? (source ? `![${size ?? ''}](${source})` : '');
+        const text =
+            linksRemote && remote
+                ? remoteMarkdownEmbed(remote.alt, remote.url, size)
+                : (embed ?? (source ? remoteMarkdownEmbed('', source, size) : ''));
 
         if (!this.canEdit(info, targetFile)) {
             // The view moved on, so the embed has no note to land in and the saved
@@ -396,7 +414,7 @@ export class PasteService {
             }
         }
 
-        if (embed === null) this.reportImageFailures(1);
+        if (!linksRemote && embed === null) this.reportImageFailures(1);
     }
 
     /** Command handler: pastes the clipboard's plain text through the full rule pipeline. */
@@ -556,7 +574,7 @@ export class PasteService {
             !settings.textQuotes &&
             !settings.textDashes &&
             !settings.linkEnabled &&
-            !settings.imageEnabled &&
+            settings.imageMode === 'off' &&
             !settings.textSnippets.some(snippet => snippet.enabled)
         )
             return;
@@ -617,7 +635,7 @@ export class PasteService {
         if (this.images.hasWork(text)) {
             try {
                 const naming = this.imageNaming(editor);
-                const embedOptions = await this.resolveEmbedOptions(editor);
+                const embedOptions = await this.resolveEmbedOptions(editor, this.imagePasteSavesFiles(text));
                 const result = await this.images.materializeImages(text, targetPath, embedOptions.size, embedOptions.cssClass, naming);
                 text = result.text;
                 imagesFailed = result.failed;
@@ -656,7 +674,7 @@ export class PasteService {
             let failed = 0;
             try {
                 const naming = this.imageNaming(editor);
-                const embedOptions = await this.resolveEmbedOptions(editor);
+                const embedOptions = await this.resolveEmbedOptions(editor, this.imagePasteSavesFiles(range.inserted));
                 const result = await this.images.materializeImages(
                     range.inserted,
                     targetPath,
@@ -781,7 +799,8 @@ export class PasteService {
         if (clipboard.files.length > 0) return false;
 
         const url = standaloneWebUrl(clipboard.getData('text/plain').trim());
-        if (url === null || !isObviousImageUrl(url) || !this.images.hasWork(url)) return false;
+        if (this.getSettings().imageMode !== 'download' || url === null || !isObviousImageUrl(url) || !this.images.hasWork(url))
+            return false;
 
         const from = editor.posToOffset(editor.getCursor('from'));
         const to = editor.posToOffset(editor.getCursor('to'));
@@ -1020,7 +1039,7 @@ export class PasteService {
      * The size and class this paste applies to saved image embeds, opening the dialog once
      * when a choice says to ask. Closing the dialog without applying decorates nothing.
      */
-    private async resolveEmbedOptions(editor: Editor): Promise<ImageEmbedChoice> {
+    private async resolveEmbedOptions(editor: Editor, includeClass = true): Promise<ImageEmbedChoice> {
         const settings = this.getSettings();
         const noteSize = this.imageSizeFor(editor);
         const sizes = parseCommaList(settings.imageSizeOptions);
@@ -1034,7 +1053,7 @@ export class PasteService {
         let cssClass = classChoice === 'ask' ? null : classChoice || null;
 
         const askSizes = noteSize === null && sizeChoice === 'ask' ? sizes : null;
-        const askClasses = classChoice === 'ask' ? classes : null;
+        const askClasses = includeClass && classChoice === 'ask' ? classes : null;
         if (askSizes || askClasses) {
             const picked = await this.promptImageOptions(askSizes, askClasses);
             if (picked) {
@@ -1043,7 +1062,13 @@ export class PasteService {
             }
         }
 
-        return { size, cssClass };
+        return { size, cssClass: includeClass ? cssClass : null };
+    }
+
+    /** True when this image pass can create a file, so its class choice is relevant. */
+    private imagePasteSavesFiles(text: string): boolean {
+        const settings = this.getSettings();
+        return settings.imageMode === 'download' || findImageReferences(text).some(reference => isDataImageUri(reference.url));
     }
 
     /**

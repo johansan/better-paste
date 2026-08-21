@@ -101,10 +101,25 @@ export const STRINGS_DE: TranslationStrings = {
 
         images: {
             heading: 'Bilder',
-            savingName: 'Webbilder im Tresor speichern',
+            savingName: 'Webbilder',
             savingDesc:
-                'Speichert Bilder aus dem Web im Anhangordner und verlinkt die lokale Datei statt der Webadresse. Gilt für "Bild kopieren" in Safari, Bilder in kopierten Webinhalten und eingefügte Bildadressen. Standardmäßig stammt der Dateiname aus der Adresse:',
-            savingAliases: ['herunterladen', 'url', 'web', 'anhang', 'safari', 'lokal', 'bild', 'ordner'],
+                'Legt fest, ob Bilder direkt aus dem Web verlinkt oder in den Anhangsordner heruntergeladen werden. Gilt für "Bild kopieren" in Safari, Bilder in kopierten Webinhalten und eingefügte Bildadressen. Standardmäßig stammt der Dateiname aus der Adresse:',
+            savingChoiceOff: 'Nichts tun',
+            savingChoiceLink: 'Verlinken mit Vorschau',
+            savingChoiceDownload: 'Herunterladen mit Vorschau',
+            savingAliases: [
+                'herunterladen',
+                'verlinken',
+                'einbetten',
+                'vorschau',
+                'url',
+                'web',
+                'anhang',
+                'safari',
+                'lokal',
+                'bild',
+                'ordner'
+            ],
             sizeStyleName: 'Größe und Stil',
             sizeStyleDesc: 'Füge eingefügten Bildern eine Breite oder eine CSS-Klasse hinzu, automatisch oder über einen Dialog.',
             sizeStyleAliases: ['größe', 'breite', 'css', 'klasse', 'stil', 'skalieren', 'invert'],

@@ -92,10 +92,25 @@ export const STRINGS_FR: TranslationStrings = {
 
         images: {
             heading: 'Images',
-            savingName: 'Enregistrer les images du web dans le coffre',
+            savingName: 'Images du web',
             savingDesc:
-                'Enregistre les images du web dans votre dossier de pièces jointes et crée un lien vers le fichier local plutôt que vers l’adresse web. Concerne « Copier l’image » de Safari, les images présentes dans du contenu web copié et les adresses d’image collées. Par défaut, le nom du fichier vient de l’adresse :',
-            savingAliases: ['télécharger', 'url', 'web', 'pièce jointe', 'safari', 'local', 'image', 'dossier'],
+                'Choisissez de lier les images directement depuis le web ou de les télécharger dans votre dossier de pièces jointes. Concerne « Copier l’image » de Safari, les images présentes dans du contenu web copié et les adresses d’image collées. Par défaut, le nom du fichier vient de l’adresse :',
+            savingChoiceOff: 'Ne rien faire',
+            savingChoiceLink: 'Lier avec aperçu',
+            savingChoiceDownload: 'Télécharger avec aperçu',
+            savingAliases: [
+                'télécharger',
+                'lier',
+                'intégrer',
+                'aperçu',
+                'url',
+                'web',
+                'pièce jointe',
+                'safari',
+                'local',
+                'image',
+                'dossier'
+            ],
             sizeStyleName: 'Taille et style',
             sizeStyleDesc: 'Ajoutez une largeur ou une classe CSS aux images collées, automatiquement ou via une boîte de dialogue.',
             sizeStyleAliases: ['taille', 'largeur', 'css', 'classe', 'style', 'redimensionner', 'invert'],

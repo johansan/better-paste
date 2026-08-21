@@ -86,10 +86,25 @@ export const STRINGS_VI: TranslationStrings = {
 
         images: {
             heading: 'Hình ảnh',
-            savingName: 'Lưu ảnh từ web vào kho',
+            savingName: 'Ảnh từ web',
             savingDesc:
-                'Lưu ảnh từ web vào thư mục tệp đính kèm của bạn và liên kết tới tệp cục bộ thay vì địa chỉ web. Bao gồm "Sao chép hình ảnh" của Safari, ảnh trong nội dung web đã sao chép và địa chỉ ảnh được dán. Theo mặc định, tên tệp lấy từ địa chỉ:',
-            savingAliases: ['tải xuống', 'url', 'web', 'tệp đính kèm', 'safari', 'cục bộ', 'hình ảnh', 'thư mục'],
+                'Chọn xem nên liên kết ảnh trực tiếp từ web hay tải chúng về thư mục tệp đính kèm của bạn. Bao gồm "Sao chép hình ảnh" của Safari, ảnh trong nội dung web đã sao chép và địa chỉ ảnh được dán. Theo mặc định, tên tệp lấy từ địa chỉ:',
+            savingChoiceOff: 'Không làm gì',
+            savingChoiceLink: 'Liên kết kèm xem trước',
+            savingChoiceDownload: 'Tải xuống kèm xem trước',
+            savingAliases: [
+                'tải xuống',
+                'liên kết',
+                'nhúng',
+                'xem trước',
+                'url',
+                'web',
+                'tệp đính kèm',
+                'safari',
+                'cục bộ',
+                'hình ảnh',
+                'thư mục'
+            ],
             sizeStyleName: 'Kích thước và kiểu',
             sizeStyleDesc: 'Thêm chiều rộng hoặc lớp CSS cho ảnh đã dán, tự động hoặc qua hộp thoại chọn.',
             sizeStyleAliases: ['kích thước', 'chiều rộng', 'css', 'lớp', 'kiểu', 'đổi kích thước', 'invert'],

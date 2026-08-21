@@ -26,6 +26,14 @@ import { parseDomainRemovals } from '../src/transforms/urlCleanup';
 import { fakeFile } from './stubs/editor';
 
 describe('normalizeSettings', () => {
+    it('migrates the web image mode and validates stored values', () => {
+        expect(normalizeSettings({ imageEnabled: false }).imageMode).toBe('off');
+        expect(normalizeSettings({ imageEnabled: true }).imageMode).toBe('link');
+        expect(normalizeSettings({}).imageMode).toBe('link');
+        expect(normalizeSettings({ imageMode: 'download' }).imageMode).toBe('download');
+        expect(normalizeSettings({ imageMode: 'invalid' }).imageMode).toBe('link');
+    });
+
     it('returns the defaults for missing data', () => {
         expect(normalizeSettings(null)).toEqual(DEFAULT_SETTINGS);
         expect(normalizeSettings(undefined)).toEqual(DEFAULT_SETTINGS);
@@ -253,12 +261,12 @@ describe('runTextPipeline', () => {
 
     it('keeps image access parameters when image downloading is off', () => {
         const input = 'See ![shot](https://cdn.discordapp.com/attachments/123/456/shot.png?ex=66f&is=66e&hm=abc123)';
-        expect(runTextPipeline(input, { ...DEFAULT_SETTINGS, imageEnabled: false }).text).toBe(input);
+        expect(runTextPipeline(input, { ...DEFAULT_SETTINGS, imageMode: 'off' }).text).toBe(input);
     });
 
     it('cleans the destination of an escaped image, which renders as a link', () => {
         const input = '\\![Screenshot](https://example.com/screenshot.png?utm_source=news)';
-        expect(runTextPipeline(input, { ...DEFAULT_SETTINGS, imageEnabled: false }).text).toBe(
+        expect(runTextPipeline(input, { ...DEFAULT_SETTINGS, imageMode: 'off' }).text).toBe(
             '\\![Screenshot](https://example.com/screenshot.png)'
         );
     });
