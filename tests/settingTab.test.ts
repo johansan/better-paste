@@ -47,7 +47,8 @@ const CUSTOM_RENDER_SETTING_KEYS = [
     'imageSizeOptions',
     'imageClassChoice',
     'imageClassOptions',
-    'textSnippets'
+    'textSnippets',
+    'urlSnippets'
 ];
 
 /** Minimal plugin double exposing only what the setting tab touches. */
@@ -210,6 +211,9 @@ class PreviewElement {
         if (selector === '.better-paste-preview textarea') {
             return descendants.filter(element => element.tagName === 'textarea' && element.hasAncestorClass('better-paste-preview'));
         }
+        if (selector === '.better-paste-preview input') {
+            return descendants.filter(element => element.tagName === 'input' && element.hasAncestorClass('better-paste-preview'));
+        }
         if (selector.startsWith('.')) {
             const cls = selector.slice(1);
             return descendants.filter(element => element.classes.has(cls));
@@ -245,7 +249,7 @@ class PreviewElement {
 const documentTarget = { defaultView: { Element: MainWindowElement } };
 
 function renderSnippetTools(tab: BetterPasteSettingTab, ownerDocument: unknown): PreviewElement {
-    const snippets = pages(tab.getSettingDefinitions()).find(page => page.name === 'Snippets');
+    const snippets = pages(tab.getSettingDefinitions()).find(page => page.name === 'Text snippets');
     const preview = flatten([...(snippets?.items ?? [])]).find(row => row.name === 'Try it');
     const settingEl = new PreviewElement();
     settingEl.ownerDocument = ownerDocument;
@@ -394,12 +398,28 @@ describe('settings tree', () => {
 
     it('puts the detail on sub-pages, declared so search can still reach it', () => {
         const found = pages(tab.getSettingDefinitions());
-        expect(found.map(page => page.name)).toEqual(['Size and style', 'Link removals', 'Snippets']);
+        expect(found.map(page => page.name)).toEqual(['Size and style', 'Link snippets', 'Link removals', 'Text snippets']);
         // `items` keeps a page in the searchable tree; the imperative `page` form does not
         for (const page of found) {
             expect(page.items, `"${page.name}" has no items`).toBeDefined();
             expect(page.page, `"${page.name}" uses the imperative form`).toBeUndefined();
         }
+    });
+
+    it('shows image handling after the text and structure transforms', () => {
+        const pipeline = flatten(tab.getSettingDefinitions()).find(row => row.name === 'Apply custom regex snippets to text');
+        const settingEl = new PreviewElement();
+        pipeline?.render?.({ settingEl } as unknown as Setting);
+
+        expect(settingEl.querySelectorAll('.better-paste-pipeline-step').map(step => step.text)).toEqual([
+            'Pasted text',
+            'Links',
+            'Text processing',
+            'Custom processing',
+            'Structure',
+            'Images',
+            'Note'
+        ]);
     });
 
     it('shows the user-defined entry count on its sub-page link', () => {
@@ -505,6 +525,18 @@ describe('settings values', () => {
         expect(plugin.settings.textSnippets.map(snippet => snippet.enabled)).toEqual([true, true]);
         expect(plugin.saveCount()).toBe(1);
         expect((tab as unknown as { updateCount: number }).updateCount).toBe(1);
+    });
+
+    it('bridges snippet toggle keys to the URL snippet list too', async () => {
+        plugin.settings.textSnippets = [{ id: 'text', name: 'Text', rules: ['s/a/b/g'], enabled: true }];
+        plugin.settings.urlSnippets = [{ id: 'link', name: 'Link', rules: ['s/c/d/g'], enabled: false }];
+
+        expect(tab.getControlValue('textSnippet:link')).toBe(false);
+        await tab.setControlValue('textSnippet:link', true);
+
+        expect(plugin.settings.urlSnippets[0]?.enabled).toBe(true);
+        expect(plugin.settings.textSnippets[0]?.enabled).toBe(true);
+        expect(plugin.saveCount()).toBe(1);
     });
 
     it('uses snippet ids as row keys when displayed names match', () => {
@@ -615,7 +647,7 @@ describe('settings values', () => {
 
     it('keeps pasted snippet rules verbatim and fills only an empty name', () => {
         const pasted = ['# Remove citations', '', '# Keep this comment', 's/a/b/g', '', '// Keep this too'].join('\n');
-        const modal = new TextSnippetModal({} as App, null, async () => undefined);
+        const modal = new TextSnippetModal({} as App, null, false, async () => undefined);
         const nameInput = { setValue: vi.fn() };
         const editable = modal as unknown as {
             nameInput: typeof nameInput;
@@ -640,7 +672,7 @@ describe('settings values', () => {
             { id: 'valid', name: 'Valid', rules: ['s/a/b/g'], enabled: true },
             { id: 'invalid', name: 'Invalid', rules: ['not a rule'], enabled: false }
         ];
-        const snippets = pages(tab.getSettingDefinitions()).find(page => page.name === 'Snippets');
+        const snippets = pages(tab.getSettingDefinitions()).find(page => page.name === 'Text snippets');
 
         expect(typeof snippets?.displayValue === 'function' ? snippets.displayValue() : snippets?.displayValue).toBe('1 enabled snippet');
         expect(typeof snippets?.status === 'function' ? snippets.status() : snippets?.status).toBe('warning');
@@ -648,7 +680,7 @@ describe('settings values', () => {
 
     it('replaces the snippet preview and preserves its sample when the row renders again', () => {
         plugin.settings.textSnippets = [{ id: 'replace', name: 'Replace', rules: ['s/a/b/g'], enabled: true }];
-        const snippets = pages(tab.getSettingDefinitions()).find(page => page.name === 'Snippets');
+        const snippets = pages(tab.getSettingDefinitions()).find(page => page.name === 'Text snippets');
         const preview = flatten([...(snippets?.items ?? [])]).find(row => row.name === 'Try it');
         const settingEl = new PreviewElement();
         const setting = { settingEl };
@@ -663,6 +695,32 @@ describe('settings values', () => {
         expect(settingEl.querySelectorAll('.better-paste-preview')).toHaveLength(1);
         expect(settingEl.querySelector('.better-paste-preview textarea')?.value).toBe('a');
         expect(settingEl.querySelector('.better-paste-preview-output')?.text).toBe('b');
+    });
+
+    it('runs the URL snippet tester through the destination-protecting composer', () => {
+        plugin.settings.urlSnippets = [
+            { id: 'gh', name: 'GitHub', rules: ['s/GitHub - //'], enabled: true },
+            { id: 'bad', name: 'Bad', rules: ['s/https:/http:/'], enabled: false }
+        ];
+        const page = pages(tab.getSettingDefinitions()).find(candidate => candidate.name === 'Link snippets');
+        const preview = flatten([...(page?.items ?? [])]).find(row => row.name === 'Try it');
+        const settingEl = new PreviewElement();
+        preview?.render?.({ settingEl } as unknown as Setting);
+        const input = settingEl.querySelector('.better-paste-preview input');
+        const output = settingEl.querySelector('.better-paste-preview-output');
+        if (!input || !output) throw new Error('The URL snippet tester is incomplete');
+
+        // Prefilled with the sample titled link, with the enabled snippet already applied
+        expect(input.value).toContain('noisetorch');
+        expect(output.text).toBe(
+            '[noisetorch/NoiseTorch: Real-time microphone noise suppression on Linux. · GitHub](https://github.com/noisetorch/NoiseTorch)'
+        );
+
+        // A snippet that rewrites the destination falls back to the unmodified titled link
+        const bad = plugin.settings.urlSnippets[1];
+        if (bad) bad.enabled = true;
+        input.listeners.get('input')?.();
+        expect(output.text).toBe(input.value);
     });
 
     it('hands contribution text to the localized website in the URL fragment', () => {

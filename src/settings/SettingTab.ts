@@ -29,6 +29,8 @@ import { createLinkLandingDefinitions } from './pages/linksPage';
 import { createTextProcessingDefinitions } from './pages/textProcessingPage';
 import { createStructureDefinitions } from './pages/structurePage';
 import { createCustomProcessingDefinitions, openSnippetEditor } from './pages/customProcessingPage';
+import type { SnippetListKey } from './pages/customProcessingPage';
+import type { TextSnippet } from './types';
 import { createStartDefinitions } from './pages/startPage';
 
 /**
@@ -125,7 +127,12 @@ export class BetterPasteSettingTab extends PluginSettingTab {
                 ]
             },
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.images.heading, items: createImageLandingDefinitions(context) },
-            { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.links.heading, items: createLinkLandingDefinitions(context) },
+            {
+                type: 'group',
+                cls: SETTINGS_CLASS,
+                heading: strings.settings.links.heading,
+                items: createLinkLandingDefinitions(context, ownerDocument => this.registerSnippetEditListener(ownerDocument))
+            },
             { type: 'group', cls: SETTINGS_CLASS, heading: strings.settings.text.heading, items: createTextProcessingDefinitions() },
             {
                 type: 'group',
@@ -155,9 +162,18 @@ export class BetterPasteSettingTab extends PluginSettingTab {
             event.stopPropagation();
             const snippetId = button.dataset.snippetId;
             if (!snippetId) return;
-            const snippet = this.plugin.settings.textSnippets.find(candidate => candidate.id === snippetId);
-            if (snippet) openSnippetEditor(this.context, snippet);
+            const found = this.findSnippet(snippetId);
+            if (found) openSnippetEditor(this.context, found.snippet, found.list);
         });
+    }
+
+    /** Ids are unique across both lists, so the id alone identifies a snippet and its list. */
+    private findSnippet(id: string): { snippet: TextSnippet; list: SnippetListKey } | null {
+        for (const list of ['textSnippets', 'urlSnippets'] as const) {
+            const snippet = this.plugin.settings[list].find(candidate => candidate.id === id);
+            if (snippet) return { snippet, list };
+        }
+        return null;
     }
 
     /**
@@ -168,7 +184,7 @@ export class BetterPasteSettingTab extends PluginSettingTab {
     getControlValue(key: string): unknown {
         if (isListControlKey(key)) return this.plugin.settings[listKeyOf(key)].join('\n');
         if (isTextSnippetControlKey(key)) {
-            return this.plugin.settings.textSnippets.find(snippet => snippet.id === textSnippetIdOf(key))?.enabled ?? false;
+            return this.findSnippet(textSnippetIdOf(key))?.snippet.enabled ?? false;
         }
         return super.getControlValue(key);
     }
@@ -183,9 +199,9 @@ export class BetterPasteSettingTab extends PluginSettingTab {
         }
 
         if (isTextSnippetControlKey(key)) {
-            const snippet = this.plugin.settings.textSnippets.find(candidate => candidate.id === textSnippetIdOf(key));
-            if (!snippet || typeof value !== 'boolean') return;
-            snippet.enabled = value;
+            const found = this.findSnippet(textSnippetIdOf(key));
+            if (!found || typeof value !== 'boolean') return;
+            found.snippet.enabled = value;
             await this.plugin.saveSettings();
             this.update();
             return;

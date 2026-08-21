@@ -80,6 +80,18 @@ describe('normalizeSettings', () => {
         expect(result.textSnippets[3]).toMatchObject({ name: 'Broken but named', rules: [], enabled: true });
     });
 
+    it('keeps URL snippets separate and their ids unique across both lists', () => {
+        const result = normalizeSettings({
+            textSnippets: [{ id: 'shared', name: 'Text', rules: ['s/a/b/'], enabled: true }],
+            urlSnippets: [{ id: 'shared', name: 'Link', rules: ['s/c/d/'], enabled: false }]
+        });
+
+        expect(result.textSnippets).toEqual([{ id: 'shared', name: 'Text', rules: ['s/a/b/'], enabled: true }]);
+        expect(result.urlSnippets[0]).toMatchObject({ name: 'Link', rules: ['s/c/d/'], enabled: false });
+        // Toggle controls and edit buttons look snippets up by id alone, so a duplicate is reassigned
+        expect(result.urlSnippets[0].id).not.toBe('shared');
+    });
+
     it('replaces values of the wrong type', () => {
         const result = normalizeSettings({ autoClean: 'yes', imageSizeProperty: 7 });
         expect(result.autoClean).toBe(DEFAULT_SETTINGS.autoClean);

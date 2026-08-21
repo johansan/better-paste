@@ -96,8 +96,10 @@ export interface BetterPasteSettings {
 
     /* Custom processing */
 
-    /** User-defined replacements, applied in list order after the built-in text rules. */
+    /** User-defined replacements, applied to the whole pasted text after the built-in rules. */
     textSnippets: TextSnippet[];
+    /** User-defined replacements, applied to the finished Markdown link after a title fetch. */
+    urlSnippets: TextSnippet[];
 
     /* Stored state */
 

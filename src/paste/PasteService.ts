@@ -46,7 +46,14 @@ import type { FileNameTokens } from '../utils/filenames';
 import { IMAGE_EXTENSIONS } from '../settings/constants';
 import { MAX_IMAGE_BYTES } from './ImageService';
 import type { ImageNamingContext, ImageService } from './ImageService';
-import { escapeLinkDestination, escapeLinkTitle, isObviousImageUrl, standaloneWebUrl } from './LinkTitleService';
+import {
+    composeTitledLink,
+    escapeLinkDestination,
+    escapeLinkTitle,
+    formatTitledLink,
+    isObviousImageUrl,
+    standaloneWebUrl
+} from './LinkTitleService';
 import type { LinkTitleService } from './LinkTitleService';
 import { logError } from '../utils/logger';
 import { showNotice } from '../utils/notices';
@@ -441,7 +448,7 @@ export class PasteService {
     }
 
     /** Command handler: applies one stored snippet to the current selection. */
-    runSnippet(editor: Editor, snippet: TextSnippet): void {
+    runSnippet(editor: Editor, snippet: TextSnippet, urlSnippet = false): void {
         const selection = editor.getSelection();
         // A single selection only: getSelection reads one text, but replaceSelection
         // would write that text into every cursor's range
@@ -450,7 +457,13 @@ export class PasteService {
             return;
         }
 
-        this.applyToSelection(editor, selection => applyTextSnippets(selection, [{ ...snippet, enabled: true }]));
+        this.applyToSelection(editor, selection => {
+            const processed = applyTextSnippets(selection, [{ ...snippet, enabled: true }]);
+            if (!urlSnippet) return processed;
+
+            const text = composeTitledLink(selection, processed.text);
+            return { text, changed: text !== selection };
+        });
     }
 
     /**
@@ -671,13 +684,16 @@ export class PasteService {
         this.pendingRanges.add(range);
         const progress = this.showTitleProgress();
         try {
-            const link = await this.titles.materializeTitle(range.inserted);
+            const materialized = await this.titles.materializeTitle(range.inserted);
             if (!this.canEdit(info, targetFile)) return;
 
-            if (link === null) {
+            if (materialized === null) {
                 this.hideTitleProgress(progress);
                 showNotice(format(strings.notices.prefix, { message: strings.notices.titleFailed }), { variant: 'warning' });
             } else {
+                const subject = formatTitledLink(materialized.title, materialized.url);
+                const ruled = applyTextSnippets(subject, this.getSettings().urlSnippets).text;
+                const link = composeTitledLink(subject, ruled);
                 // The address must still stand alone: a character that would extend a
                 // URL on either side means the user reshaped it during the fetch, and
                 // linking only the pasted half would tear their address apart

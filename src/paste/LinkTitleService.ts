@@ -73,6 +73,46 @@ export function escapeLinkDestination(url: string): string {
     return url.replace(/[\\()<>]/g, char => `%${char.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')}`);
 }
 
+/** Formats the exact Markdown subject that link snippets and the note both see. */
+export function formatTitledLink(title: string, url: string): string {
+    return `[${escapeLinkTitle(title)}](${escapeLinkDestination(url)})`;
+}
+
+/** Finds the first unescaped Markdown link destination delimiter. */
+function titledLinkDestinationStart(markdown: string): number {
+    if (!markdown.startsWith('[') || !markdown.endsWith(')') || /[\r\n]/.test(markdown)) return -1;
+
+    let backslashes = 0;
+    for (let index = 1; index < markdown.length - 1; index++) {
+        const char = markdown[index];
+        if (char === '\\') {
+            backslashes += 1;
+            continue;
+        }
+        if (char === ']' && markdown[index + 1] === '(' && backslashes % 2 === 0) return index;
+        backslashes = 0;
+    }
+    return -1;
+}
+
+/** Removes only escapes that the title formatter itself adds. */
+function unescapeLinkTitle(title: string): string {
+    return title.replace(/\\([\\`*_[\]<>~|])/g, '$1');
+}
+
+/** Keeps the original titled link unless a snippet changes only its non-empty label. */
+export function composeTitledLink(source: string, result: string): string {
+    const destinationStart = titledLinkDestinationStart(source);
+    if (destinationStart < 1 || result === source) return source;
+
+    const destination = source.slice(destinationStart);
+    if (!result.startsWith('[') || !result.endsWith(destination)) return source;
+
+    const label = result.slice(1, -destination.length);
+    if (!label.trim() || /[\r\n]/.test(label)) return source;
+    return `[${escapeLinkTitle(unescapeLinkTitle(label))}${destination}`;
+}
+
 /** True when a page-specific URL returned only a brand name found in its hostname. */
 function isGenericSiteTitle(title: string, url: URL): boolean {
     if (url.pathname === '/' && !url.search && !url.hash) return false;
@@ -82,7 +122,7 @@ function isGenericSiteTitle(title: string, url: URL): boolean {
     return normalisedTitle.length > 0 && url.hostname.split('.').some(label => normalise(label) === normalisedTitle);
 }
 
-/** Fetches page titles for standalone links and formats the resulting Markdown link. */
+/** Fetches page titles for standalone links. */
 export class LinkTitleService {
     private readonly getSettings: () => BetterPasteSettings;
     private readonly requestPage: PageRequest;
@@ -153,8 +193,8 @@ export class LinkTitleService {
         }
     }
 
-    /** Returns a titled Markdown link, or null so the already-pasted address stays unchanged. */
-    async materializeTitle(text: string): Promise<string | null> {
+    /** Returns the raw title and address for final Markdown formatting, or null on failure. */
+    async materializeTitle(text: string): Promise<{ title: string; url: string } | null> {
         if (!this.hasWork(text)) return null;
         const url = standaloneWebUrl(text);
         if (url === null) return null;
@@ -170,7 +210,7 @@ export class LinkTitleService {
             if (providerRequest !== null) {
                 const provided = await this.titleFromProvider(providerRequest, remainingMs());
                 if (this.disposed) return null;
-                if (provided !== null) return `[${escapeLinkTitle(provided)}](${escapeLinkDestination(url)})`;
+                if (provided !== null) return { title: provided, url };
             }
 
             // requestUrl buffers the whole response and cannot stream or abort, so a page
@@ -196,7 +236,7 @@ export class LinkTitleService {
             // The title lives in the head, so parsing stops after the first slice even
             // when a server streams an enormous page
             const title = this.parseTitle(response.text.slice(0, PARSE_SLICE_BYTES));
-            return title && !isGenericSiteTitle(title, new URL(url)) ? `[${escapeLinkTitle(title)}](${escapeLinkDestination(url)})` : null;
+            return title && !isGenericSiteTitle(title, new URL(url)) ? { title, url } : null;
         } catch (error) {
             logWarning(`Failed to fetch the title for ${url}`, error);
             return null;

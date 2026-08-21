@@ -53,7 +53,10 @@ const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.10',
         date: '2026-08-20',
-        new: ['You can now paste multiple paragraphs into a block quote or callout. Every pasted line stays quoted.']
+        new: [
+            'You can now clean up fetched link titles with ==Link snippets==! Your own regex rules rewrite the title, and the address always stays intact. Ready-made rules for GitHub, X, YouTube, Wikipedia and more are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets#link-snippets).',
+            'You can now paste multiple paragraphs into a block quote or callout. Every pasted line stays quoted.'
+        ]
     },
     {
         version: '1.0.9',

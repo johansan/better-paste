@@ -140,7 +140,7 @@ export default class BetterPastePlugin extends Plugin {
             id: 'selection-run-snippet',
             name: strings.commands.runSnippet,
             editorCheckCallback: (checking: boolean, editor: Editor) => {
-                if (this.settings.textSnippets.length === 0) return false;
+                if (this.settings.textSnippets.length === 0 && this.settings.urlSnippets.length === 0) return false;
                 if (!checking) this.openSnippetPicker(editor);
                 return true;
             }
@@ -265,10 +265,13 @@ export default class BetterPastePlugin extends Plugin {
         }
 
         this.snippetPickerModal?.close();
-        this.snippetPickerModal = new TextSnippetPickerModal(this.app, this.settings.textSnippets, snippet => {
+        // URL snippets are offered too, so a titled link in a note can be reworked afterwards
+        const urlSnippetIds = new Set(this.settings.urlSnippets.map(snippet => snippet.id));
+        const snippets = [...this.settings.textSnippets, ...this.settings.urlSnippets];
+        this.snippetPickerModal = new TextSnippetPickerModal(this.app, snippets, snippet => {
             this.snippetPickerModal = null;
             if (this.unloaded) return;
-            this.pasteService.runSnippet(editor, snippet);
+            this.pasteService.runSnippet(editor, snippet, urlSnippetIds.has(snippet.id));
         });
         this.snippetPickerModal.open();
     }

@@ -18,7 +18,14 @@
 
 import { describe, expect, it } from 'vitest';
 import type { RequestUrlResponse } from 'obsidian';
-import { escapeLinkTitle, isObviousImageUrl, LinkTitleService, standaloneWebUrl } from '../src/paste/LinkTitleService';
+import {
+    composeTitledLink,
+    escapeLinkTitle,
+    formatTitledLink,
+    isObviousImageUrl,
+    LinkTitleService,
+    standaloneWebUrl
+} from '../src/paste/LinkTitleService';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 
 function response(overrides: Partial<RequestUrlResponse> = {}): RequestUrlResponse {
@@ -47,10 +54,21 @@ describe('link title candidates', () => {
     it('escapes Markdown in a page title', () => {
         expect(escapeLinkTitle('A [page] with *markup* | notes')).toBe('A \\[page\\] with \\*markup\\* \\| notes');
     });
+
+    it('formats the final Markdown before snippets run', () => {
+        expect(formatTitledLink('A [page]', 'https://example.com/a(b)')).toBe('[A \\[page\\]](https://example.com/a%28b%29)');
+    });
+
+    it('rewrites only the escaped label of a finished Markdown link', () => {
+        const source = formatTitledLink('A [page]', 'https://example.com/a(b)');
+
+        expect(composeTitledLink(source, source.replace('\\[page\\]', 'document'))).toBe('[A document](https://example.com/a%28b%29)');
+        expect(composeTitledLink(source, source.replace('https:', 'http:'))).toBe(source);
+    });
 });
 
 describe('LinkTitleService', () => {
-    it('fetches an HTML title and returns a Markdown link', async () => {
+    it('fetches an HTML title and returns its raw parts', async () => {
         const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
         const service = new LinkTitleService(
             () => settings,
@@ -58,7 +76,10 @@ describe('LinkTitleService', () => {
             html => (/A page/.test(html) ? 'A page' : null)
         );
 
-        expect(await service.materializeTitle('https://example.com/page')).toBe('[A page](https://example.com/page)');
+        expect(await service.materializeTitle('https://example.com/page')).toEqual({
+            title: 'A page',
+            url: 'https://example.com/page'
+        });
     });
 
     it('rejects a site name as the title of a specific page', async () => {
@@ -70,7 +91,10 @@ describe('LinkTitleService', () => {
         );
 
         expect(await service.materializeTitle('https://www.reddit.com/r/ObsidianMD/comments/example')).toBeNull();
-        expect(await service.materializeTitle('https://www.reddit.com/')).toBe('[Reddit](https://www.reddit.com/)');
+        expect(await service.materializeTitle('https://www.reddit.com/')).toEqual({
+            title: 'Reddit',
+            url: 'https://www.reddit.com/'
+        });
     });
 
     it('leaves non-HTML responses alone', async () => {
@@ -110,7 +134,7 @@ describe('LinkTitleService', () => {
         );
 
         const pasted = 'https://www.youtube.com/watch?v=m2maDNtho7Y';
-        expect(await service.materializeTitle(pasted)).toBe(`[A video](${pasted})`);
+        expect(await service.materializeTitle(pasted)).toEqual({ title: 'A video', url: pasted });
         expect(requests).toEqual([`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(pasted)}`]);
     });
 
@@ -126,9 +150,10 @@ describe('LinkTitleService', () => {
             html => (/A channel/.test(html) ? 'A channel' : null)
         );
 
-        expect(await service.materializeTitle('https://www.youtube.com/@SomeChannel')).toBe(
-            '[A channel](https://www.youtube.com/@SomeChannel)'
-        );
+        expect(await service.materializeTitle('https://www.youtube.com/@SomeChannel')).toEqual({
+            title: 'A channel',
+            url: 'https://www.youtube.com/@SomeChannel'
+        });
     });
 
     it('falls back to the page fetch when the provider answer has no title', async () => {
@@ -143,10 +168,13 @@ describe('LinkTitleService', () => {
             html => (/A page/.test(html) ? 'A page' : null)
         );
 
-        expect(await service.materializeTitle('https://www.youtube.com/watch?v=abc')).toBe('[A page](https://www.youtube.com/watch?v=abc)');
+        expect(await service.materializeTitle('https://www.youtube.com/watch?v=abc')).toEqual({
+            title: 'A page',
+            url: 'https://www.youtube.com/watch?v=abc'
+        });
     });
 
-    it('escapes Markdown in a provider title', async () => {
+    it('keeps Markdown characters raw in a provider title', async () => {
         const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
         const service = new LinkTitleService(
             () => settings,
@@ -154,9 +182,10 @@ describe('LinkTitleService', () => {
             () => null
         );
 
-        expect(await service.materializeTitle('https://www.youtube.com/watch?v=abc')).toBe(
-            '[A \\[page\\] with \\*markup\\*](https://www.youtube.com/watch?v=abc)'
-        );
+        expect(await service.materializeTitle('https://www.youtube.com/watch?v=abc')).toEqual({
+            title: 'A [page] with *markup*',
+            url: 'https://www.youtube.com/watch?v=abc'
+        });
     });
 
     it('discards a provider response that arrives after disposal', async () => {

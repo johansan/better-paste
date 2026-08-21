@@ -20,8 +20,13 @@ import { Modal, Setting } from 'obsidian';
 import type { App, ButtonComponent, TextComponent } from 'obsidian';
 import { format, strings } from '../i18n';
 import { applyTextSnippets, createTextSnippetId, findInvalidSnippetRuleLines, snippetNameFromRules } from '../transforms/snippets';
+import { composeTitledLink } from '../paste/LinkTitleService';
 import type { TextSnippet } from './types';
 import { SNIPPETS_WIKI_URL } from './constants';
+
+/** Prefills URL snippet previews, because the titled-link subject shape is not obvious. */
+export const TITLED_LINK_SAMPLE =
+    '[GitHub - noisetorch/NoiseTorch: Real-time microphone noise suppression on Linux. · GitHub](https://github.com/noisetorch/NoiseTorch)';
 
 /** Converts the textarea value into stored lines without dropping comments or blanks. */
 function rulesFromText(value: string): string[] {
@@ -31,19 +36,22 @@ function rulesFromText(value: string): string[] {
 /** Creates or edits one custom processing snippet with validation and a live preview. */
 export class TextSnippetModal extends Modal {
     private readonly snippet: TextSnippet;
+    private readonly urlSnippet: boolean;
     private readonly onSave: (snippet: TextSnippet) => Promise<void>;
     private validationEl: HTMLElement | null = null;
     private previewEl: HTMLElement | null = null;
     private saveButton: ButtonComponent | null = null;
     private nameInput: TextComponent | null = null;
-    private sample = '';
+    private sample: string;
     private saving = false;
 
-    constructor(app: App, initial: TextSnippet | null, onSave: (snippet: TextSnippet) => Promise<void>) {
+    constructor(app: App, initial: TextSnippet | null, urlSnippet: boolean, onSave: (snippet: TextSnippet) => Promise<void>) {
         super(app);
         this.snippet = initial
             ? { ...initial, rules: [...initial.rules] }
             : { id: createTextSnippetId(), name: '', rules: [], enabled: true };
+        this.urlSnippet = urlSnippet;
+        this.sample = urlSnippet ? TITLED_LINK_SAMPLE : '';
         this.onSave = onSave;
     }
 
@@ -66,7 +74,7 @@ export class TextSnippetModal extends Modal {
             .setClass('better-paste-snippet-rules-setting')
             .addTextArea(input => {
                 input
-                    .setPlaceholder(String.raw`s/\[\d+\]//g`)
+                    .setPlaceholder(this.urlSnippet ? 's/GitHub - //' : String.raw`s/\[\d+\]//g`)
                     .setValue(this.snippet.rules.join('\n'))
                     .onChange(value => {
                         this.updateRules(value);
@@ -82,11 +90,15 @@ export class TextSnippetModal extends Modal {
         this.renderValidation();
 
         this.contentEl.createDiv({ cls: 'better-paste-snippet-preview-label', text: text.previewName });
-        this.contentEl.createDiv({ cls: 'better-paste-snippet-preview-desc', text: text.modalPreviewDesc });
+        this.contentEl.createDiv({
+            cls: 'better-paste-snippet-preview-desc',
+            text: this.urlSnippet ? text.urlModalPreviewDesc : text.modalPreviewDesc
+        });
         const preview = this.contentEl.createDiv({ cls: 'better-paste-preview' });
         const sample = preview.createEl('textarea', {
-            attr: { 'aria-label': text.previewInputLabel, rows: '4' }
+            attr: { 'aria-label': this.urlSnippet ? text.urlPreviewLabel : text.previewInputLabel, rows: '4' }
         });
+        sample.value = this.sample;
         this.previewEl = preview.createDiv({ cls: ['better-paste-preview-output', 'better-paste-preview-empty'] });
         this.previewEl.setAttrs({ role: 'status', 'aria-live': 'polite' });
         sample.addEventListener('input', () => {
@@ -145,13 +157,19 @@ export class TextSnippetModal extends Modal {
     private renderPreview(): void {
         if (!this.previewEl) return;
         if (!this.sample) {
-            this.previewEl.setText(strings.settings.custom.previewEmpty);
+            this.previewEl.setText(this.urlSnippet ? strings.settings.custom.urlPreviewEmpty : strings.settings.custom.previewEmpty);
             this.previewEl.addClass('better-paste-preview-empty');
             return;
         }
 
         this.previewEl.removeClass('better-paste-preview-empty');
-        this.previewEl.setText(applyTextSnippets(this.sample, [{ ...this.snippet, enabled: true }]).text);
+        this.previewEl.setText(this.previewText());
+    }
+
+    /** A titled-link sample goes through the production composer, so the preview shows its fallback too. */
+    private previewText(): string {
+        const processed = applyTextSnippets(this.sample, [{ ...this.snippet, enabled: true }]).text;
+        return this.urlSnippet ? composeTitledLink(this.sample, processed) : processed;
     }
 
     private updateSaveButton(): void {

@@ -23,12 +23,17 @@ import type { LinkTitleService } from '../src/paste/LinkTitleService';
 import { findImageReferences, replaceImageReferences } from '../src/paste/imageReferences';
 import type { ImageEmbedChoice } from '../src/modals/ImageEmbedModal';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
-import type { BetterPasteSettings } from '../src/settings/types';
+import type { BetterPasteSettings, TextSnippet } from '../src/settings/types';
 import { FakeEditor, fakeClipboardEvent, fakeFile } from './stubs/editor';
 import { Notice } from './stubs/obsidian';
 import type { MarkdownFileInfo, MarkdownView } from 'obsidian';
 
 const INFO = { file: { path: 'Notes/Test.md' } } as unknown as MarkdownView | MarkdownFileInfo;
+
+/** One enabled URL snippet, run on the fetched titled link. */
+function urlSnippet(...rules: string[]): TextSnippet {
+    return { id: 'url-snippet', name: 'URL snippet', rules, enabled: true };
+}
 
 /** Records what the paste handler asked the image service to save. */
 interface SavedClipboardImages {
@@ -78,7 +83,7 @@ function fakeImages(settings: BetterPasteSettings, failing = false, saved?: Save
 }
 
 /** Title service double that resolves a standalone web address to a predictable link. */
-function fakeTitles(settings: BetterPasteSettings, fetched: string[]): LinkTitleService {
+function fakeTitles(settings: BetterPasteSettings, fetched: string[], pageTitle = 'Example page'): LinkTitleService {
     const hasWork = (text: string): boolean =>
         settings.linkTitles &&
         /^https?:\/\/\S+$/i.test(text) &&
@@ -88,7 +93,7 @@ function fakeTitles(settings: BetterPasteSettings, fetched: string[]): LinkTitle
         hasWork,
         materializeTitle: async (text: string) => {
             fetched.push(text);
-            return hasWork(text) ? `[Example page](${text})` : null;
+            return hasWork(text) ? { title: pageTitle, url: text } : null;
         },
         dispose: () => undefined
     } as unknown as LinkTitleService;
@@ -100,14 +105,14 @@ interface PromptDouble {
     calls: { sizes: readonly string[] | null; classes: readonly string[] | null }[];
 }
 
-function build(overrides: Partial<BetterPasteSettings> = {}, failing = false, prompt?: PromptDouble) {
+function build(overrides: Partial<BetterPasteSettings> = {}, failing = false, prompt?: PromptDouble, pageTitle = 'Example page') {
     const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, ...overrides };
     const saved: SavedClipboardImages[] = [];
     const fetchedTitles: string[] = [];
     const service = new PasteService(
         () => settings,
         fakeImages(settings, failing, saved),
-        fakeTitles(settings, fetchedTitles),
+        fakeTitles(settings, fetchedTitles, pageTitle),
         async (sizes, classes) => {
             prompt?.calls.push({ sizes, classes });
             return prompt?.response ?? null;
@@ -854,6 +859,145 @@ describe('handleEditorPaste: link titles', () => {
         expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
     });
 
+    it('removes the GitHub repository tail from a fetched pull request title', async () => {
+        const url = 'https://github.com/obsidian-tasks-group/obsidian-tasks/pull/123';
+        const title = 'Improve documentation · obsidian-tasks-group/obsidian-tasks · GitHub';
+        const rule = String.raw`s| · [^·\]]+ · GitHub(?=\]\(https://github\.com/)||`;
+        const { service } = build({ linkTitles: true, linkEnabled: false, urlSnippets: [urlSnippet(rule)] }, false, undefined, title);
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe(`[Improve documentation](${url})`);
+    });
+
+    it('shortens a pull request title only when its finished link points to GitHub', async () => {
+        const title = 'Improve documentation by Clare Macrae · Pull Request #123 · obsidian-tasks-group/obsidian-tasks · GitHub';
+        const rule = String.raw`s| by .+ · Pull Request #(\d+) · [^·\]]+ · GitHub(?=\]\(https://github\.com/)| (#$1)|`;
+        const { service } = build({ linkTitles: true, linkEnabled: false, urlSnippets: [urlSnippet(rule)] }, false, undefined, title);
+        const github = 'https://github.com/obsidian-tasks-group/obsidian-tasks/pull/123';
+        const other = 'https://example.com/pull/123';
+        const githubEditor = new FakeEditor('');
+        const otherEditor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: github }), githubEditor.asEditor(), INFO);
+        service.handleEditorPaste(fakeClipboardEvent({ plain: other }), otherEditor.asEditor(), INFO);
+        await settle();
+
+        expect(githubEditor.getValue()).toBe(`[Improve documentation (#123)](${github})`);
+        expect(otherEditor.getValue()).toBe(`[${title}](${other})`);
+    });
+
+    it('truncates a long fetched title while keeping its tail', async () => {
+        const url = 'https://x.com/firefox/status/1864357060860891158';
+        const title = 'Firefox on X: Um apparently it is national cookie day? Our total cookie protection feature stops you / X';
+        const rule = String.raw`s|^\[(.{30}).* (/ X)\]|[$1… $2]|`;
+        const { service } = build({ linkTitles: true, linkEnabled: false, urlSnippets: [urlSnippet(rule)] }, false, undefined, title);
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe(`[Firefox on X: Um apparently it… / X](${url})`);
+    });
+
+    it('runs URL snippets on the escaped Markdown that reaches the note', async () => {
+        const url = 'https://example.com/a(b)';
+        const rule = String.raw`s/\\\[page\\\]/document/`;
+        const { service } = build({ linkTitles: true, linkEnabled: false, urlSnippets: [urlSnippet(rule)] }, false, undefined, 'A [page]');
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('[A document](https://example.com/a%28b%29)');
+    });
+
+    it('keeps a text snippet away from the fetched link', async () => {
+        const snippet: TextSnippet = { id: 'plain', name: 'Plain', rules: ['s/Example/Changed/'], enabled: true };
+        const { service } = build({ linkTitles: true, linkEnabled: false, textSnippets: [snippet] });
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
+    });
+
+    it('keeps a disabled URL snippet away from the fetched link', async () => {
+        const snippet: TextSnippet = { ...urlSnippet('s/Example/Changed/'), enabled: false };
+        const { service } = build({ linkTitles: true, linkEnabled: false, urlSnippets: [snippet] });
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
+    });
+
+    it('keeps a URL snippet away from ordinary pasted text', () => {
+        const { service } = build({ linkTitles: false, linkEnabled: false, urlSnippets: [urlSnippet('s/GitHub - //')] });
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({ plain: 'GitHub - a phrase worth keeping' });
+
+        // Declined, so Obsidian pastes the phrase untouched
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe('');
+    });
+
+    it('keeps the unmodified titled link when a rule empties its label', async () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false, urlSnippets: [urlSnippet('s/Example page//')] });
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
+    });
+
+    it('keeps the unmodified titled link when a rule deletes its wrapper', async () => {
+        const rule = String.raw`s/^\[[^]]*\]//`;
+        const { service } = build({ linkTitles: true, linkEnabled: false, urlSnippets: [urlSnippet(rule)] });
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
+    });
+
+    it('keeps the unmodified titled link when a rule changes its destination', async () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false, urlSnippets: [urlSnippet('s/https:/http:/')] });
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
+    });
+
+    it('keeps the unmodified titled link when a rule creates a multiline label', async () => {
+        const rule = String.raw`s/x/y\n\n# Notes/`;
+        const { service } = build({ linkTitles: true, linkEnabled: false, urlSnippets: [urlSnippet(rule)] });
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
+    });
+
+    it('inserts the normal titled link when URL snippets leave the finished link unchanged', async () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false, urlSnippets: [urlSnippet('s/Not here/Gone/')] });
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
+    });
+
     it('fetches a title in a tab-indented nested list item', async () => {
         const { service } = build({ linkTitles: true, linkEnabled: false });
         const doc = '- item\n\t- ';
@@ -865,15 +1009,16 @@ describe('handleEditorPaste: link titles', () => {
         expect(editor.getValue()).toBe('- item\n\t- [Example page](https://example.com/page)');
     });
 
-    it('shows title fetching progress and keeps the URL when fetching fails', async () => {
+    it('shows title fetching progress and keeps the URL without running snippets when fetching fails', async () => {
         vi.useFakeTimers();
         const settings: BetterPasteSettings = {
             ...DEFAULT_SETTINGS,
             linkTitles: true,
-            linkEnabled: false
+            linkEnabled: false,
+            urlSnippets: [urlSnippet('s/https:/broken:/')]
         };
-        let finishTitleFetch: (result: string | null) => void = () => undefined;
-        const titleResult = new Promise<string | null>(resolve => {
+        let finishTitleFetch: (result: { title: string; url: string } | null) => void = () => undefined;
+        const titleResult = new Promise<{ title: string; url: string } | null>(resolve => {
             finishTitleFetch = resolve;
         });
         const titles = {
@@ -926,8 +1071,12 @@ describe('handleEditorPaste: link titles', () => {
         expect(messages.some(message => message.includes('fetching title'))).toBe(false);
     });
 
-    it('uses selected text as the link label without fetching a title', async () => {
-        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false });
+    it('uses selected text as the link label without fetching a title or running URL snippets', async () => {
+        const { service, fetchedTitles } = build({
+            linkTitles: true,
+            linkEnabled: false,
+            urlSnippets: [urlSnippet('s/documentation/changed/')]
+        });
         const editor = selecting('Read the documentation next', 'documentation');
         const url = 'https://example.com/page';
 
@@ -936,6 +1085,30 @@ describe('handleEditorPaste: link titles', () => {
         await settle();
 
         expect(fetchedTitles).toEqual([]);
+    });
+
+    it('keeps a URL extension typed while its title is being fetched', async () => {
+        const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, linkTitles: true, linkEnabled: false };
+        let finishTitleFetch: (result: { title: string; url: string }) => void = () => undefined;
+        const titleResult = new Promise<{ title: string; url: string }>(resolve => {
+            finishTitleFetch = resolve;
+        });
+        const titles = {
+            hasWork: (text: string) => /^https?:\/\/\S+$/i.test(text),
+            materializeTitle: () => titleResult,
+            dispose: () => undefined
+        } as unknown as LinkTitleService;
+        const service = new PasteService(() => settings, fakeImages(settings), titles);
+        const editor = new FakeEditor('');
+        const url = 'https://example.com/page';
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
+        editor.replaceSelection('/docs');
+        finishTitleFetch({ title: 'Example page', url });
+        await titleResult;
+        await settle();
+
+        expect(editor.getValue()).toBe(`${url}/docs`);
     });
 
     it('fetches a title when the selection is the pasted URL itself', async () => {
@@ -1470,6 +1643,37 @@ describe('runSnippet', () => {
         });
 
         expect(editor.getValue()).toBe('keep dog here');
+    });
+
+    it('rewrites a selected link label without allowing its destination to change', () => {
+        const { service } = build();
+        const source = '[A \\[page\\]](https://example.com/a%28b%29)';
+        const labelEditor = selecting(source, source);
+        const destinationEditor = selecting(source, source);
+
+        service.runSnippet(
+            labelEditor.asEditor(),
+            {
+                id: 'rename-page',
+                name: 'Rename page',
+                rules: [String.raw`s/\\\[page\\\]/document/`],
+                enabled: true
+            },
+            true
+        );
+        service.runSnippet(
+            destinationEditor.asEditor(),
+            {
+                id: 'change-protocol',
+                name: 'Change protocol',
+                rules: ['s/https:/http:/'],
+                enabled: true
+            },
+            true
+        );
+
+        expect(labelEditor.getValue()).toBe('[A document](https://example.com/a%28b%29)');
+        expect(destinationEditor.getValue()).toBe(source);
     });
 
     it('refuses multiple selections before replacing text', () => {

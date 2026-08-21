@@ -108,6 +108,13 @@
     margin-bottom: var(--size-4-4);
 }
 
+/* A step and the arrow after it wrap as one unit, so no line starts with an arrow. */
+.better-paste-pipeline-group {
+    display: flex;
+    align-items: center;
+    gap: var(--size-4-2);
+}
+
 .better-paste-pipeline-step {
     padding: var(--size-4-2) var(--size-4-3);
     border: 1px solid var(--background-modifier-border);

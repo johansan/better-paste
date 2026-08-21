@@ -20,15 +20,19 @@ import { Notice } from 'obsidian';
 import type { Setting, SettingDefinition, SettingDefinitionItem, SettingGroupItem } from 'obsidian';
 import { format, plural, strings } from '../../i18n';
 import { applyTextSnippets, countSnippetRuleLines, findInvalidSnippetRuleLines, serializeTextSnippets } from '../../transforms/snippets';
+import { composeTitledLink } from '../../paste/LinkTitleService';
 import type { TextSnippet } from '../types';
 import { REGEX_PLAYGROUND_URL, SNIPPETS_WIKI_URL } from '../constants';
 import { TextSnippetImportModal } from '../TextSnippetImportModal';
-import { TextSnippetModal } from '../TextSnippetModal';
+import { TextSnippetModal, TITLED_LINK_SAMPLE } from '../TextSnippetModal';
 import { logError } from '../../utils/logger';
 import { SETTINGS_CLASS, TEXT_SNIPPET_KEY_PREFIX } from './context';
 import type { SettingsPageContext } from './context';
 
-type RegisterSnippetEditListener = (ownerDocument: Document) => void;
+export type RegisterSnippetEditListener = (ownerDocument: Document) => void;
+
+/** The two snippet lists share every control; only the paste stage they run in differs. */
+export type SnippetListKey = 'textSnippets' | 'urlSnippets';
 
 /** Saves a structural list change and rebuilds the definitions that represent it. */
 async function saveAndUpdate(context: SettingsPageContext): Promise<void> {
@@ -59,9 +63,9 @@ function snippetDescription(snippet: TextSnippet): string | DocumentFragment {
 }
 
 /** Opens the editor and persists either a replacement or a new list item. */
-export function openSnippetEditor(context: SettingsPageContext, snippet: TextSnippet | null): void {
-    new TextSnippetModal(context.app, snippet, async saved => {
-        const snippets = context.settings().textSnippets;
+export function openSnippetEditor(context: SettingsPageContext, snippet: TextSnippet | null, list: SnippetListKey): void {
+    new TextSnippetModal(context.app, snippet, list === 'urlSnippets', async saved => {
+        const snippets = context.settings()[list];
         const index = snippet ? snippets.findIndex(candidate => candidate.id === snippet.id) : -1;
         if (index < 0) snippets.push(saved);
         else snippets[index] = saved;
@@ -74,18 +78,29 @@ function renderPipeline(setting: Setting): void {
     const text = strings.settings.custom;
     setting.settingEl.addClass('better-paste-pipeline-setting');
     const pipeline = setting.settingEl.createDiv({ cls: 'better-paste-pipeline' });
-    // The structure rules run after the text rules, because they read the note around
-    // the cursor and reshape the already-cleaned text to fit it
-    const steps = [text.pastedText, text.builtInRules, text.customSnippets, strings.settings.structure.heading, text.note];
+    // Each step reuses a section heading, so every label points at a section the user
+    // can find in this pane. Image handling follows the synchronous text and structure
+    // transforms. Link snippets run in the separate title fetch after a link paste.
+    const steps = [
+        text.pastedText,
+        strings.settings.links.heading,
+        strings.settings.text.heading,
+        strings.settings.custom.heading,
+        strings.settings.structure.heading,
+        strings.settings.images.heading,
+        text.note
+    ];
 
     steps.forEach((step, index) => {
-        if (index > 0) pipeline.createSpan({ cls: 'better-paste-pipeline-arrow', text: '\u2192' });
-        // The snippets step is inverted, marking the stage this section configures
+        // A step and the arrow after it share a group, so a wrapped line never starts with an arrow
+        const group = pipeline.createDiv({ cls: 'better-paste-pipeline-group' });
+        // The custom processing step is inverted, marking the stage this section configures
         const cls =
-            step === text.customSnippets
+            step === strings.settings.custom.heading
                 ? ['better-paste-pipeline-step', 'better-paste-pipeline-step-current']
                 : 'better-paste-pipeline-step';
-        pipeline.createDiv({ cls, text: step });
+        group.createDiv({ cls, text: step });
+        if (index < steps.length - 1) group.createSpan({ cls: 'better-paste-pipeline-arrow', text: '\u2192' });
     });
 
     const buttons = setting.settingEl.createDiv({ cls: 'better-paste-pipeline-buttons' });
@@ -109,7 +124,8 @@ function snippetDefinition(snippet: TextSnippet): SettingDefinition {
 /** Reorderable snippet list and the import, export, and preview tools below it. */
 function createSnippetsPageDefinitions(
     context: SettingsPageContext,
-    registerSnippetEditListener: RegisterSnippetEditListener
+    registerSnippetEditListener: RegisterSnippetEditListener,
+    list: SnippetListKey
 ): SettingDefinitionItem[] {
     const text = strings.settings.custom;
 
@@ -117,21 +133,21 @@ function createSnippetsPageDefinitions(
         {
             type: 'list',
             cls: SETTINGS_CLASS,
-            items: context.settings().textSnippets.map(snippet => snippetDefinition(snippet)),
+            items: context.settings()[list].map(snippet => snippetDefinition(snippet)),
             emptyState: text.emptyState,
             addItem: {
                 name: text.addSnippet,
-                action: () => openSnippetEditor(context, null)
+                action: () => openSnippetEditor(context, null, list)
             },
             onReorder: (oldIndex, newIndex) => {
-                const snippets = context.settings().textSnippets;
+                const snippets = context.settings()[list];
                 const [snippet] = snippets.splice(oldIndex, 1);
                 if (!snippet) return;
                 snippets.splice(newIndex, 0, snippet);
                 void saveAndUpdate(context);
             },
             onDelete: index => {
-                context.settings().textSnippets.splice(index, 1);
+                context.settings()[list].splice(index, 1);
                 void saveAndUpdate(context);
             }
         },
@@ -145,7 +161,7 @@ function createSnippetsPageDefinitions(
                     render: setting => {
                         setting.addButton(button =>
                             button.setButtonText(text.exportButton).onClick(() => {
-                                const interchange = serializeTextSnippets(context.settings().textSnippets, text.importFallbackName);
+                                const interchange = serializeTextSnippets(context.settings()[list], text.importFallbackName);
                                 void navigator.clipboard
                                     .writeText(interchange)
                                     .then(() => {
@@ -166,7 +182,7 @@ function createSnippetsPageDefinitions(
                         setting.addButton(button =>
                             button.setButtonText(text.importName).onClick(() => {
                                 new TextSnippetImportModal(context.app, async snippets => {
-                                    context.settings().textSnippets.push(...snippets);
+                                    context.settings()[list].push(...snippets);
                                     await saveAndUpdate(context);
                                 }).open();
                             })
@@ -175,13 +191,14 @@ function createSnippetsPageDefinitions(
                 },
                 {
                     name: text.previewName,
-                    desc: text.previewDesc,
+                    desc: list === 'urlSnippets' ? text.urlPreviewDesc : text.previewDesc,
                     searchable: false,
                     render: setting => {
                         const register = (): void => registerSnippetEditListener(setting.settingEl.ownerDocument);
                         const stopWatchingWindow = setting.settingEl.onWindowMigrated(register);
                         register();
-                        renderSnippetPreview(setting, context);
+                        if (list === 'urlSnippets') renderUrlSnippetPreview(setting, context);
+                        else renderSnippetPreview(setting, context);
                         return stopWatchingWindow;
                     }
                 }
@@ -220,7 +237,76 @@ function renderSnippetPreview(setting: Setting, context: SettingsPageContext): v
     render();
 }
 
-/** Pipeline overview and the link to the full snippet editor page. */
+/** Live titled-link preview for every enabled title snippet, through the production composer. */
+function renderUrlSnippetPreview(setting: Setting, context: SettingsPageContext): void {
+    const text = strings.settings.custom;
+    setting.settingEl.addClass('better-paste-tester');
+    const sample = setting.settingEl.querySelector<HTMLInputElement>('.better-paste-preview input')?.value ?? TITLED_LINK_SAMPLE;
+    // update() re-invokes this renderer on the same setting element, so replace its custom DOM.
+    for (const existing of setting.settingEl.querySelectorAll<HTMLElement>('.better-paste-preview')) existing.remove();
+
+    const container = setting.settingEl.createDiv({ cls: 'better-paste-preview' });
+    const input = container.createEl('input', {
+        type: 'text',
+        attr: { 'aria-label': text.urlPreviewLabel }
+    });
+    input.value = sample;
+    const output = container.createDiv({ cls: ['better-paste-preview-output', 'better-paste-preview-empty'] });
+    output.setAttrs({ role: 'status', 'aria-live': 'polite' });
+
+    const render = (): void => {
+        if (!input.value) {
+            output.setText(text.urlPreviewEmpty);
+            output.addClass('better-paste-preview-empty');
+            return;
+        }
+        output.removeClass('better-paste-preview-empty');
+        const processed = applyTextSnippets(input.value, context.settings().urlSnippets).text;
+        output.setText(composeTitledLink(input.value, processed));
+    };
+
+    input.addEventListener('input', render);
+    render();
+}
+
+/** Sub-page link with the enabled count and a warning when a rule needs repair. */
+function snippetsPage(
+    context: SettingsPageContext,
+    registerSnippetEditListener: RegisterSnippetEditListener,
+    name: string,
+    desc: string,
+    list: SnippetListKey
+): SettingGroupItem {
+    const text = strings.settings.custom;
+
+    return {
+        type: 'page',
+        name,
+        desc,
+        displayValue: () => plural(text.enabledSnippetsCount, context.settings()[list].filter(snippet => snippet.enabled).length),
+        status: () => (context.settings()[list].some(snippet => findInvalidSnippetRuleLines(snippet.rules).length > 0) ? 'warning' : null),
+        items: createSnippetsPageDefinitions(context, registerSnippetEditListener, list)
+    };
+}
+
+/**
+ * The title snippets page, placed in the Links section under the fetch titles toggle
+ * because the rules only ever see a fetched title. Hidden with the toggle off, since
+ * no title fetch means nothing for them to run on.
+ */
+export function createUrlSnippetsPage(
+    context: SettingsPageContext,
+    registerSnippetEditListener: RegisterSnippetEditListener
+): SettingGroupItem {
+    const text = strings.settings.custom;
+
+    return {
+        ...snippetsPage(context, registerSnippetEditListener, text.urlSnippetsName, text.urlSnippetsDesc, 'urlSnippets'),
+        visible: () => context.settings().linkTitles
+    };
+}
+
+/** Pipeline overview and the link to the text snippet list page. */
 export function createCustomProcessingDefinitions(
     context: SettingsPageContext,
     registerSnippetEditListener: RegisterSnippetEditListener
@@ -233,15 +319,6 @@ export function createCustomProcessingDefinitions(
             searchable: false,
             render: renderPipeline
         },
-        {
-            type: 'page',
-            name: text.snippetsName,
-            desc: text.snippetsDesc,
-            displayValue: () =>
-                plural(text.enabledSnippetsCount, context.settings().textSnippets.filter(snippet => snippet.enabled).length),
-            status: () =>
-                context.settings().textSnippets.some(snippet => findInvalidSnippetRuleLines(snippet.rules).length > 0) ? 'warning' : null,
-            items: createSnippetsPageDefinitions(context, registerSnippetEditListener)
-        }
+        snippetsPage(context, registerSnippetEditListener, text.snippetsName, text.snippetsDesc, 'textSnippets')
     ];
 }

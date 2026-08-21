@@ -23,6 +23,8 @@ import { findInvalidRemovalRules } from '../normalize';
 import { buildUrlCleanupOptions, cleanUrl } from '../../transforms/urlCleanup';
 import { aliases, format, localeTag, plural, strings } from '../../i18n';
 import { BUILT_IN_LINK_REMOVALS_URL } from '../../urls';
+import { createUrlSnippetsPage } from './customProcessingPage';
+import type { RegisterSnippetEditListener } from './customProcessingPage';
 import { LIST_KEY_SUFFIX, SETTINGS_CLASS } from './context';
 import type { SettingsPageContext } from './context';
 
@@ -125,7 +127,10 @@ export function linkRemovalContributionUrl(removals: readonly string[], version:
 }
 
 /** Rows shown directly under the Links heading on the landing page. */
-export function createLinkLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
+export function createLinkLandingDefinitions(
+    context: SettingsPageContext,
+    registerSnippetEditListener: RegisterSnippetEditListener
+): SettingGroupItem[] {
     const enabled = (): boolean => context.settings().linkEnabled;
 
     const text = strings.settings.links;
@@ -137,6 +142,7 @@ export function createLinkLandingDefinitions(context: SettingsPageContext): Sett
             aliases: aliases(source => source.settings.links.titlesAliases),
             control: { type: 'toggle', key: 'linkTitles', defaultValue: DEFAULT_SETTINGS.linkTitles }
         },
+        createUrlSnippetsPage(context, registerSnippetEditListener),
         {
             name: text.cleaningName,
             desc: cleaningExample(),

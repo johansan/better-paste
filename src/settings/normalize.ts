@@ -34,11 +34,11 @@ function asStringArray(value: unknown): string[] {
     return value.filter((entry): entry is string => typeof entry === 'string');
 }
 
-function asTextSnippets(value: unknown): TextSnippet[] {
+/** The id set spans both snippet lists because the settings tab keys controls by id alone. */
+function asTextSnippets(value: unknown, ids: Set<string>): TextSnippet[] {
     if (!Array.isArray(value)) return [];
 
     const snippets: TextSnippet[] = [];
-    const ids = new Set<string>();
     for (const entry of value) {
         if (typeof entry !== 'object' || entry === null || Array.isArray(entry)) continue;
 
@@ -86,6 +86,7 @@ function asEmbedChoice(value: unknown, options: string): string {
 export function normalizeSettings(raw: unknown): BetterPasteSettings {
     const data = (typeof raw === 'object' && raw !== null ? raw : {}) as Partial<Record<keyof BetterPasteSettings, unknown>>;
     const defaults = DEFAULT_SETTINGS;
+    const snippetIds = new Set<string>();
 
     return {
         autoClean: asBoolean(data.autoClean, defaults.autoClean),
@@ -121,7 +122,8 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
         textQuotes: asBoolean(data.textQuotes, defaults.textQuotes),
         textDashes: asBoolean(data.textDashes, defaults.textDashes),
 
-        textSnippets: asTextSnippets(data.textSnippets),
+        textSnippets: asTextSnippets(data.textSnippets, snippetIds),
+        urlSnippets: asTextSnippets(data.urlSnippets, snippetIds),
 
         lastShownVersion: normalizeVersion(data.lastShownVersion),
 
