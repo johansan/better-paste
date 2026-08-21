@@ -62,6 +62,7 @@ const RELEASE_NOTES: ReleaseNote[] = [
         ],
         fixed: [
             'Fixed link titles for **Stack Overflow** and the **Stack Exchange**. Titles are now fetched using the Stack Exchange API.',
+            'Fixed link titles for **Dropbox**. Pasted share links now get the file or folder name as their title.',
             'Fixed the overlapping plugins dialog counting Better Paste itself among the overlapping plugins.'
         ]
     },
