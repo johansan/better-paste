@@ -54,6 +54,11 @@ describe('link title candidates', () => {
 
     it('recognises image paths without making a request', () => {
         expect(isObviousImageUrl('https://example.com/photo_(1).PNG?size=2')).toBe(true);
+        expect(isObviousImageUrl('https://www.dropbox.com/scl/fi/id/photo.jpg?rlkey=secret&dl=0')).toBe(false);
+        expect(isObviousImageUrl('https://www.dropbox.com/scl/fi/id/photo.jpg?raw=1')).toBe(true);
+        expect(isObviousImageUrl('https://www.dropbox.com/scl/fi/id/photo.jpg?dl=1')).toBe(true);
+        expect(isObviousImageUrl('https://dl.dropbox.com/scl/fi/id/photo.jpg')).toBe(true);
+        expect(isObviousImageUrl('https://www.dropbox.com/scl/fo/id/token/sub/photo.jpg?dl=0')).toBe(false);
         expect(isObviousImageUrl('https://example.com/article')).toBe(false);
     });
 
@@ -290,6 +295,101 @@ describe('LinkTitleService', () => {
             title: 'A [page] with *markup*',
             url: 'https://www.youtube.com/watch?v=abc'
         });
+    });
+
+    it.each([
+        ['filename*', `attachment; filename="Wrong.docx"; filename*=UTF-8''AI%20notes.docx`, 'AI notes.docx'],
+        ['filename* with whitespace', `attachment; filename*=UTF-8''evil%0A%23%20Heading.txt`, 'evil # Heading.txt'],
+        ['quoted filename', 'attachment; filename="AI notes.docx"', 'AI notes.docx'],
+        ['unquoted filename', 'attachment; filename=AI-notes.docx', 'AI-notes.docx']
+    ])('reads a Dropbox %s content disposition', async (_case, disposition, title) => {
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
+        const requests: unknown[] = [];
+        const service = new LinkTitleService(
+            () => settings,
+            async request => {
+                requests.push(request);
+                return response({ headers: { 'content-disposition': disposition }, text: '' });
+            },
+            () => null
+        );
+        const pasted = 'https://www.dropbox.com/scl/fi/id/cosmetic-name.docx?rlkey=secret&dl=0&tracking=ignored';
+
+        expect(await service.materializeTitle(pasted)).toEqual({ title, url: pasted });
+        expect(requests).toEqual([
+            { url: 'https://dl.dropboxusercontent.com/scl/fi/id/cosmetic-name.docx?rlkey=secret', method: 'HEAD', throw: false }
+        ]);
+    });
+
+    it.each([
+        ['https://www.dropbox.com/scl/fi/id/AI-notes.docx?rlkey=secret&dl=0', 'AI-notes.docx'],
+        ['https://www.dropbox.com/scl/fi/id/evil%0A%23%20Heading.txt?dl=0', 'evil # Heading.txt'],
+        ['https://dropbox.com/scl/fi/id/bad%ZZname.jpg?rlkey=secret', 'bad%ZZname.jpg']
+    ])('uses the Dropbox path name when its file request fails', async (pasted, title) => {
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
+        const requests: unknown[] = [];
+        const service = new LinkTitleService(
+            () => settings,
+            async request => {
+                requests.push(request);
+                return response({ status: 403, text: '' });
+            },
+            () => 'Dropbox'
+        );
+
+        expect(await service.materializeTitle(pasted)).toEqual({ title, url: pasted });
+        expect(requests).toHaveLength(1);
+    });
+
+    it('does not fetch a Dropbox page after a terminal folder request fails', async () => {
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
+        const requests: unknown[] = [];
+        const service = new LinkTitleService(
+            () => settings,
+            async request => {
+                requests.push(request);
+                return response({ status: 403, text: '' });
+            },
+            () => 'Dropbox'
+        );
+        const pasted = 'https://dl.dropbox.com/scl/fo/id/token?rlkey=wrong&dl=0';
+
+        expect(await service.materializeTitle(pasted)).toBeNull();
+        expect(requests).toEqual([{ url: 'https://www.dropbox.com/scl/fo/id/token?rlkey=wrong&dl=1', method: 'HEAD', throw: false }]);
+    });
+
+    it('strips the zip suffix from a Dropbox folder title', async () => {
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
+        const service = new LinkTitleService(
+            () => settings,
+            async () => response({ headers: { 'content-disposition': 'attachment; filename="Project.zip"' }, text: '' }),
+            () => null
+        );
+        const pasted = 'https://www.dropbox.com/sh/id/token/subpath?dl=0';
+
+        expect(await service.materializeTitle(pasted)).toEqual({ title: 'Project', url: pasted });
+    });
+
+    it('fetches mixed Dropbox and ordinary URLs in one batch', async () => {
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
+        const service = new LinkTitleService(
+            () => settings,
+            async request => {
+                const url = typeof request === 'string' ? request : request.url;
+                if (url.startsWith('https://dl.dropboxusercontent.com/')) {
+                    return response({ headers: { 'content-disposition': 'attachment; filename="Photo.jpg"' }, text: '' });
+                }
+                return response({ text: '<title>Ordinary page</title>' });
+            },
+            html => (/Ordinary page/.test(html) ? 'Ordinary page' : null)
+        );
+        const dropbox = 'https://www.dropbox.com/scl/fi/id/photo.jpg?rlkey=secret&dl=0';
+        const ordinary = 'https://example.com/page';
+
+        expect(await service.materializeTitles(`${dropbox}\n${ordinary}`)).toEqual([
+            { title: 'Photo.jpg', url: dropbox },
+            { title: 'Ordinary page', url: ordinary }
+        ]);
     });
 
     it('discards a provider response that arrives after disposal', async () => {

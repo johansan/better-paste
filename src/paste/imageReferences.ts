@@ -20,6 +20,7 @@ import { trimTrailingNoise, urlBoundary } from '../transforms/urlCleanup';
 import { frontmatterRanges, markdownSyntaxRanges } from '../transforms/typography';
 import { markdownCodeRanges } from '../transforms/markdownRanges';
 import { IMAGE_EXTENSIONS } from '../settings/constants';
+import { isDropboxShareUrl } from './titleProviders';
 
 /** Where an image reference came from, which decides how it is rewritten. */
 export type ImageReferenceKind = 'markdown' | 'html' | 'bare';
@@ -133,6 +134,7 @@ export function extensionOfUrl(url: string): string | null {
 
 /** True when a bare URL points at something that looks like an image file. */
 function looksLikeImageUrl(url: string): boolean {
+    if (isDropboxShareUrl(url)) return false;
     const extension = extensionOfUrl(url);
     return extension !== null && IMAGE_EXTENSIONS.some(candidate => candidate.toLowerCase() === extension);
 }

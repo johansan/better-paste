@@ -17,10 +17,15 @@
  */
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { RequestUrlResponse } from 'obsidian';
 import { titleProviderRequest } from '../src/paste/titleProviders';
 
 function requestUrl(address: string): string | null {
     return titleProviderRequest(new URL(address))?.url ?? null;
+}
+
+function response(text: string): RequestUrlResponse {
+    return { status: 200, headers: {}, arrayBuffer: new ArrayBuffer(0), json: null, text };
 }
 
 afterEach(() => {
@@ -28,6 +33,18 @@ afterEach(() => {
 });
 
 describe('titleProviderRequest', () => {
+    it('keeps direct Dropbox files eligible for providers', () => {
+        expect(requestUrl('https://www.dropbox.com/scl/fi/id/document.docx?dl=1')).toBe(
+            'https://dl.dropboxusercontent.com/scl/fi/id/document.docx'
+        );
+    });
+
+    it('recognises nested modern Dropbox folder links', () => {
+        expect(requestUrl('https://www.dropbox.com/scl/fo/id/token/sub/folder?dl=0')).toBe(
+            'https://www.dropbox.com/scl/fo/id/token/sub/folder?dl=1'
+        );
+    });
+
     it('builds a YouTube request for videos, short links and Shorts', () => {
         expect(requestUrl('https://www.youtube.com/watch?v=m2maDNtho7Y')).toBe(
             `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent('https://www.youtube.com/watch?v=m2maDNtho7Y')}`
@@ -94,16 +111,16 @@ describe('titleProviderRequest', () => {
 describe('provider response parsing', () => {
     it('reads and normalises an oEmbed title field', () => {
         const provider = titleProviderRequest(new URL('https://www.youtube.com/watch?v=abc'));
-        expect(provider?.titleFromResponse('{"title":"  A \\n title "}')).toBe('A title');
+        expect(provider?.titleFromResponse(response('{"title":"  A \\n title "}'))).toBe('A title');
     });
 
     it('rejects oEmbed bodies without a usable title', () => {
         const provider = titleProviderRequest(new URL('https://www.youtube.com/watch?v=abc'));
-        expect(provider?.titleFromResponse('{"title":42}')).toBeNull();
-        expect(provider?.titleFromResponse('{"title":"   "}')).toBeNull();
-        expect(provider?.titleFromResponse('{"html":"<a>x</a>"}')).toBeNull();
-        expect(provider?.titleFromResponse('not json')).toBeNull();
-        expect(provider?.titleFromResponse('null')).toBeNull();
+        expect(provider?.titleFromResponse(response('{"title":42}'))).toBeNull();
+        expect(provider?.titleFromResponse(response('{"title":"   "}'))).toBeNull();
+        expect(provider?.titleFromResponse(response('{"html":"<a>x</a>"}'))).toBeNull();
+        expect(provider?.titleFromResponse(response('not json'))).toBeNull();
+        expect(provider?.titleFromResponse(response('null'))).toBeNull();
     });
 
     it('decodes entities and normalises a Stack Exchange title', () => {
@@ -120,18 +137,18 @@ describe('provider response parsing', () => {
         );
 
         const provider = titleProviderRequest(new URL('https://stackoverflow.com/questions/419163/what-does-if-name-main-do'));
-        expect(provider?.titleFromResponse(JSON.stringify({ items: [{ title: encoded }] }))).toBe(
+        expect(provider?.titleFromResponse(response(JSON.stringify({ items: [{ title: encoded }] })))).toBe(
             'What does if __name__ == "__main__": do? & why?'
         );
     });
 
     it('rejects Stack Exchange bodies without a usable first item title', () => {
         const provider = titleProviderRequest(new URL('https://stackoverflow.com/q/419163'));
-        expect(provider?.titleFromResponse('{"items":[]}')).toBeNull();
-        expect(provider?.titleFromResponse('{"items":[{}]}')).toBeNull();
-        expect(provider?.titleFromResponse('{"items":[{"title":42}]}')).toBeNull();
-        expect(provider?.titleFromResponse('{"items":[{"title":"   "}]}')).toBeNull();
-        expect(provider?.titleFromResponse('{"items":null}')).toBeNull();
-        expect(provider?.titleFromResponse('not json')).toBeNull();
+        expect(provider?.titleFromResponse(response('{"items":[]}'))).toBeNull();
+        expect(provider?.titleFromResponse(response('{"items":[{}]}'))).toBeNull();
+        expect(provider?.titleFromResponse(response('{"items":[{"title":42}]}'))).toBeNull();
+        expect(provider?.titleFromResponse(response('{"items":[{"title":"   "}]}'))).toBeNull();
+        expect(provider?.titleFromResponse(response('{"items":null}'))).toBeNull();
+        expect(provider?.titleFromResponse(response('not json'))).toBeNull();
     });
 });

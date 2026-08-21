@@ -19,7 +19,7 @@
 import { requestUrl } from 'obsidian';
 import type { RequestUrlParam, RequestUrlResponse } from 'obsidian';
 import { escapeMarkdownDestination, extensionOfUrl } from './imageReferences';
-import { titleProviderRequest } from './titleProviders';
+import { isDropboxShareUrl, titleProviderRequest } from './titleProviders';
 import type { TitleProviderRequest } from './titleProviders';
 import { IMAGE_EXTENSIONS, LINK_TITLE_MAX_PARALLEL, LINK_TITLE_TIMEOUT_SECONDS } from '../settings/constants';
 import { BLOCKQUOTE_PREFIX } from '../transforms/markdownRanges';
@@ -78,6 +78,7 @@ export function standaloneWebUrlLines(text: string, options: StandaloneWebUrlLin
 
 /** True when the path extension identifies a URL as an image without making a request. */
 export function isObviousImageUrl(url: string): boolean {
+    if (isDropboxShareUrl(url)) return false;
     const extension = extensionOfUrl(url);
     return extension !== null && IMAGE_EXTENSIONS.includes(extension);
 }
@@ -224,22 +225,23 @@ export class LinkTitleService {
 
     /**
      * Asks a site's own title endpoint, because some sites answer it while blocking
-     * ordinary page loads. Every failure returns null so the page fetch still runs.
+     * ordinary page loads. Failures use the provider fallback, and terminal providers
+     * prevent a later page fetch when no title is available.
      */
     private async titleFromProvider(provider: TitleProviderRequest, timeoutMs: number): Promise<string | null> {
         let timer: ReturnType<typeof setTimeout> | undefined;
         try {
             const response = await Promise.race([
-                this.requestPage({ url: provider.url, method: 'GET', throw: false }),
+                this.requestPage({ url: provider.url, method: provider.method, throw: false }),
                 new Promise<null>(resolve => {
                     timer = window.setTimeout(() => resolve(null), timeoutMs);
                 })
             ]);
-            if (this.disposed || response === null) return null;
-            if (response.status < 200 || response.status >= 300) return null;
-            return provider.titleFromResponse(response.text);
+            if (this.disposed) return null;
+            if (response === null || response.status < 200 || response.status >= 300) return provider.fallbackTitle;
+            return provider.titleFromResponse(response) ?? provider.fallbackTitle;
         } catch {
-            return null;
+            return this.disposed ? null : provider.fallbackTitle;
         } finally {
             if (timer !== undefined) window.clearTimeout(timer);
         }
@@ -263,6 +265,7 @@ export class LinkTitleService {
                 const provided = await this.titleFromProvider(providerRequest, remainingMs());
                 if (this.disposed) return null;
                 if (provided !== null) return { title: provided, url };
+                if (providerRequest.terminal) return null;
             }
 
             // requestUrl buffers the whole response and cannot stream or abort, so a page

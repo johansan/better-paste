@@ -184,6 +184,17 @@ describe('findImageReferences', () => {
         expect(found[0].kind).toBe('bare');
     });
 
+    it('leaves a Dropbox image share URL for link title handling', () => {
+        expect(findImageReferences('https://www.dropbox.com/scl/fi/id/photo.jpg?rlkey=secret&dl=0')).toHaveLength(0);
+        expect(findImageReferences('https://www.dropbox.com/scl/fo/id/token/sub/photo.jpg?dl=0')).toHaveLength(0);
+    });
+
+    it('finds Dropbox image URLs that serve raw content', () => {
+        expect(findImageReferences('https://www.dropbox.com/scl/fi/id/photo.jpg?raw=1')).toHaveLength(1);
+        expect(findImageReferences('https://www.dropbox.com/scl/fi/id/photo.jpg?dl=1')).toHaveLength(1);
+        expect(findImageReferences('https://dl.dropbox.com/scl/fi/id/photo.jpg')).toHaveLength(1);
+    });
+
     it('leaves character reference text in a bare URL untouched', () => {
         const url = 'https://example.com/photo.jpg?one=1&amp;two=2';
         const found = findImageReferences(url);
