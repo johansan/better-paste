@@ -94,7 +94,7 @@ export const STRINGS_PT_BR: TranslationStrings = {
             heading: 'Imagens',
             savingName: 'Imagens da web',
             savingDesc:
-                'Escolha o que acontece quando você cola imagens da web. "Não fazer nada" deixa a colagem como está, "Vincular com pré-visualização" mostra a imagem diretamente da web e "Baixar com pré-visualização" salva uma cópia no seu cofre, incluindo imagens copiadas no Safari.',
+                'Escolha o que acontece quando você cola links de imagens da web. "Não fazer nada" deixa a colagem como está, "Vincular com pré-visualização" mostra a imagem diretamente da web e "Baixar com pré-visualização" salva uma cópia no seu cofre.',
             savingDownloadDesc: 'Por padrão, o nome do arquivo vem do endereço:',
             savingChoiceOff: 'Não fazer nada',
             savingChoiceLink: 'Vincular com pré-visualização',

@@ -94,7 +94,7 @@ export const STRINGS_FR: TranslationStrings = {
             heading: 'Images',
             savingName: 'Images du web',
             savingDesc:
-                'Choisissez ce qui se passe quand vous collez des images du web. « Ne rien faire » laisse le collage tel quel, « Lier avec aperçu » affiche l’image directement depuis le web, et « Télécharger avec aperçu » enregistre une copie dans votre coffre, y compris pour les images copiées dans Safari.',
+                'Choisissez ce qui se passe quand vous collez des liens vers des images du web. « Ne rien faire » laisse le collage tel quel, « Lier avec aperçu » affiche l’image directement depuis le web, et « Télécharger avec aperçu » enregistre une copie dans votre coffre.',
             savingDownloadDesc: 'Par défaut, le nom du fichier vient de l’adresse :',
             savingChoiceOff: 'Ne rien faire',
             savingChoiceLink: 'Lier avec aperçu',

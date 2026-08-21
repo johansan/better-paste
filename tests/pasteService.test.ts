@@ -441,7 +441,7 @@ describe('handleEditorPaste: Safari copy image', () => {
         expect(typeof sourcePath === 'function' ? sourcePath() : sourcePath).toBe('Notes/Test.md');
     });
 
-    it('links the HTML source instead of saving clipboard bytes in link mode', async () => {
+    it('saves clipboard bytes and inserts the vault embed in link mode', async () => {
         const { service, saved } = build({ imageMode: 'link', imageSizeChoice: '400' });
         const editor = new FakeEditor('');
         const noticeCount = Notice.instances.length;
@@ -449,41 +449,41 @@ describe('handleEditorPaste: Safari copy image', () => {
         expect(service.handleEditorPaste(safariEvent(), editor.asEditor(), INFO)).toBe(true);
         await settle();
 
-        expect(saved).toHaveLength(0);
+        expect(saved).toHaveLength(1);
         expect(Notice.instances).toHaveLength(noticeCount);
-        expect(editor.getValue()).toBe(
-            '![Johan Sanneblad talar om agentisk utveckling|400](https://www.tokentek.ai/_astro/gaia-2026-talk.J2oaR4rx_sdIoa.webp)'
-        );
+        expect(editor.getValue()).toBe('![[gaia-2026-talk.J2oaR4rx_sdIoa.png|400]]');
     });
 
-    it('decodes the source URL from Chrome copy image HTML in link mode', async () => {
+    it('decodes the source URL when a link-mode byte save fails', async () => {
         const html =
             "<meta charset='utf-8'><img src=\"https://static.bonniernews.se/ba/" +
             'b199b344-6661-4663-90b8-6496bcea47f3.jpeg?' +
             'crop=3200%2C1600%2Cx0%2Cy100&amp;auto=webp&amp;width=620&amp;quality=70"/>';
         const event = fakeClipboardEvent({ html, files: [fakeFile('image.png', 'image/png')] });
-        const { service } = build({ imageMode: 'link' });
+        const { service, saved } = build({ imageMode: 'link' }, true);
         const editor = new FakeEditor('');
 
         expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
         await settle();
 
+        expect(saved).toHaveLength(1);
         expect(editor.getValue()).toBe(
             '![](https://static.bonniernews.se/ba/b199b344-6661-4663-90b8-6496bcea47f3.jpeg?' +
                 'crop=3200%2C1600%2Cx0%2Cy100&auto=webp&width=620&quality=70)'
         );
     });
 
-    it('makes the linked HTML source safe for Markdown', async () => {
+    it('saves a source whose address and alt text need Markdown escaping', async () => {
         const html = '<img src="https://example.com/a (b.png" alt="A [cat] | photo">';
         const event = fakeClipboardEvent({ html, files: [fakeFile('image.png', 'image/png')] });
-        const { service } = build({ imageMode: 'link', imageSizeChoice: '400' });
+        const { service, saved } = build({ imageMode: 'link', imageSizeChoice: '400' });
         const editor = new FakeEditor('');
 
         expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
         await settle();
 
-        expect(editor.getValue()).toBe('![A cat photo|400](https://example.com/a%20%28b.png)');
+        expect(saved).toHaveLength(1);
+        expect(editor.getValue()).toBe('![[a (b.png|400]]');
     });
 
     it('ignores srcset so only the real source is used', async () => {
@@ -884,8 +884,8 @@ describe('image embed options', () => {
         expect(editor.getValue()).toBe('![[image-0.png#invertW|800]]');
     });
 
-    it('asks for size but not class when link mode saves no file', async () => {
-        const prompt: PromptDouble = { response: { size: '400', cssClass: null }, calls: [] };
+    it('asks for size and class when link mode saves a clipboard bitmap', async () => {
+        const prompt: PromptDouble = { response: { size: '400', cssClass: 'invert' }, calls: [] };
         const { service } = build(
             { imageMode: 'link', imageSizeChoice: 'ask', imageClassChoice: 'ask', imageClassOptions: 'invert' },
             false,
@@ -896,8 +896,8 @@ describe('image embed options', () => {
         service.handleEditorPaste(bitmapEvent(), editor.asEditor(), INFO);
         await settle();
 
-        expect(prompt.calls).toEqual([{ sizes: ['200', '400', '600'], classes: null }]);
-        expect(editor.getValue()).toBe('![a photo|400](https://example.com/photo.webp)');
+        expect(prompt.calls).toEqual([{ sizes: ['200', '400', '600'], classes: ['invert'] }]);
+        expect(editor.getValue()).toBe('![[photo.png#invert|400]]');
     });
 
     it('applies nothing when the dialog is dismissed', async () => {

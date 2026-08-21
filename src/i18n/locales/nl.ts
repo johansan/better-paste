@@ -94,7 +94,7 @@ export const STRINGS_NL: TranslationStrings = {
             heading: 'Afbeeldingen',
             savingName: 'Webafbeeldingen',
             savingDesc:
-                'Kies wat er gebeurt wanneer je afbeeldingen van het web plakt. "Niets doen" laat het geplakte zoals het is, "Linken met voorvertoning" toont de afbeelding rechtstreeks vanaf het web, en "Downloaden met voorvertoning" slaat een kopie op in je kluis, ook van afbeeldingen die je in Safari kopieert.',
+                'Kies wat er gebeurt wanneer je links naar afbeeldingen van het web plakt. "Niets doen" laat het geplakte zoals het is, "Linken met voorvertoning" toont de afbeelding rechtstreeks vanaf het web, en "Downloaden met voorvertoning" slaat een kopie op in je kluis.',
             savingDownloadDesc: 'Standaard komt de bestandsnaam uit het adres:',
             savingChoiceOff: 'Niets doen',
             savingChoiceLink: 'Linken met voorvertoning',

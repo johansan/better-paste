@@ -88,7 +88,7 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             heading: '图片',
             savingName: '网络图片',
             savingDesc:
-                '选择粘贴网络图片时的处理方式。“什么都不做”保持粘贴内容原样，“链接并预览”直接从网络显示图片，“下载并预览”则把副本保存到你的仓库，包括在 Safari 中复制的图片。',
+                '选择粘贴网络图片链接时的处理方式。“什么都不做”保持粘贴内容原样，“链接并预览”直接从网络显示图片，“下载并预览”则把副本保存到你的仓库。',
             savingDownloadDesc: '文件名默认取自网址：',
             savingChoiceOff: '什么都不做',
             savingChoiceLink: '链接并预览',

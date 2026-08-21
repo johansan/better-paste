@@ -256,10 +256,10 @@ export class PasteService {
 
             // Two clipboard shapes reach this branch. Safari's "Copy image" puts the bitmap
             // AND an <img> tag on the clipboard, and Obsidian prefers the HTML there, which
-            // turns a copied picture into an external link; that is a web image, so the
-            // image mode decides between saving the bytes, linking the address and leaving
-            // it to Obsidian. A bare nameless bitmap, such as a screenshot, is
-            // local content and is always taken over, to run it through the file name
+            // turns a copied picture into an external link. A clipboard bitmap is always
+            // saved from its bytes, so the image mode decides only between leaving HTML
+            // images to Obsidian when it is off and claiming the paste otherwise. A bare
+            // nameless bitmap, such as a screenshot, is always taken over to run it through the file name
             // format and any size or class; it gets the same name Obsidian would give it,
             // so a default setup pastes identically to the app.
             const file = clipboard.files[0];
@@ -349,25 +349,25 @@ export class PasteService {
             : undefined;
         const naming = this.imageNaming(editor);
 
-        const linksRemote = this.getSettings().imageMode === 'link' && remote !== undefined;
-        const { size, cssClass } = await this.resolveEmbedOptions(editor, !linksRemote);
+        const { size, cssClass } = await this.resolveEmbedOptions(editor);
         let stored: { embed: string; file: TFile } | null = null;
 
-        if (!linksRemote) {
-            try {
-                stored = await this.images.saveClipboardImage(file, sources[0] ?? '', () => targetFile?.path ?? '', size, cssClass, naming);
-            } catch (error) {
-                logError('Could not save a pasted image', error);
-            }
+        try {
+            stored = await this.images.saveClipboardImage(file, sources[0] ?? '', () => targetFile?.path ?? '', size, cssClass, naming);
+        } catch (error) {
+            logError('Could not save a pasted image', error);
         }
         const embed = stored?.embed ?? null;
 
         // Nothing was saved, so fall back to linking the original picture rather than
         // swallowing the paste entirely.
-        const text =
-            linksRemote && remote
+        const fallback =
+            this.getSettings().imageMode === 'link' && remote
                 ? remoteMarkdownEmbed(remote.alt, remote.url, size)
-                : (embed ?? (source ? remoteMarkdownEmbed('', source, size) : ''));
+                : source
+                  ? remoteMarkdownEmbed('', source, size)
+                  : '';
+        const text = embed ?? fallback;
 
         if (!this.canEdit(info, targetFile)) {
             // The view moved on, so the embed has no note to land in and the saved
@@ -414,7 +414,7 @@ export class PasteService {
             }
         }
 
-        if (!linksRemote && embed === null) this.reportImageFailures(1);
+        if (embed === null) this.reportImageFailures(1);
     }
 
     /** Command handler: pastes the clipboard's plain text through the full rule pipeline. */

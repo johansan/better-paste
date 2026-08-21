@@ -94,7 +94,7 @@ export const STRINGS_IT: TranslationStrings = {
             heading: 'Immagini',
             savingName: 'Immagini dal web',
             savingDesc:
-                'Scegli cosa succede quando incolli immagini dal web. "Non fare nulla" lascia il contenuto incollato com’è, "Collega con anteprima" mostra l’immagine direttamente dal web e "Scarica con anteprima" salva una copia nel tuo vault, incluse le immagini copiate in Safari.',
+                'Scegli cosa succede quando incolli link a immagini dal web. "Non fare nulla" lascia il contenuto incollato com’è, "Collega con anteprima" mostra l’immagine direttamente dal web e "Scarica con anteprima" salva una copia nel tuo vault.',
             savingDownloadDesc: 'Per impostazione predefinita il nome del file viene dall’indirizzo:',
             savingChoiceOff: 'Non fare nulla',
             savingChoiceLink: 'Collega con anteprima',

@@ -88,7 +88,7 @@ export const STRINGS_VI: TranslationStrings = {
             heading: 'Hình ảnh',
             savingName: 'Ảnh từ web',
             savingDesc:
-                'Chọn điều xảy ra khi bạn dán ảnh từ web. "Không làm gì" giữ nguyên nội dung dán, "Liên kết kèm xem trước" hiển thị ảnh trực tiếp từ web, còn "Tải xuống kèm xem trước" lưu một bản sao vào kho của bạn, kể cả ảnh đã sao chép trong Safari.',
+                'Chọn điều xảy ra khi bạn dán liên kết ảnh từ web. "Không làm gì" giữ nguyên nội dung dán, "Liên kết kèm xem trước" hiển thị ảnh trực tiếp từ web, còn "Tải xuống kèm xem trước" lưu một bản sao vào kho của bạn.',
             savingDownloadDesc: 'Theo mặc định, tên tệp lấy từ địa chỉ:',
             savingChoiceOff: 'Không làm gì',
             savingChoiceLink: 'Liên kết kèm xem trước',

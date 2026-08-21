@@ -88,7 +88,7 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             heading: '圖片',
             savingName: '網路圖片',
             savingDesc:
-                '選擇貼上網路圖片時的處理方式。「什麼都不做」保持貼上內容原樣，「連結並預覽」直接從網路顯示圖片，「下載並預覽」則把副本儲存到你的儲存庫，包括在 Safari 中複製的圖片。',
+                '選擇貼上網路圖片連結時的處理方式。「什麼都不做」保持貼上內容原樣，「連結並預覽」直接從網路顯示圖片，「下載並預覽」則把副本儲存到你的儲存庫。',
             savingDownloadDesc: '檔案名稱預設取自網址：',
             savingChoiceOff: '什麼都不做',
             savingChoiceLink: '連結並預覽',

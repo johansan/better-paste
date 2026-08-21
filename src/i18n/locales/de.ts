@@ -103,7 +103,7 @@ export const STRINGS_DE: TranslationStrings = {
             heading: 'Bilder',
             savingName: 'Webbilder',
             savingDesc:
-                'Wähle, was mit eingefügten Bildern aus dem Web geschieht. "Nichts tun" lässt das Eingefügte unverändert, "Verlinken mit Vorschau" zeigt das Bild direkt aus dem Web, und "Herunterladen mit Vorschau" speichert eine Kopie in deinem Tresor, auch von in Safari kopierten Bildern.',
+                'Wähle, was mit eingefügten Links zu Bildern aus dem Web geschieht. "Nichts tun" lässt das Eingefügte unverändert, "Verlinken mit Vorschau" zeigt das Bild direkt aus dem Web, und "Herunterladen mit Vorschau" speichert eine Kopie in deinem Tresor.',
             savingDownloadDesc: 'Standardmäßig stammt der Dateiname aus der Adresse:',
             savingChoiceOff: 'Nichts tun',
             savingChoiceLink: 'Verlinken mit Vorschau',
