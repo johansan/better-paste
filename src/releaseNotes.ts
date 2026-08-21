@@ -52,14 +52,14 @@ export interface ReleaseNote {
 const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.10',
-        date: '2026-08-20',
+        date: '2026-08-21',
         new: [
             'You can now clean up fetched link titles with ==Link snippets==! Your own regex rules rewrite the title, and the address always stays intact. Ready-made rules for GitHub, X, YouTube, Wikipedia and more are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets#link-snippets).',
-            'You can now paste several links at once! Every address on its own line gets its title and becomes a Markdown link.',
-            'You can now paste multiple paragraphs into a block quote or callout. Every pasted line stays quoted.'
+            'You can now ==paste several links at once==! Every address on its own line gets its title and becomes a Markdown link.',
+            'You can now ==paste multiple paragraphs into a block quote or callout==. Every pasted line stays quoted. [This has been an issue with Obsidian for years](https://forum.obsidian.md/t/paste-multiple-paragraphs-into-block-quote/36126/7).'
         ],
         fixed: [
-            'Fixed link titles for Stack Overflow and the Stack Exchange sites. Question pages block normal lookups, so the title is now fetched from the Stack Exchange API.',
+            'Fixed link titles for **Stack Overflow** and the **Stack Exchange**. Titles are now fetched using the Stack Exchange API.',
             'Fixed the overlapping plugins dialog counting Better Paste itself among the overlapping plugins.'
         ]
     },
