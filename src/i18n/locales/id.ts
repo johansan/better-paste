@@ -41,6 +41,8 @@ export const STRINGS_ID: TranslationStrings = {
         clipboardFailed: 'tidak dapat membaca papan klip',
         titleFailed: 'tidak dapat mengambil judul.',
         fetchingTitle: 'mengambil judul...',
+        fetchingTitles: 'mengambil judul...',
+        titlesFailed: { other: 'tidak dapat mengambil {count} judul' },
         imagesFailed: { other: '{count} gambar gagal disimpan' },
         imagesFailedLinkKept: '{images}, tautan aslinya dipertahankan',
         imagesFailedNothingPasted: '{images}, jadi tidak ada yang ditempel',

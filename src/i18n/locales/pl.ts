@@ -41,6 +41,13 @@ export const STRINGS_PL: TranslationStrings = {
         clipboardFailed: 'nie udało się odczytać schowka',
         titleFailed: 'nie udało się pobrać tytułu.',
         fetchingTitle: 'pobieranie tytułu...',
+        fetchingTitles: 'pobieranie tytułów...',
+        titlesFailed: {
+            one: 'nie udało się pobrać {count} tytułu',
+            few: 'nie udało się pobrać {count} tytułów',
+            many: 'nie udało się pobrać {count} tytułów',
+            other: 'nie udało się pobrać {count} tytułu'
+        },
         imagesFailed: {
             one: 'nie udało się zapisać {count} obrazu',
             few: 'nie udało się zapisać {count} obrazów',

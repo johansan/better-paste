@@ -41,6 +41,8 @@ export const STRINGS_TH: TranslationStrings = {
         clipboardFailed: 'อ่านคลิปบอร์ดไม่ได้',
         titleFailed: 'ดึงชื่อเรื่องไม่สำเร็จ',
         fetchingTitle: 'กำลังดึงชื่อเรื่อง...',
+        fetchingTitles: 'กำลังดึงชื่อเรื่อง...',
+        titlesFailed: { other: 'ดึงชื่อเรื่อง {count} รายการไม่สำเร็จ' },
         imagesFailed: { other: 'บันทึกรูปภาพ {count} รูปไม่สำเร็จ' },
         imagesFailedLinkKept: '{images} จึงคงลิงก์เดิมไว้',
         imagesFailedNothingPasted: '{images} จึงไม่ได้วางอะไรเลย',

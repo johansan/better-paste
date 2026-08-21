@@ -41,6 +41,8 @@ export const STRINGS_JA: TranslationStrings = {
         clipboardFailed: 'クリップボードを読み取れませんでした',
         titleFailed: 'タイトルを取得できませんでした。',
         fetchingTitle: 'タイトルを取得中...',
+        fetchingTitles: 'タイトルを取得中...',
+        titlesFailed: { other: 'タイトル {count} 件を取得できませんでした' },
         imagesFailed: { other: '画像 {count} 件を保存できませんでした' },
         imagesFailedLinkKept: '{images}。元のリンクを残しました',
         imagesFailedNothingPasted: '{images}。そのため何も貼り付けていません',

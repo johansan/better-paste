@@ -41,6 +41,11 @@ export const STRINGS_FR: TranslationStrings = {
         clipboardFailed: 'impossible de lire le presse-papiers',
         titleFailed: 'impossible de récupérer le titre.',
         fetchingTitle: 'récupération du titre...',
+        fetchingTitles: 'récupération des titres...',
+        titlesFailed: {
+            one: '{count} titre n’a pas pu être récupéré',
+            other: '{count} titres n’ont pas pu être récupérés'
+        },
         imagesFailed: {
             one: '{count} image n’a pas pu être enregistrée',
             other: '{count} images n’ont pas pu être enregistrées'

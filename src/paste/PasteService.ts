@@ -25,6 +25,7 @@ import type { TextCommaPlacement } from '../transforms/textProcessing';
 import { cleanTerminalText } from '../transforms/terminalText';
 import { rebaseListPaste } from '../transforms/listPaste';
 import { continueQuotePaste } from '../transforms/quotePaste';
+import { BLOCKQUOTE_PREFIX } from '../transforms/markdownRanges';
 import { applyTextSnippets } from '../transforms/snippets';
 import { cleanPdfText } from '../transforms/pdfText';
 import type { PdfCleanupOptions } from '../transforms/pdfText';
@@ -52,7 +53,8 @@ import {
     escapeLinkTitle,
     formatTitledLink,
     isObviousImageUrl,
-    standaloneWebUrl
+    standaloneWebUrl,
+    standaloneWebUrlLines
 } from './LinkTitleService';
 import type { LinkTitleService } from './LinkTitleService';
 import { logError } from '../utils/logger';
@@ -116,6 +118,11 @@ function isFrontmatterValueSlot(content: string, start: number, end: number): bo
 function linkFromSelection(selection: string, clipboardText: string, url: string): string | null {
     if (!selection.trim() || selection === clipboardText || selection === url) return null;
     return `[${escapeLinkTitle(selection)}](${escapeLinkDestination(url)})`;
+}
+
+/** True when a neighbouring character would become part of a pasted web address. */
+function extendsUrl(char: string | undefined): boolean {
+    return char !== undefined && !/[\s<>"`\\\u201C\u201D]/.test(char);
 }
 
 /** True when the clipboard carries exactly one image file. */
@@ -284,8 +291,9 @@ export class PasteService {
             rebased === null && settings.quoteContinuation ? continueQuotePaste(result.text, valueBefore, startOffset, endOffset) : null;
         const needsImages = this.images.hasWork(result.text);
         const needsTitle = this.titles.hasWork(result.text);
+        const needsTitleBatch = this.titles.hasBatchWork(result.text);
         // A document transform takes the paste over because it can change clean text on its own
-        if (rebased === null && quoted === null && !result.changed && !needsImages && !needsTitle) return false;
+        if (rebased === null && quoted === null && !result.changed && !needsImages && !needsTitle && !needsTitleBatch) return false;
 
         const targetFile = info.file;
         const selectedLink = needsTitle ? linkFromSelection(editor.getSelection(), plain, result.text) : null;
@@ -301,6 +309,7 @@ export class PasteService {
 
         if (needsImages) void this.runImagePass(editor, info, targetFile, () => targetFile?.path ?? '', range);
         else if (needsTitle && selectedLink === null) void this.runTitlePass(editor, info, targetFile, range);
+        else if (needsTitleBatch) void this.runTitleBatchPass(editor, info, targetFile, range);
 
         return true;
     }
@@ -414,6 +423,7 @@ export class PasteService {
                 : null;
         const needsImages = this.images.hasWork(result.text);
         const needsTitle = this.titles.hasWork(result.text);
+        const needsTitleBatch = this.titles.hasBatchWork(result.text);
         const invocationSelection = valueAtInvocation.slice(fromOffset, toOffset);
         const selectedLink =
             needsTitle && valueBefore === valueAtInvocation ? linkFromSelection(invocationSelection, clipboardText, result.text) : null;
@@ -429,6 +439,7 @@ export class PasteService {
         }
 
         if (needsTitle && selectedLink === null) await this.runTitlePass(editor, info, targetFile, range);
+        else if (needsTitleBatch) await this.runTitleBatchPass(editor, info, targetFile, range);
     }
 
     /** Command handler: pastes the clipboard's plain text with no transforms applied. */
@@ -682,7 +693,7 @@ export class PasteService {
         range: AsyncPasteRange
     ): Promise<void> {
         this.pendingRanges.add(range);
-        const progress = this.showTitleProgress();
+        const progress = this.showTitleProgress(strings.notices.fetchingTitle);
         try {
             const materialized = await this.titles.materializeTitle(range.inserted);
             if (!this.canEdit(info, targetFile)) return;
@@ -697,11 +708,57 @@ export class PasteService {
                 // The address must still stand alone: a character that would extend a
                 // URL on either side means the user reshaped it during the fetch, and
                 // linking only the pasted half would tear their address apart
-                const extendsUrl = (char: string | undefined): boolean => char !== undefined && !/[\s<>"`\\\u201C\u201D]/.test(char);
                 const standalone = (value: string, offset: number): boolean =>
                     !extendsUrl(value[offset - 1]) && !extendsUrl(value[offset + range.inserted.length]);
                 this.replaceRange(editor, range, link, standalone);
             }
+        } finally {
+            this.hideTitleProgress(progress);
+            this.pendingRanges.delete(range);
+        }
+    }
+
+    /** Fetches and rewrites every URL line in one already-inserted pasted range. */
+    private async runTitleBatchPass(
+        editor: Editor,
+        info: MarkdownView | MarkdownFileInfo,
+        targetFile: TFile | null,
+        range: AsyncPasteRange
+    ): Promise<void> {
+        const lines = standaloneWebUrlLines(range.inserted, { allowBlockQuotes: true });
+        if (lines === null) return;
+
+        this.pendingRanges.add(range);
+        const progressMessage = lines.length > 1 ? strings.notices.fetchingTitles : strings.notices.fetchingTitle;
+        const progress = this.showTitleProgress(progressMessage);
+        try {
+            const materialized = await this.titles.materializeTitles(range.inserted, { allowBlockQuotes: true });
+            if (!this.canEdit(info, targetFile) || materialized === null) return;
+
+            let resultIndex = 0;
+            let failed = 0;
+            const rebuilt = range.inserted
+                .split('\n')
+                .map(line => {
+                    if (!line.slice((BLOCKQUOTE_PREFIX.exec(line)?.[0] ?? '').length).trim()) return line;
+                    const parts = lines[resultIndex];
+                    const result = materialized[resultIndex];
+                    resultIndex += 1;
+                    if (result === null) {
+                        failed += 1;
+                        return line;
+                    }
+                    const subject = formatTitledLink(result.title, result.url);
+                    const ruled = applyTextSnippets(subject, this.getSettings().urlSnippets).text;
+                    return `${parts.leading}${composeTitledLink(subject, ruled)}${parts.trailing}`;
+                })
+                .join('\n');
+
+            const standalone = (value: string, offset: number): boolean =>
+                (!extendsUrl(range.inserted[0]) || !extendsUrl(value[offset - 1])) &&
+                (!extendsUrl(range.inserted[range.inserted.length - 1]) || !extendsUrl(value[offset + range.inserted.length]));
+            if (rebuilt !== range.inserted) this.replaceRange(editor, range, rebuilt, standalone);
+            this.reportTitleFailures(failed);
         } finally {
             this.hideTitleProgress(progress);
             this.pendingRanges.delete(range);
@@ -790,11 +847,11 @@ export class PasteService {
     }
 
     /** Shows a spinner notice for title work, delayed so a quick fetch never flashes it. */
-    private showTitleProgress(): TitleProgressNotice {
+    private showTitleProgress(progressMessage: string): TitleProgressNotice {
         const progress: TitleProgressNotice = { notice: null, timer: 0 };
         progress.timer = window.setTimeout(() => {
             if (!this.titleProgressNotices.has(progress)) return;
-            const message = format(strings.notices.prefix, { message: strings.notices.fetchingTitle });
+            const message = format(strings.notices.prefix, { message: progressMessage });
             progress.notice = showNotice(message, { timeout: 0, variant: 'loading' });
         }, TITLE_PROGRESS_DELAY_MS);
 
@@ -1030,5 +1087,12 @@ export class PasteService {
             images
         });
         new Notice(format(strings.notices.prefix, { message }));
+    }
+
+    /** Reports one count notice after a list of title fetches completes. */
+    private reportTitleFailures(failed: number): void {
+        if (failed === 0) return;
+        const message = plural(strings.notices.titlesFailed, failed);
+        showNotice(format(strings.notices.prefix, { message }), { variant: 'warning' });
     }
 }

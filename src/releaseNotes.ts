@@ -55,6 +55,7 @@ const RELEASE_NOTES: ReleaseNote[] = [
         date: '2026-08-20',
         new: [
             'You can now clean up fetched link titles with ==Link snippets==! Your own regex rules rewrite the title, and the address always stays intact. Ready-made rules for GitHub, X, YouTube, Wikipedia and more are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets#link-snippets).',
+            'You can now paste several links at once! Every address on its own line gets its title and becomes a Markdown link.',
             'You can now paste multiple paragraphs into a block quote or callout. Every pasted line stays quoted.'
         ],
         fixed: [

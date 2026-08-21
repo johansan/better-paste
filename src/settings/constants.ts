@@ -41,6 +41,9 @@ export const IMAGE_TIMEOUT_SECONDS = 30;
 /** How long to wait for a page title before leaving the pasted address alone. */
 export const LINK_TITLE_TIMEOUT_SECONDS = 10;
 
+/** Bounds simultaneous title requests for a pasted list. */
+export const LINK_TITLE_MAX_PARALLEL = 4;
+
 /** Filename format used for source names and as the starting custom format. */
 export const DEFAULT_IMAGE_NAME_TEMPLATE = '{{name}}';
 

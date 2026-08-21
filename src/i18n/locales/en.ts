@@ -56,6 +56,8 @@ export const STRINGS_EN = {
         clipboardFailed: 'could not read the clipboard',
         titleFailed: 'could not fetch the title.',
         fetchingTitle: 'fetching title...',
+        fetchingTitles: 'fetching titles...',
+        titlesFailed: { one: 'could not fetch {count} title', other: 'could not fetch {count} titles' } as PluralForms,
         imagesFailed: { one: '{count} image could not be saved', other: '{count} images could not be saved' } as PluralForms,
         imagesFailedLinkKept: '{images}, the original link was kept',
         imagesFailedNothingPasted: '{images}, so nothing was pasted',

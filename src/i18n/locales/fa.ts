@@ -41,6 +41,11 @@ export const STRINGS_FA: TranslationStrings = {
         clipboardFailed: 'خواندن حافظه موقت ممکن نشد',
         titleFailed: 'دریافت عنوان ممکن نشد.',
         fetchingTitle: 'در حال دریافت عنوان...',
+        fetchingTitles: 'در حال دریافت عنوان‌ها...',
+        titlesFailed: {
+            one: '{count} عنوان دریافت نشد',
+            other: '{count} عنوان دریافت نشد'
+        },
         imagesFailed: {
             one: '{count} تصویر ذخیره نشد',
             other: '{count} تصویر ذخیره نشد'

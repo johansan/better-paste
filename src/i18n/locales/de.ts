@@ -41,6 +41,11 @@ export const STRINGS_DE: TranslationStrings = {
         clipboardFailed: 'Zwischenablage konnte nicht gelesen werden',
         titleFailed: 'Titel konnte nicht abgerufen werden.',
         fetchingTitle: 'Titel wird abgerufen...',
+        fetchingTitles: 'Titel werden abgerufen...',
+        titlesFailed: {
+            one: '{count} Titel konnte nicht abgerufen werden',
+            other: '{count} Titel konnten nicht abgerufen werden'
+        },
         imagesFailed: {
             one: '{count} Bild konnte nicht gespeichert werden',
             other: '{count} Bilder konnten nicht gespeichert werden'

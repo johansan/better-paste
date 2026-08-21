@@ -41,6 +41,13 @@ export const STRINGS_RU: TranslationStrings = {
         clipboardFailed: 'не удалось прочитать буфер обмена',
         titleFailed: 'не удалось получить заголовок.',
         fetchingTitle: 'получение заголовка...',
+        fetchingTitles: 'получение заголовков...',
+        titlesFailed: {
+            one: 'не удалось получить {count} заголовок',
+            few: 'не удалось получить {count} заголовка',
+            many: 'не удалось получить {count} заголовков',
+            other: 'не удалось получить {count} заголовка'
+        },
         imagesFailed: {
             one: 'не удалось сохранить {count} изображение',
             few: 'не удалось сохранить {count} изображения',

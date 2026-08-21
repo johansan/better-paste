@@ -21,7 +21,8 @@ import type { RequestUrlParam, RequestUrlResponse } from 'obsidian';
 import { extensionOfUrl } from './imageReferences';
 import { titleProviderRequest } from './titleProviders';
 import type { TitleProviderRequest } from './titleProviders';
-import { IMAGE_EXTENSIONS, LINK_TITLE_TIMEOUT_SECONDS } from '../settings/constants';
+import { IMAGE_EXTENSIONS, LINK_TITLE_MAX_PARALLEL, LINK_TITLE_TIMEOUT_SECONDS } from '../settings/constants';
+import { BLOCKQUOTE_PREFIX } from '../transforms/markdownRanges';
 
 /** Pages declaring more than this are skipped: no title is worth buffering them. */
 const MAX_PAGE_BYTES = 2 * 1024 * 1024;
@@ -45,6 +46,34 @@ export function standaloneWebUrl(text: string): string | null {
     } catch {
         return null;
     }
+}
+
+export interface StandaloneWebUrlLine {
+    url: string;
+    leading: string;
+    trailing: string;
+}
+
+export interface StandaloneWebUrlLinesOptions {
+    allowBlockQuotes?: boolean;
+}
+
+/** Returns the URL-bearing lines when the text is solely a list of web addresses. */
+export function standaloneWebUrlLines(text: string, options: StandaloneWebUrlLinesOptions = {}): StandaloneWebUrlLine[] | null {
+    if (standaloneWebUrl(text) !== null) return null;
+
+    const lines: StandaloneWebUrlLine[] = [];
+    for (const line of text.split('\n')) {
+        const quotePrefix = options.allowBlockQuotes ? (BLOCKQUOTE_PREFIX.exec(line)?.[0] ?? '') : '';
+        const content = line.slice(quotePrefix.length);
+        if (!content.trim()) continue;
+        const leading = quotePrefix + (content.match(/^\s*/)?.[0] ?? '');
+        const trailing = content.match(/\s*$/)?.[0] ?? '';
+        const url = standaloneWebUrl(content.trim());
+        if (url === null || isObviousImageUrl(url)) return null;
+        lines.push({ url, leading, trailing });
+    }
+    return lines.length > 0 ? lines : null;
 }
 
 /** True when the path extension identifies a URL as an image without making a request. */
@@ -169,6 +198,37 @@ export class LinkTitleService {
         if (this.disposed || !this.getSettings().linkTitles) return false;
         const url = standaloneWebUrl(text);
         return url !== null && !isObviousImageUrl(url);
+    }
+
+    /** True when the paste is solely URL lines and is not owned by the single-link path. */
+    hasBatchWork(text: string): boolean {
+        return !this.disposed && this.getSettings().linkTitles && standaloneWebUrlLines(text) !== null;
+    }
+
+    /** Fetches distinct URL titles with bounded concurrency and restores line order. */
+    async materializeTitles(
+        text: string,
+        options: StandaloneWebUrlLinesOptions = {}
+    ): Promise<({ title: string; url: string } | null)[] | null> {
+        if (this.disposed || !this.getSettings().linkTitles) return null;
+        const lines = standaloneWebUrlLines(text, options);
+        if (lines === null) return null;
+
+        const urls = [...new Set(lines.map(line => line.url))];
+        const results = new Map<string, { title: string; url: string } | null>();
+        let next = 0;
+        const worker = async (): Promise<void> => {
+            while (!this.disposed) {
+                const index = next;
+                next += 1;
+                if (index >= urls.length) return;
+                const url = urls[index];
+                results.set(url, await this.materializeTitle(url));
+            }
+        };
+
+        await Promise.all(Array.from({ length: Math.min(LINK_TITLE_MAX_PARALLEL, urls.length) }, () => worker()));
+        return lines.map(line => results.get(line.url) ?? null);
     }
 
     /**

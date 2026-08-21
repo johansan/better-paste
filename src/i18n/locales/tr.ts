@@ -41,6 +41,11 @@ export const STRINGS_TR: TranslationStrings = {
         clipboardFailed: 'pano okunamadı',
         titleFailed: 'başlık alınamadı.',
         fetchingTitle: 'başlık alınıyor...',
+        fetchingTitles: 'başlıklar alınıyor...',
+        titlesFailed: {
+            one: '{count} başlık alınamadı',
+            other: '{count} başlık alınamadı'
+        },
         imagesFailed: {
             one: '{count} görsel kaydedilemedi',
             other: '{count} görsel kaydedilemedi'

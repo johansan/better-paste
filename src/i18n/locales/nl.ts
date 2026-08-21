@@ -41,6 +41,11 @@ export const STRINGS_NL: TranslationStrings = {
         clipboardFailed: 'kon het klembord niet lezen',
         titleFailed: 'kon de titel niet ophalen.',
         fetchingTitle: 'titel ophalen...',
+        fetchingTitles: 'titels ophalen...',
+        titlesFailed: {
+            one: 'kon {count} titel niet ophalen',
+            other: 'kon {count} titels niet ophalen'
+        },
         imagesFailed: {
             one: '{count} afbeelding kon niet worden opgeslagen',
             other: '{count} afbeeldingen konden niet worden opgeslagen'

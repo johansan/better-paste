@@ -41,6 +41,8 @@ export const STRINGS_KO: TranslationStrings = {
         clipboardFailed: '클립보드를 읽지 못했습니다',
         titleFailed: '제목을 가져오지 못했습니다.',
         fetchingTitle: '제목 가져오는 중...',
+        fetchingTitles: '제목 가져오는 중...',
+        titlesFailed: { other: '제목 {count}개를 가져오지 못했습니다' },
         imagesFailed: { other: '이미지 {count}개를 저장하지 못했습니다' },
         imagesFailedLinkKept: '{images}. 원래 링크를 유지했습니다',
         imagesFailedNothingPasted: '{images}. 그래서 아무것도 붙여넣지 않았습니다',

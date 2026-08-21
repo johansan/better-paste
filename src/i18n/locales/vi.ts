@@ -41,6 +41,8 @@ export const STRINGS_VI: TranslationStrings = {
         clipboardFailed: 'không đọc được bảng nhớ tạm',
         titleFailed: 'không lấy được tiêu đề.',
         fetchingTitle: 'đang lấy tiêu đề...',
+        fetchingTitles: 'đang lấy tiêu đề...',
+        titlesFailed: { other: 'không lấy được {count} tiêu đề' },
         imagesFailed: { other: 'không lưu được {count} ảnh' },
         imagesFailedLinkKept: '{images}, đã giữ liên kết gốc',
         imagesFailedNothingPasted: '{images}, nên không dán gì cả',

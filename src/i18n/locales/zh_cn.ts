@@ -41,6 +41,8 @@ export const STRINGS_ZH_CN: TranslationStrings = {
         clipboardFailed: '无法读取剪贴板',
         titleFailed: '无法获取标题。',
         fetchingTitle: '正在获取标题...',
+        fetchingTitles: '正在获取标题...',
+        titlesFailed: { other: '有 {count} 个标题未能获取' },
         imagesFailed: { other: '有 {count} 张图片未能保存' },
         imagesFailedLinkKept: '{images}，已保留原始链接',
         imagesFailedNothingPasted: '{images}，因此没有粘贴任何内容',

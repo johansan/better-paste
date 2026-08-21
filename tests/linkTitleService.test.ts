@@ -24,8 +24,10 @@ import {
     formatTitledLink,
     isObviousImageUrl,
     LinkTitleService,
-    standaloneWebUrl
+    standaloneWebUrl,
+    standaloneWebUrlLines
 } from '../src/paste/LinkTitleService';
+import { LINK_TITLE_MAX_PARALLEL } from '../src/settings/constants';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 
 afterEach(() => {
@@ -53,6 +55,22 @@ describe('link title candidates', () => {
     it('recognises image paths without making a request', () => {
         expect(isObviousImageUrl('https://example.com/photo_(1).PNG?size=2')).toBe(true);
         expect(isObviousImageUrl('https://example.com/article')).toBe(false);
+    });
+
+    it('detects only URL-line batches and preserves their whitespace', () => {
+        expect(standaloneWebUrlLines('https://a.com\n\n  https://b.com  ')).toEqual([
+            { url: 'https://a.com', leading: '', trailing: '' },
+            { url: 'https://b.com', leading: '  ', trailing: '  ' }
+        ]);
+        expect(standaloneWebUrlLines('https://a.com\n')).toEqual([{ url: 'https://a.com', leading: '', trailing: '' }]);
+        expect(standaloneWebUrlLines('https://a.com')).toBeNull();
+        expect(standaloneWebUrlLines('https://a.com\nSome prose')).toBeNull();
+        expect(standaloneWebUrlLines('https://a.com\nhttps://example.com/image.png')).toBeNull();
+        expect(standaloneWebUrlLines('> https://a.com\n> https://b.com')).toBeNull();
+        expect(standaloneWebUrlLines('> https://a.com\n>\n> >  https://b.com  ', { allowBlockQuotes: true })).toEqual([
+            { url: 'https://a.com', leading: '> ', trailing: '' },
+            { url: 'https://b.com', leading: '> >  ', trailing: '  ' }
+        ]);
     });
 
     it('escapes Markdown in a page title', () => {
@@ -120,6 +138,54 @@ describe('LinkTitleService', () => {
             () => 'A page'
         );
         expect(service.hasWork('https://example.com/page')).toBe(false);
+        expect(service.hasBatchWork('https://a.com\nhttps://b.com')).toBe(false);
+    });
+
+    it('fetches a batch in order, reuses duplicates and keeps failures null', async () => {
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
+        const gets: string[] = [];
+        const service = new LinkTitleService(
+            () => settings,
+            async request => {
+                const url = typeof request === 'string' ? request : request.url;
+                if ((typeof request === 'string' ? 'GET' : request.method) === 'GET') gets.push(url);
+                return response({ status: url.includes('fail') ? 500 : 200 });
+            },
+            () => 'Title'
+        );
+
+        const results = await service.materializeTitles('https://a.com/page\nhttps://fail.com/page\nhttps://a.com/page');
+        expect(results).toEqual([{ title: 'Title', url: 'https://a.com/page' }, null, { title: 'Title', url: 'https://a.com/page' }]);
+        expect(gets).toEqual(['https://a.com/page', 'https://fail.com/page']);
+    });
+
+    it('bounds batch concurrency and starts no requests after disposal', async () => {
+        const settings = { ...DEFAULT_SETTINGS, linkTitles: true };
+        let active = 0;
+        let peak = 0;
+        const releases: (() => void)[] = [];
+        const service = new LinkTitleService(
+            () => settings,
+            async request => {
+                if (typeof request !== 'string' && request.method === 'HEAD') return response();
+                active += 1;
+                peak = Math.max(peak, active);
+                await new Promise<void>(resolve => releases.push(resolve));
+                active -= 1;
+                return response();
+            },
+            () => 'Title'
+        );
+        const urls = Array.from({ length: LINK_TITLE_MAX_PARALLEL + 2 }, (_, index) => `https://example.com/${index}`).join('\n');
+        const batch = service.materializeTitles(urls);
+        await vi.waitFor(() => expect(active).toBe(LINK_TITLE_MAX_PARALLEL));
+        service.dispose();
+        releases.splice(0).forEach(release => release());
+        const results = await batch;
+
+        expect(peak).toBe(LINK_TITLE_MAX_PARALLEL);
+        expect(results?.filter(result => result !== null)).toHaveLength(0);
+        expect(releases).toHaveLength(0);
     });
 
     it('takes the title from a site provider before fetching the page', async () => {

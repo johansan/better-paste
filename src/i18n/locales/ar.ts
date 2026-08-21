@@ -41,6 +41,15 @@ export const STRINGS_AR: TranslationStrings = {
         clipboardFailed: 'تعذّرت قراءة الحافظة',
         titleFailed: 'تعذّر جلب العنوان.',
         fetchingTitle: 'جارٍ جلب العنوان...',
+        fetchingTitles: 'جارٍ جلب العناوين...',
+        titlesFailed: {
+            zero: 'تعذّر جلب {count} عناوين',
+            one: 'تعذّر جلب {count} عنوان',
+            two: 'تعذّر جلب {count} عنوانين',
+            few: 'تعذّر جلب {count} عناوين',
+            many: 'تعذّر جلب {count} عنوانًا',
+            other: 'تعذّر جلب {count} عنوان'
+        },
         imagesFailed: {
             zero: 'تعذّر حفظ {count} صور',
             one: 'تعذّر حفظ {count} صورة',

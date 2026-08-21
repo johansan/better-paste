@@ -82,6 +82,8 @@ becomes
 
 The URL is pasted right away and updates when the title arrives, so nothing blocks.
 
+A list of links works too. Paste several URLs, each on its own line, and every one gets its title.
+
 Reddit, YouTube, TikTok and Loom block ordinary page lookups, so their titles are fetched from each site's own embed service instead.
 
 ### 2.5 Nested lists

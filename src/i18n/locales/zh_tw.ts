@@ -41,6 +41,8 @@ export const STRINGS_ZH_TW: TranslationStrings = {
         clipboardFailed: '無法讀取剪貼簿',
         titleFailed: '無法取得標題。',
         fetchingTitle: '正在取得標題...',
+        fetchingTitles: '正在取得標題...',
+        titlesFailed: { other: '有 {count} 個標題未能取得' },
         imagesFailed: { other: '有 {count} 張圖片未能儲存' },
         imagesFailedLinkKept: '{images}，已保留原始連結',
         imagesFailedNothingPasted: '{images}，因此沒有貼上任何內容',

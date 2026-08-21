@@ -19,7 +19,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { PasteService, isSingleImageFile } from '../src/paste/PasteService';
 import type { ImageService } from '../src/paste/ImageService';
-import type { LinkTitleService } from '../src/paste/LinkTitleService';
+import { standaloneWebUrlLines } from '../src/paste/LinkTitleService';
+import type { LinkTitleService, StandaloneWebUrlLinesOptions } from '../src/paste/LinkTitleService';
 import { findImageReferences, replaceImageReferences } from '../src/paste/imageReferences';
 import type { ImageEmbedChoice } from '../src/modals/ImageEmbedModal';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
@@ -91,9 +92,23 @@ function fakeTitles(settings: BetterPasteSettings, fetched: string[], pageTitle 
 
     return {
         hasWork,
+        hasBatchWork: (text: string) => {
+            if (!settings.linkTitles || hasWork(text)) return false;
+            const lines = text.split('\n').filter(line => line.trim());
+            return lines.length > 0 && lines.every(line => hasWork(line.trim()));
+        },
         materializeTitle: async (text: string) => {
             fetched.push(text);
             return hasWork(text) ? { title: pageTitle, url: text } : null;
+        },
+        materializeTitles: async (text: string, options?: StandaloneWebUrlLinesOptions) => {
+            const urls = standaloneWebUrlLines(text, options)?.map(line => line.url) ?? [];
+            return Promise.all(
+                urls.map(async url => {
+                    fetched.push(url);
+                    return hasWork(url) ? { title: pageTitle, url } : null;
+                })
+            );
         },
         dispose: () => undefined
     } as unknown as LinkTitleService;
@@ -841,6 +856,186 @@ describe('image embed options', () => {
 });
 
 describe('handleEditorPaste: link titles', () => {
+    it('rewrites URL lines continued inside a block quote', async () => {
+        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false });
+        const editor = new FakeEditor('> ', 2);
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://a.com\nhttps://b.com' }), editor.asEditor(), INFO)).toBe(
+            true
+        );
+        await settle();
+
+        expect(fetchedTitles).toEqual(['https://a.com', 'https://b.com']);
+        expect(editor.getValue()).toBe('> [Example page](https://a.com)\n> [Example page](https://b.com)');
+    });
+
+    it('preserves a quoted blank line inside a URL batch', async () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false });
+        const editor = new FakeEditor('> ', 2);
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://a.com\n\nhttps://b.com' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('> [Example page](https://a.com)\n>\n> [Example page](https://b.com)');
+    });
+
+    it('does not treat clipboard-authored quote lines as a URL batch', () => {
+        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false, textTrim: false });
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: '> https://a.com\n> https://b.com' }), editor.asEditor(), INFO)).toBe(
+            false
+        );
+        expect(fetchedTitles).toEqual([]);
+    });
+
+    it('rewrites URL lines while preserving indentation and blank lines', async () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false, textTrim: false });
+        const editor = new FakeEditor('');
+        const pasted = '  https://a.com/page  \n\nhttps://b.com/page';
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: pasted }), editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(editor.getValue()).toBe('  [Example page](https://a.com/page)  \n\n[Example page](https://b.com/page)');
+    });
+
+    it('applies URL snippets to every titled link in a batch', async () => {
+        const { service } = build({
+            linkTitles: true,
+            linkEnabled: false,
+            urlSnippets: [urlSnippet('s/Example page/Page/')]
+        });
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://a.com/page\nhttps://b.com/page' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('[Page](https://a.com/page)\n[Page](https://b.com/page)');
+    });
+
+    it('keeps failed batch URLs bare and reports one count notice', async () => {
+        const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, linkTitles: true, linkEnabled: false };
+        const titles = {
+            hasWork: () => false,
+            hasBatchWork: () => true,
+            materializeTitles: async () => [{ title: 'First', url: 'https://a.com' }, null],
+            dispose: () => undefined
+        } as unknown as LinkTitleService;
+        const service = new PasteService(() => settings, fakeImages(settings), titles);
+        const editor = new FakeEditor('');
+        const noticeCount = Notice.instances.length;
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://a.com\nhttps://b.com' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('[First](https://a.com)\nhttps://b.com');
+        expect(Notice.instances.slice(noticeCount).map(notice => notice.message)).toContain('Better Paste: could not fetch 1 title');
+    });
+
+    it('skips a batch rewrite after an edit inside the pasted range', async () => {
+        const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, linkTitles: true, linkEnabled: false };
+        let finish: (value: ({ title: string; url: string } | null)[]) => void = () => undefined;
+        const pending = new Promise<({ title: string; url: string } | null)[]>(resolve => {
+            finish = resolve;
+        });
+        const titles = {
+            hasWork: () => false,
+            hasBatchWork: () => true,
+            materializeTitles: () => pending,
+            dispose: () => undefined
+        } as unknown as LinkTitleService;
+        const service = new PasteService(() => settings, fakeImages(settings), titles);
+        const pasted = 'https://a.com\nhttps://b.com';
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: pasted }), editor.asEditor(), INFO);
+        editor.setSelection(8, 8);
+        editor.replaceSelection('edited-');
+        finish([
+            { title: 'First', url: 'https://a.com' },
+            { title: 'Second', url: 'https://b.com' }
+        ]);
+        await pending;
+        await settle();
+
+        expect(editor.getValue()).toBe('https://edited-a.com\nhttps://b.com');
+    });
+
+    it('guards only URL-shaped edges while a batch title fetch is pending', async () => {
+        const run = async (pasted: string, editOffset: number, typed: string): Promise<string> => {
+            const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, linkTitles: true, linkEnabled: false, textTrim: false };
+            let finish: (value: { title: string; url: string }[]) => void = () => undefined;
+            const pending = new Promise<{ title: string; url: string }[]>(resolve => {
+                finish = resolve;
+            });
+            const titles = {
+                hasWork: () => false,
+                hasBatchWork: () => true,
+                materializeTitles: () => pending,
+                dispose: () => undefined
+            } as unknown as LinkTitleService;
+            const service = new PasteService(() => settings, fakeImages(settings), titles);
+            const editor = new FakeEditor('');
+
+            service.handleEditorPaste(fakeClipboardEvent({ plain: pasted }), editor.asEditor(), INFO);
+            editor.setSelection(editOffset, editOffset);
+            editor.replaceSelection(typed);
+            finish([
+                { title: 'First', url: 'https://a.com' },
+                { title: 'Second', url: 'https://b.com' }
+            ]);
+            await pending;
+            await settle();
+            return editor.getValue();
+        };
+
+        const urls = 'https://a.com\nhttps://b.com';
+        expect(await run(urls, urls.length, '/docs')).toBe(`${urls}/docs`);
+        expect(await run(urls, 0, 'prefix-')).toBe(`prefix-${urls}`);
+
+        const withNewline = `${urls}\n`;
+        expect(await run(withNewline, withNewline.length, 'Following line')).toBe(
+            '[First](https://a.com)\n[Second](https://b.com)\nFollowing line'
+        );
+    });
+
+    it('rewrites a URL-line batch through paste processed', async () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false });
+        const editor = new FakeEditor('');
+        vi.stubGlobal('navigator', { clipboard: { readText: async () => 'https://a.com\nhttps://b.com' } });
+
+        try {
+            await service.pasteProcessed(editor.asEditor(), INFO);
+            expect(editor.getValue()).toBe('[Example page](https://a.com)\n[Example page](https://b.com)');
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
+    it('rewrites a URL-line batch through paste processed inside a block quote', async () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false });
+        const editor = new FakeEditor('> ', 2);
+        vi.stubGlobal('navigator', { clipboard: { readText: async () => 'https://a.com\nhttps://b.com' } });
+
+        try {
+            await service.pasteProcessed(editor.asEditor(), INFO);
+            expect(editor.getValue()).toBe('> [Example page](https://a.com)\n> [Example page](https://b.com)');
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
+    it('replaces a selection with a batch without using it as a label', async () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false });
+        const editor = selecting('Before selected text after', 'selected text');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://a.com\nhttps://b.com' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('Before [Example page](https://a.com)\n[Example page](https://b.com) after');
+    });
+
     it('leaves a standalone URL to Obsidian when title fetching is off', () => {
         const { service } = build({ linkTitles: false, linkEnabled: false, textTrim: false });
         const editor = new FakeEditor('');
@@ -1023,6 +1218,7 @@ describe('handleEditorPaste: link titles', () => {
         });
         const titles = {
             hasWork: (text: string) => /^https?:\/\/\S+$/i.test(text),
+            hasBatchWork: () => false,
             materializeTitle: () => titleResult,
             dispose: () => undefined
         } as unknown as LinkTitleService;
@@ -1095,6 +1291,7 @@ describe('handleEditorPaste: link titles', () => {
         });
         const titles = {
             hasWork: (text: string) => /^https?:\/\/\S+$/i.test(text),
+            hasBatchWork: () => false,
             materializeTitle: () => titleResult,
             dispose: () => undefined
         } as unknown as LinkTitleService;

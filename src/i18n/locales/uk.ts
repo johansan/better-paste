@@ -41,6 +41,13 @@ export const STRINGS_UK: TranslationStrings = {
         clipboardFailed: 'не вдалося прочитати буфер обміну',
         titleFailed: 'не вдалося отримати заголовок.',
         fetchingTitle: 'отримання заголовка...',
+        fetchingTitles: 'отримання заголовків...',
+        titlesFailed: {
+            one: 'не вдалося отримати {count} заголовок',
+            few: 'не вдалося отримати {count} заголовки',
+            many: 'не вдалося отримати {count} заголовків',
+            other: 'не вдалося отримати {count} заголовка'
+        },
         imagesFailed: {
             one: 'не вдалося зберегти {count} зображення',
             few: 'не вдалося зберегти {count} зображення',

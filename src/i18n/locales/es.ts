@@ -41,6 +41,11 @@ export const STRINGS_ES: TranslationStrings = {
         clipboardFailed: 'no se pudo leer el portapapeles',
         titleFailed: 'no se pudo obtener el título.',
         fetchingTitle: 'obteniendo el título...',
+        fetchingTitles: 'obteniendo los títulos...',
+        titlesFailed: {
+            one: 'no se pudo obtener {count} título',
+            other: 'no se pudieron obtener {count} títulos'
+        },
         imagesFailed: {
             one: 'no se pudo guardar {count} imagen',
             other: 'no se pudieron guardar {count} imágenes'
