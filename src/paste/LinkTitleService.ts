@@ -48,6 +48,27 @@ export function standaloneWebUrl(text: string): string | null {
     }
 }
 
+/** Returns the note title and original address from a standalone Obsidian open URL. */
+export function obsidianUrlTitle(text: string): { title: string; url: string } | null {
+    if (!text || /\s/.test(text)) return null;
+
+    try {
+        const parsed = new URL(text);
+        if (parsed.protocol.toLowerCase() !== 'obsidian:' || parsed.host.toLowerCase() !== 'open') return null;
+
+        const file = parsed.searchParams.get('file');
+        if (!file) return null;
+        // A heading or block suffix opens a place inside the note, so it stays in the
+        // destination but not in the label. A trailing .md goes too, because the copy
+        // command writes note names without it.
+        const title = file.split('#')[0].split('/').pop()?.replace(/\.md$/i, '');
+        if (!title) return null;
+        return { title, url: text };
+    } catch {
+        return null;
+    }
+}
+
 export interface StandaloneWebUrlLine {
     url: string;
     leading: string;

@@ -153,7 +153,7 @@ export const STRINGS_TR: TranslationStrings = {
             heading: 'Bağlantılar',
             titlesName: 'Yapıştırılan bağlantıların başlığını al',
             titlesDesc:
-                'Tek başına bir web adresi yapıştırmak, sayfa başlığını taşıyan bir Markdown bağlantısı ekler. Metin seçiliyse, seçili metin etiket olur ve başlık alınmaz. Başlık alınamazsa adresin kendisi kalır.',
+                'Tek başına bir web adresi yapıştırmak, sayfa başlığını taşıyan bir Markdown bağlantısı ekler. Bir Obsidian URL’si yapıştırmak, not adını taşıyan bir bağlantı ekler. Metin seçiliyse, seçili metin etiket olur ve başlık alınmaz. Başlık alınamazsa adresin kendisi kalır.',
             titlesAliases: ['başlık', 'sayfa', 'web sitesi', 'markdown bağlantısı', 'indir'],
             cleaningName: 'Yapıştırılan bağlantıları temizle',
             cleaningDesc: 'Yapıştırılan bağlantılardan izleme parametrelerini kaldırır:',

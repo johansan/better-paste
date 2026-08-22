@@ -146,7 +146,7 @@ export const STRINGS_KO: TranslationStrings = {
             heading: '링크',
             titlesName: '붙여넣은 링크의 제목 가져오기',
             titlesDesc:
-                '웹 주소만 붙여넣으면 페이지 제목이 붙은 Markdown 링크가 삽입됩니다. 텍스트를 선택해 두었다면 그 텍스트가 링크 이름이 되고 제목은 가져오지 않습니다. 제목을 가져오지 못하면 주소만 남습니다.',
+                '웹 주소만 붙여넣으면 페이지 제목이 붙은 Markdown 링크가 삽입됩니다. Obsidian URL을 붙여넣으면 노트 이름이 붙은 링크가 삽입됩니다. 텍스트를 선택해 두었다면 그 텍스트가 링크 이름이 되고 제목은 가져오지 않습니다. 제목을 가져오지 못하면 주소만 남습니다.',
             titlesAliases: ['제목', '페이지', '웹사이트', 'markdown 링크', '다운로드'],
             cleaningName: '붙여넣은 링크 정리',
             cleaningDesc: '붙여넣은 링크에서 추적 매개변수를 제거합니다:',

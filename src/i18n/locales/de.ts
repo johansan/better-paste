@@ -174,7 +174,7 @@ export const STRINGS_DE: TranslationStrings = {
             heading: 'Links',
             titlesName: 'Titel für eingefügte Links abrufen',
             titlesDesc:
-                'Wird eine Webadresse allein eingefügt, entsteht ein Markdown-Link mit dem Seitentitel. Ist Text ausgewählt, wird dieser die Beschriftung und es wird kein Titel abgerufen. Lässt sich der Titel nicht abrufen, bleibt die reine Adresse stehen.',
+                'Wird eine Webadresse allein eingefügt, entsteht ein Markdown-Link mit dem Seitentitel. Wird eine Obsidian-URL eingefügt, entsteht ein Link mit dem Notiznamen. Ist Text ausgewählt, wird dieser die Beschriftung und es wird kein Titel abgerufen. Lässt sich der Titel nicht abrufen, bleibt die reine Adresse stehen.',
             titlesAliases: ['titel', 'seite', 'webseite', 'markdown-link', 'herunterladen'],
             cleaningName: 'Eingefügte Links bereinigen',
             cleaningDesc: 'Entfernt Tracking-Parameter aus eingefügten Links:',

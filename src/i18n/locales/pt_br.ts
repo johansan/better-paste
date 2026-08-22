@@ -165,7 +165,7 @@ export const STRINGS_PT_BR: TranslationStrings = {
             heading: 'Links',
             titlesName: 'Buscar o título dos links colados',
             titlesDesc:
-                'Colar um endereço da web sozinho insere um link Markdown com o título da página. Se houver texto selecionado, esse texto vira o rótulo e nenhum título é buscado. O endereço simples é mantido quando o título não pode ser obtido.',
+                'Colar um endereço da web sozinho insere um link Markdown com o título da página. Colar uma URL do Obsidian insere um link com o nome da nota. Se houver texto selecionado, esse texto vira o rótulo e nenhum título é buscado. O endereço simples é mantido quando o título não pode ser obtido.',
             titlesAliases: ['título', 'página', 'site', 'link markdown', 'baixar'],
             cleaningName: 'Limpar os links colados',
             cleaningDesc: 'Remove os parâmetros de rastreamento dos links colados:',

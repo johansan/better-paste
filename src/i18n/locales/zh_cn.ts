@@ -144,7 +144,7 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             heading: '链接',
             titlesName: '为粘贴的链接获取标题',
             titlesDesc:
-                '单独粘贴一个网址时，会插入带页面标题的 Markdown 链接。若已选中文本，该文本会成为链接文字，并且不获取标题。无法获取标题时保留网址本身。',
+                '单独粘贴一个网址时，会插入带页面标题的 Markdown 链接。粘贴 Obsidian URL 时，会插入带笔记名称的链接。若已选中文本，该文本会成为链接文字，并且不获取标题。无法获取标题时保留网址本身。',
             titlesAliases: ['标题', '页面', '网站', 'markdown 链接', '下载'],
             cleaningName: '清理粘贴的链接',
             cleaningDesc: '移除粘贴链接中的跟踪参数：',

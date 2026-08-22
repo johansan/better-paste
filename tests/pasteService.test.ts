@@ -936,6 +936,65 @@ describe('image embed options', () => {
 });
 
 describe('handleEditorPaste: link titles', () => {
+    const obsidianUrl = 'obsidian://open?vault=Notes&file=Folder%2FMy%20Note';
+
+    it('inserts a titled link for a standalone Obsidian open URL', () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false });
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: obsidianUrl }), editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe(`[My Note](${obsidianUrl})`);
+    });
+
+    it('leaves an Obsidian open URL native when title fetching is off', () => {
+        const { service } = build({ linkTitles: false, linkEnabled: false, textTrim: false });
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: obsidianUrl }), editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe('');
+    });
+
+    it('uses the selection as the Obsidian URL label', () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false });
+        const editor = selecting('Before selected text after', 'selected text');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: obsidianUrl }), editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe(`Before [selected text](${obsidianUrl}) after`);
+    });
+
+    it('applies URL snippets to an Obsidian URL link', () => {
+        const { service } = build({
+            linkTitles: true,
+            linkEnabled: false,
+            urlSnippets: [urlSnippet('s/My Note/Named note/')]
+        });
+        const editor = new FakeEditor('');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: obsidianUrl }), editor.asEditor(), INFO);
+        expect(editor.getValue()).toBe(`[Named note](${obsidianUrl})`);
+    });
+
+    it('inserts a titled Obsidian URL through paste processed', async () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false });
+        const editor = new FakeEditor('');
+        vi.stubGlobal('navigator', { clipboard: { readText: async () => obsidianUrl } });
+
+        try {
+            await service.pasteProcessed(editor.asEditor(), INFO);
+            expect(editor.getValue()).toBe(`[My Note](${obsidianUrl})`);
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
+    it('leaves other Obsidian actions native', () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false, textTrim: false });
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: 'obsidian://search?query=x' }), editor.asEditor(), INFO)).toBe(false);
+        expect(editor.getValue()).toBe('');
+    });
+
     it('rewrites URL lines continued inside a block quote', async () => {
         const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false });
         const editor = new FakeEditor('> ', 2);

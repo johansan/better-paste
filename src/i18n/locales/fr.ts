@@ -165,7 +165,7 @@ export const STRINGS_FR: TranslationStrings = {
             heading: 'Liens',
             titlesName: 'Récupérer le titre des liens collés',
             titlesDesc:
-                'Coller une adresse web seule insère un lien Markdown portant le titre de la page. Si du texte est sélectionné, ce texte devient le libellé et aucun titre n’est récupéré. L’adresse brute est conservée si le titre ne peut pas être récupéré.',
+                'Coller une adresse web seule insère un lien Markdown portant le titre de la page. Coller une URL Obsidian insère un lien portant le nom de la note. Si du texte est sélectionné, ce texte devient le libellé et aucun titre n’est récupéré. L’adresse brute est conservée si le titre ne peut pas être récupéré.',
             titlesAliases: ['titre', 'page', 'site web', 'lien markdown', 'télécharger'],
             cleaningName: 'Nettoyer les liens collés',
             cleaningDesc: 'Supprime les paramètres de suivi des liens collés :',

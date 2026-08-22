@@ -61,6 +61,7 @@ import {
     escapeLinkTitle,
     formatTitledLink,
     isObviousImageUrl,
+    obsidianUrlTitle,
     standaloneWebUrl,
     standaloneWebUrlLines
 } from './LinkTitleService';
@@ -301,14 +302,19 @@ export class PasteService {
         const needsImages = this.images.hasWork(result.text);
         const needsTitle = this.titles.hasWork(result.text);
         const needsTitleBatch = this.titles.hasBatchWork(result.text);
+        const localTitle = settings.linkTitles ? obsidianUrlTitle(result.text) : null;
+        const localSubject = localTitle ? formatTitledLink(localTitle.title, localTitle.url) : null;
+        const localLink = localSubject ? composeTitledLink(localSubject, applyTextSnippets(localSubject, settings.urlSnippets).text) : null;
         // A document transform takes the paste over because it can change clean text on its own
-        if (rebased === null && quoted === null && !result.changed && !needsImages && !needsTitle && !needsTitleBatch) return false;
+        if (rebased === null && quoted === null && !result.changed && !needsImages && !needsTitle && !needsTitleBatch && localLink === null)
+            return false;
 
         const targetFile = info.file;
-        const selectedLink = needsTitle ? linkFromSelection(editor.getSelection(), plain, result.text) : null;
-        const inserted = selectedLink ?? rebased?.inserted ?? quoted ?? result.text;
+        const selectedLink =
+            needsTitle || localTitle ? linkFromSelection(editor.getSelection(), plain, localTitle?.url ?? result.text) : null;
+        const inserted = selectedLink ?? localLink ?? rebased?.inserted ?? quoted ?? result.text;
         // The rebase may reach back before the selection, to replace the destination's checkbox
-        const from = selectedLink === null && rebased !== null ? rebased.from : startOffset;
+        const from = selectedLink === null && localLink === null && rebased !== null ? rebased.from : startOffset;
         editor.replaceRange(inserted, editor.offsetToPos(from), editor.offsetToPos(endOffset));
         editor.setCursor(editor.offsetToPos(from + inserted.length));
         // An earlier paste may still be downloading; its snapshots must learn about this
@@ -442,12 +448,17 @@ export class PasteService {
         const needsImages = this.images.hasWork(result.text);
         const needsTitle = this.titles.hasWork(result.text);
         const needsTitleBatch = this.titles.hasBatchWork(result.text);
+        const localTitle = settings.linkTitles ? obsidianUrlTitle(result.text) : null;
+        const localSubject = localTitle ? formatTitledLink(localTitle.title, localTitle.url) : null;
+        const localLink = localSubject ? composeTitledLink(localSubject, applyTextSnippets(localSubject, settings.urlSnippets).text) : null;
         const invocationSelection = valueAtInvocation.slice(fromOffset, toOffset);
         const selectedLink =
-            needsTitle && valueBefore === valueAtInvocation ? linkFromSelection(invocationSelection, clipboardText, result.text) : null;
-        const inserted = selectedLink ?? rebased?.inserted ?? quoted ?? result.text;
+            (needsTitle || localTitle) && valueBefore === valueAtInvocation
+                ? linkFromSelection(invocationSelection, clipboardText, localTitle?.url ?? result.text)
+                : null;
+        const inserted = selectedLink ?? localLink ?? rebased?.inserted ?? quoted ?? result.text;
         // The rebase may reach back before the selection, to replace the destination's checkbox
-        const insertFrom = selectedLink === null && rebased !== null ? rebased.from : fromOffset;
+        const insertFrom = selectedLink === null && localLink === null && rebased !== null ? rebased.from : fromOffset;
         const startOffset = this.insertAfterClipboardRead(editor, valueAtInvocation, insertFrom, toOffset, inserted);
         const range = asyncPasteRange(startOffset, inserted, valueBefore, editor.getValue());
 

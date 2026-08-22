@@ -165,7 +165,7 @@ export const STRINGS_NL: TranslationStrings = {
             heading: 'Links',
             titlesName: 'Titels ophalen voor geplakte links',
             titlesDesc:
-                'Een webadres los plakken levert een Markdown-link met de paginatitel op. Is er tekst geselecteerd, dan wordt die tekst het label en wordt er geen titel opgehaald. Lukt het ophalen niet, dan blijft het adres zelf staan.',
+                'Een webadres los plakken levert een Markdown-link met de paginatitel op. Een Obsidian-URL plakken levert een link met de naam van de notitie op. Is er tekst geselecteerd, dan wordt die tekst het label en wordt er geen titel opgehaald. Lukt het ophalen niet, dan blijft het adres zelf staan.',
             titlesAliases: ['titel', 'pagina', 'website', 'markdown-link', 'downloaden'],
             cleaningName: 'Geplakte links opschonen',
             cleaningDesc: 'Verwijdert trackingparameters uit geplakte links:',

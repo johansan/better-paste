@@ -166,7 +166,7 @@ export const STRINGS_IT: TranslationStrings = {
             heading: 'Collegamenti',
             titlesName: 'Recupera il titolo dei collegamenti incollati',
             titlesDesc:
-                'Incollare un indirizzo web da solo inserisce un collegamento Markdown con il titolo della pagina. Se c’è del testo selezionato, quel testo diventa l’etichetta e non viene recuperato alcun titolo. Se il titolo non si può recuperare, resta solo l’indirizzo.',
+                'Incollare un indirizzo web da solo inserisce un collegamento Markdown con il titolo della pagina. Incollare un URL di Obsidian inserisce un collegamento con il nome della nota. Se c’è del testo selezionato, quel testo diventa l’etichetta e non viene recuperato alcun titolo. Se il titolo non si può recuperare, resta solo l’indirizzo.',
             titlesAliases: ['titolo', 'pagina', 'sito web', 'collegamento markdown', 'scarica'],
             cleaningName: 'Pulisci i collegamenti incollati',
             cleaningDesc: 'Rimuove i parametri di tracciamento dai collegamenti incollati:',

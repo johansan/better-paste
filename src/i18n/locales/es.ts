@@ -165,7 +165,7 @@ export const STRINGS_ES: TranslationStrings = {
             heading: 'Enlaces',
             titlesName: 'Obtener el título de los enlaces pegados',
             titlesDesc:
-                'Al pegar una dirección web sola se inserta un enlace de Markdown con el título de la página. Si hay texto seleccionado, ese texto pasa a ser la etiqueta y no se obtiene ningún título. Si el título no se puede obtener, se conserva la dirección tal cual.',
+                'Al pegar una dirección web sola se inserta un enlace de Markdown con el título de la página. Al pegar una URL de Obsidian se inserta un enlace con el nombre de la nota. Si hay texto seleccionado, ese texto pasa a ser la etiqueta y no se obtiene ningún título. Si el título no se puede obtener, se conserva la dirección tal cual.',
             titlesAliases: ['título', 'página', 'sitio web', 'enlace markdown', 'descargar'],
             cleaningName: 'Limpiar los enlaces pegados',
             cleaningDesc: 'Elimina los parámetros de seguimiento de los enlaces pegados:',

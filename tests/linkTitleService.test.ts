@@ -24,6 +24,7 @@ import {
     formatTitledLink,
     isObviousImageUrl,
     LinkTitleService,
+    obsidianUrlTitle,
     standaloneWebUrl,
     standaloneWebUrlLines
 } from '../src/paste/LinkTitleService';
@@ -46,6 +47,47 @@ function response(overrides: Partial<RequestUrlResponse> = {}): RequestUrlRespon
 }
 
 describe('link title candidates', () => {
+    it('derives note titles from standalone Obsidian open URLs', () => {
+        expect(obsidianUrlTitle('obsidian://open?vault=Notes&file=My%20Note')).toEqual({
+            title: 'My Note',
+            url: 'obsidian://open?vault=Notes&file=My%20Note'
+        });
+        expect(obsidianUrlTitle('obsidian://open?vault=Notes&file=Folder%2FMy%20Note')).toEqual({
+            title: 'My Note',
+            url: 'obsidian://open?vault=Notes&file=Folder%2FMy%20Note'
+        });
+        expect(obsidianUrlTitle('obsidian://open?file=Folder%2FA%20%26%20B')).toEqual({
+            title: 'A & B',
+            url: 'obsidian://open?file=Folder%2FA%20%26%20B'
+        });
+        expect(obsidianUrlTitle('obsidian://open?file=A%20%5Bnote%5D')).toEqual({
+            title: 'A [note]',
+            url: 'obsidian://open?file=A%20%5Bnote%5D'
+        });
+        expect(obsidianUrlTitle('obsidian://open?vault=Notes&file=My%20Note%23Heading')).toEqual({
+            title: 'My Note',
+            url: 'obsidian://open?vault=Notes&file=My%20Note%23Heading'
+        });
+        expect(obsidianUrlTitle('obsidian://open?file=Folder%2FMy%20Note%23%5Eabc123')).toEqual({
+            title: 'My Note',
+            url: 'obsidian://open?file=Folder%2FMy%20Note%23%5Eabc123'
+        });
+        expect(obsidianUrlTitle('obsidian://open?file=Folder%2FMy%20Note.md')).toEqual({
+            title: 'My Note',
+            url: 'obsidian://open?file=Folder%2FMy%20Note.md'
+        });
+    });
+
+    it('rejects incomplete or non-open Obsidian URLs', () => {
+        expect(obsidianUrlTitle('obsidian://open?vault=Notes')).toBeNull();
+        expect(obsidianUrlTitle('obsidian://open?file=')).toBeNull();
+        expect(obsidianUrlTitle('obsidian://open?file=%23Heading')).toBeNull();
+        expect(obsidianUrlTitle('obsidian://search?query=x')).toBeNull();
+        expect(obsidianUrlTitle('https://example.com/?file=Note')).toBeNull();
+        expect(obsidianUrlTitle('obsidian://open?file=My%20Note extra')).toBeNull();
+        expect(obsidianUrlTitle('not a URL')).toBeNull();
+    });
+
     it('accepts only one complete web address', () => {
         expect(standaloneWebUrl('https://example.com/page')).toBe('https://example.com/page');
         expect(standaloneWebUrl('See https://example.com/page')).toBeNull();

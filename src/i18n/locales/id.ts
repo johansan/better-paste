@@ -147,7 +147,7 @@ export const STRINGS_ID: TranslationStrings = {
             heading: 'Tautan',
             titlesName: 'Ambil judul untuk tautan yang ditempel',
             titlesDesc:
-                'Menempel alamat web yang berdiri sendiri akan memasukkan tautan Markdown berisi judul halaman. Jika ada teks yang dipilih, teks itu menjadi labelnya dan judul tidak diambil. Alamat apa adanya dipertahankan bila judul tidak dapat diambil.',
+                'Menempel alamat web yang berdiri sendiri akan memasukkan tautan Markdown berisi judul halaman. Menempel URL Obsidian akan memasukkan tautan berisi nama catatan. Jika ada teks yang dipilih, teks itu menjadi labelnya dan judul tidak diambil. Alamat apa adanya dipertahankan bila judul tidak dapat diambil.',
             titlesAliases: ['judul', 'halaman', 'situs web', 'tautan markdown', 'unduh'],
             cleaningName: 'Bersihkan tautan yang ditempel',
             cleaningDesc: 'Menghapus parameter pelacakan dari tautan yang ditempel:',

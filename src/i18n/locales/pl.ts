@@ -157,7 +157,7 @@ export const STRINGS_PL: TranslationStrings = {
             heading: 'Odnośniki',
             titlesName: 'Pobieraj tytuły wklejanych odnośników',
             titlesDesc:
-                'Wklejenie samego adresu internetowego wstawia odnośnik Markdown z tytułem strony. Jeśli tekst jest zaznaczony, staje się on etykietą i tytuł nie jest pobierany. Gdy tytułu nie da się pobrać, zostaje sam adres.',
+                'Wklejenie samego adresu internetowego wstawia odnośnik Markdown z tytułem strony. Wklejenie adresu URL Obsidiana wstawia odnośnik z nazwą notatki. Jeśli tekst jest zaznaczony, staje się on etykietą i tytuł nie jest pobierany. Gdy tytułu nie da się pobrać, zostaje sam adres.',
             titlesAliases: ['tytuł', 'strona', 'witryna', 'odnośnik markdown', 'pobieranie'],
             cleaningName: 'Czyść wklejane odnośniki',
             cleaningDesc: 'Usuwa parametry śledzące z wklejanych odnośników:',

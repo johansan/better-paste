@@ -144,7 +144,7 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             heading: '連結',
             titlesName: '為貼上的連結取得標題',
             titlesDesc:
-                '單獨貼上一個網址時，會插入帶頁面標題的 Markdown 連結。若已選取文字，該文字會成為連結文字，且不取得標題。無法取得標題時保留網址本身。',
+                '單獨貼上一個網址時，會插入帶頁面標題的 Markdown 連結。貼上 Obsidian URL 時，會插入帶筆記名稱的連結。若已選取文字，該文字會成為連結文字，且不取得標題。無法取得標題時保留網址本身。',
             titlesAliases: ['標題', '頁面', '網站', 'markdown 連結', '下載'],
             cleaningName: '整理貼上的連結',
             cleaningDesc: '移除貼上連結中的追蹤參數：',

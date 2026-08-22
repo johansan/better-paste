@@ -164,7 +164,7 @@ export const STRINGS_EN = {
             heading: 'Links',
             titlesName: 'Fetch titles for pasted links',
             titlesDesc:
-                'Pasting a web address by itself inserts a Markdown link with the page title. If text is selected, the selected text becomes the label and no title is fetched. The plain address is kept when the title cannot be fetched.',
+                'Pasting a web address by itself inserts a Markdown link with the page title. Pasting an Obsidian URL inserts a link with the note name. If text is selected, the selected text becomes the label and no title is fetched. The plain address is kept when the title cannot be fetched.',
             titlesAliases: ['title', 'page', 'website', 'markdown link', 'download'],
             cleaningName: 'Clean pasted links',
             cleaningDesc: 'Removes tracking parameters from pasted links:',

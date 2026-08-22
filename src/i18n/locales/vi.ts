@@ -160,7 +160,7 @@ export const STRINGS_VI: TranslationStrings = {
             heading: 'Liên kết',
             titlesName: 'Lấy tiêu đề cho liên kết đã dán',
             titlesDesc:
-                'Dán riêng một địa chỉ web sẽ chèn liên kết Markdown kèm tiêu đề trang. Nếu đang chọn văn bản, phần văn bản đó thành nhãn và không lấy tiêu đề. Địa chỉ nguyên dạng được giữ lại khi không lấy được tiêu đề.',
+                'Dán riêng một địa chỉ web sẽ chèn liên kết Markdown kèm tiêu đề trang. Dán URL Obsidian sẽ chèn liên kết kèm tên ghi chú. Nếu đang chọn văn bản, phần văn bản đó thành nhãn và không lấy tiêu đề. Địa chỉ nguyên dạng được giữ lại khi không lấy được tiêu đề.',
             titlesAliases: ['tiêu đề', 'trang', 'trang web', 'liên kết markdown', 'tải xuống'],
             cleaningName: 'Dọn liên kết đã dán',
             cleaningDesc: 'Loại bỏ tham số theo dõi khỏi liên kết đã dán:',
