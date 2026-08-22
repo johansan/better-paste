@@ -20,7 +20,7 @@ If you love using Better Paste, please consider [☕️ Buying me a coffee](http
 
 ## 2 What it does
 
-Nine examples. Some run on every paste, others are commands you run when you need them.
+Ten examples. Some run on every paste, others are commands you run when you need them.
 
 ### 2.1 Custom snippets
 
@@ -36,11 +36,11 @@ becomes
 The fix shipped last week and rollout begins today.
 ```
 
-Ready-made snippets to import are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets): convert ChatGPT math, remove bold from headings, collapse runs of blank lines, and more. How a rule is written is in [section 3.5](#35-custom-processing).
+Two snippets come with the plugin, ready to edit or switch off: **Remove bold from headings** and **Collapse blank lines**. More to import are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets), like converting ChatGPT math. How a rule is written is in [section 3.5](#35-custom-processing).
 
 ### 2.2 Images from Safari
 
-Copy an image in Safari, paste it into Obsidian, and you get a web link. The picture shows up in your note, but it loads from the web every time and breaks if the address stops working. Want the real file? Set **Web images** to **Download with preview** and Better Paste saves it into your vault:
+Copy an image in Safari, paste it into Obsidian, and you get a web link. The picture shows up in your note, but it loads from the web every time and breaks if the address stops working. Better Paste saves the real file into your vault:
 
 ```
 ![](https://images.example.com/2026/05/skyline-8f21a.jpg?auto=format&w=2400)
@@ -84,7 +84,9 @@ The URL is pasted right away and updates when the title arrives, so nothing bloc
 
 A list of links works too. Paste several URLs, each on its own line, and every one gets its title.
 
-Reddit, YouTube, TikTok and Loom block ordinary page lookups, so their titles are fetched from each site's own embed service instead.
+Fetched titles often end with the site name, like `· GitHub` or `- YouTube`. The included **Remove site names from titles** link snippet trims those, and you can add your own rules, see [section 3.5](#35-custom-processing).
+
+Reddit, YouTube, TikTok and Loom block ordinary page lookups, so their titles are fetched from each site's own embed service instead, and Stack Overflow and the other Stack Exchange sites through the Stack Exchange API. Dropbox share links get the file or folder name as their title, and Obsidian URLs get the note name.
 
 ### 2.5 Nested lists
 
@@ -118,7 +120,35 @@ becomes
 
 It works with bullets, numbered lists and checkboxes, however deep the destination is, and whether the copy uses tabs or spaces. A paste that is not purely a list, or does not land on a list item, comes through exactly as before. Rich copies from web pages go through Obsidian's HTML conversion instead.
 
-### 2.6 Terminal output
+### 2.6 Block quotes
+
+Paste several paragraphs into a block quote and only the first line stays quoted, an [Obsidian issue for years](https://forum.obsidian.md/t/paste-multiple-paragraphs-into-block-quote/36126). Better Paste quotes every pasted line, so the whole paste stays inside the quote. This:
+
+```
+We started in a garage.
+
+Two years later we were forty people.
+```
+
+pasted into the callout
+
+```
+> [!quote] From the interview
+>
+```
+
+becomes
+
+```
+> [!quote] From the interview
+> We started in a garage.
+>
+> Two years later we were forty people.
+```
+
+It works in plain block quotes and callouts alike.
+
+### 2.7 Terminal output
 
 Terminals break long lines at the window edge. Escape codes are stripped on every paste, and when you select the pasted output and run **Clean up terminal output**, the lines are joined back together:
 
@@ -133,7 +163,7 @@ becomes
 npm warn deprecated inflight@1.0.6: This module is not supported and leaks memory. Do not use it. Check out lru-cache instead.
 ```
 
-### 2.7 Text from PDFs
+### 2.8 Text from PDFs
 
 PDFs wrap paragraphs into short lines and break words with hyphens. Select the pasted text and run **Clean up PDF text**:
 
@@ -153,7 +183,7 @@ Ligatures like ﬁ become real letters too, so search finds the words again.
 
 The command opens a dialog with a preview, so you see the result before it lands. Two switches handle what no rule can guess: remove page numbers, or join everything into one paragraph. Your picks are remembered for the next time.
 
-### 2.8 Cleanup of AI-generated text
+### 2.9 Cleanup of AI-generated text
 
 Chatbot text comes with curly quotes, long dashes and invisible characters. The invisible ones are removed on every paste, and with **Quotes** and **Dashes** turned on the rest becomes plain text too:
 
@@ -167,7 +197,7 @@ becomes
 "It works," she said - finally.
 ```
 
-### 2.9 Commas and quotes
+### 2.10 Commas and quotes
 
 Prefer your commas outside the quotation marks? Select the text and run **Move commas outside quotes**:
 
@@ -196,7 +226,7 @@ Here are the settings you will actually look for.
 
 ### 3.2 Images
 
-- **Web images**: covers Safari's "Copy image", pictures inside copied web content, and pasted image URLs. **Link with preview**, the default, pastes an embed that shows the picture straight from the web. **Download with preview** saves the image into your vault, wherever your attachment settings point, named after the source file, so no more `image.png`. **Do nothing** leaves the paste alone.
+- **Web images**: what happens when a paste links to a picture on the web, as a bare image URL or inside copied web content. **Link with preview**, the default, pastes an embed that shows the picture straight from the web. **Download with preview** saves a copy into your vault, wherever your attachment settings point, named after the source file, so no more `image.png`. **Do nothing** leaves the paste alone. Safari's "Copy image" puts the real picture on the clipboard, so that paste is saved into your vault in both **Link with preview** and **Download with preview**.
 - **File names**: add your own format, like `{{name}}-YYYY-MM-DD`. You can also use `{{noteName}}` for the note name, `{{property:xyz}}` for any frontmatter property, and `{{counter}}` or `{{counter:2}}` for a number that counts up. A screenshot has no source name, so it gets `Pasted image` plus a timestamp, the same name Obsidian gives it. With `attachName: demo` in a note and the format `{{property:attachName}}-{{counter}}`, pasted screenshots become `demo-1.png`, `demo-2.png`, `demo-3.png`. The format applies to every image Better Paste saves, screenshots included.
 - **Size and style**: give every saved image a width, a class, or both, so a paste comes out as `![[photo.jpg#invert|400]]`. Define your own comma-separated lists like `200, 400, 600` and `invert, invertW`, then apply one value everywhere or pick **Ask on every paste** to choose in a small dialog each time (Enter applies, and your last pick is preselected). Classes like `#invert` are defined by themes and CSS snippets, for example to invert an image in dark mode. The **Image width property** (default `image-width`) sets a per-note width, see [section 4](#4-per-note-control).
 
@@ -246,7 +276,8 @@ Start a line with `!` to turn off the built-in removals for one site:
 
 ### 3.5 Custom processing
 
-- **Snippets**: your own regex rules, run after the built-in rules on every paste. Each snippet has its own switch, and they run in list order, so drag to reorder.
+- **Text snippets**: your own regex rules, run on the whole paste after the built-in rules. Each snippet has its own switch, and they run in list order, so drag to reorder. **Remove bold from headings** and **Collapse blank lines** come with the plugin.
+- **Link snippets**: the same kind of rules, run on each pasted link once its title has arrived. A rule sees the finished Markdown link, and the address stays unchanged. **Remove site names from titles** comes with the plugin and trims endings like `· GitHub` and `- YouTube`.
 - A rule is one JavaScript regex replacement per line, in the form `s/find/replace/flags`. Lines starting with `#` are comments:
 
 ```
@@ -254,13 +285,16 @@ Start a line with `!` to turn off the built-in removals for one site:
 s/\[\d+\]//g
 ```
 
-- **Try it**: type sample text and watch every enabled snippet run on it, live. The snippet editor has the same preview for the snippet you are writing.
+- **Try it**: type sample text and watch every enabled snippet run on it, live. Link snippets have their own tester that takes a Markdown link. The snippet editor has the same preview for the snippet you are writing.
 - **Import snippets** and **Export snippets**: move snippets between vaults through the clipboard. Ready-made ones are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets); copy one there and paste it in.
 - **Open regex playground**: opens [regex101](https://regex101.com/) set up the way the rules work, for building and testing a find pattern.
 
 ### 3.6 Structure
 
-- **Keep list nesting on paste**: on by default, see example 2.5 above. Structure rules run after the text rules, because they read the note around the cursor and reshape the cleaned text to fit it.
+- **Keep list nesting on paste**: on by default, see example 2.5 above.
+- **Continue block quotes on paste**: also on by default, see example 2.6 above.
+
+Structure rules run after the text rules, because they read the note around the cursor and reshape the cleaned text to fit it.
 
 <br/>
 
