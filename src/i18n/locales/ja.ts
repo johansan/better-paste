@@ -257,8 +257,8 @@ export const STRINGS_JA: TranslationStrings = {
             modalPreviewDesc: 'サンプルテキストを入力して、このスニペットの結果を確認します。',
             previewInputLabel: 'サンプルテキスト',
             previewEmpty: '処理後のテキストがここに表示されます。',
-            urlPreviewDesc: 'タイトル付きリンクのサンプルを編集して、有効なすべてのリンクスニペットの結果を確認します。',
-            urlModalPreviewDesc: 'タイトル付きリンクのサンプルを編集して、このスニペットの結果を確認します。',
+            urlPreviewDesc: 'Markdown リンクを貼り付けて、有効なすべてのリンクスニペットの結果を確認します。',
+            urlModalPreviewDesc: 'Markdown リンクを貼り付けて、このスニペットの結果を確認します。',
             urlPreviewLabel: 'タイトル付きリンクのサンプル',
             urlPreviewEmpty: '処理後のリンクがここに表示されます。',
             nameName: '名前',
@@ -270,7 +270,10 @@ export const STRINGS_JA: TranslationStrings = {
             recognizedSnippetsCount: { other: 'スニペット {count} 件を認識' },
             recognizedRulesCount: { other: 'ルール {count} 件を認識' },
             unparseableName: '解析できない行',
-            importFallbackName: 'インポートしたスニペット'
+            importFallbackName: 'インポートしたスニペット',
+            defaultSnippetBoldHeadings: '見出しの太字を削除',
+            defaultSnippetBlankLines: '空行をまとめる',
+            defaultSnippetSiteSuffixes: 'タイトルからサイト名を削除'
         }
     },
 

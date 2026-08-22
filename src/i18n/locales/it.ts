@@ -256,9 +256,8 @@ export const STRINGS_IT: TranslationStrings = {
             modalPreviewDesc: 'Digita un testo di esempio per vedere il risultato di questo snippet.',
             previewInputLabel: 'Testo di esempio',
             previewEmpty: 'Il testo elaborato compare qui.',
-            urlPreviewDesc:
-                'Modifica il collegamento con titolo di esempio per vedere il risultato di tutti gli snippet attivi dei collegamenti.',
-            urlModalPreviewDesc: 'Modifica il collegamento con titolo di esempio per vedere il risultato di questo snippet.',
+            urlPreviewDesc: 'Incolla un collegamento Markdown per vedere il risultato di tutti gli snippet di collegamento attivi.',
+            urlModalPreviewDesc: 'Incolla un collegamento Markdown per vedere il risultato di questo snippet.',
             urlPreviewLabel: 'Collegamento con titolo di esempio',
             urlPreviewEmpty: 'Il collegamento elaborato compare qui.',
             nameName: 'Nome',
@@ -270,7 +269,10 @@ export const STRINGS_IT: TranslationStrings = {
             recognizedSnippetsCount: { one: '{count} snippet riconosciuto', other: '{count} snippet riconosciuti' },
             recognizedRulesCount: { one: '{count} regola riconosciuta', other: '{count} regole riconosciute' },
             unparseableName: 'Righe non riconosciute',
-            importFallbackName: 'Snippet importato'
+            importFallbackName: 'Snippet importato',
+            defaultSnippetBoldHeadings: 'Rimuovi il grassetto dai titoli',
+            defaultSnippetBlankLines: 'Unisci le righe vuote',
+            defaultSnippetSiteSuffixes: 'Rimuovi i nomi dei siti dai titoli delle pagine'
         }
     },
 

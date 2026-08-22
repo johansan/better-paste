@@ -30,7 +30,7 @@ import { BetterPasteSettingTab } from '../src/settings/SettingTab';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import type BetterPastePlugin from '../src/main';
 import type { BetterPasteSettings } from '../src/settings/types';
-import { TextSnippetModal } from '../src/settings/TextSnippetModal';
+import { TextSnippetModal, TITLED_LINK_SAMPLE } from '../src/settings/TextSnippetModal';
 import { linkRemovalContributionUrl } from '../src/settings/pages/linksPage';
 import { BUILT_IN_LINK_REMOVALS_URL } from '../src/urls';
 
@@ -711,8 +711,12 @@ describe('settings values', () => {
         const output = settingEl.querySelector('.better-paste-preview-output');
         if (!input || !output) throw new Error('The URL snippet tester is incomplete');
 
-        // Prefilled with the sample titled link, with the enabled snippet already applied
-        expect(input.value).toContain('noisetorch');
+        // Starts empty with the sample as a placeholder, so nothing is prefilled
+        expect(input.value).toBe('');
+        expect(input.attrs.placeholder).toContain('noisetorch');
+
+        input.value = TITLED_LINK_SAMPLE;
+        input.listeners.get('input')?.();
         expect(output.text).toBe(
             '[noisetorch/NoiseTorch: Real-time microphone noise suppression on Linux. · GitHub](https://github.com/noisetorch/NoiseTorch)'
         );

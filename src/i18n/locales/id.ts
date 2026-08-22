@@ -247,8 +247,8 @@ export const STRINGS_ID: TranslationStrings = {
             modalPreviewDesc: 'Ketik teks contoh untuk melihat hasil dari cuplikan ini.',
             previewInputLabel: 'Teks contoh',
             previewEmpty: 'Teks yang diproses muncul di sini.',
-            urlPreviewDesc: 'Ubah contoh tautan berjudul untuk melihat hasil dari semua cuplikan tautan yang aktif.',
-            urlModalPreviewDesc: 'Ubah contoh tautan berjudul untuk melihat hasil dari cuplikan ini.',
+            urlPreviewDesc: 'Tempelkan tautan Markdown untuk melihat hasil dari semua cuplikan tautan yang aktif.',
+            urlModalPreviewDesc: 'Tempelkan tautan Markdown untuk melihat hasil dari cuplikan ini.',
             urlPreviewLabel: 'Contoh tautan berjudul',
             urlPreviewEmpty: 'Tautan yang diproses muncul di sini.',
             nameName: 'Nama',
@@ -260,7 +260,10 @@ export const STRINGS_ID: TranslationStrings = {
             recognizedSnippetsCount: { other: '{count} cuplikan dikenali' },
             recognizedRulesCount: { other: '{count} aturan dikenali' },
             unparseableName: 'Baris yang tidak dikenali',
-            importFallbackName: 'Cuplikan yang diimpor'
+            importFallbackName: 'Cuplikan yang diimpor',
+            defaultSnippetBoldHeadings: 'Hapus cetak tebal dari judul',
+            defaultSnippetBlankLines: 'Gabungkan baris kosong',
+            defaultSnippetSiteSuffixes: 'Hapus nama situs dari judul halaman'
         }
     },
 

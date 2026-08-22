@@ -230,8 +230,8 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             modalPreviewDesc: '输入示例文本，查看此片段的处理结果。',
             previewInputLabel: '示例文本',
             previewEmpty: '处理后的文本会显示在这里。',
-            urlPreviewDesc: '编辑带标题的示例链接，查看所有已启用链接片段的处理结果。',
-            urlModalPreviewDesc: '编辑带标题的示例链接，查看此片段的处理结果。',
+            urlPreviewDesc: '粘贴一个 Markdown 链接，查看所有已启用链接片段的处理结果。',
+            urlModalPreviewDesc: '粘贴一个 Markdown 链接，查看此片段的处理结果。',
             urlPreviewLabel: '带标题的示例链接',
             urlPreviewEmpty: '处理后的链接会显示在这里。',
             nameName: '名称',
@@ -243,7 +243,10 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             recognizedSnippetsCount: { other: '识别出 {count} 个片段' },
             recognizedRulesCount: { other: '识别出 {count} 条规则' },
             unparseableName: '无法解析的行',
-            importFallbackName: '导入的片段'
+            importFallbackName: '导入的片段',
+            defaultSnippetBoldHeadings: '移除标题中的加粗',
+            defaultSnippetBlankLines: '合并空行',
+            defaultSnippetSiteSuffixes: '移除页面标题中的网站名称'
         }
     },
 

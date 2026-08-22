@@ -245,8 +245,8 @@ export const STRINGS_FA: TranslationStrings = {
             modalPreviewDesc: 'متن نمونه‌ای بنویسید تا نتیجه این قطعه را ببینید.',
             previewInputLabel: 'متن نمونه',
             previewEmpty: 'متن پردازش‌شده اینجا نمایش داده می‌شود.',
-            urlPreviewDesc: 'پیوند عنوان‌دار نمونه را ویرایش کنید تا نتیجه همه قطعه‌های فعال پیوند را ببینید.',
-            urlModalPreviewDesc: 'پیوند عنوان‌دار نمونه را ویرایش کنید تا نتیجه این قطعه را ببینید.',
+            urlPreviewDesc: 'پیوند Markdown را بچسبانید تا نتیجه همه قطعه‌های فعال پیوند را ببینید.',
+            urlModalPreviewDesc: 'پیوند Markdown را بچسبانید تا نتیجه این قطعه را ببینید.',
             urlPreviewLabel: 'پیوند عنوان‌دار نمونه',
             urlPreviewEmpty: 'پیوند پردازش‌شده اینجا نمایش داده می‌شود.',
             nameName: 'نام',
@@ -258,7 +258,10 @@ export const STRINGS_FA: TranslationStrings = {
             recognizedSnippetsCount: { one: '{count} قطعه شناسایی شد', other: '{count} قطعه شناسایی شد' },
             recognizedRulesCount: { one: '{count} قاعده شناسایی شد', other: '{count} قاعده شناسایی شد' },
             unparseableName: 'خط‌های شناسایی‌نشده',
-            importFallbackName: 'قطعه درون‌ریزی‌شده'
+            importFallbackName: 'قطعه درون‌ریزی‌شده',
+            defaultSnippetBoldHeadings: 'حذف قالب پررنگ از عنوان‌ها',
+            defaultSnippetBlankLines: 'ادغام خط‌های خالی',
+            defaultSnippetSiteSuffixes: 'حذف نام وب‌گاه از عنوان صفحه'
         }
     },
 

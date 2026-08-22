@@ -290,8 +290,8 @@ export const STRINGS_UK: TranslationStrings = {
             modalPreviewDesc: 'Введіть приклад тексту, щоб побачити результат цього сніпета.',
             previewInputLabel: 'Приклад тексту',
             previewEmpty: 'Оброблений текст зʼявиться тут.',
-            urlPreviewDesc: 'Змініть приклад посилання із заголовком, щоб побачити результат усіх увімкнених сніпетів посилань.',
-            urlModalPreviewDesc: 'Змініть приклад посилання із заголовком, щоб побачити результат цього сніпета.',
+            urlPreviewDesc: 'Вставте посилання Markdown, щоб побачити результат усіх увімкнених сніпетів посилань.',
+            urlModalPreviewDesc: 'Вставте посилання Markdown, щоб побачити результат цього сніпета.',
             urlPreviewLabel: 'Приклад посилання із заголовком',
             urlPreviewEmpty: 'Оброблене посилання зʼявиться тут.',
             nameName: 'Назва',
@@ -313,7 +313,10 @@ export const STRINGS_UK: TranslationStrings = {
                 other: 'розпізнано {count} правила'
             },
             unparseableName: 'Нерозпізнані рядки',
-            importFallbackName: 'Імпортований сніпет'
+            importFallbackName: 'Імпортований сніпет',
+            defaultSnippetBoldHeadings: 'Прибрати жирний шрифт із заголовків',
+            defaultSnippetBlankLines: 'Обʼєднати порожні рядки',
+            defaultSnippetSiteSuffixes: 'Прибрати назви сайтів із заголовків сторінок'
         }
     },
 

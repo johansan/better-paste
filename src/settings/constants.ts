@@ -61,6 +61,22 @@ export const SNIPPETS_WIKI_URL = 'https://github.com/johansan/better-paste/wiki/
  */
 export const REGEX_PLAYGROUND_URL = 'https://regex101.com/r/8sw6Xt/1';
 
+// Anchored through a lookbehind rather than a consumed ^ prefix, so every bold pair
+// on a heading line is removed, not only the first one.
+export const DEFAULT_BOLD_HEADINGS_SNIPPET_RULES: readonly string[] = [
+    String.raw`s/(?<=^#{1,6} [^\n]*?)(?<!\\)\*\*([^\n]*?)(?<!\\)\*\*/$1/gm`
+];
+
+export const DEFAULT_BLANK_LINES_SNIPPET_RULES: readonly string[] = [String.raw`s/\n(?:[ \t]*\n){2,}/\n\n/g`];
+
+export const DEFAULT_SITE_SUFFIXES_SNIPPET_RULES: readonly string[] = [
+    String.raw`s#^\[GitHub - ([^\]]+) · GitHub\](\(https://github\.com/\S+\))$#[$1]$2#`,
+    String.raw`s#^\[([^\]]+) · GitHub\](\(https://github\.com/\S+\))$#[$1]$2#`,
+    String.raw`s#^\[(.+) - YouTube\](\(https://(?:www\.|m\.)?(?:youtube\.com|youtu\.be)/\S+\))$#[$1]$2#`,
+    String.raw`s#^\[(.+) : r/[^\s\]]+\](\(https://(?:www\.|old\.)?reddit\.com/\S+\))$#[$1]$2#`,
+    String.raw`s#^\[(.+) [-–—] [^\]]+\](\(https://[a-z-]+\.(?:m\.)?wikipedia\.org/\S+\))$#[$1]$2#`
+];
+
 export { LINK_REMOVALS_UPDATED, SHIPPED_PARAM_REMOVALS, SIGNED_URL_PARAM_SETS, TRACKING_PARAMS } from './linkRemovals.generated';
 
 /* -------------------------------------------------------------------------- */

@@ -265,8 +265,8 @@ export const STRINGS_EN = {
             modalPreviewDesc: 'Type sample text to see the result from this snippet.',
             previewInputLabel: 'Sample text',
             previewEmpty: 'The processed text appears here.',
-            urlPreviewDesc: 'Edit the sample titled link to see the result from every enabled link snippet.',
-            urlModalPreviewDesc: 'Edit the sample titled link to see the result from this snippet.',
+            urlPreviewDesc: 'Paste a Markdown link to see the result from every enabled link snippet.',
+            urlModalPreviewDesc: 'Paste a Markdown link to see the result from this snippet.',
             urlPreviewLabel: 'Sample titled link',
             urlPreviewEmpty: 'The processed link appears here.',
             nameName: 'Name',
@@ -278,7 +278,10 @@ export const STRINGS_EN = {
             recognizedSnippetsCount: { one: '{count} snippet recognized', other: '{count} snippets recognized' } as PluralForms,
             recognizedRulesCount: { one: '{count} rule recognized', other: '{count} rules recognized' } as PluralForms,
             unparseableName: 'Unparseable lines',
-            importFallbackName: 'Imported snippet'
+            importFallbackName: 'Imported snippet',
+            defaultSnippetBoldHeadings: 'Remove bold from headings',
+            defaultSnippetBlankLines: 'Collapse blank lines',
+            defaultSnippetSiteSuffixes: 'Remove site names from titles'
         }
     },
 

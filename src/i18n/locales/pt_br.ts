@@ -264,8 +264,8 @@ export const STRINGS_PT_BR: TranslationStrings = {
             modalPreviewDesc: 'Digite um texto de exemplo para ver o resultado deste trecho.',
             previewInputLabel: 'Texto de exemplo',
             previewEmpty: 'O texto processado aparece aqui.',
-            urlPreviewDesc: 'Edite o link com título de exemplo para ver o resultado de todos os trechos de link ativados.',
-            urlModalPreviewDesc: 'Edite o link com título de exemplo para ver o resultado deste trecho.',
+            urlPreviewDesc: 'Cole um link Markdown para ver o resultado de todos os trechos de link ativados.',
+            urlModalPreviewDesc: 'Cole um link Markdown para ver o resultado deste trecho.',
             urlPreviewLabel: 'Link com título de exemplo',
             urlPreviewEmpty: 'O link processado aparece aqui.',
             nameName: 'Nome',
@@ -277,7 +277,10 @@ export const STRINGS_PT_BR: TranslationStrings = {
             recognizedSnippetsCount: { one: '{count} trecho reconhecido', other: '{count} trechos reconhecidos' },
             recognizedRulesCount: { one: '{count} regra reconhecida', other: '{count} regras reconhecidas' },
             unparseableName: 'Linhas não reconhecidas',
-            importFallbackName: 'Trecho importado'
+            importFallbackName: 'Trecho importado',
+            defaultSnippetBoldHeadings: 'Remover negrito dos cabeçalhos',
+            defaultSnippetBlankLines: 'Juntar linhas em branco',
+            defaultSnippetSiteSuffixes: 'Remover nomes de sites dos títulos'
         }
     },
 

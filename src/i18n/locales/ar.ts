@@ -275,8 +275,8 @@ export const STRINGS_AR: TranslationStrings = {
             modalPreviewDesc: 'اكتب نصًا تجريبيًا لرؤية نتيجة هذا المقتطف.',
             previewInputLabel: 'نص تجريبي',
             previewEmpty: 'يظهر النص المعالَج هنا.',
-            urlPreviewDesc: 'حرّر الرابط المعنون التجريبي لترى نتيجة كل مقتطفات الروابط المفعّلة.',
-            urlModalPreviewDesc: 'حرّر الرابط المعنون التجريبي لترى نتيجة هذا المقتطف.',
+            urlPreviewDesc: 'الصق رابط Markdown لرؤية نتيجة كل مقتطفات الروابط المفعّلة.',
+            urlModalPreviewDesc: 'الصق رابط Markdown لرؤية نتيجة هذا المقتطف.',
             urlPreviewLabel: 'رابط معنون تجريبي',
             urlPreviewEmpty: 'يظهر الرابط المعالَج هنا.',
             nameName: 'الاسم',
@@ -302,7 +302,10 @@ export const STRINGS_AR: TranslationStrings = {
                 other: 'تم التعرّف على {count} قاعدة'
             },
             unparseableName: 'أسطر غير قابلة للتحليل',
-            importFallbackName: 'مقتطف مستورد'
+            importFallbackName: 'مقتطف مستورد',
+            defaultSnippetBoldHeadings: 'إزالة الخط الغامق من العناوين',
+            defaultSnippetBlankLines: 'دمج الأسطر الفارغة',
+            defaultSnippetSiteSuffixes: 'إزالة أسماء المواقع من عناوين الصفحات'
         }
     },
 

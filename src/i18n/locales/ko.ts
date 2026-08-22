@@ -235,8 +235,8 @@ export const STRINGS_KO: TranslationStrings = {
             modalPreviewDesc: '예제 텍스트를 입력하여 이 스니펫의 결과를 확인합니다.',
             previewInputLabel: '예제 텍스트',
             previewEmpty: '처리된 텍스트가 여기에 표시됩니다.',
-            urlPreviewDesc: '제목이 붙은 링크 예제를 수정하여 활성화된 모든 링크 스니펫의 결과를 확인합니다.',
-            urlModalPreviewDesc: '제목이 붙은 링크 예제를 수정하여 이 스니펫의 결과를 확인합니다.',
+            urlPreviewDesc: 'Markdown 링크를 붙여넣어 활성화된 모든 링크 스니펫의 결과를 확인합니다.',
+            urlModalPreviewDesc: 'Markdown 링크를 붙여넣어 이 스니펫의 결과를 확인합니다.',
             urlPreviewLabel: '제목이 붙은 링크 예제',
             urlPreviewEmpty: '처리된 링크가 여기에 표시됩니다.',
             nameName: '이름',
@@ -248,7 +248,10 @@ export const STRINGS_KO: TranslationStrings = {
             recognizedSnippetsCount: { other: '스니펫 {count}개 인식됨' },
             recognizedRulesCount: { other: '규칙 {count}개 인식됨' },
             unparseableName: '해석할 수 없는 줄',
-            importFallbackName: '가져온 스니펫'
+            importFallbackName: '가져온 스니펫',
+            defaultSnippetBoldHeadings: '제목의 굵은 글씨 제거',
+            defaultSnippetBlankLines: '빈 줄 합치기',
+            defaultSnippetSiteSuffixes: '페이지 제목에서 사이트 이름 제거'
         }
     },
 

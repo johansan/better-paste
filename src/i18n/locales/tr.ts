@@ -253,8 +253,8 @@ export const STRINGS_TR: TranslationStrings = {
             modalPreviewDesc: 'Bu parçacığın sonucunu görmek için örnek metin yazın.',
             previewInputLabel: 'Örnek metin',
             previewEmpty: 'İşlenen metin burada görünür.',
-            urlPreviewDesc: 'Tüm etkin bağlantı parçacıklarının sonucunu görmek için başlıklı örnek bağlantıyı düzenleyin.',
-            urlModalPreviewDesc: 'Bu parçacığın sonucunu görmek için başlıklı örnek bağlantıyı düzenleyin.',
+            urlPreviewDesc: 'Tüm etkin bağlantı parçacıklarının sonucunu görmek için bir Markdown bağlantısı yapıştırın.',
+            urlModalPreviewDesc: 'Bu parçacığın sonucunu görmek için bir Markdown bağlantısı yapıştırın.',
             urlPreviewLabel: 'Başlıklı örnek bağlantı',
             urlPreviewEmpty: 'İşlenen bağlantı burada görünür.',
             nameName: 'Ad',
@@ -266,7 +266,10 @@ export const STRINGS_TR: TranslationStrings = {
             recognizedSnippetsCount: { one: '{count} parçacık tanındı', other: '{count} parçacık tanındı' },
             recognizedRulesCount: { one: '{count} kural tanındı', other: '{count} kural tanındı' },
             unparseableName: 'Okunamayan satırlar',
-            importFallbackName: 'İçe aktarılan parçacık'
+            importFallbackName: 'İçe aktarılan parçacık',
+            defaultSnippetBoldHeadings: 'Başlıklardaki kalın yazıyı kaldır',
+            defaultSnippetBlankLines: 'Boş satırları birleştir',
+            defaultSnippetSiteSuffixes: 'Site adlarını sayfa başlıklarından kaldır'
         }
     },
 

@@ -17,8 +17,10 @@
  */
 
 import { DEFAULT_SETTINGS } from './defaults';
+import { strings } from '../i18n';
 import { normalizeVersion } from '../releaseNotes';
 import { createTextSnippetId, parseSnippetRuleLine } from '../transforms/snippets';
+import { DEFAULT_BLANK_LINES_SNIPPET_RULES, DEFAULT_BOLD_HEADINGS_SNIPPET_RULES, DEFAULT_SITE_SUFFIXES_SNIPPET_RULES } from './constants';
 import type { BetterPasteSettings, TextSnippet } from './types';
 
 function asBoolean(value: unknown, fallback: boolean): boolean {
@@ -65,6 +67,31 @@ function asTextSnippets(value: unknown, ids: Set<string>): TextSnippet[] {
         });
     }
     return snippets;
+}
+
+function defaultTextSnippets(): Omit<TextSnippet, 'id'>[] {
+    return [
+        {
+            name: strings.settings.custom.defaultSnippetBoldHeadings,
+            rules: [...DEFAULT_BOLD_HEADINGS_SNIPPET_RULES],
+            enabled: true
+        },
+        {
+            name: strings.settings.custom.defaultSnippetBlankLines,
+            rules: [...DEFAULT_BLANK_LINES_SNIPPET_RULES],
+            enabled: true
+        }
+    ];
+}
+
+function defaultUrlSnippets(): Omit<TextSnippet, 'id'>[] {
+    return [
+        {
+            name: strings.settings.custom.defaultSnippetSiteSuffixes,
+            rules: [...DEFAULT_SITE_SUFFIXES_SNIPPET_RULES],
+            enabled: true
+        }
+    ];
 }
 
 /** Splits a comma-separated options field into trimmed values, dropping blank ones. */
@@ -127,8 +154,8 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
         textQuotes: asBoolean(data.textQuotes, defaults.textQuotes),
         textDashes: asBoolean(data.textDashes, defaults.textDashes),
 
-        textSnippets: asTextSnippets(data.textSnippets, snippetIds),
-        urlSnippets: asTextSnippets(data.urlSnippets, snippetIds),
+        textSnippets: asTextSnippets(data.textSnippets === undefined ? defaultTextSnippets() : data.textSnippets, snippetIds),
+        urlSnippets: asTextSnippets(data.urlSnippets === undefined ? defaultUrlSnippets() : data.urlSnippets, snippetIds),
 
         lastShownVersion: normalizeVersion(data.lastShownVersion),
 

@@ -243,8 +243,8 @@ export const STRINGS_TH: TranslationStrings = {
             modalPreviewDesc: 'พิมพ์ข้อความตัวอย่างเพื่อดูผลลัพธ์จากชุดคำสั่งนี้',
             previewInputLabel: 'ข้อความตัวอย่าง',
             previewEmpty: 'ข้อความที่ประมวลผลแล้วจะแสดงที่นี่',
-            urlPreviewDesc: 'แก้ไขตัวอย่างลิงก์ที่มีชื่อเรื่องเพื่อดูผลลัพธ์จากชุดคำสั่งลิงก์ทุกชุดที่เปิดใช้',
-            urlModalPreviewDesc: 'แก้ไขตัวอย่างลิงก์ที่มีชื่อเรื่องเพื่อดูผลลัพธ์จากชุดคำสั่งนี้',
+            urlPreviewDesc: 'วางลิงก์ Markdown เพื่อดูผลลัพธ์จากชุดคำสั่งลิงก์ทุกชุดที่เปิดใช้',
+            urlModalPreviewDesc: 'วางลิงก์ Markdown เพื่อดูผลลัพธ์จากชุดคำสั่งนี้',
             urlPreviewLabel: 'ตัวอย่างลิงก์ที่มีชื่อเรื่อง',
             urlPreviewEmpty: 'ลิงก์ที่ประมวลผลแล้วจะแสดงที่นี่',
             nameName: 'ชื่อ',
@@ -256,7 +256,10 @@ export const STRINGS_TH: TranslationStrings = {
             recognizedSnippetsCount: { other: 'พบชุดคำสั่ง {count} ชุด' },
             recognizedRulesCount: { other: 'พบกฎ {count} ข้อ' },
             unparseableName: 'บรรทัดที่อ่านไม่ได้',
-            importFallbackName: 'ชุดคำสั่งที่นำเข้า'
+            importFallbackName: 'ชุดคำสั่งที่นำเข้า',
+            defaultSnippetBoldHeadings: 'ลบตัวหนาออกจากหัวข้อ',
+            defaultSnippetBlankLines: 'รวมบรรทัดว่าง',
+            defaultSnippetSiteSuffixes: 'ลบชื่อเว็บไซต์ออกจากชื่อเรื่อง'
         }
     },
 

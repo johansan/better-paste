@@ -58,7 +58,8 @@ const RELEASE_NOTES: ReleaseNote[] = [
             'You can now choose how web images are pasted: ==Do nothing==, ==Link with preview== or ==Download with preview==. **Link with preview** is the new default.',
             'You can now clean up fetched link titles with ==Link snippets==! Your own regex rules rewrite the title, and the address always stays intact. Ready-made rules for GitHub, X, YouTube, Wikipedia and more are on the [wiki](https://github.com/johansan/better-paste/wiki/Snippets#link-snippets).',
             'You can now ==paste several links at once==! Every address on its own line gets its title and becomes a Markdown link.',
-            'You can now ==paste multiple paragraphs into a block quote or callout==. Every pasted line stays quoted. [This has been an issue with Obsidian for years](https://forum.obsidian.md/t/paste-multiple-paragraphs-into-block-quote/36126/7).'
+            'You can now ==paste multiple paragraphs into a block quote or callout==. Every pasted line stays quoted. [This has been an issue with Obsidian for years](https://forum.obsidian.md/t/paste-multiple-paragraphs-into-block-quote/36126/7).',
+            'Ready-made snippets are now included: ==Remove bold from headings==, ==Collapse blank lines== and ==Remove site names from titles== for pasted links. Edit them or switch them off like any snippet.'
         ],
         fixed: [
             'Fixed link titles for **Stack Overflow** and the **Stack Exchange**. Titles are now fetched using the Stack Exchange API.',

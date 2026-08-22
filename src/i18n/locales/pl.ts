@@ -267,8 +267,8 @@ export const STRINGS_PL: TranslationStrings = {
             modalPreviewDesc: 'Wpisz przykładowy tekst, aby zobaczyć wynik tego fragmentu.',
             previewInputLabel: 'Przykładowy tekst',
             previewEmpty: 'Przetworzony tekst pojawi się tutaj.',
-            urlPreviewDesc: 'Edytuj przykładowy odnośnik z tytułem, aby zobaczyć wynik wszystkich włączonych fragmentów odnośników.',
-            urlModalPreviewDesc: 'Edytuj przykładowy odnośnik z tytułem, aby zobaczyć wynik tego fragmentu.',
+            urlPreviewDesc: 'Wklej odnośnik Markdown, aby zobaczyć wynik wszystkich włączonych fragmentów odnośników.',
+            urlModalPreviewDesc: 'Wklej odnośnik Markdown, aby zobaczyć wynik tego fragmentu.',
             urlPreviewLabel: 'Przykładowy odnośnik z tytułem',
             urlPreviewEmpty: 'Przetworzony odnośnik pojawi się tutaj.',
             nameName: 'Nazwa',
@@ -290,7 +290,10 @@ export const STRINGS_PL: TranslationStrings = {
                 other: 'rozpoznano {count} reguły'
             },
             unparseableName: 'Nierozpoznane wiersze',
-            importFallbackName: 'Zaimportowany fragment'
+            importFallbackName: 'Zaimportowany fragment',
+            defaultSnippetBoldHeadings: 'Usuń pogrubienie z nagłówków',
+            defaultSnippetBlankLines: 'Scal puste wiersze',
+            defaultSnippetSiteSuffixes: 'Usuń nazwy witryn z tytułów'
         }
     },
 

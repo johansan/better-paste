@@ -265,8 +265,8 @@ export const STRINGS_NL: TranslationStrings = {
             modalPreviewDesc: 'Typ voorbeeldtekst om het resultaat van deze snippet te zien.',
             previewInputLabel: 'Voorbeeldtekst',
             previewEmpty: 'De verwerkte tekst verschijnt hier.',
-            urlPreviewDesc: 'Bewerk de voorbeeldlink met titel om het resultaat van alle actieve linksnippets te zien.',
-            urlModalPreviewDesc: 'Bewerk de voorbeeldlink met titel om het resultaat van deze snippet te zien.',
+            urlPreviewDesc: 'Plak een Markdown-link om het resultaat van alle actieve linksnippets te zien.',
+            urlModalPreviewDesc: 'Plak een Markdown-link om het resultaat van deze snippet te zien.',
             urlPreviewLabel: 'Voorbeeldlink met titel',
             urlPreviewEmpty: 'De verwerkte link verschijnt hier.',
             nameName: 'Naam',
@@ -278,7 +278,10 @@ export const STRINGS_NL: TranslationStrings = {
             recognizedSnippetsCount: { one: '{count} snippet herkend', other: '{count} snippets herkend' },
             recognizedRulesCount: { one: '{count} regel herkend', other: '{count} regels herkend' },
             unparseableName: 'Niet-herkende regels',
-            importFallbackName: 'Geïmporteerde snippet'
+            importFallbackName: 'Geïmporteerde snippet',
+            defaultSnippetBoldHeadings: 'Vette opmaak uit koppen verwijderen',
+            defaultSnippetBlankLines: 'Lege regels samenvoegen',
+            defaultSnippetSiteSuffixes: 'Sitenamen uit titels verwijderen'
         }
     },
 

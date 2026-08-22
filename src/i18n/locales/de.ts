@@ -283,8 +283,8 @@ export const STRINGS_DE: TranslationStrings = {
             modalPreviewDesc: 'Gib Beispieltext ein, um das Ergebnis dieses Snippets zu sehen.',
             previewInputLabel: 'Beispieltext',
             previewEmpty: 'Der verarbeitete Text erscheint hier.',
-            urlPreviewDesc: 'Bearbeite den Beispiel-Link mit Titel, um das Ergebnis aller aktiven Link-Snippets zu sehen.',
-            urlModalPreviewDesc: 'Bearbeite den Beispiel-Link mit Titel, um das Ergebnis dieses Snippets zu sehen.',
+            urlPreviewDesc: 'Füge einen Markdown-Link ein, um das Ergebnis aller aktiven Link-Snippets zu sehen.',
+            urlModalPreviewDesc: 'Füge einen Markdown-Link ein, um das Ergebnis dieses Snippets zu sehen.',
             urlPreviewLabel: 'Beispiel-Link mit Titel',
             urlPreviewEmpty: 'Der verarbeitete Link erscheint hier.',
             nameName: 'Name',
@@ -296,7 +296,10 @@ export const STRINGS_DE: TranslationStrings = {
             recognizedSnippetsCount: { one: '{count} Snippet erkannt', other: '{count} Snippets erkannt' },
             recognizedRulesCount: { one: '{count} Regel erkannt', other: '{count} Regeln erkannt' },
             unparseableName: 'Nicht erkannte Zeilen',
-            importFallbackName: 'Importiertes Snippet'
+            importFallbackName: 'Importiertes Snippet',
+            defaultSnippetBoldHeadings: 'Fettdruck aus Überschriften entfernen',
+            defaultSnippetBlankLines: 'Leerzeilen zusammenfassen',
+            defaultSnippetSiteSuffixes: 'Websitenamen aus Titeln entfernen'
         }
     },
 

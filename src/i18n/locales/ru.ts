@@ -290,8 +290,8 @@ export const STRINGS_RU: TranslationStrings = {
             modalPreviewDesc: 'Введите пример текста, чтобы увидеть результат этого сниппета.',
             previewInputLabel: 'Пример текста',
             previewEmpty: 'Обработанный текст появится здесь.',
-            urlPreviewDesc: 'Измените пример ссылки с заголовком, чтобы увидеть результат всех включённых сниппетов ссылок.',
-            urlModalPreviewDesc: 'Измените пример ссылки с заголовком, чтобы увидеть результат этого сниппета.',
+            urlPreviewDesc: 'Вставьте ссылку Markdown, чтобы увидеть результат всех включённых сниппетов ссылок.',
+            urlModalPreviewDesc: 'Вставьте ссылку Markdown, чтобы увидеть результат этого сниппета.',
             urlPreviewLabel: 'Пример ссылки с заголовком',
             urlPreviewEmpty: 'Обработанная ссылка появится здесь.',
             nameName: 'Название',
@@ -313,7 +313,10 @@ export const STRINGS_RU: TranslationStrings = {
                 other: 'распознано {count} правила'
             },
             unparseableName: 'Нераспознанные строки',
-            importFallbackName: 'Импортированный сниппет'
+            importFallbackName: 'Импортированный сниппет',
+            defaultSnippetBoldHeadings: 'Убрать жирный шрифт из заголовков',
+            defaultSnippetBlankLines: 'Объединить пустые строки',
+            defaultSnippetSiteSuffixes: 'Убрать названия сайтов из заголовков страниц'
         }
     },
 

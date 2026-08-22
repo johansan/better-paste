@@ -249,8 +249,8 @@ export const STRINGS_VI: TranslationStrings = {
             modalPreviewDesc: 'Nhập văn bản mẫu để xem kết quả của đoạn mã này.',
             previewInputLabel: 'Văn bản mẫu',
             previewEmpty: 'Văn bản đã xử lý sẽ xuất hiện ở đây.',
-            urlPreviewDesc: 'Sửa liên kết có tiêu đề mẫu để xem kết quả từ mọi đoạn mã liên kết đang bật.',
-            urlModalPreviewDesc: 'Sửa liên kết có tiêu đề mẫu để xem kết quả từ đoạn mã này.',
+            urlPreviewDesc: 'Dán một liên kết Markdown để xem kết quả của mọi đoạn mã liên kết đang bật.',
+            urlModalPreviewDesc: 'Dán một liên kết Markdown để xem kết quả của đoạn mã này.',
             urlPreviewLabel: 'Liên kết có tiêu đề mẫu',
             urlPreviewEmpty: 'Liên kết đã xử lý sẽ xuất hiện ở đây.',
             nameName: 'Tên',
@@ -262,7 +262,10 @@ export const STRINGS_VI: TranslationStrings = {
             recognizedSnippetsCount: { other: 'Đã nhận dạng {count} đoạn mã' },
             recognizedRulesCount: { other: 'đã nhận dạng {count} quy tắc' },
             unparseableName: 'Các dòng không nhận dạng được',
-            importFallbackName: 'Đoạn mã đã nhập'
+            importFallbackName: 'Đoạn mã đã nhập',
+            defaultSnippetBoldHeadings: 'Bỏ in đậm khỏi tiêu đề',
+            defaultSnippetBlankLines: 'Gộp các dòng trống',
+            defaultSnippetSiteSuffixes: 'Xóa tên trang web khỏi tiêu đề trang'
         }
     },
 

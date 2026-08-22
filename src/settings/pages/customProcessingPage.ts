@@ -241,14 +241,14 @@ function renderSnippetPreview(setting: Setting, context: SettingsPageContext): v
 function renderUrlSnippetPreview(setting: Setting, context: SettingsPageContext): void {
     const text = strings.settings.custom;
     setting.settingEl.addClass('better-paste-tester');
-    const sample = setting.settingEl.querySelector<HTMLInputElement>('.better-paste-preview input')?.value ?? TITLED_LINK_SAMPLE;
+    const sample = setting.settingEl.querySelector<HTMLInputElement>('.better-paste-preview input')?.value ?? '';
     // update() re-invokes this renderer on the same setting element, so replace its custom DOM.
     for (const existing of setting.settingEl.querySelectorAll<HTMLElement>('.better-paste-preview')) existing.remove();
 
     const container = setting.settingEl.createDiv({ cls: 'better-paste-preview' });
     const input = container.createEl('input', {
         type: 'text',
-        attr: { 'aria-label': text.urlPreviewLabel }
+        attr: { 'aria-label': text.urlPreviewLabel, placeholder: TITLED_LINK_SAMPLE }
     });
     input.value = sample;
     const output = container.createDiv({ cls: ['better-paste-preview-output', 'better-paste-preview-empty'] });

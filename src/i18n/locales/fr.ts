@@ -255,8 +255,8 @@ export const STRINGS_FR: TranslationStrings = {
             modalPreviewDesc: 'Saisissez un exemple de texte pour voir le résultat de cet extrait.',
             previewInputLabel: 'Exemple de texte',
             previewEmpty: 'Le texte traité apparaît ici.',
-            urlPreviewDesc: 'Modifiez l’exemple de lien avec titre pour voir le résultat de tous les extraits de lien activés.',
-            urlModalPreviewDesc: 'Modifiez l’exemple de lien avec titre pour voir le résultat de cet extrait.',
+            urlPreviewDesc: 'Collez un lien Markdown pour voir le résultat de tous les extraits de lien activés.',
+            urlModalPreviewDesc: 'Collez un lien Markdown pour voir le résultat de cet extrait.',
             urlPreviewLabel: 'Exemple de lien avec titre',
             urlPreviewEmpty: 'Le lien traité apparaît ici.',
             nameName: 'Nom',
@@ -268,7 +268,10 @@ export const STRINGS_FR: TranslationStrings = {
             recognizedSnippetsCount: { one: '{count} extrait reconnu', other: '{count} extraits reconnus' },
             recognizedRulesCount: { one: '{count} règle reconnue', other: '{count} règles reconnues' },
             unparseableName: 'Lignes non reconnues',
-            importFallbackName: 'Extrait importé'
+            importFallbackName: 'Extrait importé',
+            defaultSnippetBoldHeadings: 'Retirer le gras des titres',
+            defaultSnippetBlankLines: 'Fusionner les lignes vides',
+            defaultSnippetSiteSuffixes: 'Retirer les noms de sites des titres de page'
         }
     },
 

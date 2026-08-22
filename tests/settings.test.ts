@@ -19,9 +19,15 @@
 import { describe, expect, it } from 'vitest';
 import { findInvalidRemovalRules, normalizeSettings, parseLines } from '../src/settings/normalize';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
-import { SHIPPED_PARAM_REMOVALS } from '../src/settings/constants';
+import {
+    DEFAULT_BLANK_LINES_SNIPPET_RULES,
+    DEFAULT_BOLD_HEADINGS_SNIPPET_RULES,
+    DEFAULT_SITE_SUFFIXES_SNIPPET_RULES,
+    SHIPPED_PARAM_REMOVALS
+} from '../src/settings/constants';
 import { isPreformattedHtml, isSingleImageFile } from '../src/paste/PasteService';
 import { runTextPipeline } from '../src/transforms';
+import { applyTextSnippets, parseSnippetRuleLine } from '../src/transforms/snippets';
 import { parseDomainRemovals } from '../src/transforms/urlCleanup';
 import { fakeFile } from './stubs/editor';
 
@@ -34,10 +40,64 @@ describe('normalizeSettings', () => {
         expect(normalizeSettings({ imageMode: 'invalid' }).imageMode).toBe('link');
     });
 
-    it('returns the defaults for missing data', () => {
-        expect(normalizeSettings(null)).toEqual(DEFAULT_SETTINGS);
-        expect(normalizeSettings(undefined)).toEqual(DEFAULT_SETTINGS);
-        expect(normalizeSettings({})).toEqual(DEFAULT_SETTINGS);
+    it('seeds custom snippets for missing data', () => {
+        const result = normalizeSettings(null);
+
+        expect(result.textSnippets).toMatchObject([
+            { name: 'Remove bold from headings', rules: DEFAULT_BOLD_HEADINGS_SNIPPET_RULES, enabled: true },
+            { name: 'Collapse blank lines', rules: DEFAULT_BLANK_LINES_SNIPPET_RULES, enabled: true }
+        ]);
+        expect(result.urlSnippets).toMatchObject([
+            { name: 'Remove site names from titles', rules: DEFAULT_SITE_SUFFIXES_SNIPPET_RULES, enabled: true }
+        ]);
+        const ids = [...result.textSnippets, ...result.urlSnippets].map(snippet => snippet.id);
+        expect(new Set(ids).size).toBe(ids.length);
+    });
+
+    it('keeps stored empty snippet lists empty', () => {
+        const result = normalizeSettings({ textSnippets: [], urlSnippets: [] });
+
+        expect(result.textSnippets).toEqual([]);
+        expect(result.urlSnippets).toEqual([]);
+    });
+
+    it('does not append defaults to stored snippets', () => {
+        const text = [{ id: 'stored-text', name: 'Stored text', rules: ['s/a/b/g'], enabled: false }];
+        const url = [{ id: 'stored-url', name: 'Stored link', rules: ['s/c/d/g'], enabled: true }];
+        const result = normalizeSettings({ textSnippets: text, urlSnippets: url });
+
+        expect(result.textSnippets).toEqual(text);
+        expect(result.urlSnippets).toEqual(url);
+    });
+
+    it('ships valid rules in every seeded snippet', () => {
+        const result = normalizeSettings(null);
+
+        for (const snippet of [...result.textSnippets, ...result.urlSnippets]) {
+            for (const rule of snippet.rules) expect(parseSnippetRuleLine(rule).status).toBe('valid');
+        }
+    });
+
+    it('applies the seeded link snippets', () => {
+        const snippets = normalizeSettings(null).urlSnippets;
+        const github =
+            '[GitHub - noisetorch/NoiseTorch: Real-time microphone noise suppression on Linux. · GitHub](https://github.com/noisetorch/NoiseTorch)';
+
+        expect(applyTextSnippets(github, snippets).text).toBe(
+            '[noisetorch/NoiseTorch: Real-time microphone noise suppression on Linux.](https://github.com/noisetorch/NoiseTorch)'
+        );
+        expect(applyTextSnippets('[Alien - Wikipedia](https://en.wikipedia.org/wiki/Alien)', snippets).text).toBe(
+            '[Alien](https://en.wikipedia.org/wiki/Alien)'
+        );
+    });
+
+    it('applies the seeded text snippets', () => {
+        const snippets = normalizeSettings(null).textSnippets;
+
+        expect(applyTextSnippets('## **Title**', snippets).text).toBe('## Title');
+        expect(applyTextSnippets('## **A** and **B**', snippets).text).toBe('## A and B');
+        expect(applyTextSnippets('A **bold** paragraph', snippets).text).toBe('A **bold** paragraph');
+        expect(applyTextSnippets('a\n\n\n\nb', snippets).text).toBe('a\n\nb');
     });
 
     it('fetches link titles by default', () => {
@@ -117,7 +177,7 @@ describe('normalizeSettings', () => {
             imageLinkPaste: 'link',
             urlTrackingParams: ['x']
         });
-        expect(result).toEqual(DEFAULT_SETTINGS);
+        expect({ ...result, textSnippets: [], urlSnippets: [] }).toEqual(DEFAULT_SETTINGS);
     });
 
     it('stores only user-defined removals, leaving the shipped list in code', () => {

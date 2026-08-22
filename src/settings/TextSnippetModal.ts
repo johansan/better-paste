@@ -24,7 +24,7 @@ import { composeTitledLink } from '../paste/LinkTitleService';
 import type { TextSnippet } from './types';
 import { SNIPPETS_WIKI_URL } from './constants';
 
-/** Prefills URL snippet previews, because the titled-link subject shape is not obvious. */
+/** Placeholder for URL snippet previews, because the titled-link subject shape is not obvious. */
 export const TITLED_LINK_SAMPLE =
     '[GitHub - noisetorch/NoiseTorch: Real-time microphone noise suppression on Linux. · GitHub](https://github.com/noisetorch/NoiseTorch)';
 
@@ -51,7 +51,7 @@ export class TextSnippetModal extends Modal {
             ? { ...initial, rules: [...initial.rules] }
             : { id: createTextSnippetId(), name: '', rules: [], enabled: true };
         this.urlSnippet = urlSnippet;
-        this.sample = urlSnippet ? TITLED_LINK_SAMPLE : '';
+        this.sample = '';
         this.onSave = onSave;
     }
 
@@ -95,9 +95,12 @@ export class TextSnippetModal extends Modal {
             text: this.urlSnippet ? text.urlModalPreviewDesc : text.modalPreviewDesc
         });
         const preview = this.contentEl.createDiv({ cls: 'better-paste-preview' });
-        const sample = preview.createEl('textarea', {
-            attr: { 'aria-label': this.urlSnippet ? text.urlPreviewLabel : text.previewInputLabel, rows: '4' }
-        });
+        const sampleAttrs: Record<string, string> = {
+            'aria-label': this.urlSnippet ? text.urlPreviewLabel : text.previewInputLabel,
+            rows: '4'
+        };
+        if (this.urlSnippet) sampleAttrs.placeholder = TITLED_LINK_SAMPLE;
+        const sample = preview.createEl('textarea', { attr: sampleAttrs });
         sample.value = this.sample;
         this.previewEl = preview.createDiv({ cls: ['better-paste-preview-output', 'better-paste-preview-empty'] });
         this.previewEl.setAttrs({ role: 'status', 'aria-live': 'polite' });
