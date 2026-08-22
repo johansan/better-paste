@@ -1521,6 +1521,32 @@ describe('handleEditorPaste: rich content', () => {
         expect(editor.getValue()).toBe('text ![[image-0.png]] [link](https://example.com/b)');
     });
 
+    it('continues converted rich content inside a block quote', async () => {
+        const { service } = build();
+        const editor = new FakeEditor('> ');
+        const html = '<h3>Fixed</h3><ul><li>Fixed <strong>bold text</strong></li></ul>';
+
+        await pasteRich(service, editor, html, '### Fixed\n\n- Fixed **bold text**');
+
+        expect(editor.getValue()).toBe('> ### Fixed\n>\n> - Fixed **bold text**');
+    });
+
+    it('leaves converted rich content unquoted when quote continuation is off', async () => {
+        const { service } = build({
+            quoteContinuation: false,
+            textInvisible: false,
+            textQuotes: false,
+            textDashes: false,
+            linkEnabled: false,
+            imageMode: 'off'
+        });
+        const editor = new FakeEditor('> ');
+
+        await pasteRich(service, editor, '<p>First</p><p>Second</p>', 'First\n\nSecond');
+
+        expect(editor.getValue()).toBe('> First\n\nSecond');
+    });
+
     it('only touches the pasted range, leaving surrounding text alone', async () => {
         const { service } = build();
         const existing = 'before https://example.com/keep?utm_source=x after\n\n';
@@ -1555,8 +1581,8 @@ describe('handleEditorPaste: rich content', () => {
         expect(editor.getValue()).toBe('unrelated');
     });
 
-    it('does no work when both rich-content rules are off', async () => {
-        const { service } = build({ linkEnabled: false, imageMode: 'off' });
+    it('does no work when the rich-content rules are off', async () => {
+        const { service } = build({ linkEnabled: false, imageMode: 'off', quoteContinuation: false });
         const editor = new FakeEditor('');
 
         await pasteRich(service, editor, RICH_HTML, '[link](https://example.com/b?utm_source=x)');

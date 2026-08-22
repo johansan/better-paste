@@ -51,6 +51,11 @@ export interface ReleaseNote {
 /** Newest first. A new release goes at the top. */
 const RELEASE_NOTES: ReleaseNote[] = [
     {
+        version: '1.0.11',
+        date: '2026-08-22',
+        fixed: ['Fixed block quote and callout continuation for formatted multi-paragraph pastes on mobile.']
+    },
+    {
         version: '1.0.10',
         date: '2026-08-22',
         info: 'This release changes how pasted web images work. By default Better Paste now **paste web images as links** instead of downloading a copy into your vault. If you want local copies like before of every image link, set `Web images` to `Download with preview`.\n\nIf you enjoy using Better Paste, please help me spread the word to help others discover it!',

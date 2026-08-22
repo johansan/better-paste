@@ -586,6 +586,7 @@ export class PasteService {
             !settings.textDashes &&
             !settings.linkEnabled &&
             settings.imageMode === 'off' &&
+            !settings.quoteContinuation &&
             !settings.textSnippets.some(snippet => snippet.enabled)
         )
             return;
@@ -609,7 +610,7 @@ export class PasteService {
 
             const inserted = valueAfter.slice(startOffset, startOffset + insertedLength);
             const range = asyncPasteRange(startOffset, inserted, valueBefore, valueAfter);
-            void this.processRichRange(editor, info, targetFile, () => targetFile?.path ?? '', range);
+            void this.processRichRange(editor, info, targetFile, () => targetFile?.path ?? '', range, startOffset + selectionLength);
         }, 0);
     }
 
@@ -619,7 +620,8 @@ export class PasteService {
         info: MarkdownView | MarkdownFileInfo,
         targetFile: TFile | null,
         targetPath: () => string,
-        range: AsyncPasteRange
+        range: AsyncPasteRange,
+        selectionEnd: number
     ): Promise<void> {
         this.pendingRanges.add(range);
         const settings = this.getSettings();
@@ -641,6 +643,8 @@ export class PasteService {
         }
 
         text = applyTextSnippets(text, settings.textSnippets).text;
+        const quoted = settings.quoteContinuation ? continueQuotePaste(text, range.valueBefore, range.startOffset, selectionEnd) : null;
+        if (quoted !== null) text = quoted;
 
         let downloadedFiles: TFile[] = [];
         if (this.images.hasWork(text)) {
