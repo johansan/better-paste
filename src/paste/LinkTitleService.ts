@@ -88,9 +88,13 @@ export function standaloneWebUrlLines(text: string, options: StandaloneWebUrlLin
         const quotePrefix = options.allowBlockQuotes ? (BLOCKQUOTE_PREFIX.exec(line)?.[0] ?? '') : '';
         const content = line.slice(quotePrefix.length);
         if (!content.trim()) continue;
-        const leading = quotePrefix + (content.match(/^\s*/)?.[0] ?? '');
-        const trailing = content.match(/\s*$/)?.[0] ?? '';
-        const url = standaloneWebUrl(content.trim());
+        const indentation = content.match(/^[ \t]*/)?.[0] ?? '';
+        const afterIndentation = content.slice(indentation.length);
+        const listPrefix = afterIndentation.match(/^(?:[-+*]|\d{1,9}[.)])[ \t]+(?:\[[ xX]\][ \t]+)?/)?.[0] ?? '';
+        const value = afterIndentation.slice(listPrefix.length);
+        const leading = quotePrefix + indentation + listPrefix;
+        const trailing = value.match(/[ \t]*$/)?.[0] ?? '';
+        const url = standaloneWebUrl(value.trim());
         if (url === null || isObviousImageUrl(url)) return null;
         lines.push({ url, leading, trailing });
     }

@@ -92,11 +92,7 @@ function fakeTitles(settings: BetterPasteSettings, fetched: string[], pageTitle 
 
     return {
         hasWork,
-        hasBatchWork: (text: string) => {
-            if (!settings.linkTitles || hasWork(text)) return false;
-            const lines = text.split('\n').filter(line => line.trim());
-            return lines.length > 0 && lines.every(line => hasWork(line.trim()));
-        },
+        hasBatchWork: (text: string) => settings.linkTitles && !hasWork(text) && standaloneWebUrlLines(text) !== null,
         materializeTitle: async (text: string) => {
             fetched.push(text);
             return hasWork(text) ? { title: pageTitle, url: text } : null;
@@ -1037,6 +1033,19 @@ describe('handleEditorPaste: link titles', () => {
         await settle();
 
         expect(editor.getValue()).toBe('  [Example page](https://a.com/page)  \n\n[Example page](https://b.com/page)');
+    });
+
+    it('rewrites URL lists while preserving their markers', async () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false });
+        const editor = new FakeEditor('');
+        const pasted = '1. https://a.com/page\n2. https://b.com/page\n- [ ] https://c.com/page';
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: pasted }), editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(editor.getValue()).toBe(
+            '1. [Example page](https://a.com/page)\n2. [Example page](https://b.com/page)\n- [ ] [Example page](https://c.com/page)'
+        );
     });
 
     it('applies URL snippets to every titled link in a batch', async () => {

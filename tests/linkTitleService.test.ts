@@ -120,6 +120,22 @@ describe('link title candidates', () => {
         ]);
     });
 
+    it('preserves Markdown list prefixes around URL lines', () => {
+        expect(
+            standaloneWebUrlLines(
+                '- https://a.com\n  * https://b.com\n3. https://c.com\n4) https://d.com\n- [ ] https://e.com\n1. [x] https://f.com'
+            )
+        ).toEqual([
+            { url: 'https://a.com', leading: '- ', trailing: '' },
+            { url: 'https://b.com', leading: '  * ', trailing: '' },
+            { url: 'https://c.com', leading: '3. ', trailing: '' },
+            { url: 'https://d.com', leading: '4) ', trailing: '' },
+            { url: 'https://e.com', leading: '- [ ] ', trailing: '' },
+            { url: 'https://f.com', leading: '1. [x] ', trailing: '' }
+        ]);
+        expect(standaloneWebUrlLines('- Label https://a.com\n- https://b.com')).toBeNull();
+    });
+
     it('escapes Markdown in a page title', () => {
         expect(escapeLinkTitle('A [page] with *markup* | notes')).toBe('A \\[page\\] with \\*markup\\* \\| notes');
     });

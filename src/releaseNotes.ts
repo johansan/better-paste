@@ -53,7 +53,10 @@ const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.11',
         date: '2026-08-22',
-        fixed: ['Fixed block quote and callout continuation for formatted multi-paragraph pastes on mobile.']
+        fixed: [
+            'Fixed block quote and callout continuation for formatted multi-paragraph pastes on mobile.',
+            'Fixed link titles for numbered, bulleted and task lists of URLs.'
+        ]
     },
     {
         version: '1.0.10',
