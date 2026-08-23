@@ -85,7 +85,13 @@ export const STRINGS_KO: TranslationStrings = {
         },
 
         images: {
-            heading: '이미지',
+            heading: '첨부 파일',
+            fileModeName: '붙여넣은 파일',
+            fileModeDesc:
+                '기기에서 PDF나 스크린샷 같은 파일을 붙여넣을 때 어떻게 처리할지 선택하세요. "아무것도 안 함"은 미리보기를 포함해 붙여넣기를 그대로 Obsidian에 맡기고, "미리보기 없이 링크"는 느낌표를 제거합니다.',
+            fileModeChoiceOff: '아무것도 안 함',
+            fileModeChoiceLink: '미리보기 없이 링크',
+            fileModeAliases: ['파일', '첨부', '미리보기', '임베드', '링크', 'pdf', '스크린샷', '느낌표'],
             savingName: '웹 이미지',
             savingDesc:
                 '웹 이미지 링크를 붙여넣을 때 어떻게 처리할지 선택하세요. "아무것도 안 함"은 붙여넣은 내용을 그대로 두고, "미리보기와 함께 링크"는 웹에서 바로 이미지를 표시하며, "미리보기와 함께 다운로드"는 보관함에 사본을 저장합니다.',
@@ -301,7 +307,6 @@ export const STRINGS_KO: TranslationStrings = {
         categoryFixed: '수정',
         support: 'Better Paste가 도움이 되었다면 개발을 후원해 주세요.',
         coffeeButton: '☕️ 커피 한 잔 사주기',
-        thanksButton: '고마워요!',
-        dontShowAgain: '업데이트 후 다시 표시하지 않음'
+        thanksButton: '고마워요!'
     }
 };

@@ -220,7 +220,9 @@ export class ImageService {
             const saved = await this.saveImage(source, data, extension, sourcePath, settings, naming, fallbackName);
             if (!saved) return null;
 
-            return { embed: this.embedFor(saved, sourcePath, size, '', cssClass), file: saved };
+            const embed =
+                settings.fileMode === 'link' ? this.plainLinkFor(saved, sourcePath) : this.embedFor(saved, sourcePath, size, '', cssClass);
+            return { embed, file: saved };
         } catch (error) {
             logWarning('Failed to save a pasted image', error);
             return null;
@@ -271,6 +273,13 @@ export class ImageService {
         const label = size ? (alt ? `${alt}|${size}` : size) : alt || undefined;
         const subpath = cssClass ? `#${cssClass}` : undefined;
         return `!${this.app.fileManager.generateMarkdownLink(file, resolveSourcePath(sourcePath), subpath, label)}`;
+    }
+
+    /** Supplies a label because Obsidian's Markdown links for non-Markdown files otherwise use empty text. */
+    private plainLinkFor(file: TFile, sourcePath: SourcePath): string {
+        const resolvedSourcePath = resolveSourcePath(sourcePath);
+        const link = this.app.fileManager.generateMarkdownLink(file, resolvedSourcePath);
+        return link.startsWith('[](') ? this.app.fileManager.generateMarkdownLink(file, resolvedSourcePath, undefined, file.name) : link;
     }
 
     /**

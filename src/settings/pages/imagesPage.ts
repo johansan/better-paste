@@ -36,6 +36,7 @@ const FILENAME_EXAMPLE_DATE = new Date(2026, 7, 13, 14, 5, 6);
 const SAVING_EXAMPLE_ADDRESS = 'https://images.example.com/2026/05/';
 const SAVING_EXAMPLE_FILE = 'skyline-8f21a.jpg';
 const SAVING_EXAMPLE_QUERY = '?auto=format&w=2400';
+const FILE_LINK_EXAMPLE_RESULT = '[[Document.pdf]]';
 
 /**
  * Shows what the selected mode leaves in the note. Download derives the file name from
@@ -69,6 +70,21 @@ function savingExample(mode: 'off' | 'link' | 'download'): string | DocumentFrag
         } else {
             example.createSpan({ text: mode === 'link' ? `![](${address})` : address });
         }
+    });
+}
+
+/** Shows what the selected mode makes of a pasted file embed. */
+function fileModeDescription(mode: 'off' | 'link'): string | DocumentFragment {
+    const text = strings.settings.images;
+    const result = mode === 'link' ? FILE_LINK_EXAMPLE_RESULT : `!${FILE_LINK_EXAMPLE_RESULT}`;
+    const example = `!${FILE_LINK_EXAMPLE_RESULT} → ${result}`;
+    if (typeof createFragment === 'undefined') {
+        return format(strings.settings.exampleFallback, { description: text.fileModeDesc, example });
+    }
+
+    return createFragment(fragment => {
+        fragment.appendText(text.fileModeDesc);
+        fragment.createDiv({ cls: 'better-paste-example', text: example });
     });
 }
 
@@ -137,7 +153,7 @@ function choiceLabel(choice: string, options: string): string {
 }
 
 /**
- * Rows shown under the Images heading. The saving choice governs web images only;
+ * Rows shown under the Attachments heading. The saving choice governs web images only;
  * naming and decoration also reach clipboard images, so those rows are always visible.
  */
 export function createImageLandingDefinitions(context: SettingsPageContext): SettingGroupItem[] {
@@ -160,6 +176,26 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
                         if (value !== 'off' && value !== 'link' && value !== 'download') return;
                         context.settings().imageMode = value;
                         setting.setDesc(savingExample(value));
+                        return context.saveSettings();
+                    });
+                });
+            }
+        },
+        {
+            name: text.fileModeName,
+            desc: fileModeDescription(context.settings().fileMode),
+            aliases: aliases(source => source.settings.images.fileModeAliases),
+            render: setting => {
+                setting.setName(text.fileModeName);
+                setting.setDesc(fileModeDescription(context.settings().fileMode));
+                setting.addDropdown(dropdown => {
+                    dropdown.addOption('off', text.fileModeChoiceOff);
+                    dropdown.addOption('link', text.fileModeChoiceLink);
+                    dropdown.setValue(context.settings().fileMode);
+                    dropdown.onChange(value => {
+                        if (value !== 'off' && value !== 'link') return;
+                        context.settings().fileMode = value;
+                        setting.setDesc(fileModeDescription(value));
                         return context.saveSettings();
                     });
                 });

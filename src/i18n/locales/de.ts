@@ -100,7 +100,13 @@ export const STRINGS_DE: TranslationStrings = {
         },
 
         images: {
-            heading: 'Bilder',
+            heading: 'Anhänge',
+            fileModeName: 'Eingefügte Dateien',
+            fileModeDesc:
+                'Wähle, was mit Dateien geschieht, die du von deinem Gerät einfügst, etwa PDFs und Screenshots. "Nichts tun" überlässt Obsidian das Einfügen samt Vorschau, und "Verlinken ohne Vorschau" entfernt das Ausrufezeichen.',
+            fileModeChoiceOff: 'Nichts tun',
+            fileModeChoiceLink: 'Verlinken ohne Vorschau',
+            fileModeAliases: ['datei', 'anhang', 'vorschau', 'einbetten', 'link', 'pdf', 'screenshot', 'bildschirmfoto', 'ausrufezeichen'],
             savingName: 'Webbilder',
             savingDesc:
                 'Wähle, was mit eingefügten Links zu Bildern aus dem Web geschieht. "Nichts tun" lässt das Eingefügte unverändert, "Verlinken mit Vorschau" zeigt das Bild direkt aus dem Web, und "Herunterladen mit Vorschau" speichert eine Kopie in deinem Tresor.',
@@ -351,7 +357,6 @@ export const STRINGS_DE: TranslationStrings = {
         categoryFixed: 'Behoben',
         support: 'Wenn dir Better Paste nützlich ist, unterstütze bitte seine Entwicklung.',
         coffeeButton: '☕️ Spendier mir einen Kaffee',
-        thanksButton: 'Danke!',
-        dontShowAgain: 'Nach Updates nicht mehr anzeigen'
+        thanksButton: 'Danke!'
     }
 };

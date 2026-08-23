@@ -91,7 +91,13 @@ export const STRINGS_NL: TranslationStrings = {
         },
 
         images: {
-            heading: 'Afbeeldingen',
+            heading: 'Bijlagen',
+            fileModeName: 'Geplakte bestanden',
+            fileModeDesc:
+                'Kies wat er gebeurt wanneer je bestanden vanaf je apparaat plakt, zoals PDF\'s en schermafbeeldingen. "Niets doen" laat het plakken aan Obsidian over, inclusief de voorvertoning. "Linken zonder voorvertoning" verwijdert het uitroepteken.',
+            fileModeChoiceOff: 'Niets doen',
+            fileModeChoiceLink: 'Linken zonder voorvertoning',
+            fileModeAliases: ['bestand', 'bijlage', 'voorvertoning', 'insluiten', 'link', 'pdf', 'schermafbeelding', 'uitroepteken'],
             savingName: 'Webafbeeldingen',
             savingDesc:
                 'Kies wat er gebeurt wanneer je links naar afbeeldingen van het web plakt. "Niets doen" laat het geplakte zoals het is, "Linken met voorvertoning" toont de afbeelding rechtstreeks vanaf het web, en "Downloaden met voorvertoning" slaat een kopie op in je kluis.',
@@ -333,7 +339,6 @@ export const STRINGS_NL: TranslationStrings = {
         categoryFixed: 'Opgelost',
         support: 'Als Better Paste je van pas komt, overweeg dan de ontwikkeling te steunen.',
         coffeeButton: '☕️ Trakteer me op koffie',
-        thanksButton: 'Bedankt!',
-        dontShowAgain: 'Niet meer tonen na updates'
+        thanksButton: 'Bedankt!'
     }
 };

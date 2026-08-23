@@ -51,7 +51,7 @@ import {
     resolveNameProperty
 } from './noteOptions';
 import { format, plural, strings } from '../i18n';
-import { baseNameFromPath, buildFileNameTokens, expandFileNameTemplate, resolveExtension } from '../utils/filenames';
+import { baseNameFromPath, baseNameFromUrl, buildFileNameTokens, expandFileNameTemplate, resolveExtension } from '../utils/filenames';
 import type { FileNameTokens } from '../utils/filenames';
 import { IMAGE_EXTENSIONS } from '../settings/constants';
 import { MAX_IMAGE_BYTES } from './ImageService';
@@ -175,6 +175,9 @@ export type ImageOptionsPrompt = (sizes: readonly string[] | null, classes: read
 /** Shows the PDF cleanup dialog for the selection and resolves with the picks, or null on cancel. */
 export type PdfOptionsPrompt = (text: string) => Promise<PdfCleanupOptions | null>;
 
+/** Arms the native attachment link rewrite for a file paste this service leaves to Obsidian. */
+export type NativeFilePasteWatcher = (files: readonly File[], editor: Editor) => void;
+
 /** A stored embed choice is honoured only while its value is still one of the options. */
 function embedChoice(choice: string, options: readonly string[]): string {
     if (choice === 'ask') return options.length > 0 ? 'ask' : '';
@@ -188,6 +191,7 @@ export class PasteService {
     private readonly titles: LinkTitleService;
     private readonly promptImageOptions: ImageOptionsPrompt;
     private readonly promptPdfOptions: PdfOptionsPrompt;
+    private readonly watchNativeFilePaste: NativeFilePasteWatcher;
     /** Set on unload, so awaited work that is still in flight stops touching the editor. */
     private disposed = false;
     /** Ranges still awaiting work, kept aligned when another pending paste is rewritten. */
@@ -200,13 +204,15 @@ export class PasteService {
         images: ImageService,
         titles: LinkTitleService,
         promptImageOptions: ImageOptionsPrompt = () => Promise.resolve(null),
-        promptPdfOptions: PdfOptionsPrompt = () => Promise.resolve(null)
+        promptPdfOptions: PdfOptionsPrompt = () => Promise.resolve(null),
+        watchNativeFilePaste: NativeFilePasteWatcher = () => undefined
     ) {
         this.getSettings = getSettings;
         this.images = images;
         this.titles = titles;
         this.promptImageOptions = promptImageOptions;
         this.promptPdfOptions = promptPdfOptions;
+        this.watchNativeFilePaste = watchNativeFilePaste;
     }
 
     /** Called from the plugin's onunload. */
@@ -229,31 +235,34 @@ export class PasteService {
     handleEditorPaste(event: ClipboardEvent, editor: Editor, info: MarkdownView | MarkdownFileInfo): boolean {
         const settings = this.getSettings();
 
-        // Async work tracks one inserted range. Leave multi-selection pastes to Obsidian so
-        // every cursor receives the native paste instead of only one range being rewritten.
-        if (editor.listSelections().length !== 1) return false;
+        const clipboard = event.clipboardData;
+        if (!clipboard) return false;
 
         // A note can opt out, or opt in while automatic cleanup is off. Explicit commands
         // deliberately ignore this: if the user asks for the rules by name, they get them.
         const content = editor.getValue();
-        if (!this.automaticPasteEnabled(content, settings)) return false;
+        if (!this.automaticPasteEnabled(content, settings)) return this.leaveFilePasteNative(clipboard, editor, content);
 
-        const clipboard = event.clipboardData;
-        if (!clipboard) return false;
+        // Async work tracks one inserted range. Leave multi-selection pastes to Obsidian so
+        // every cursor receives the native paste instead of only one range being rewritten.
+        // The attachment link filter operates on Obsidian's own transaction, so it can cover
+        // every selection without taking the paste over.
+        if (editor.listSelections().length !== 1) return this.leaveFilePasteNative(clipboard, editor, content);
 
         // Markdown code and frontmatter are left verbatim. Pasting terminal output into a
         // fence is an act of preservation, so rejoining its lines there would destroy the
         // thing the user was protecting. The one exception is an image address pasted into
         // an empty frontmatter value, which is saved like a body paste.
         if (isInsideVerbatimContext(content, editor.posToOffset(editor.getCursor('from')))) {
-            return this.claimFrontmatterImagePaste(clipboard, editor, info, content);
+            const claimed = this.claimFrontmatterImagePaste(clipboard, editor, info, content);
+            return claimed || this.leaveFilePasteNative(clipboard, editor, content);
         }
 
         const html = clipboard.getData('text/html');
 
         if (clipboard.files.length > 0) {
             // Obsidian owns multi-file pastes. This path only handles one bitmap.
-            if (!isSingleImageFile(clipboard.files)) return false;
+            if (!isSingleImageFile(clipboard.files)) return this.leaveFilePasteNative(clipboard, editor, content);
 
             // Two clipboard shapes reach this branch. Safari's "Copy image" puts the bitmap
             // AND an <img> tag on the clipboard, and Obsidian prefers the HTML there, which
@@ -265,19 +274,21 @@ export class PasteService {
             // so a default setup pastes identically to the app.
             const file = clipboard.files[0];
             if (htmlHasImages(html)) {
-                if (settings.imageMode === 'off') return false;
+                if (settings.imageMode === 'off') return this.leaveFilePasteNative(clipboard, editor, content);
             } else {
                 // A bitmap the save would reject stays with Obsidian: taking it over
                 // suppresses the native paste, and without an HTML flavour there is no
                 // URL to fall back on, so the failed save would swallow the screenshot
-                if (resolveExtension(file.type, file.name || '', IMAGE_EXTENSIONS) === null || file.size > MAX_IMAGE_BYTES) return false;
+                if (resolveExtension(file.type, file.name || '', IMAGE_EXTENSIONS) === null || file.size > MAX_IMAGE_BYTES)
+                    return this.leaveFilePasteNative(clipboard, editor, content);
                 // A file with a real name of its own was copied from a file manager, and
                 // Obsidian's handler resolves its path, linking an image that is already
                 // in the vault instead of duplicating it. It is only claimed when a size
                 // or class has to be applied, which is what this plugin always did.
                 const ownName = baseNameFromPath(file.name || '');
-                if (ownName !== null && ownName.toLowerCase() !== 'image' && !this.decoratesEmbeds(editor)) return false;
-                if (!this.namesClipboardImage(file, editor, info, settings)) return false;
+                if (ownName !== null && ownName.toLowerCase() !== 'image' && !this.decoratesEmbeds(editor))
+                    return this.leaveFilePasteNative(clipboard, editor, content);
+                if (!this.namesClipboardImage(file, editor, info, settings)) return this.leaveFilePasteNative(clipboard, editor, content);
             }
 
             void this.pasteClipboardImage(clipboard, editor, info, html);
@@ -355,7 +366,8 @@ export class PasteService {
             : undefined;
         const naming = this.imageNaming(editor);
 
-        const { size, cssClass } = await this.resolveEmbedOptions(editor);
+        const linkOnly = this.getSettings().fileMode === 'link';
+        const { size, cssClass } = linkOnly ? { size: null, cssClass: null } : await this.resolveEmbedOptions(editor);
         let stored: { embed: string; file: TFile } | null = null;
 
         try {
@@ -367,13 +379,14 @@ export class PasteService {
 
         // Nothing was saved, so fall back to linking the original picture rather than
         // swallowing the paste entirely.
+        const fallbackLabel = linkOnly ? remote?.alt || baseNameFromUrl(source) || file.name || 'Image' : '';
         const fallback =
             this.getSettings().imageMode === 'link' && remote
-                ? remoteMarkdownEmbed(remote.alt, remote.url, size)
+                ? remoteMarkdownEmbed(linkOnly ? fallbackLabel : remote.alt, remote.url, size)
                 : source
-                  ? remoteMarkdownEmbed('', source, size)
+                  ? remoteMarkdownEmbed(fallbackLabel, source, size)
                   : '';
-        const text = embed ?? fallback;
+        const text = embed ?? (linkOnly && fallback.startsWith('!') ? fallback.slice(1) : fallback);
 
         if (!this.canEdit(info, targetFile)) {
             // The view moved on, so the embed has no note to land in and the saved
@@ -1045,9 +1058,25 @@ export class PasteService {
     /** True when the note or the embed settings add a size or class to saved embeds. */
     private decoratesEmbeds(editor: Editor): boolean {
         const settings = this.getSettings();
+        if (settings.fileMode === 'link') return false;
         if (this.imageSizeFor(editor) !== null) return true;
         if (embedChoice(settings.imageSizeChoice, parseCommaList(settings.imageSizeOptions)) !== '') return true;
         return embedChoice(settings.imageClassChoice, parseCommaList(settings.imageClassOptions)) !== '';
+    }
+
+    /** Leaves a file paste to Obsidian and records it when the resulting attachment should be a link. */
+    private leaveFilePasteNative(clipboard: DataTransfer, editor: Editor, content: string): false {
+        const settings = this.getSettings();
+        // The note's off override wins here like everywhere else, so a note that asked
+        // to be left alone keeps its previews while link mode is on globally
+        if (
+            settings.fileMode === 'link' &&
+            clipboard.files.length > 0 &&
+            notePasteOverride(this.frontmatterOf(content), settings.noteProperty) !== 'off'
+        ) {
+            this.watchNativeFilePaste(Array.from(clipboard.files), editor);
+        }
+        return false;
     }
 
     /**

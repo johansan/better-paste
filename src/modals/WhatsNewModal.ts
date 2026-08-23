@@ -91,23 +91,16 @@ function formatReleaseDate(date: string): string {
     return parsed.toLocaleDateString(localeTag, { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-/**
- * The What's new dialog. `onDismiss` runs once it is closed, however it was closed.
- * `onDontShowAgain` adds a checkbox and runs on close when it was ticked, so the update
- * dialog can offer switching itself off while the settings button shows no checkbox.
- */
+/** The What's new dialog. `onDismiss` runs once it is closed, however it was closed. */
 export class WhatsNewModal extends Modal {
     private readonly releaseNotes: ReleaseNote[];
     private readonly onDismiss: () => void;
-    private readonly onDontShowAgain: (() => void) | null;
     private thanksButton: HTMLButtonElement | null = null;
-    private dontShowAgain: HTMLInputElement | null = null;
 
-    constructor(app: App, releaseNotes: ReleaseNote[], onDismiss: () => void, onDontShowAgain: (() => void) | null = null) {
+    constructor(app: App, releaseNotes: ReleaseNote[], onDismiss: () => void) {
         super(app);
         this.releaseNotes = releaseNotes;
         this.onDismiss = onDismiss;
-        this.onDontShowAgain = onDontShowAgain;
     }
 
     onOpen(): void {
@@ -126,12 +119,6 @@ export class WhatsNewModal extends Modal {
             cls: 'better-paste-modal-support',
             text: strings.whatsNew.support
         });
-
-        if (this.onDontShowAgain) {
-            const remind = this.contentEl.createEl('label', { cls: 'better-paste-modal-remind' });
-            this.dontShowAgain = remind.createEl('input', { type: 'checkbox' });
-            remind.appendText(strings.whatsNew.dontShowAgain);
-        }
 
         const buttons = this.contentEl.createDiv({ cls: 'better-paste-modal-buttons' });
 
@@ -157,12 +144,9 @@ export class WhatsNewModal extends Modal {
     }
 
     onClose(): void {
-        const dontShowAgain = this.dontShowAgain?.checked === true;
         this.contentEl.empty();
         this.modalEl.removeClass('better-paste-modal');
         this.thanksButton = null;
-        this.dontShowAgain = null;
-        if (dontShowAgain) this.onDontShowAgain?.();
         this.onDismiss();
     }
 

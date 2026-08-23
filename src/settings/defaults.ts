@@ -25,6 +25,8 @@ export const DEFAULT_SETTINGS: BetterPasteSettings = {
     quoteContinuation: true,
     showReleaseNotes: true,
 
+    fileMode: 'off',
+
     imageMode: 'link',
     // Capped below Obsidian's 700 px readable line length, where larger widths do nothing
     imageSizeOptions: '200, 400, 600',

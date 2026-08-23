@@ -85,7 +85,13 @@ export const STRINGS_ZH_CN: TranslationStrings = {
         },
 
         images: {
-            heading: '图片',
+            heading: '附件',
+            fileModeName: '粘贴的文件',
+            fileModeDesc:
+                '选择从设备粘贴文件（如 PDF 和截图）时的处理方式。“什么都不做”让 Obsidian 照常粘贴，预览也一并保留。“链接但不预览”则移除感叹号。',
+            fileModeChoiceOff: '什么都不做',
+            fileModeChoiceLink: '链接但不预览',
+            fileModeAliases: ['文件', '附件', '预览', '嵌入', '链接', 'pdf', '截图', '感叹号'],
             savingName: '网络图片',
             savingDesc:
                 '选择粘贴网络图片链接时的处理方式。“什么都不做”保持粘贴内容原样，“链接并预览”直接从网络显示图片，“下载并预览”则把副本保存到你的仓库。',
@@ -296,7 +302,6 @@ export const STRINGS_ZH_CN: TranslationStrings = {
         categoryFixed: '修复',
         support: '如果 Better Paste 对你有帮助，欢迎支持它的开发。',
         coffeeButton: '☕️ 请我喝杯咖啡',
-        thanksButton: '谢谢！',
-        dontShowAgain: '更新后不再显示'
+        thanksButton: '谢谢！'
     }
 };

@@ -31,6 +31,10 @@ function asString(value: unknown, fallback: string): string {
     return typeof value === 'string' ? value : fallback;
 }
 
+function asFileMode(value: unknown): BetterPasteSettings['fileMode'] {
+    return value === 'off' || value === 'link' ? value : DEFAULT_SETTINGS.fileMode;
+}
+
 function asImageMode(value: unknown, legacyEnabled: unknown): BetterPasteSettings['imageMode'] {
     if (value === 'off' || value === 'link' || value === 'download') return value;
     return legacyEnabled === false ? 'off' : DEFAULT_SETTINGS.imageMode;
@@ -125,6 +129,8 @@ export function normalizeSettings(raw: unknown): BetterPasteSettings {
         listNesting: asBoolean(data.listNesting, defaults.listNesting),
         quoteContinuation: asBoolean(data.quoteContinuation, defaults.quoteContinuation),
         showReleaseNotes: asBoolean(data.showReleaseNotes, defaults.showReleaseNotes),
+
+        fileMode: asFileMode(data.fileMode),
 
         imageMode: asImageMode(data.imageMode, (data as Record<string, unknown>).imageEnabled),
         // The former imageNameFormat dropdown gated the template. A vault that stored

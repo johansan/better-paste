@@ -99,7 +99,13 @@ export const STRINGS_AR: TranslationStrings = {
         },
 
         images: {
-            heading: 'الصور',
+            heading: 'المرفقات',
+            fileModeName: 'الملفات الملصقة',
+            fileModeDesc:
+                'اختر ما يحدث عند لصق ملفات من جهازك، مثل ملفات PDF ولقطات الشاشة. «لا تفعل شيئًا» يدع Obsidian يتولى اللصق بما في ذلك المعاينة، و«ربط بدون معاينة» يزيل علامة التعجب.',
+            fileModeChoiceOff: 'لا تفعل شيئًا',
+            fileModeChoiceLink: 'ربط بدون معاينة',
+            fileModeAliases: ['ملف', 'مرفق', 'معاينة', 'تضمين', 'رابط', 'pdf', 'لقطة شاشة', 'علامة تعجب'],
             savingName: 'صور الويب',
             savingDesc:
                 'اختر ما يحدث عند لصق روابط لصور من الويب. «لا تفعل شيئًا» يترك اللصق كما هو، و«ربط مع معاينة» يعرض الصورة مباشرة من الويب، و«تنزيل مع معاينة» يحفظ نسخة في خزنتك.',
@@ -361,7 +367,6 @@ export const STRINGS_AR: TranslationStrings = {
         categoryFixed: 'مُصلح',
         support: 'إذا كان Better Paste مفيدًا لك، ففكّر في دعم تطويره.',
         coffeeButton: '☕️ اشترِ لي قهوة',
-        thanksButton: 'شكرًا!',
-        dontShowAgain: 'عدم العرض مجددًا بعد التحديثات'
+        thanksButton: 'شكرًا!'
     }
 };

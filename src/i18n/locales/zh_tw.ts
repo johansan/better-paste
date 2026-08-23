@@ -85,7 +85,13 @@ export const STRINGS_ZH_TW: TranslationStrings = {
         },
 
         images: {
-            heading: '圖片',
+            heading: '附件',
+            fileModeName: '貼上的檔案',
+            fileModeDesc:
+                '選擇從裝置貼上檔案（如 PDF 和螢幕截圖）時的處理方式。「什麼都不做」讓 Obsidian 照常貼上，預覽也一併保留。「連結但不預覽」則移除驚嘆號。',
+            fileModeChoiceOff: '什麼都不做',
+            fileModeChoiceLink: '連結但不預覽',
+            fileModeAliases: ['檔案', '附件', '預覽', '嵌入', '連結', 'pdf', '螢幕截圖', '驚嘆號'],
             savingName: '網路圖片',
             savingDesc:
                 '選擇貼上網路圖片連結時的處理方式。「什麼都不做」保持貼上內容原樣，「連結並預覽」直接從網路顯示圖片，「下載並預覽」則把副本儲存到你的儲存庫。',
@@ -296,7 +302,6 @@ export const STRINGS_ZH_TW: TranslationStrings = {
         categoryFixed: '修正',
         support: '如果 Better Paste 對你有幫助，歡迎支持它的開發。',
         coffeeButton: '☕️ 請我喝杯咖啡',
-        thanksButton: '謝謝！',
-        dontShowAgain: '更新後不再顯示'
+        thanksButton: '謝謝！'
     }
 };

@@ -91,7 +91,22 @@ export const STRINGS_ES: TranslationStrings = {
         },
 
         images: {
-            heading: 'Imágenes',
+            heading: 'Adjuntos',
+            fileModeName: 'Archivos pegados',
+            fileModeDesc:
+                'Elige qué pasa cuando pegas archivos desde tu dispositivo, como PDF y capturas de pantalla. "No hacer nada" deja lo pegado en manos de Obsidian, vista previa incluida. "Enlazar sin vista previa" elimina el signo de exclamación.',
+            fileModeChoiceOff: 'No hacer nada',
+            fileModeChoiceLink: 'Enlazar sin vista previa',
+            fileModeAliases: [
+                'archivo',
+                'adjunto',
+                'vista previa',
+                'incrustar',
+                'enlace',
+                'pdf',
+                'captura de pantalla',
+                'signo de exclamación'
+            ],
             savingName: 'Imágenes de la web',
             savingDesc:
                 'Elige qué pasa cuando pegas enlaces a imágenes de la web. "No hacer nada" deja lo pegado tal cual, "Enlazar con vista previa" muestra la imagen directamente desde la web y "Descargar con vista previa" guarda una copia en tu bóveda.',
@@ -323,7 +338,6 @@ export const STRINGS_ES: TranslationStrings = {
         categoryFixed: 'Corregido',
         support: 'Si Better Paste te resulta útil, considera apoyar su desarrollo.',
         coffeeButton: '☕️ Invítame a un café',
-        thanksButton: '¡Gracias!',
-        dontShowAgain: 'No volver a mostrar tras las actualizaciones'
+        thanksButton: '¡Gracias!'
     }
 };

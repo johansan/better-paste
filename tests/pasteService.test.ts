@@ -27,7 +27,7 @@ import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import type { BetterPasteSettings, TextSnippet } from '../src/settings/types';
 import { FakeEditor, fakeClipboardEvent, fakeFile } from './stubs/editor';
 import { Notice } from './stubs/obsidian';
-import type { MarkdownFileInfo, MarkdownView } from 'obsidian';
+import type { Editor, MarkdownFileInfo, MarkdownView } from 'obsidian';
 
 const INFO = { file: { path: 'Notes/Test.md' } } as unknown as MarkdownView | MarkdownFileInfo;
 
@@ -76,7 +76,8 @@ function fakeImages(settings: BetterPasteSettings, failing = false, saved?: Save
             if (failing) return null;
             // Name the saved file after the source picture, as the real service does
             const base = source ? (source.split('/').pop() ?? file.name).replace(/\.[a-z0-9]+$/i, '') : file.name;
-            return { embed: `![[${base}.png${embedSuffix(size, cssClass)}]]`, file: { path: `${base}.png` } };
+            const embed = settings.fileMode === 'link' ? `[[${base}.png]]` : `![[${base}.png${embedSuffix(size, cssClass)}]]`;
+            return { embed, file: { path: `${base}.png` } };
         },
         discardFiles: async () => undefined,
         dispose: () => undefined
@@ -120,6 +121,7 @@ function build(overrides: Partial<BetterPasteSettings> = {}, failing = false, pr
     const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, imageMode: 'download', ...overrides };
     const saved: SavedClipboardImages[] = [];
     const fetchedTitles: string[] = [];
+    const nativeFilePastes: { files: readonly File[]; editor: Editor }[] = [];
     const service = new PasteService(
         () => settings,
         fakeImages(settings, failing, saved),
@@ -127,9 +129,11 @@ function build(overrides: Partial<BetterPasteSettings> = {}, failing = false, pr
         async (sizes, classes) => {
             prompt?.calls.push({ sizes, classes });
             return prompt?.response ?? null;
-        }
+        },
+        undefined,
+        (files, editor) => nativeFilePastes.push({ files, editor })
     );
-    return { settings, service, saved, fetchedTitles };
+    return { settings, service, saved, fetchedTitles, nativeFilePastes };
 }
 
 /** Lets queued timers and download promises settle. */
@@ -570,6 +574,102 @@ describe('isSingleImageFile', () => {
     it('accepts a blank type when the file name has an image extension', () => {
         expect(isSingleImageFile([fakeFile('photo.png', '')])).toBe(true);
         expect(isSingleImageFile([fakeFile('notes.pdf', '')])).toBe(false);
+    });
+});
+
+describe('handleEditorPaste: pasted file links', () => {
+    it('arms the native rewrite for a PDF while leaving the paste to Obsidian', () => {
+        const file = fakeFile('Document.pdf', 'application/pdf');
+        const { service, nativeFilePastes } = build({ fileMode: 'link' });
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ files: [file] }), editor.asEditor(), INFO)).toBe(false);
+        expect(nativeFilePastes).toEqual([{ files: [file], editor: editor.asEditor() }]);
+    });
+
+    it('does not arm the native rewrite in the default preview mode', () => {
+        const { service, nativeFilePastes } = build();
+
+        expect(
+            service.handleEditorPaste(
+                fakeClipboardEvent({ files: [fakeFile('Document.pdf', 'application/pdf')] }),
+                new FakeEditor('').asEditor(),
+                INFO
+            )
+        ).toBe(false);
+        expect(nativeFilePastes).toHaveLength(0);
+    });
+
+    it('arms the native rewrite when automatic cleanup is off or the cursor is in code', () => {
+        const file = fakeFile('Document.pdf', 'application/pdf');
+        const disabled = build({ fileMode: 'link', autoClean: false });
+        const inCode = build({ fileMode: 'link' });
+
+        expect(disabled.service.handleEditorPaste(fakeClipboardEvent({ files: [file] }), new FakeEditor('').asEditor(), INFO)).toBe(false);
+        expect(inCode.service.handleEditorPaste(fakeClipboardEvent({ files: [file] }), new FakeEditor('`code`', 3).asEditor(), INFO)).toBe(
+            false
+        );
+
+        expect(disabled.nativeFilePastes).toHaveLength(1);
+        expect(inCode.nativeFilePastes).toHaveLength(1);
+    });
+
+    it('keeps the preview in a note whose property opts out of paste handling', () => {
+        const content = '---\nbp: false\n---\n\n';
+        const { service, nativeFilePastes } = build({ fileMode: 'link' });
+        const editor = new FakeEditor(content, content.length);
+
+        expect(
+            service.handleEditorPaste(fakeClipboardEvent({ files: [fakeFile('Document.pdf', 'application/pdf')] }), editor.asEditor(), INFO)
+        ).toBe(false);
+        expect(nativeFilePastes).toHaveLength(0);
+    });
+
+    it('leaves named images and multi-file pastes to the native rewrite', () => {
+        const named = fakeFile('photo.png', 'image/png');
+        const document = fakeFile('Document.pdf', 'application/pdf');
+        const { service, nativeFilePastes } = build({ fileMode: 'link', imageSizeChoice: '400' });
+        const editor = new FakeEditor('');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ files: [named] }), editor.asEditor(), INFO)).toBe(false);
+        expect(service.handleEditorPaste(fakeClipboardEvent({ files: [named, document] }), editor.asEditor(), INFO)).toBe(false);
+
+        expect(nativeFilePastes.map(paste => paste.files)).toEqual([[named], [named, document]]);
+    });
+
+    it('inserts a direct link for a clipboard bitmap without asking for embed options', async () => {
+        const prompt: PromptDouble = { response: { size: '400', cssClass: 'invert' }, calls: [] };
+        const { service, saved } = build(
+            { fileMode: 'link', imageSizeChoice: 'ask', imageClassChoice: 'ask', imageClassOptions: 'invert' },
+            false,
+            prompt
+        );
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({
+            html: '<img src="https://example.com/photo.webp" alt="A photo">',
+            files: [fakeFile('image.png', 'image/png')]
+        });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(prompt.calls).toHaveLength(0);
+        expect(saved).toMatchObject([{ size: null, cssClass: null }]);
+        expect(editor.getValue()).toBe('[[photo.png]]');
+    });
+
+    it('keeps visible text when removing the preview marker from a fallback web link', async () => {
+        const { service } = build({ fileMode: 'link' }, true);
+        const editor = new FakeEditor('');
+        const event = fakeClipboardEvent({
+            html: '<img src="https://example.com/photo.png" alt="A photo">',
+            files: [fakeFile('image.png', 'image/png')]
+        });
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(editor.getValue()).toBe('[A photo](https://example.com/photo.png)');
     });
 });
 

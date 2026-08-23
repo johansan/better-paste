@@ -85,7 +85,13 @@ export const STRINGS_ID: TranslationStrings = {
         },
 
         images: {
-            heading: 'Gambar',
+            heading: 'Lampiran',
+            fileModeName: 'Berkas yang ditempel',
+            fileModeDesc:
+                'Pilih apa yang terjadi saat Anda menempel berkas dari perangkat, seperti PDF dan tangkapan layar. "Jangan lakukan apa-apa" membiarkan Obsidian menangani tempelan, termasuk pratinjaunya, dan "Tautkan tanpa pratinjau" menghapus tanda seru.',
+            fileModeChoiceOff: 'Jangan lakukan apa-apa',
+            fileModeChoiceLink: 'Tautkan tanpa pratinjau',
+            fileModeAliases: ['berkas', 'file', 'lampiran', 'pratinjau', 'sematkan', 'tautan', 'pdf', 'tangkapan layar', 'tanda seru'],
             savingName: 'Gambar web',
             savingDesc:
                 'Pilih apa yang terjadi saat Anda menempel tautan gambar dari web. "Jangan lakukan apa-apa" membiarkan tempelan apa adanya, "Tautkan dengan pratinjau" menampilkan gambar langsung dari web, dan "Unduh dengan pratinjau" menyimpan salinannya ke brankas Anda.',
@@ -314,7 +320,6 @@ export const STRINGS_ID: TranslationStrings = {
         categoryFixed: 'Diperbaiki',
         support: 'Jika Better Paste bermanfaat bagi Anda, pertimbangkan untuk mendukung pengembangannya.',
         coffeeButton: '☕️ Traktir saya kopi',
-        thanksButton: 'Terima kasih!',
-        dontShowAgain: 'Jangan tampilkan lagi setelah pembaruan'
+        thanksButton: 'Terima kasih!'
     }
 };

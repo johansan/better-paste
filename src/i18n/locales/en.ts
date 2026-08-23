@@ -101,7 +101,13 @@ export const STRINGS_EN = {
         },
 
         images: {
-            heading: 'Images',
+            heading: 'Attachments',
+            fileModeName: 'Pasted files',
+            fileModeDesc:
+                'Choose what happens when you paste files from your device, like PDFs and screenshots. "Do nothing" leaves the paste to Obsidian, preview included. "Link without preview" removes the exclamation mark.',
+            fileModeChoiceOff: 'Do nothing',
+            fileModeChoiceLink: 'Link without preview',
+            fileModeAliases: ['file', 'attachment', 'preview', 'embed', 'link', 'pdf', 'screenshot', 'exclamation mark'],
             savingName: 'Web images',
             savingDesc:
                 'Choose what happens when you paste links to images from the web. "Do nothing" keeps the paste as it is, "Link with preview" shows the image straight from the web, and "Download with preview" saves a copy to your vault.',
@@ -332,7 +338,6 @@ export const STRINGS_EN = {
         categoryFixed: 'Fixed',
         support: 'If you find Better Paste useful, please consider supporting its development.',
         coffeeButton: '☕️ Buy me a coffee',
-        thanksButton: 'Thanks!',
-        dontShowAgain: "Don't show this again after updates"
+        thanksButton: 'Thanks!'
     }
 };

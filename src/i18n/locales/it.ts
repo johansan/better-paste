@@ -91,7 +91,13 @@ export const STRINGS_IT: TranslationStrings = {
         },
 
         images: {
-            heading: 'Immagini',
+            heading: 'Allegati',
+            fileModeName: 'File incollati',
+            fileModeDesc:
+                'Scegli cosa succede quando incolli file dal tuo dispositivo, come PDF e screenshot. "Non fare nulla" lascia l’incollaggio a Obsidian, anteprima compresa. "Collega senza anteprima" rimuove il punto esclamativo.',
+            fileModeChoiceOff: 'Non fare nulla',
+            fileModeChoiceLink: 'Collega senza anteprima',
+            fileModeAliases: ['file', 'allegato', 'anteprima', 'incorpora', 'collegamento', 'pdf', 'screenshot', 'punto esclamativo'],
             savingName: 'Immagini dal web',
             savingDesc:
                 'Scegli cosa succede quando incolli link a immagini dal web. "Non fare nulla" lascia il contenuto incollato com’è, "Collega con anteprima" mostra l’immagine direttamente dal web e "Scarica con anteprima" salva una copia nel tuo vault.',
@@ -324,7 +330,6 @@ export const STRINGS_IT: TranslationStrings = {
         categoryFixed: 'Corretto',
         support: 'Se Better Paste ti è utile, valuta di sostenerne lo sviluppo.',
         coffeeButton: '☕️ Offrimi un caffè',
-        thanksButton: 'Grazie!',
-        dontShowAgain: 'Non mostrare più dopo gli aggiornamenti'
+        thanksButton: 'Grazie!'
     }
 };

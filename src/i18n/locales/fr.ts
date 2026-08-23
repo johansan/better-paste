@@ -91,7 +91,13 @@ export const STRINGS_FR: TranslationStrings = {
         },
 
         images: {
-            heading: 'Images',
+            heading: 'Pièces jointes',
+            fileModeName: 'Fichiers collés',
+            fileModeDesc:
+                'Choisissez ce qui se passe quand vous collez des fichiers depuis votre appareil, comme des PDF et des captures d’écran. « Ne rien faire » laisse Obsidian gérer le collage, aperçu compris. « Lier sans aperçu » supprime le point d’exclamation.',
+            fileModeChoiceOff: 'Ne rien faire',
+            fileModeChoiceLink: 'Lier sans aperçu',
+            fileModeAliases: ['fichier', 'pièce jointe', 'aperçu', 'intégrer', 'lien', 'pdf', 'capture d’écran', 'point d’exclamation'],
             savingName: 'Images du web',
             savingDesc:
                 'Choisissez ce qui se passe quand vous collez des liens vers des images du web. « Ne rien faire » laisse le collage tel quel, « Lier avec aperçu » affiche l’image directement depuis le web, et « Télécharger avec aperçu » enregistre une copie dans votre coffre.',
@@ -323,7 +329,6 @@ export const STRINGS_FR: TranslationStrings = {
         categoryFixed: 'Corrigé',
         support: 'Si Better Paste vous est utile, envisagez de soutenir son développement.',
         coffeeButton: '☕️ Offrez-moi un café',
-        thanksButton: 'Merci !',
-        dontShowAgain: 'Ne plus afficher après les mises à jour'
+        thanksButton: 'Merci !'
     }
 };

@@ -20,6 +20,21 @@
 // Only the members the tested code paths touch at import time are provided; anything
 // that performs real Obsidian work throws so a test can never silently depend on it.
 
+import { StateField } from '@codemirror/state';
+
+let currentEditorInfo: unknown = null;
+
+/** CodeMirror field used by the attachment transaction filter. */
+export const editorInfoField = StateField.define<unknown>({
+    create: () => currentEditorInfo,
+    update: value => value
+});
+
+/** Supplies the value returned by editorInfoField when a test creates an editor state. */
+export function setEditorInfoForTest(info: unknown): void {
+    currentEditorInfo = info;
+}
+
 /**
  * Obsidian's interface language. Tests run against English, which is also what the real
  * call returns when the user has not chosen another language.
@@ -81,6 +96,10 @@ export class TFile {
     path = '';
     basename = '';
     extension = '';
+
+    get name(): string {
+        return this.path.split('/').pop() ?? '';
+    }
 }
 
 export class Plugin {}

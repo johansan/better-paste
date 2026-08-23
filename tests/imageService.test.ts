@@ -23,7 +23,7 @@ import { ImageService } from '../src/paste/ImageService';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import type { BetterPasteSettings } from '../src/settings/types';
 
-function build(overrides: Partial<BetterPasteSettings> = {}, seededPaths: string[] = []) {
+function build(overrides: Partial<BetterPasteSettings> = {}, seededPaths: string[] = [], markdownLinks = false) {
     const writes: { path: string; data: ArrayBuffer }[] = [];
     const existing = new Set<string>();
     const files: TFile[] = [];
@@ -52,7 +52,9 @@ function build(overrides: Partial<BetterPasteSettings> = {}, seededPaths: string
                 return path;
             },
             generateMarkdownLink: (file: TFile, _sourcePath: string, subpath?: string, alias?: string) =>
-                `[[${file.path}${subpath ?? ''}${alias ? `|${alias}` : ''}]]`
+                markdownLinks
+                    ? `[${alias ?? ''}](${file.path}${subpath ?? ''})`
+                    : `[[${file.path}${subpath ?? ''}${alias ? `|${alias}` : ''}]]`
         },
         metadataCache: {
             // The real resolver returns the shortest unambiguous link text
@@ -265,6 +267,32 @@ describe('ImageService', () => {
         await service.saveClipboardImage(file, '', 'Notes/Test.md');
 
         expect(writes[0].path).toBe('Attachments/photo.png');
+    });
+
+    it('returns a link without embed decoration for a clipboard file in link mode', async () => {
+        const { service } = build({ fileMode: 'link' });
+        const file = { name: 'photo.png', type: 'image/png', size: 1, arrayBuffer: async () => new ArrayBuffer(1) } as File;
+
+        const result = await service.saveClipboardImage(file, '', 'Notes/Test.md', '400', 'invert');
+
+        expect(result?.embed).toBe('[[Attachments/photo.png]]');
+    });
+
+    it('adds the file name to a Markdown link for a clipboard file in link mode', async () => {
+        const { service } = build({ fileMode: 'link' }, [], true);
+        const file = { name: 'photo.png', type: 'image/png', size: 1, arrayBuffer: async () => new ArrayBuffer(1) } as File;
+
+        const result = await service.saveClipboardImage(file, '', 'Notes/Test.md');
+
+        expect(result?.embed).toBe('[photo.png](Attachments/photo.png)');
+    });
+
+    it('still embeds an image that came from pasted Markdown in file link mode', async () => {
+        const { service } = build({ fileMode: 'link' });
+
+        const result = await service.materializeImages('![](data:image/png;base64,AA==)', 'Notes/Test.md');
+
+        expect(result.text).toBe('![[Attachments/pasted-image.png]]');
     });
 
     it('rejects an oversized clipboard file before reading its bytes', async () => {

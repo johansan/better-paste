@@ -85,7 +85,13 @@ export const STRINGS_VI: TranslationStrings = {
         },
 
         images: {
-            heading: 'Hình ảnh',
+            heading: 'Tệp đính kèm',
+            fileModeName: 'Tệp đã dán',
+            fileModeDesc:
+                'Chọn điều xảy ra khi bạn dán tệp từ thiết bị, như PDF và ảnh chụp màn hình. "Không làm gì" để Obsidian tự xử lý việc dán, kèm cả bản xem trước, còn "Liên kết không kèm xem trước" xóa dấu chấm than.',
+            fileModeChoiceOff: 'Không làm gì',
+            fileModeChoiceLink: 'Liên kết không kèm xem trước',
+            fileModeAliases: ['tệp', 'đính kèm', 'xem trước', 'nhúng', 'liên kết', 'pdf', 'ảnh chụp màn hình', 'dấu chấm than'],
             savingName: 'Ảnh từ web',
             savingDesc:
                 'Chọn điều xảy ra khi bạn dán liên kết ảnh từ web. "Không làm gì" giữ nguyên nội dung dán, "Liên kết kèm xem trước" hiển thị ảnh trực tiếp từ web, còn "Tải xuống kèm xem trước" lưu một bản sao vào kho của bạn.',
@@ -316,7 +322,6 @@ export const STRINGS_VI: TranslationStrings = {
         categoryFixed: 'Sửa lỗi',
         support: 'Nếu Better Paste hữu ích với bạn, hãy cân nhắc ủng hộ việc phát triển.',
         coffeeButton: '☕️ Mời tôi ly cà phê',
-        thanksButton: 'Cảm ơn!',
-        dontShowAgain: 'Không hiện lại sau khi cập nhật'
+        thanksButton: 'Cảm ơn!'
     }
 };

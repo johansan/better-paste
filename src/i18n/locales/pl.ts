@@ -95,7 +95,13 @@ export const STRINGS_PL: TranslationStrings = {
         },
 
         images: {
-            heading: 'Obrazy',
+            heading: 'Załączniki',
+            fileModeName: 'Wklejone pliki',
+            fileModeDesc:
+                'Wybierz, co się dzieje, gdy wklejasz pliki z urządzenia, na przykład PDF-y i zrzuty ekranu. „Nic nie rób” zostawia wklejanie Obsidianowi, razem z podglądem. „Linkuj bez podglądu” usuwa wykrzyknik.',
+            fileModeChoiceOff: 'Nic nie rób',
+            fileModeChoiceLink: 'Linkuj bez podglądu',
+            fileModeAliases: ['plik', 'załącznik', 'podgląd', 'osadź', 'link', 'pdf', 'zrzut ekranu', 'wykrzyknik'],
             savingName: 'Obrazy z sieci',
             savingDesc:
                 'Wybierz, co się dzieje, gdy wklejasz linki do obrazów z sieci. „Nic nie rób” zostawia wklejoną treść bez zmian, „Linkuj z podglądem” pokazuje obraz prosto z sieci, a „Pobierz z podglądem” zapisuje kopię w twoim sejfie.',
@@ -347,7 +353,6 @@ export const STRINGS_PL: TranslationStrings = {
         categoryFixed: 'Poprawione',
         support: 'Jeśli Better Paste jest dla ciebie przydatny, rozważ wsparcie jego rozwoju.',
         coffeeButton: '☕️ Postaw mi kawę',
-        thanksButton: 'Dzięki!',
-        dontShowAgain: 'Nie pokazuj ponownie po aktualizacjach'
+        thanksButton: 'Dzięki!'
     }
 };

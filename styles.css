@@ -327,8 +327,7 @@
     margin-top: var(--size-4-4);
 }
 
-.better-paste-overlap-remind,
-.better-paste-modal-remind {
+.better-paste-overlap-remind {
     display: flex;
     align-items: center;
     justify-content: center;

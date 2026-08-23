@@ -40,6 +40,12 @@ describe('normalizeSettings', () => {
         expect(normalizeSettings({ imageMode: 'invalid' }).imageMode).toBe('link');
     });
 
+    it('validates the pasted files mode', () => {
+        expect(normalizeSettings({}).fileMode).toBe('off');
+        expect(normalizeSettings({ fileMode: 'link' }).fileMode).toBe('link');
+        expect(normalizeSettings({ fileMode: 'preview' }).fileMode).toBe('off');
+    });
+
     it('seeds custom snippets for missing data', () => {
         const result = normalizeSettings(null);
 

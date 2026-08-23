@@ -85,7 +85,13 @@ export const STRINGS_JA: TranslationStrings = {
         },
 
         images: {
-            heading: '画像',
+            heading: '添付ファイル',
+            fileModeName: '貼り付けたファイル',
+            fileModeDesc:
+                'デバイスからファイル（PDFやスクリーンショットなど）を貼り付けたときの動作を選べます。「何もしない」はプレビューも含めて貼り付けを Obsidian に任せ、「プレビューなしでリンク」は感嘆符を取り除きます。',
+            fileModeChoiceOff: '何もしない',
+            fileModeChoiceLink: 'プレビューなしでリンク',
+            fileModeAliases: ['ファイル', '添付', 'プレビュー', '埋め込み', 'リンク', 'pdf', 'スクリーンショット', '感嘆符'],
             savingName: 'ウェブ画像',
             savingDesc:
                 'ウェブ画像へのリンクを貼り付けたときの動作を選べます。「何もしない」は貼り付けた内容をそのまま残し、「プレビュー付きでリンク」はウェブから直接画像を表示し、「プレビュー付きでダウンロード」は保管庫にコピーを保存します。',
@@ -324,7 +330,6 @@ export const STRINGS_JA: TranslationStrings = {
         categoryFixed: '修正',
         support: 'Better Paste が役に立ったら、開発の支援をご検討ください。',
         coffeeButton: '☕️ コーヒーをおごる',
-        thanksButton: 'ありがとう!',
-        dontShowAgain: '更新後に表示しない'
+        thanksButton: 'ありがとう!'
     }
 };

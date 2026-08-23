@@ -42,6 +42,7 @@ const STORED_STATE_KEYS = ['lastShownVersion', 'imageLastSize', 'imageLastClass'
 
 /** Settings owned by a custom-rendered row rather than a declarative control. */
 const CUSTOM_RENDER_SETTING_KEYS = [
+    'fileMode',
     'imageMode',
     'imageNameTemplate',
     'imageSizeChoice',
@@ -329,7 +330,7 @@ describe('settings tree', () => {
 
         expect(groups.map(group => group.heading)).toEqual([
             undefined,
-            'Images',
+            'Attachments',
             'Links',
             'Text processing',
             'Custom processing',
@@ -338,17 +339,18 @@ describe('settings tree', () => {
         ]);
     });
 
-    it('puts the note property under the master toggle and the width property under Images', () => {
+    it('puts the note property under the master toggle and the width property under Attachments', () => {
         const groups = tab
             .getSettingDefinitions()
             .filter((item): item is SettingDefinitionGroup => 'type' in item && item.type === 'group');
         const top = groups.find(group => group.heading === undefined);
-        const images = groups.find(group => group.heading === 'Images');
+        const images = groups.find(group => group.heading === 'Attachments');
 
         const topNames = flatten([...(top?.items ?? [])]).map(row => row.name);
         expect(topNames).toEqual(['Clean up every paste', 'Note property']);
 
         const imageNames = flatten([...(images?.items ?? [])]).map(row => row.name);
+        expect(imageNames.slice(0, 2)).toEqual(['Web images', 'Pasted files']);
         expect(imageNames.indexOf('Image width property')).toBeGreaterThan(imageNames.indexOf('Size options'));
     });
 
@@ -380,6 +382,12 @@ describe('settings tree', () => {
         const dashesRow = controlRows(tab).find(candidate => candidate.control.key === 'textDashes');
         expect(quotesRow?.control.type).toBe('toggle');
         expect(dashesRow?.control.type).toBe('toggle');
+    });
+
+    it('shows the unchanged paste example while the pasted files mode is off', () => {
+        const row = flatten(tab.getSettingDefinitions()).find(candidate => candidate.name === 'Pasted files');
+
+        expect(row?.desc).toContain('![[Document.pdf]] → ![[Document.pdf]]');
     });
 
     it('shows an example for each character cleanup setting', () => {
@@ -418,7 +426,7 @@ describe('settings tree', () => {
             'Text processing',
             'Custom processing',
             'Structure',
-            'Images',
+            'Attachments',
             'Note'
         ]);
     });

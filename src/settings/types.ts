@@ -40,6 +40,11 @@ export interface BetterPasteSettings {
     /** Continue every line of a multi-line paste inside the destination block quote. */
     quoteContinuation: boolean;
 
+    /* Attachments */
+
+    /** Device file handling: off keeps Obsidian's preview embeds, link inserts plain links. */
+    fileMode: 'off' | 'link';
+
     /* Images */
 
     /** Web image handling: off leaves references alone, link embeds URLs, download saves files. */

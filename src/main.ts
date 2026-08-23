@@ -18,6 +18,7 @@
 
 import { Notice, Plugin } from 'obsidian';
 import type { Editor, MarkdownFileInfo, MarkdownView } from 'obsidian';
+import { AttachmentLinkService } from './paste/AttachmentLinkService';
 import { ImageService } from './paste/ImageService';
 import { LinkTitleService } from './paste/LinkTitleService';
 import { PasteService } from './paste/PasteService';
@@ -62,6 +63,7 @@ const OVERLAP_DISMISSED_KEY = 'better-paste-overlap-dismissed';
 export default class BetterPastePlugin extends Plugin {
     settings: BetterPasteSettings = DEFAULT_SETTINGS;
     private pasteService!: PasteService;
+    private attachmentLinkService!: AttachmentLinkService;
     /** The image options dialog while it is open, closed on unload so it cannot outlive the plugin. */
     private imageModal: ImageEmbedModal | null = null;
     /** The PDF cleanup dialog while it is open, closed on unload for the same reason. */
@@ -78,12 +80,16 @@ export default class BetterPastePlugin extends Plugin {
 
         const imageService = new ImageService(this.app, () => this.settings);
         const linkTitleService = new LinkTitleService(() => this.settings);
+        this.attachmentLinkService = new AttachmentLinkService(this.app);
+        this.registerEditorExtension(this.attachmentLinkService.extension);
+        this.registerEvent(this.app.vault.on('create', file => this.attachmentLinkService.handleFileCreated(file)));
         this.pasteService = new PasteService(
             () => this.settings,
             imageService,
             linkTitleService,
             (sizes, classes) => this.promptImageOptions(sizes, classes),
-            text => this.promptPdfOptions(text)
+            text => this.promptPdfOptions(text),
+            (files, editor) => this.attachmentLinkService.arm(files, editor)
         );
 
         this.registerEvent(
@@ -190,6 +196,7 @@ export default class BetterPastePlugin extends Plugin {
         // An image write may still be in flight; this stops it editing a note that the
         // plugin no longer owns
         this.pasteService.dispose();
+        this.attachmentLinkService.dispose();
     }
 
     /**
@@ -328,31 +335,17 @@ export default class BetterPastePlugin extends Plugin {
 
         if (!shouldAutoDisplayReleaseNotesForUpdate(lastShownVersion, currentVersion)) return;
 
-        this.openWhatsNew(getReleaseNotesForUpdate(lastShownVersion, currentVersion), true);
+        this.openWhatsNew(getReleaseNotesForUpdate(lastShownVersion, currentVersion));
     }
 
-    /** The don't-show-again checkbox appears only when the dialog opened by itself after an update. */
-    private openWhatsNew(releaseNotes: ReleaseNote[], offerDontShowAgain = false): void {
-        this.startupModal = new WhatsNewModal(
-            this.app,
-            releaseNotes,
-            () => {
-                // Closed by unload rather than by the user: leaving the marker alone means
-                // the dialog simply shows again next time, while advancing it here would
-                // write through a plugin instance that no longer owns its settings
-                if (this.unloaded) return;
-                this.advanceLastShownVersion(this.manifest.version).catch(error =>
-                    logError('Could not record the shown release notes', error)
-                );
-            },
-            offerDontShowAgain
-                ? () => {
-                      if (this.unloaded) return;
-                      this.settings.showReleaseNotes = false;
-                      this.saveSettings().catch(error => logError('Could not save the release notes setting', error));
-                  }
-                : null
-        );
+    private openWhatsNew(releaseNotes: ReleaseNote[]): void {
+        this.startupModal = new WhatsNewModal(this.app, releaseNotes, () => {
+            // Closed by unload rather than by the user: leaving the marker alone means
+            // the dialog simply shows again next time, while advancing it here would
+            // write through a plugin instance that no longer owns its settings
+            if (this.unloaded) return;
+            this.advanceLastShownVersion(this.manifest.version).catch(error => logError('Could not record the shown release notes', error));
+        });
         this.startupModal.open();
     }
 

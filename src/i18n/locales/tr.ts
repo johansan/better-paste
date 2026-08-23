@@ -91,7 +91,13 @@ export const STRINGS_TR: TranslationStrings = {
         },
 
         images: {
-            heading: 'Görseller',
+            heading: 'Ekler',
+            fileModeName: 'Yapıştırılan dosyalar',
+            fileModeDesc:
+                'Cihazınızdan PDF ve ekran görüntüsü gibi dosyalar yapıştırdığınızda ne olacağını seçin. "Hiçbir şey yapma" yapıştırmayı önizlemesiyle birlikte Obsidian’a bırakır. "Önizlemesiz bağlantı ver" ise ünlem işaretini kaldırır.',
+            fileModeChoiceOff: 'Hiçbir şey yapma',
+            fileModeChoiceLink: 'Önizlemesiz bağlantı ver',
+            fileModeAliases: ['dosya', 'ek', 'önizleme', 'göm', 'bağlantı', 'pdf', 'ekran görüntüsü', 'ünlem işareti'],
             savingName: 'Web görselleri',
             savingDesc:
                 'Webden görsel bağlantısı yapıştırdığınızda ne olacağını seçin. "Hiçbir şey yapma" yapıştırılanı olduğu gibi bırakır, "Önizlemeyle bağlantı ver" görseli doğrudan webden gösterir, "Önizlemeyle indir" ise kasanıza bir kopya kaydeder.',
@@ -321,7 +327,6 @@ export const STRINGS_TR: TranslationStrings = {
         categoryFixed: 'Düzeltildi',
         support: 'Better Paste işinize yarıyorsa geliştirilmesini desteklemeyi düşünün.',
         coffeeButton: '☕️ Bana bir kahve ısmarla',
-        thanksButton: 'Teşekkürler!',
-        dontShowAgain: 'Güncellemelerden sonra bir daha gösterme'
+        thanksButton: 'Teşekkürler!'
     }
 };
