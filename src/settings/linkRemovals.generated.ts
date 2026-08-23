@@ -18,7 +18,7 @@
 
 // Generated from LINK_REMOVALS.md. Edit that file, then run npm run generate:link-removals.
 
-export const LINK_REMOVALS_UPDATED = '2026-08-17';
+export const LINK_REMOVALS_UPDATED = '2026-08-23';
 
 export const SIGNED_URL_PARAM_SETS = [
     ['X-Amz-Signature'],
@@ -57,6 +57,7 @@ export const TRACKING_PARAMS = [
     's_kwcid',
     'WT.mc_id',
     '_bhlid',
+    'bsft_*',
     'ck_subscriber_id',
     'elqCampaignId',
     'mc_cid',

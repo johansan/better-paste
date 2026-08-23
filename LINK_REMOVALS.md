@@ -1,6 +1,6 @@
 # Built-in link removals
 
-Last updated: 2026-08-17
+Last updated: 2026-08-23
 
 This file is the source for the removal lists bundled with Better Paste. Plugin updates can add new entries. Anything not listed in this file stays in the link: a Wall Street Journal gift link keeps `st=gift123`, a shared Slack file keeps `pub_secret`, and a Zoom invite keeps `pwd`.
 
@@ -56,6 +56,7 @@ WT.mc_id
 
 # Email marketing
 _bhlid
+bsft_*
 ck_subscriber_id
 elqCampaignId
 mc_cid

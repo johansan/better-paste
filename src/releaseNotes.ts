@@ -53,6 +53,7 @@ const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.11',
         date: '2026-08-22',
+        improved: ['Added Blueshift email tracking codes to the built-in link removals.'],
         fixed: [
             'Fixed block quote and callout continuation for formatted multi-paragraph pastes on mobile.',
             'Fixed link titles for numbered, bulleted and task lists of URLs.'

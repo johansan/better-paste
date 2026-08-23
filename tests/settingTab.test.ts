@@ -471,7 +471,7 @@ describe('settings values', () => {
     it('describes the built-in removals separately from the user list', () => {
         const builtIn = flatten(tab.getSettingDefinitions()).find(row => row.name === 'Built-in removals');
         expect(builtIn?.desc).toBe(
-            'Updated August 17, 2026. Global tracking filters: 75. Site-specific rules: 18. Cryptographically signed links stay unchanged.'
+            'Updated August 23, 2026. Global tracking filters: 76. Site-specific rules: 18. Cryptographically signed links stay unchanged.'
         );
         expect(tab.getControlValue('linkRemovals.text')).toBe('');
     });
