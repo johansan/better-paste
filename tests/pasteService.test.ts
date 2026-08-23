@@ -673,6 +673,36 @@ describe('handleEditorPaste: pasted file links', () => {
     });
 });
 
+describe('handleEditorDrop: native attachments', () => {
+    function drop(files: readonly File[] | null): DragEvent {
+        return { dataTransfer: files === null ? null : { files } } as unknown as DragEvent;
+    }
+
+    it('arms file drops in link mode', () => {
+        const file = fakeFile('photo.png', 'image/png');
+        const link = build({ fileMode: 'link' });
+        const editor = new FakeEditor('');
+
+        link.service.handleEditorDrop(drop([file]), editor.asEditor(), INFO);
+
+        expect(link.nativeFilePastes).toHaveLength(1);
+    });
+
+    it('does not arm without files, with default behavior, or when the note opts out', () => {
+        const defaults = build();
+        const optedOut = build({ fileMode: 'link' });
+        const editor = new FakeEditor('---\nbp: false\n---\n');
+
+        defaults.service.handleEditorDrop(drop(null), editor.asEditor(), INFO);
+        defaults.service.handleEditorDrop(drop([]), editor.asEditor(), INFO);
+        defaults.service.handleEditorDrop(drop([fakeFile('photo.png', 'image/png')]), editor.asEditor(), INFO);
+        optedOut.service.handleEditorDrop(drop([fakeFile('photo.png', 'image/png')]), editor.asEditor(), INFO);
+
+        expect(defaults.nativeFilePastes).toHaveLength(0);
+        expect(optedOut.nativeFilePastes).toHaveLength(0);
+    });
+});
+
 describe('handleEditorPaste: clipboard image naming', () => {
     const naming: Partial<BetterPasteSettings> = {
         imageNameTemplate: '{{noteName}}-{{counter}}'

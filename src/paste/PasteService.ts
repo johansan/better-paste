@@ -215,7 +215,7 @@ export type ImageOptionsPrompt = (sizes: readonly string[] | null, classes: read
 /** Shows the PDF cleanup dialog for the selection and resolves with the picks, or null on cancel. */
 export type PdfOptionsPrompt = (text: string) => Promise<PdfCleanupOptions | null>;
 
-/** Arms the native attachment link rewrite for a file paste this service leaves to Obsidian. */
+/** Arms the native attachment watcher before Obsidian handles the event. */
 export type NativeFilePasteWatcher = (files: readonly File[], editor: Editor) => void;
 
 /** A stored embed choice is honoured only while its value is still one of the options. */
@@ -379,6 +379,14 @@ export class PasteService {
         else if (needsTitleBatch) void this.runTitleBatchPass(editor, info, targetFile, range);
 
         return true;
+    }
+
+    /** Records a native file drop without taking it over from Obsidian. */
+    handleEditorDrop(event: DragEvent, editor: Editor, _info: MarkdownView | MarkdownFileInfo): boolean {
+        const transfer = event.dataTransfer;
+        if (!transfer) return false;
+        this.armNativeFilePaste(transfer, editor, editor.getValue());
+        return false;
     }
 
     /**
@@ -1110,19 +1118,19 @@ export class PasteService {
         return embedChoice(settings.imageClassChoice, parseCommaList(settings.imageClassOptions)) !== '';
     }
 
-    /** Leaves a file paste to Obsidian and records it when the resulting attachment should be a link. */
+    /** Leaves a file paste to Obsidian after recording any native attachment work. */
     private leaveFilePasteNative(clipboard: DataTransfer, editor: Editor, content: string): false {
-        const settings = this.getSettings();
-        // The note's off override wins here like everywhere else, so a note that asked
-        // to be left alone keeps its previews while link mode is on globally
-        if (
-            settings.fileMode === 'link' &&
-            clipboard.files.length > 0 &&
-            notePasteOverride(this.frontmatterOf(content), settings.noteProperty) !== 'off'
-        ) {
-            this.watchNativeFilePaste(Array.from(clipboard.files), editor);
-        }
+        this.armNativeFilePaste(clipboard, editor, content);
         return false;
+    }
+
+    /** Records a native attachment when link mode is enabled for the note. */
+    private armNativeFilePaste(transfer: DataTransfer, editor: Editor, content: string): void {
+        const settings = this.getSettings();
+        if (transfer.files.length === 0) return;
+        if (settings.fileMode !== 'link') return;
+        if (notePasteOverride(this.frontmatterOf(content), settings.noteProperty) === 'off') return;
+        this.watchNativeFilePaste(Array.from(transfer.files), editor);
     }
 
     /**

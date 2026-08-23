@@ -31,11 +31,16 @@ interface ClipboardFileIdentity {
     pastedImageExtension: string | null;
 }
 
+interface PendingFileEntry {
+    identity: ClipboardFileIdentity;
+    candidates: { file: TFile; createdAfterArm: boolean }[];
+    consumed: boolean;
+}
+
 interface PendingFilePaste {
     editor: Editor;
-    files: readonly ClipboardFileIdentity[];
-    candidates: Set<TFile>;
-    remaining: number;
+    entries: PendingFileEntry[];
+    claimedCandidates: Set<TFile>;
     timer: number;
 }
 
@@ -85,6 +90,7 @@ export class AttachmentLinkService {
     readonly extension: Extension;
     private readonly app: App;
     private readonly pending = new Set<PendingFilePaste>();
+    private readonly claimedCandidates = new Set<TFile>();
     private disposed = false;
 
     constructor(app: App) {
@@ -97,35 +103,49 @@ export class AttachmentLinkService {
         if (this.disposed || files.length === 0) return;
 
         const identities = files.map(identityOf);
-        const candidates = new Set<TFile>();
-        for (const candidate of this.app.vault.getFiles()) {
-            if (identities.some(identity => matchesClipboardFile(candidate, identity))) candidates.add(candidate);
-        }
+        const entries = identities.map<PendingFileEntry>(identity => ({
+            identity,
+            candidates: this.app.vault
+                .getFiles()
+                .filter(file => !this.claimedCandidates.has(file) && matchesClipboardFile(file, identity))
+                .map(file => ({ file, createdAfterArm: false })),
+            consumed: false
+        }));
 
         const pending: PendingFilePaste = {
             editor,
-            files: identities,
-            candidates,
-            remaining: files.length,
+            entries,
+            claimedCandidates: new Set(),
             timer: 0
         };
         pending.timer = window.setTimeout(() => this.remove(pending), FILE_PASTE_TIMEOUT_MS);
         this.pending.add(pending);
     }
 
-    /** Adds a newly saved attachment to every paste whose clipboard names can produce it. */
+    /** Assigns a newly saved attachment to the first matching unfilled clipboard entry. */
     handleFileCreated(file: TAbstractFile): void {
-        if (this.disposed || !(file instanceof TFile)) return;
+        if (this.disposed || !(file instanceof TFile) || this.claimedCandidates.has(file)) return;
         for (const pending of this.pending) {
-            if (pending.files.some(identity => matchesClipboardFile(file, identity, true))) pending.candidates.add(file);
+            const entry = pending.entries.find(
+                item =>
+                    !item.consumed &&
+                    !item.candidates.some(candidate => candidate.createdAfterArm) &&
+                    matchesClipboardFile(file, item.identity, true)
+            );
+            if (!entry) continue;
+            // A create event can also come from sync. The inserted-link match is the second
+            // provenance gate, though an indistinguishable sync file remains inherently ambiguous.
+            entry.candidates.push({ file, createdAfterArm: true });
+            pending.claimedCandidates.add(file);
+            this.claimedCandidates.add(file);
+            return;
         }
     }
 
     /** Stops pending watches before the editor extension is unregistered. */
     dispose(): void {
         this.disposed = true;
-        for (const pending of this.pending) window.clearTimeout(pending.timer);
-        this.pending.clear();
+        for (const pending of Array.from(this.pending)) this.remove(pending);
     }
 
     private filterTransaction(transaction: Transaction): TransactionSpec | readonly TransactionSpec[] {
@@ -140,37 +160,67 @@ export class AttachmentLinkService {
 
         const sourcePath = info.file?.path ?? '';
         const replacements: ChangeSpec[] = [];
-        const match: { pending: PendingFilePaste | null } = { pending: null };
 
         transaction.changes.iterChanges((_fromA, _toA, fromB, _toB, inserted) => {
             const text = inserted.toString();
-            const watchesToCheck = match.pending ? [match.pending] : watches;
-            for (const pending of watchesToCheck) {
-                for (const candidate of pending.candidates) {
-                    const link = this.app.fileManager.generateMarkdownLink(candidate, sourcePath);
-                    const embed = `!${link}`;
-                    if (text !== embed && text !== `${embed}\n\n`) continue;
-
-                    const visibleLink = link.startsWith('[](')
-                        ? this.app.fileManager.generateMarkdownLink(candidate, sourcePath, undefined, candidate.name)
-                        : link;
-                    match.pending = pending;
-                    replacements.push({ from: fromB, to: fromB + embed.length, insert: visibleLink });
-                    return;
+            const consumedRanges: { from: number; to: number }[] = [];
+            while (true) {
+                let found: {
+                    pending: PendingFilePaste;
+                    entry: PendingFileEntry;
+                    candidate: TFile;
+                    link: string;
+                    embed: string;
+                    index: number;
+                } | null = null;
+                for (const pending of watches) {
+                    for (const entry of pending.entries) {
+                        if (entry.consumed) continue;
+                        for (const observation of entry.candidates) {
+                            if (!observation.createdAfterArm && this.claimedCandidates.has(observation.file)) continue;
+                            const candidate = observation.file;
+                            const link = this.app.fileManager.generateMarkdownLink(candidate, sourcePath);
+                            const embed = `!${link}`;
+                            let index = text.indexOf(embed);
+                            while (index >= 0 && consumedRanges.some(range => index < range.to && index + embed.length > range.from)) {
+                                index = text.indexOf(embed, index + embed.length);
+                            }
+                            if (index < 0) continue;
+                            if (found === null || index < found.index) {
+                                found = {
+                                    pending,
+                                    entry,
+                                    candidate,
+                                    link,
+                                    embed,
+                                    index
+                                };
+                            }
+                        }
+                    }
                 }
+                if (found === null) break;
+
+                const { pending, entry, candidate, link, embed, index } = found;
+                entry.consumed = true;
+                pending.claimedCandidates.add(candidate);
+                this.claimedCandidates.add(candidate);
+                consumedRanges.push({ from: index, to: index + embed.length });
+                const visibleLink = link.startsWith('[](')
+                    ? this.app.fileManager.generateMarkdownLink(candidate, sourcePath, undefined, candidate.name)
+                    : link;
+                replacements.push({ from: fromB + index, to: fromB + index + embed.length, insert: visibleLink });
+                if (pending.entries.every(item => item.consumed)) this.remove(pending);
             }
         });
 
-        const matched = match.pending;
-        if (replacements.length === 0 || matched === null) return transaction;
-
-        matched.remaining -= 1;
-        if (matched.remaining === 0) this.remove(matched);
+        if (replacements.length === 0) return transaction;
         return [transaction, { changes: replacements, sequential: true }];
     }
 
     private remove(pending: PendingFilePaste): void {
         if (!this.pending.delete(pending)) return;
         window.clearTimeout(pending.timer);
+        for (const candidate of pending.claimedCandidates) this.claimedCandidates.delete(candidate);
     }
 }

@@ -100,6 +100,12 @@ export default class BetterPastePlugin extends Plugin {
                 if (this.pasteService.handleEditorPaste(event, editor, info)) event.preventDefault();
             })
         );
+        this.registerEvent(
+            this.app.workspace.on('editor-drop', (event: DragEvent, editor: Editor, info: MarkdownView | MarkdownFileInfo) => {
+                if (event.defaultPrevented) return;
+                if (this.pasteService.handleEditorDrop(event, editor, info)) event.preventDefault();
+            })
+        );
 
         this.addCommand({
             id: 'paste',

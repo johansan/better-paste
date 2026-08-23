@@ -17,7 +17,7 @@
  */
 
 import { EditorState } from '@codemirror/state';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { editorInfoField, TFile } from 'obsidian';
 import type { App, Editor } from 'obsidian';
 import { AttachmentLinkService } from '../src/paste/AttachmentLinkService';
@@ -49,6 +49,10 @@ function build(files: TFile[] = [], markdownLinks = false): { service: Attachmen
     return { service, app };
 }
 
+function arm(service: AttachmentLinkService, files: readonly File[], editor: Editor): void {
+    service.arm(files, editor);
+}
+
 function editorState(service: AttachmentLinkService, editor: Editor, doc = ''): EditorState {
     setEditorInfoForTest({ editor, file: { path: 'Notes/Test.md' } });
     return EditorState.create({ doc, extensions: [editorInfoField, service.extension] });
@@ -60,6 +64,7 @@ function insert(state: EditorState, text: string): EditorState {
 
 afterEach(() => {
     for (const service of services.splice(0)) service.dispose();
+    vi.useRealTimers();
 });
 
 describe('AttachmentLinkService', () => {
@@ -67,7 +72,7 @@ describe('AttachmentLinkService', () => {
         const { service } = build();
         const editor = {} as Editor;
         const attachment = vaultFile('Attachments/Document.pdf');
-        service.arm([fakeFile('Document.pdf', 'application/pdf')], editor);
+        arm(service, [fakeFile('Document.pdf', 'application/pdf')], editor);
         service.handleFileCreated(attachment);
 
         const state = insert(editorState(service, editor), '![[Attachments/Document.pdf]]');
@@ -79,7 +84,7 @@ describe('AttachmentLinkService', () => {
         const { service } = build([], true);
         const editor = {} as Editor;
         const attachment = vaultFile('Attachments/Document.pdf');
-        service.arm([fakeFile('Document.pdf', 'application/pdf')], editor);
+        arm(service, [fakeFile('Document.pdf', 'application/pdf')], editor);
         service.handleFileCreated(attachment);
 
         const state = insert(editorState(service, editor), '![](Attachments/Document.pdf)');
@@ -91,8 +96,40 @@ describe('AttachmentLinkService', () => {
         const attachment = vaultFile('Attachments/Document.pdf');
         const { service } = build([attachment]);
         const editor = {} as Editor;
-        service.arm([fakeFile('Document.pdf', 'application/pdf')], editor);
+        arm(service, [fakeFile('Document.pdf', 'application/pdf')], editor);
 
+        const state = insert(editorState(service, editor), '![[Attachments/Document.pdf]]');
+
+        expect(state.doc.toString()).toBe('[[Attachments/Document.pdf]]');
+    });
+
+    it('matches the same existing vault attachment in sequential pastes', () => {
+        const attachment = vaultFile('Attachments/Document.pdf');
+        const { service } = build([attachment]);
+        const editor = {} as Editor;
+        let state = editorState(service, editor);
+
+        arm(service, [fakeFile('Document.pdf', 'application/pdf')], editor);
+        state = insert(state, '![[Attachments/Document.pdf]]');
+        arm(service, [fakeFile('Document.pdf', 'application/pdf')], editor);
+        state = insert(state, '![[Attachments/Document.pdf]]');
+
+        expect(state.doc.toString()).toBe('[[Attachments/Document.pdf]][[Attachments/Document.pdf]]');
+    });
+
+    it('releases created-file claims when a watch expires', () => {
+        vi.useFakeTimers();
+        const files: TFile[] = [];
+        const attachment = vaultFile('Attachments/Document.pdf');
+        const { service } = build(files);
+        const editor = {} as Editor;
+
+        arm(service, [fakeFile('Document.pdf', 'application/pdf')], editor);
+        service.handleFileCreated(attachment);
+        files.push(attachment);
+        vi.advanceTimersByTime(60_000);
+
+        arm(service, [fakeFile('Document.pdf', 'application/pdf')], editor);
         const state = insert(editorState(service, editor), '![[Attachments/Document.pdf]]');
 
         expect(state.doc.toString()).toBe('[[Attachments/Document.pdf]]');
@@ -101,7 +138,7 @@ describe('AttachmentLinkService', () => {
     it('matches Obsidian collision names and generic screenshot names', () => {
         const { service } = build();
         const editor = {} as Editor;
-        service.arm([fakeFile('Document.pdf', 'application/pdf'), fakeFile('image.png', 'image/png')], editor);
+        arm(service, [fakeFile('Document.pdf', 'application/pdf'), fakeFile('image.png', 'image/png')], editor);
         service.handleFileCreated(vaultFile('Attachments/Document 1.pdf'));
         service.handleFileCreated(vaultFile('Attachments/Pasted image 20260823120000.png'));
 
@@ -115,7 +152,7 @@ describe('AttachmentLinkService', () => {
     it('matches pathless images that Obsidian renames and normalizes to JPG', () => {
         const { service } = build();
         const editor = {} as Editor;
-        service.arm([fakeFile('IMG_1234.png', 'image/png'), fakeFile('IMG_5678.jpeg', 'image/jpeg')], editor);
+        arm(service, [fakeFile('IMG_1234.png', 'image/png'), fakeFile('IMG_5678.jpeg', 'image/jpeg')], editor);
         service.handleFileCreated(vaultFile('Attachments/Pasted image 20260823120000.png'));
         service.handleFileCreated(vaultFile('Attachments/Pasted image 20260823120001.jpg'));
 
@@ -130,7 +167,7 @@ describe('AttachmentLinkService', () => {
         const attachment = vaultFile('Attachments/Document.pdf');
         const { service } = build([attachment]);
         const watchedEditor = {} as Editor;
-        service.arm([fakeFile('Document.pdf', 'application/pdf')], watchedEditor);
+        arm(service, [fakeFile('Document.pdf', 'application/pdf')], watchedEditor);
 
         let state = editorState(service, watchedEditor);
         state = insert(state, '![[Attachments/Other.pdf]]');
@@ -146,7 +183,7 @@ describe('AttachmentLinkService', () => {
         const sheet = vaultFile('Attachments/Sheet.csv');
         const { service } = build([document, sheet]);
         const editor = {} as Editor;
-        service.arm([fakeFile('Document.pdf', 'application/pdf'), fakeFile('Sheet.csv', 'text/csv')], editor);
+        arm(service, [fakeFile('Document.pdf', 'application/pdf'), fakeFile('Sheet.csv', 'text/csv')], editor);
 
         let state = editorState(service, editor);
         state = insert(state, '![[Attachments/Document.pdf]]');
@@ -154,5 +191,19 @@ describe('AttachmentLinkService', () => {
         state = insert(state, '![[Attachments/Document.pdf]]');
 
         expect(state.doc.toString()).toBe('[[Attachments/Document.pdf]][[Attachments/Sheet.csv]]![[Attachments/Document.pdf]]');
+    });
+
+    it('consumes repeated file names once each when one transaction inserts several embeds', () => {
+        const { service } = build();
+        const editor = {} as Editor;
+        arm(service, [fakeFile('Document.pdf', 'application/pdf'), fakeFile('Document.pdf', 'application/pdf')], editor);
+        service.handleFileCreated(vaultFile('Attachments/Document.pdf'));
+        service.handleFileCreated(vaultFile('Attachments/Document 1.pdf'));
+
+        let state = editorState(service, editor);
+        state = insert(state, '![[Attachments/Document.pdf]]\n![[Attachments/Document 1.pdf]]');
+        state = insert(state, '![[Attachments/Document.pdf]]');
+
+        expect(state.doc.toString()).toBe('[[Attachments/Document.pdf]]\n[[Attachments/Document 1.pdf]]![[Attachments/Document.pdf]]');
     });
 });
