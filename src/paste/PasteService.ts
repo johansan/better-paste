@@ -129,6 +129,46 @@ function linkFromSelection(selection: string, clipboardText: string, url: string
     return `[${escapeLinkTitle(selection)}](${escapeMarkdownDestination(url)})`;
 }
 
+/** True when the character at `index` is escaped by an odd run of backslashes. */
+function isEscapedAt(text: string, index: number): boolean {
+    let slashes = 0;
+    for (let cursor = index - 1; cursor >= 0 && text[cursor] === '\\'; cursor--) slashes += 1;
+    return slashes % 2 === 1;
+}
+
+/** True when `close` ends a Markdown link label on the same line. */
+function hasMarkdownLinkLabel(text: string, close: number, lineStart: number): boolean {
+    let depth = 1;
+    for (let cursor = close - 1; cursor >= lineStart; cursor--) {
+        if (isEscapedAt(text, cursor)) continue;
+        if (text[cursor] === ']') depth += 1;
+        else if (text[cursor] === '[' && --depth === 0) return true;
+    }
+    return false;
+}
+
+/** True when the paste range sits between the parentheses of an existing Markdown link. */
+function isInsideMarkdownLinkDestination(text: string, start: number, end: number): boolean {
+    const lineStart = text.lastIndexOf('\n', start - 1) + 1;
+
+    for (let open = start - 1; open >= lineStart; open--) {
+        if (text[open] !== '(' || text[open - 1] !== ']' || isEscapedAt(text, open) || isEscapedAt(text, open - 1)) continue;
+        if (!hasMarkdownLinkLabel(text, open - 1, lineStart)) continue;
+
+        let depth = 1;
+        for (let cursor = open + 1; cursor < text.length && text[cursor] !== '\n'; cursor++) {
+            if (isEscapedAt(text, cursor)) continue;
+            if (text[cursor] === '(') depth += 1;
+            else if (text[cursor] === ')' && --depth === 0) {
+                if (start >= open + 1 && end <= cursor) return true;
+                break;
+            }
+        }
+    }
+
+    return false;
+}
+
 /** True when a neighbouring character would become part of a pasted web address. */
 function extendsUrl(char: string | undefined): boolean {
     return char !== undefined && !/[\s<>"`\\\u201C\u201D]/.test(char);
@@ -311,9 +351,10 @@ export class PasteService {
         const quoted =
             rebased === null && settings.quoteContinuation ? continueQuotePaste(result.text, valueBefore, startOffset, endOffset) : null;
         const needsImages = this.images.hasWork(result.text);
-        const needsTitle = this.titles.hasWork(result.text);
-        const needsTitleBatch = this.titles.hasBatchWork(result.text);
-        const localTitle = settings.linkTitles ? obsidianUrlTitle(result.text) : null;
+        const allowLinkTitle = !isInsideMarkdownLinkDestination(valueBefore, startOffset, endOffset);
+        const needsTitle = allowLinkTitle && this.titles.hasWork(result.text);
+        const needsTitleBatch = allowLinkTitle && this.titles.hasBatchWork(result.text);
+        const localTitle = allowLinkTitle && settings.linkTitles ? obsidianUrlTitle(result.text) : null;
         const localSubject = localTitle ? formatTitledLink(localTitle.title, localTitle.url) : null;
         const localLink = localSubject ? composeTitledLink(localSubject, applyTextSnippets(localSubject, settings.urlSnippets).text) : null;
         // A document transform takes the paste over because it can change clean text on its own
@@ -459,9 +500,14 @@ export class PasteService {
                 ? continueQuotePaste(result.text, valueAtInvocation, fromOffset, toOffset)
                 : null;
         const needsImages = this.images.hasWork(result.text);
-        const needsTitle = this.titles.hasWork(result.text);
-        const needsTitleBatch = this.titles.hasBatchWork(result.text);
-        const localTitle = settings.linkTitles ? obsidianUrlTitle(result.text) : null;
+        const currentOffset = editor.posToOffset(editor.getCursor());
+        const allowLinkTitle =
+            valueBefore === valueAtInvocation
+                ? !isInsideMarkdownLinkDestination(valueAtInvocation, fromOffset, toOffset)
+                : !isInsideMarkdownLinkDestination(valueBefore, currentOffset, currentOffset);
+        const needsTitle = allowLinkTitle && this.titles.hasWork(result.text);
+        const needsTitleBatch = allowLinkTitle && this.titles.hasBatchWork(result.text);
+        const localTitle = allowLinkTitle && settings.linkTitles ? obsidianUrlTitle(result.text) : null;
         const localSubject = localTitle ? formatTitledLink(localTitle.title, localTitle.url) : null;
         const localLink = localSubject ? composeTitledLink(localSubject, applyTextSnippets(localSubject, settings.urlSnippets).text) : null;
         const invocationSelection = valueAtInvocation.slice(fromOffset, toOffset);

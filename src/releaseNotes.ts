@@ -53,7 +53,10 @@ const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.12',
         date: '2026-08-23',
-        new: ['You can now paste files as links instead of previews. Screenshots, PDFs and other files are still saved to your vault.']
+        new: ['You can now paste files as links instead of previews. Screenshots, PDFs and other files are still saved to your vault.'],
+        improved: [
+            'Pasting an address into an existing Markdown link no longer fetches a title. Paste `https://help.obsidian.md` into `[Obsidian help]()` and you get `[Obsidian help](https://help.obsidian.md)`.'
+        ]
     },
     {
         version: '1.0.11',

@@ -1302,6 +1302,46 @@ describe('handleEditorPaste: link titles', () => {
         expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
     });
 
+    it('does not fetch a title inside an existing Markdown link destination', async () => {
+        const { service, fetchedTitles } = build({ linkTitles: true });
+        const prefix = '[Title](';
+        const editor = new FakeEditor(`${prefix})`, prefix.length);
+
+        expect(
+            service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page?utm_source=news' }), editor.asEditor(), INFO)
+        ).toBe(true);
+        await settle();
+
+        expect(editor.getValue()).toBe('[Title](https://example.com/page)');
+        expect(fetchedTitles).toEqual([]);
+    });
+
+    it('does not use a selected Markdown link destination as a new link label', async () => {
+        const { service, fetchedTitles } = build({ linkTitles: true });
+        const editor = selecting('[Title](https://old.example)', 'https://old.example');
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page?utm_source=news' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe('[Title](https://example.com/page)');
+        expect(fetchedTitles).toEqual([]);
+    });
+
+    it('does not fetch a title inside a Markdown link through paste processed', async () => {
+        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false });
+        const prefix = '[Title](';
+        const editor = new FakeEditor(`${prefix})`, prefix.length);
+        vi.stubGlobal('navigator', { clipboard: { readText: async () => 'https://example.com/page' } });
+
+        try {
+            await service.pasteProcessed(editor.asEditor(), INFO);
+            expect(editor.getValue()).toBe('[Title](https://example.com/page)');
+            expect(fetchedTitles).toEqual([]);
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
     it('removes the GitHub repository tail from a fetched pull request title', async () => {
         const url = 'https://github.com/obsidian-tasks-group/obsidian-tasks/pull/123';
         const title = 'Improve documentation · obsidian-tasks-group/obsidian-tasks · GitHub';
