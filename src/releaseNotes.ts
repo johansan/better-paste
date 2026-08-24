@@ -52,7 +52,7 @@ export interface ReleaseNote {
 const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.13',
-        date: '2026-08-25',
+        date: '2026-08-24',
         improved: [
             'Dropped files now follow the ==Pasted files== setting. Drag a PDF into a note with ==Link without preview== on and you get `[[Document.pdf]]`, the same as pasting it.'
         ],

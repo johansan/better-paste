@@ -1724,6 +1724,21 @@ describe('handleEditorPaste: rich content', () => {
         expect(editor.getValue()).toBe(`[Example page](${url})`);
     });
 
+    it.each([
+        ['after text in a nested bullet', '- Parent\n\t- Random text '],
+        ['in an empty bullet below a task', '- [ ] Test task\n\t- '],
+        ['after text in a bullet below a task', '- [ ] Test task\n\t- Random text ']
+    ])('fetches a rich link title %s', async (_case, prefix) => {
+        const { service, fetchedTitles } = build({ linkEnabled: false });
+        const editor = new FakeEditor(prefix);
+        const url = 'https://github.com/example/project/issues';
+
+        await pasteRich(service, editor, `<a href="${url}">${url}</a>`, url);
+
+        expect(fetchedTitles).toEqual([url]);
+        expect(editor.getValue()).toBe(`${prefix}[Example page](${url})`);
+    });
+
     it('keeps a URL extension typed while a rich title fetch is pending', async () => {
         const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, imageMode: 'off', linkEnabled: false };
         let finishTitleFetch: (result: { title: string; url: string }) => void = () => undefined;
