@@ -125,6 +125,10 @@ export const STRINGS_ID: TranslationStrings = {
                 'Gunakan {{name}} untuk nama sumber, {{noteName}} untuk nama catatan, {{property:xyz}} untuk properti frontmatter, {{counter}} atau {{counter:2}} untuk nomor yang terus bertambah, dan format tanggal Moment seperti YYYY-MM-DD.',
             customScreenshotDesc:
                 'Tangkapan layar tidak punya nama sumber, sehingga {{name}}-nya menjadi "Pasted image" dengan stempel waktu, seperti di Obsidian.',
+            namingInfoTitle: 'Kapan format nama berkas berlaku',
+            namingInfoLead: 'Penting! Dalam dua situasi berikut, Better Paste tidak bisa mengganti nama berkas:',
+            namingInfoExplorer: 'Salin berkas di Finder atau File Explorer lalu tempel',
+            namingInfoDrag: 'Seret berkas ke catatan',
             customMomentLink: 'Format Moment',
             customExample: 'Contoh: {value}',
             customExampleNote: 'Catatan saya',

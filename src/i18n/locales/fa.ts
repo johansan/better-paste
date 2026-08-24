@@ -131,6 +131,10 @@ export const STRINGS_FA: TranslationStrings = {
                 'از {{name}} برای نام منبع، {{noteName}} برای نام یادداشت، {{property:xyz}} برای یک ویژگی frontmatter، {{counter}} یا {{counter:2}} برای شماره‌ای افزایشی و از قالب‌های تاریخ Moment مانند YYYY-MM-DD استفاده کنید.',
             customScreenshotDesc:
                 'نماگرفت نام منبع ندارد، پس {{name}} آن به «Pasted image» همراه با مهر زمانی تبدیل می‌شود، مانند خود Obsidian.',
+            namingInfoTitle: 'زمانی که قالب نام پرونده اعمال می‌شود',
+            namingInfoLead: 'مهم! در این دو حالت، Better Paste نمی‌تواند نام پرونده‌ها را تغییر دهد:',
+            namingInfoExplorer: 'پرونده‌ای را در Finder یا File Explorer کپی کنید و بچسبانید',
+            namingInfoDrag: 'پرونده‌ای را به یادداشت بکشید',
             customMomentLink: 'قالب Moment',
             customExample: 'نمونه: {value}',
             customExampleNote: 'یادداشت من',

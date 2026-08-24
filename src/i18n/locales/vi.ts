@@ -137,6 +137,10 @@ export const STRINGS_VI: TranslationStrings = {
                 'Dùng {{name}} cho tên nguồn, {{noteName}} cho tên ghi chú, {{property:xyz}} cho một thuộc tính frontmatter, {{counter}} hoặc {{counter:2}} cho số tăng dần, và các định dạng ngày của Moment như YYYY-MM-DD.',
             customScreenshotDesc:
                 'Ảnh chụp màn hình không có tên nguồn, nên {{name}} của nó trở thành "Pasted image" kèm dấu thời gian, như trong Obsidian.',
+            namingInfoTitle: 'Khi nào định dạng tên tệp được áp dụng',
+            namingInfoLead: 'Quan trọng! Trong hai trường hợp sau, Better Paste không thể đổi tên tệp:',
+            namingInfoExplorer: 'Sao chép tệp trong Finder hoặc File Explorer rồi dán',
+            namingInfoDrag: 'Kéo tệp vào ghi chú',
             customMomentLink: 'Định dạng Moment',
             customExample: 'Ví dụ: {value}',
             customExampleNote: 'Ghi chú của tôi',

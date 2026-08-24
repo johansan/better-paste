@@ -122,6 +122,10 @@ export const STRINGS_ZH_TW: TranslationStrings = {
             customDesc:
                 '用 {{name}} 代表來源名稱，{{noteName}} 代表筆記名稱，{{property:xyz}} 代表 frontmatter 屬性，{{counter}} 或 {{counter:2}} 代表遞增編號，日期可用 YYYY-MM-DD 這類 Moment 格式。',
             customScreenshotDesc: '螢幕截圖沒有來源名稱，因此它的 {{name}} 會像 Obsidian 一樣變成帶時間戳記的「Pasted image」。',
+            namingInfoTitle: '檔案名稱格式何時生效',
+            namingInfoLead: '重要！以下兩種情況 Better Paste 無法重新命名檔案：',
+            namingInfoExplorer: '在 Finder 或檔案總管中複製檔案後貼上',
+            namingInfoDrag: '把檔案拖進筆記',
             customMomentLink: 'Moment 格式',
             customExample: '範例：{value}',
             customExampleNote: '我的筆記',

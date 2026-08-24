@@ -47,6 +47,20 @@
     font-family: var(--font-monospace);
 }
 
+/* The naming overview at the end of the Attachments rows uses the full row width */
+.setting-item.better-paste-naming-info {
+    display: block;
+}
+
+.better-paste-naming-info ol {
+    margin: var(--size-2-1) 0 0 var(--size-4-5);
+    padding: 0;
+}
+
+.better-paste-naming-info li + li {
+    margin-top: var(--size-2-1);
+}
+
 /* Live preview panes for the URL and terminal rules */
 .better-paste-preview {
     display: flex;

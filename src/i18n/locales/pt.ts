@@ -152,6 +152,10 @@ export const STRINGS_PT: TranslationStrings = {
                 'Use {{name}} para o nome de origem, {{noteName}} para o nome da nota, {{property:xyz}} para uma propriedade do frontmatter, {{counter}} ou {{counter:2}} para um número crescente e formatos de data do Moment como YYYY-MM-DD.',
             customScreenshotDesc:
                 'Uma captura de ecrã não tem nome de origem, por isso o seu {{name}} passa a "Pasted image" com data e hora, como no Obsidian.',
+            namingInfoTitle: 'Quando o formato do nome de ficheiro se aplica',
+            namingInfoLead: 'Importante! Nestas duas situações, o Better Paste não pode renomear os ficheiros:',
+            namingInfoExplorer: 'Copie um ficheiro no Finder ou no Explorador de Ficheiros e cole-o',
+            namingInfoDrag: 'Arraste um ficheiro para uma nota',
             customMomentLink: 'Formato Moment',
             customExample: 'Exemplo: {value}',
             customExampleNote: 'A minha nota',

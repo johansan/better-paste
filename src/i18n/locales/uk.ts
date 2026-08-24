@@ -147,6 +147,10 @@ export const STRINGS_UK: TranslationStrings = {
                 'Використовуйте {{name}} для назви джерела, {{noteName}} для назви нотатки, {{property:xyz}} для властивості з frontmatter, {{counter}} або {{counter:2}} для номера, що зростає, та формати дат Moment, наприклад YYYY-MM-DD.',
             customScreenshotDesc:
                 'Знімок екрана не має назви джерела, тому його {{name}} стає «Pasted image» з міткою часу, як в Obsidian.',
+            namingInfoTitle: 'Коли застосовується формат імені файлу',
+            namingInfoLead: 'Важливо! У цих двох випадках Better Paste не може перейменувати файли:',
+            namingInfoExplorer: 'Скопіюйте файл у Finder або Провіднику та вставте його',
+            namingInfoDrag: 'Перетягніть файл у нотатку',
             customMomentLink: 'Формат Moment',
             customExample: 'Приклад: {value}',
             customExampleNote: 'Моя нотатка',

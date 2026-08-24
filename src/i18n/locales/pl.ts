@@ -135,6 +135,10 @@ export const STRINGS_PL: TranslationStrings = {
                 'Użyj {{name}} dla nazwy źródła, {{noteName}} dla nazwy notatki, {{property:xyz}} dla właściwości frontmattera, {{counter}} lub {{counter:2}} dla rosnącego numeru oraz formatów daty Moment, takich jak YYYY-MM-DD.',
             customScreenshotDesc:
                 'Zrzut ekranu nie ma nazwy źródła, więc jego {{name}} staje się „Pasted image” ze znacznikiem czasu, jak w Obsidianie.',
+            namingInfoTitle: 'Kiedy format nazwy pliku ma zastosowanie',
+            namingInfoLead: 'Ważne! W tych dwóch sytuacjach Better Paste nie może zmienić nazw plików:',
+            namingInfoExplorer: 'Skopiuj plik w Finderze lub Eksploratorze i wklej go',
+            namingInfoDrag: 'Przeciągnij plik do notatki',
             customMomentLink: 'Format Moment',
             customExample: 'Przykład: {value}',
             customExampleNote: 'Moja notatka',

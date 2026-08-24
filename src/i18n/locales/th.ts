@@ -123,6 +123,10 @@ export const STRINGS_TH: TranslationStrings = {
                 'ใช้ {{name}} แทนชื่อต้นทาง {{noteName}} แทนชื่อโน้ต {{property:xyz}} แทนคุณสมบัติใน frontmatter {{counter}} หรือ {{counter:2}} แทนตัวเลขที่เพิ่มขึ้น และรูปแบบวันที่ของ Moment เช่น YYYY-MM-DD',
             customScreenshotDesc:
                 'ภาพหน้าจอไม่มีชื่อต้นทาง ดังนั้น {{name}} จึงกลายเป็น "Pasted image" พร้อมประทับเวลา เช่นเดียวกับใน Obsidian',
+            namingInfoTitle: 'รูปแบบชื่อไฟล์มีผลเมื่อใด',
+            namingInfoLead: 'สำคัญ! ในสองกรณีนี้ Better Paste เปลี่ยนชื่อไฟล์ให้ไม่ได้:',
+            namingInfoExplorer: 'คัดลอกไฟล์ใน Finder หรือ File Explorer แล้ววาง',
+            namingInfoDrag: 'ลากไฟล์เข้ามาในโน้ต',
             customMomentLink: 'รูปแบบ Moment',
             customExample: 'ตัวอย่าง: {value}',
             customExampleNote: 'โน้ตของฉัน',

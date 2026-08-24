@@ -136,6 +136,10 @@ export const STRINGS_JA: TranslationStrings = {
                 '元の名前には {{name}} を、ノート名には {{noteName}} を、フロントマターのプロパティには {{property:xyz}} を、連番には {{counter}} や {{counter:2}} を、日付には YYYY-MM-DD のような Moment の書式を使います。',
             customScreenshotDesc:
                 'スクリーンショットには元の名前がないため、{{name}} は Obsidian と同じくタイムスタンプ付きの「Pasted image」になります。',
+            namingInfoTitle: 'ファイル名の書式が適用される場面',
+            namingInfoLead: '重要！次の 2 つの場合、Better Paste はファイル名を変えられません:',
+            namingInfoExplorer: 'Finder やエクスプローラーでファイルをコピーして貼り付ける',
+            namingInfoDrag: 'ファイルをノートにドラッグする',
             customMomentLink: 'Moment の書式',
             customExample: '例: {value}',
             customExampleNote: 'マイノート',

@@ -124,6 +124,10 @@ export const STRINGS_KO: TranslationStrings = {
                 '원본 이름에는 {{name}}을, 노트 이름에는 {{noteName}}을, 프론트매터 속성에는 {{property:xyz}}를, 증가하는 번호에는 {{counter}} 또는 {{counter:2}}를, 날짜에는 YYYY-MM-DD 같은 Moment 형식을 사용하세요.',
             customScreenshotDesc:
                 '스크린샷에는 원본 이름이 없으므로 {{name}}은 Obsidian에서처럼 타임스탬프가 붙은 "Pasted image"가 됩니다.',
+            namingInfoTitle: '파일 이름 형식이 적용되는 경우',
+            namingInfoLead: '중요! 다음 두 가지 경우에는 Better Paste가 파일 이름을 바꿀 수 없습니다:',
+            namingInfoExplorer: 'Finder나 탐색기에서 파일을 복사해 붙여넣기',
+            namingInfoDrag: '파일을 노트로 끌어다 놓기',
             customMomentLink: 'Moment 형식',
             customExample: '예: {value}',
             customExampleNote: '내 노트',

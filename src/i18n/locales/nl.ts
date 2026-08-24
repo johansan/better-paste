@@ -143,6 +143,10 @@ export const STRINGS_NL: TranslationStrings = {
                 'Gebruik {{name}} voor de bronnaam, {{noteName}} voor de notitienaam, {{property:xyz}} voor een frontmatter-eigenschap, {{counter}} of {{counter:2}} voor een oplopend nummer en Moment-datumnotaties zoals YYYY-MM-DD.',
             customScreenshotDesc:
                 'Een schermafbeelding heeft geen bronnaam, dus wordt {{name}} "Pasted image" met een tijdstempel, net als in Obsidian.',
+            namingInfoTitle: 'Wanneer de bestandsnaamnotatie geldt',
+            namingInfoLead: 'Belangrijk! In deze twee situaties kan Better Paste bestanden niet hernoemen:',
+            namingInfoExplorer: 'Kopieer een bestand in de Finder of Verkenner en plak het',
+            namingInfoDrag: 'Sleep een bestand in een notitie',
             customMomentLink: 'Moment-notatie',
             customExample: 'Voorbeeld: {value}',
             customExampleNote: 'Mijn notitie',

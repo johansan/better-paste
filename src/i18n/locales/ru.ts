@@ -147,6 +147,10 @@ export const STRINGS_RU: TranslationStrings = {
                 'Используйте {{name}} для имени источника, {{noteName}} для имени заметки, {{property:xyz}} для свойства из frontmatter, {{counter}} или {{counter:2}} для возрастающего номера и форматы дат Moment, например YYYY-MM-DD.',
             customScreenshotDesc:
                 'У снимка экрана нет имени источника, поэтому его {{name}} становится «Pasted image» с меткой времени, как в Obsidian.',
+            namingInfoTitle: 'Когда применяется формат имени файла',
+            namingInfoLead: 'Важно! В этих двух случаях Better Paste не может переименовать файлы:',
+            namingInfoExplorer: 'Скопируйте файл в Finder или Проводнике и вставьте его',
+            namingInfoDrag: 'Перетащите файл в заметку',
             customMomentLink: 'Формат Moment',
             customExample: 'Пример: {value}',
             customExampleNote: 'Моя заметка',

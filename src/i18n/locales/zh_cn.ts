@@ -122,6 +122,10 @@ export const STRINGS_ZH_CN: TranslationStrings = {
             customDesc:
                 '用 {{name}} 表示来源名称，{{noteName}} 表示笔记名称，{{property:xyz}} 表示 frontmatter 属性，{{counter}} 或 {{counter:2}} 表示递增编号，日期可用 YYYY-MM-DD 这类 Moment 格式。',
             customScreenshotDesc: '截图没有来源名称，因此它的 {{name}} 会像 Obsidian 一样变成带时间戳的“Pasted image”。',
+            namingInfoTitle: '文件名格式何时生效',
+            namingInfoLead: '重要！以下两种情况 Better Paste 无法重命名文件：',
+            namingInfoExplorer: '在访达或文件资源管理器中复制文件后粘贴',
+            namingInfoDrag: '把文件拖入笔记',
             customMomentLink: 'Moment 格式',
             customExample: '示例：{value}',
             customExampleNote: '我的笔记',

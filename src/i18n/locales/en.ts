@@ -141,6 +141,10 @@ export const STRINGS_EN = {
                 'Use {{name}} for the source name, {{noteName}} for the note name, {{property:xyz}} for a frontmatter property, {{counter}} or {{counter:2}} for a rising number, and Moment date formats such as YYYY-MM-DD.',
             customScreenshotDesc:
                 'A screenshot has no source name, so its {{name}} becomes "Pasted image" with a timestamp, as in Obsidian.',
+            namingInfoTitle: 'When the file name format applies',
+            namingInfoLead: 'Important! Better Paste cannot rename files in these two situations:',
+            namingInfoExplorer: 'Copy a file in Finder or Explorer and paste it',
+            namingInfoDrag: 'Drag a file into a note',
             customMomentLink: 'Moment format',
             customExample: 'Example: {value}',
             customExampleNote: 'My note',

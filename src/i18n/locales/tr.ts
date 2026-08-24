@@ -131,6 +131,10 @@ export const STRINGS_TR: TranslationStrings = {
                 'Kaynak adı için {{name}}, not adı için {{noteName}}, bir frontmatter özelliği için {{property:xyz}}, artan bir numara için {{counter}} veya {{counter:2}} ve YYYY-MM-DD gibi Moment tarih biçimlerini kullanın.',
             customScreenshotDesc:
                 'Ekran görüntüsünün kaynak adı olmadığından {{name}} değeri, Obsidian’daki gibi zaman damgalı "Pasted image" olur.',
+            namingInfoTitle: 'Dosya adı biçiminin uygulandığı durumlar',
+            namingInfoLead: 'Önemli! Better Paste şu iki durumda dosyaları yeniden adlandıramaz:',
+            namingInfoExplorer: 'Finder veya Dosya Gezgini’nde bir dosyayı kopyalayıp yapıştırın',
+            namingInfoDrag: 'Bir dosyayı nota sürükleyin',
             customMomentLink: 'Moment biçimi',
             customExample: 'Örnek: {value}',
             customExampleNote: 'Notum',

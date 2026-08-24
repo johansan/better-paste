@@ -152,6 +152,10 @@ export const STRINGS_DE: TranslationStrings = {
                 'Verwende {{name}} für den Quellnamen, {{noteName}} für den Notiznamen, {{property:xyz}} für eine Frontmatter-Eigenschaft, {{counter}} oder {{counter:2}} für eine fortlaufende Nummer und Moment-Datumsformate wie YYYY-MM-DD.',
             customScreenshotDesc:
                 'Ein Screenshot hat keinen Quellnamen, sein {{name}} wird deshalb zu "Pasted image" mit Zeitstempel, wie in Obsidian.',
+            namingInfoTitle: 'Wann das Format für Dateinamen gilt',
+            namingInfoLead: 'Wichtig! In diesen zwei Fällen kann Better Paste Dateien nicht umbenennen:',
+            namingInfoExplorer: 'Eine Datei im Finder oder Explorer kopieren und einfügen',
+            namingInfoDrag: 'Eine Datei in eine Notiz ziehen',
             customMomentLink: 'Moment-Format',
             customExample: 'Beispiel: {value}',
             customExampleNote: 'Meine Notiz',
