@@ -22,7 +22,7 @@ import type { TranslationStrings } from '../types';
 export const STRINGS_ID: TranslationStrings = {
     commands: {
         paste: 'Tempel',
-        pasteRaw: 'Tempel tanpa pemrosesan',
+        pasteRaw: 'Tempel sebagai teks biasa',
         cleanSelection: 'Bersihkan pilihan',
         cleanTerminal: 'Bersihkan keluaran terminal',
         cleanPdf: 'Bersihkan teks PDF',

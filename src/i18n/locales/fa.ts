@@ -22,7 +22,7 @@ import type { TranslationStrings } from '../types';
 export const STRINGS_FA: TranslationStrings = {
     commands: {
         paste: 'چسباندن',
-        pasteRaw: 'چسباندن بدون پردازش',
+        pasteRaw: 'چسباندن به‌صورت متن ساده',
         cleanSelection: 'پاک‌سازی متن انتخاب‌شده',
         cleanTerminal: 'پاک‌سازی خروجی پایانه',
         cleanPdf: 'پاک‌سازی متن PDF',

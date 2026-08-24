@@ -22,7 +22,7 @@ import type { TranslationStrings } from '../types';
 export const STRINGS_TR: TranslationStrings = {
     commands: {
         paste: 'Yapıştır',
-        pasteRaw: 'İşlemeden yapıştır',
+        pasteRaw: 'Düz metin olarak yapıştır',
         cleanSelection: 'Seçimi temizle',
         cleanTerminal: 'Terminal çıktısını temizle',
         cleanPdf: 'PDF metnini temizle',

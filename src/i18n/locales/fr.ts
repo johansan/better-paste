@@ -22,7 +22,7 @@ import type { TranslationStrings } from '../types';
 export const STRINGS_FR: TranslationStrings = {
     commands: {
         paste: 'Coller',
-        pasteRaw: 'Coller sans traitement',
+        pasteRaw: 'Coller en texte brut',
         cleanSelection: 'Nettoyer la sélection',
         cleanTerminal: 'Nettoyer la sortie de terminal',
         cleanPdf: 'Nettoyer le texte PDF',

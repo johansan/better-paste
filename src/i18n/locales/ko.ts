@@ -22,7 +22,7 @@ import type { TranslationStrings } from '../types';
 export const STRINGS_KO: TranslationStrings = {
     commands: {
         paste: '붙여넣기',
-        pasteRaw: '처리 없이 붙여넣기',
+        pasteRaw: '일반 텍스트로 붙여넣기',
         cleanSelection: '선택 영역 정리',
         cleanTerminal: '터미널 출력 정리',
         cleanPdf: 'PDF 텍스트 정리',

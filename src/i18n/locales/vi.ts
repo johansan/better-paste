@@ -22,7 +22,7 @@ import type { TranslationStrings } from '../types';
 export const STRINGS_VI: TranslationStrings = {
     commands: {
         paste: 'Dán',
-        pasteRaw: 'Dán không xử lý',
+        pasteRaw: 'Dán dưới dạng văn bản thuần',
         cleanSelection: 'Dọn phần đã chọn',
         cleanTerminal: 'Dọn đầu ra terminal',
         cleanPdf: 'Dọn văn bản từ PDF',

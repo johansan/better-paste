@@ -333,7 +333,7 @@ Images come out as `![[picture.png|400]]`, Obsidian's own size syntax. `400x300`
 Nine commands, ready for your own hotkeys (Settings, Hotkeys). The ids are for URI schemes and plugins like Commander, prefixed `better-paste:`.
 
 - **Paste** (`paste`): paste through the rules, even in a note that opted out.
-- **Paste without processing** (`paste-raw`): paste exactly what is on the clipboard.
+- **Paste as plain text** (`paste-raw`): paste the clipboard's plain text without running any rules.
 - **Clean up selection** (`selection-clean`): run the text rules on selected text.
 - **Clean up terminal output** (`selection-clean-terminal`): rejoin wrapped lines, remove leading indentation and turn `•` bullets into Markdown lists in the selection. On demand, because only you know the text came from a terminal.
 - **Clean up PDF text** (`selection-clean-pdf`): rejoin the short lines a PDF layout makes, repair words broken by hyphens and expand ligatures in the selection. A dialog previews the result and offers page number and paragraph options.

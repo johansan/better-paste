@@ -22,7 +22,7 @@ import type { TranslationStrings } from '../types';
 export const STRINGS_UK: TranslationStrings = {
     commands: {
         paste: 'Вставити',
-        pasteRaw: 'Вставити без обробки',
+        pasteRaw: 'Вставити як звичайний текст',
         cleanSelection: 'Очистити виділення',
         cleanTerminal: 'Очистити вивід термінала',
         cleanPdf: 'Очистити текст із PDF',

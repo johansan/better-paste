@@ -22,7 +22,7 @@ import type { TranslationStrings } from '../types';
 export const STRINGS_NL: TranslationStrings = {
     commands: {
         paste: 'Plakken',
-        pasteRaw: 'Plakken zonder bewerking',
+        pasteRaw: 'Plakken als platte tekst',
         cleanSelection: 'Selectie opschonen',
         cleanTerminal: 'Terminaluitvoer opschonen',
         cleanPdf: 'PDF-tekst opschonen',

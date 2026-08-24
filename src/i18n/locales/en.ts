@@ -36,7 +36,7 @@ export const STRINGS_EN = {
     // Command palette entries
     commands: {
         paste: 'Paste',
-        pasteRaw: 'Paste without processing',
+        pasteRaw: 'Paste as plain text',
         cleanSelection: 'Clean up selection',
         cleanTerminal: 'Clean up terminal output',
         cleanPdf: 'Clean up PDF text',
@@ -316,7 +316,7 @@ export const STRINGS_EN = {
         title: 'Welcome to Better Paste',
         intro: [
             'Copy images from Safari straight into your vault, paste links without tracking junk, fix broken terminal output, and clean up AI text. Just paste, and Better Paste handles the rest.',
-            'One tip before you start: bind **Paste without processing** to `Cmd+Shift+V` (`Ctrl+Shift+V` on Windows), so you can always paste exactly what is on the clipboard.',
+            "One tip before you start: bind **Paste as plain text** to `Cmd+Shift+V` (`Ctrl+Shift+V` on Windows), so you can paste the clipboard's plain text without running any rules.",
             'Every rule has its own toggle under Settings, Better Paste, and the `{property}: false` property turns the plugin off for a single note.'
         ],
         startButton: 'Get started'

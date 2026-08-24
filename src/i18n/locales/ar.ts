@@ -22,7 +22,7 @@ import type { TranslationStrings } from '../types';
 export const STRINGS_AR: TranslationStrings = {
     commands: {
         paste: 'لصق',
-        pasteRaw: 'لصق بدون معالجة',
+        pasteRaw: 'لصق كنص عادي',
         cleanSelection: 'تنظيف التحديد',
         cleanTerminal: 'تنظيف مخرجات الطرفية',
         cleanPdf: 'تنظيف نص PDF',

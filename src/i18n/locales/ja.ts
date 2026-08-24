@@ -22,7 +22,7 @@ import type { TranslationStrings } from '../types';
 export const STRINGS_JA: TranslationStrings = {
     commands: {
         paste: '貼り付け',
-        pasteRaw: '処理せずに貼り付け',
+        pasteRaw: 'プレーンテキストとして貼り付け',
         cleanSelection: '選択範囲を整える',
         cleanTerminal: 'ターミナル出力を整える',
         cleanPdf: 'PDFのテキストを整える',

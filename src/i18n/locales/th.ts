@@ -22,7 +22,7 @@ import type { TranslationStrings } from '../types';
 export const STRINGS_TH: TranslationStrings = {
     commands: {
         paste: 'วาง',
-        pasteRaw: 'วางโดยไม่ประมวลผล',
+        pasteRaw: 'วางเป็นข้อความธรรมดา',
         cleanSelection: 'จัดระเบียบข้อความที่เลือก',
         cleanTerminal: 'จัดระเบียบผลลัพธ์เทอร์มินัล',
         cleanPdf: 'จัดระเบียบข้อความจาก PDF',

@@ -22,7 +22,7 @@ import type { TranslationStrings } from '../types';
 export const STRINGS_ZH_CN: TranslationStrings = {
     commands: {
         paste: '粘贴',
-        pasteRaw: '不做处理直接粘贴',
+        pasteRaw: '粘贴为纯文本',
         cleanSelection: '清理选中内容',
         cleanTerminal: '清理终端输出',
         cleanPdf: '清理 PDF 文本',
