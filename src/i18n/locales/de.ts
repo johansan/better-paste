@@ -153,9 +153,11 @@ export const STRINGS_DE: TranslationStrings = {
             customScreenshotDesc:
                 'Ein Screenshot hat keinen Quellnamen, sein {{name}} wird deshalb zu "Pasted image" mit Zeitstempel, wie in Obsidian.',
             namingInfoTitle: 'Wann das Format für Dateinamen gilt',
-            namingInfoLead: 'Wichtig! In diesen zwei Fällen kann Better Paste Dateien nicht umbenennen:',
-            namingInfoExplorer: 'Eine Datei im Finder oder Explorer kopieren und einfügen',
-            namingInfoDrag: 'Eine Datei in eine Notiz ziehen',
+            namingInfoLead: 'Wichtig! Folgendes kann Better Paste nicht:',
+            namingInfoExplorer: 'Eine Datei umbenennen, die du im Finder oder Explorer kopierst und einfügst',
+            namingInfoDrag: 'Eine Datei umbenennen, die du in eine Notiz ziehst',
+            namingInfoMobile:
+                'Einfügungen mit Obsidians eigenem Einfügen-Befehl auf Mobilgeräten verarbeiten. Verwende stattdessen "{command}".',
             customMomentLink: 'Moment-Format',
             customExample: 'Beispiel: {value}',
             customExampleNote: 'Meine Notiz',

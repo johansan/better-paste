@@ -137,9 +137,11 @@ export const STRINGS_JA: TranslationStrings = {
             customScreenshotDesc:
                 'スクリーンショットには元の名前がないため、{{name}} は Obsidian と同じくタイムスタンプ付きの「Pasted image」になります。',
             namingInfoTitle: 'ファイル名の書式が適用される場面',
-            namingInfoLead: '重要！次の 2 つの場合、Better Paste はファイル名を変えられません:',
-            namingInfoExplorer: 'Finder やエクスプローラーでファイルをコピーして貼り付ける',
-            namingInfoDrag: 'ファイルをノートにドラッグする',
+            namingInfoLead: '重要！Better Paste ができないこと:',
+            namingInfoExplorer: 'Finder やエクスプローラーでコピーして貼り付けたファイルの名前を変えること',
+            namingInfoDrag: 'ノートにドラッグしたファイルの名前を変えること',
+            namingInfoMobile:
+                'モバイルで Obsidian 自身の「貼り付け」コマンドで貼り付けた内容を処理すること。代わりに「{command}」を使ってください。',
             customMomentLink: 'Moment の書式',
             customExample: '例: {value}',
             customExampleNote: 'マイノート',

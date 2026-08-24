@@ -124,9 +124,10 @@ export const STRINGS_TH: TranslationStrings = {
             customScreenshotDesc:
                 'ภาพหน้าจอไม่มีชื่อต้นทาง ดังนั้น {{name}} จึงกลายเป็น "Pasted image" พร้อมประทับเวลา เช่นเดียวกับใน Obsidian',
             namingInfoTitle: 'รูปแบบชื่อไฟล์มีผลเมื่อใด',
-            namingInfoLead: 'สำคัญ! ในสองกรณีนี้ Better Paste เปลี่ยนชื่อไฟล์ให้ไม่ได้:',
-            namingInfoExplorer: 'คัดลอกไฟล์ใน Finder หรือ File Explorer แล้ววาง',
-            namingInfoDrag: 'ลากไฟล์เข้ามาในโน้ต',
+            namingInfoLead: 'สำคัญ! สิ่งที่ Better Paste ทำไม่ได้:',
+            namingInfoExplorer: 'เปลี่ยนชื่อไฟล์ที่คุณคัดลอกใน Finder หรือ File Explorer แล้ววาง',
+            namingInfoDrag: 'เปลี่ยนชื่อไฟล์ที่คุณลากเข้ามาในโน้ต',
+            namingInfoMobile: 'ประมวลผลสิ่งที่วางด้วยคำสั่งวางของ Obsidian เองบนมือถือ ให้ใช้ "{command}" แทน',
             customMomentLink: 'รูปแบบ Moment',
             customExample: 'ตัวอย่าง: {value}',
             customExampleNote: 'โน้ตของฉัน',

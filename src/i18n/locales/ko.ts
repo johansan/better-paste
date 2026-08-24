@@ -125,9 +125,10 @@ export const STRINGS_KO: TranslationStrings = {
             customScreenshotDesc:
                 '스크린샷에는 원본 이름이 없으므로 {{name}}은 Obsidian에서처럼 타임스탬프가 붙은 "Pasted image"가 됩니다.',
             namingInfoTitle: '파일 이름 형식이 적용되는 경우',
-            namingInfoLead: '중요! 다음 두 가지 경우에는 Better Paste가 파일 이름을 바꿀 수 없습니다:',
-            namingInfoExplorer: 'Finder나 탐색기에서 파일을 복사해 붙여넣기',
-            namingInfoDrag: '파일을 노트로 끌어다 놓기',
+            namingInfoLead: '중요! Better Paste가 할 수 없는 것:',
+            namingInfoExplorer: 'Finder나 탐색기에서 복사해 붙여넣은 파일의 이름 바꾸기',
+            namingInfoDrag: '노트로 끌어다 놓은 파일의 이름 바꾸기',
+            namingInfoMobile: '모바일에서 Obsidian 자체 붙여넣기 명령으로 붙여넣은 내용 처리하기. 대신 "{command}" 명령을 사용하세요.',
             customMomentLink: 'Moment 형식',
             customExample: '예: {value}',
             customExampleNote: '내 노트',

@@ -347,7 +347,7 @@ describe('settings tree', () => {
         const images = groups.find(group => group.heading === 'Attachments');
 
         const topNames = flatten([...(top?.items ?? [])]).map(row => row.name);
-        expect(topNames).toEqual(['Clean up every paste', 'Note property']);
+        expect(topNames).toEqual(['Clean up every paste', 'Note property', 'When the file name format applies']);
 
         const imageNames = flatten([...(images?.items ?? [])]).map(row => row.name);
         expect(imageNames.slice(0, 2)).toEqual(['Web images', 'Pasted files']);

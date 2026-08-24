@@ -144,9 +144,10 @@ export const STRINGS_NL: TranslationStrings = {
             customScreenshotDesc:
                 'Een schermafbeelding heeft geen bronnaam, dus wordt {{name}} "Pasted image" met een tijdstempel, net als in Obsidian.',
             namingInfoTitle: 'Wanneer de bestandsnaamnotatie geldt',
-            namingInfoLead: 'Belangrijk! In deze twee situaties kan Better Paste bestanden niet hernoemen:',
-            namingInfoExplorer: 'Kopieer een bestand in de Finder of Verkenner en plak het',
-            namingInfoDrag: 'Sleep een bestand in een notitie',
+            namingInfoLead: 'Belangrijk! Dit kan Better Paste niet:',
+            namingInfoExplorer: 'Een bestand hernoemen dat je in de Finder of Verkenner kopieert en plakt',
+            namingInfoDrag: 'Een bestand hernoemen dat je in een notitie sleept',
+            namingInfoMobile: 'Verwerken wat je op mobiel met Obsidians eigen plakopdracht plakt. Gebruik in plaats daarvan "{command}".',
             customMomentLink: 'Moment-notatie',
             customExample: 'Voorbeeld: {value}',
             customExampleNote: 'Mijn notitie',

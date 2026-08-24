@@ -138,9 +138,10 @@ export const STRINGS_VI: TranslationStrings = {
             customScreenshotDesc:
                 'Ảnh chụp màn hình không có tên nguồn, nên {{name}} của nó trở thành "Pasted image" kèm dấu thời gian, như trong Obsidian.',
             namingInfoTitle: 'Khi nào định dạng tên tệp được áp dụng',
-            namingInfoLead: 'Quan trọng! Trong hai trường hợp sau, Better Paste không thể đổi tên tệp:',
-            namingInfoExplorer: 'Sao chép tệp trong Finder hoặc File Explorer rồi dán',
-            namingInfoDrag: 'Kéo tệp vào ghi chú',
+            namingInfoLead: 'Quan trọng! Better Paste không thể làm những việc sau:',
+            namingInfoExplorer: 'Đổi tên tệp bạn sao chép trong Finder hoặc File Explorer rồi dán',
+            namingInfoDrag: 'Đổi tên tệp bạn kéo vào ghi chú',
+            namingInfoMobile: 'Xử lý nội dung được dán bằng lệnh dán của chính Obsidian trên di động. Hãy dùng "{command}" thay thế.',
             customMomentLink: 'Định dạng Moment',
             customExample: 'Ví dụ: {value}',
             customExampleNote: 'Ghi chú của tôi',

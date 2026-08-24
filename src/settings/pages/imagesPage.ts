@@ -131,11 +131,12 @@ function renderCustomFilenameFormat(setting: Setting, context: SettingsPageConte
 }
 
 /**
- * Full-width note closing the Attachments rows: the two ways a file is saved by Obsidian
- * rather than by Better Paste, because their unchanged names are what users report as
- * a bug in the file name format.
+ * Full-width note closing the Attachments rows: the limitations users report as bugs.
+ * Two are files Obsidian saves itself, so the file name format never runs, and one is
+ * the mobile Paste command that bypasses plugins entirely. The command name in the last
+ * item is substituted from the command strings so it stays correct in every language.
  */
-function renderNamingInfo(setting: Setting): void {
+export function renderNamingInfo(setting: Setting): void {
     const text = strings.settings.images;
     setting.setName('');
     setting.setDesc('');
@@ -144,6 +145,7 @@ function renderNamingInfo(setting: Setting): void {
     const list = setting.descEl.createEl('ol');
     list.createEl('li', { text: text.namingInfoExplorer });
     list.createEl('li', { text: text.namingInfoDrag });
+    list.createEl('li', { text: format(text.namingInfoMobile, { command: `Better Paste: ${strings.commands.paste}` }) });
 }
 
 /** Fills a choice dropdown with none, the offered values, and ask. */
@@ -238,10 +240,6 @@ export function createImageLandingDefinitions(context: SettingsPageContext): Set
                 return parts.length > 0 ? parts.join(', ') : text.choiceNone;
             },
             items: createSizeStylePageDefinitions(context)
-        },
-        {
-            name: text.namingInfoTitle,
-            render: setting => renderNamingInfo(setting)
         }
     ];
 }

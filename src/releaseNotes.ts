@@ -52,9 +52,13 @@ export interface ReleaseNote {
 const RELEASE_NOTES: ReleaseNote[] = [
     {
         version: '1.0.13',
-        date: '2026-08-23',
+        date: '2026-08-25',
         improved: [
             'Dropped files now follow the ==Pasted files== setting. Drag a PDF into a note with ==Link without preview== on and you get `[[Document.pdf]]`, the same as pasting it.'
+        ],
+        fixed: [
+            'Fixed copied browser images not being saved when pasted into a note property [#5](https://github.com/johansan/better-paste/issues/5).',
+            'Fixed link titles for standalone URLs and URL lists copied with rich formatting [#24](https://github.com/johansan/better-paste/issues/24).'
         ]
     },
     {

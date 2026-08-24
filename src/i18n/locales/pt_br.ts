@@ -154,9 +154,10 @@ export const STRINGS_PT_BR: TranslationStrings = {
             customScreenshotDesc:
                 'Uma captura de tela não tem nome de origem, então o {{name}} dela vira "Pasted image" com data e hora, como no Obsidian.',
             namingInfoTitle: 'Quando o formato do nome de arquivo se aplica',
-            namingInfoLead: 'Importante! Nestas duas situações, o Better Paste não consegue renomear os arquivos:',
-            namingInfoExplorer: 'Copie um arquivo no Finder ou no Explorador de Arquivos e cole',
-            namingInfoDrag: 'Arraste um arquivo para uma nota',
+            namingInfoLead: 'Importante! O Better Paste não consegue fazer o seguinte:',
+            namingInfoExplorer: 'Renomear um arquivo que você copia no Finder ou no Explorador de Arquivos e cola',
+            namingInfoDrag: 'Renomear um arquivo que você arrasta para uma nota',
+            namingInfoMobile: 'Processar o que é colado com o comando Colar do Obsidian no celular. Use "{command}" no lugar.',
             customMomentLink: 'Formato Moment',
             customExample: 'Exemplo: {value}',
             customExampleNote: 'Minha nota',

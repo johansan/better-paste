@@ -142,9 +142,10 @@ export const STRINGS_EN = {
             customScreenshotDesc:
                 'A screenshot has no source name, so its {{name}} becomes "Pasted image" with a timestamp, as in Obsidian.',
             namingInfoTitle: 'When the file name format applies',
-            namingInfoLead: 'Important! Better Paste cannot rename files in these two situations:',
-            namingInfoExplorer: 'Copy a file in Finder or Explorer and paste it',
-            namingInfoDrag: 'Drag a file into a note',
+            namingInfoLead: 'Important! Better Paste cannot do the following:',
+            namingInfoExplorer: 'Rename a file that you copy in Finder or Explorer and paste',
+            namingInfoDrag: 'Rename a file that you drag into a note',
+            namingInfoMobile: 'Process a paste made with Obsidian\'s own Paste command on mobile. Use "{command}" instead.',
             customMomentLink: 'Moment format',
             customExample: 'Example: {value}',
             customExampleNote: 'My note',

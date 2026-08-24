@@ -291,8 +291,8 @@ export class PasteService {
 
         // Markdown code and frontmatter are left verbatim. Pasting terminal output into a
         // fence is an act of preservation, so rejoining its lines there would destroy the
-        // thing the user was protecting. The one exception is an image address pasted into
-        // an empty frontmatter value, which is saved like a body paste.
+        // thing the user was protecting. The one exception is a web image pasted into an
+        // empty frontmatter value, which is saved like a body paste.
         if (isInsideVerbatimContext(content, editor.posToOffset(editor.getCursor('from')))) {
             const claimed = this.claimFrontmatterImagePaste(clipboard, editor, info, content);
             return claimed || this.leaveFilePasteNative(clipboard, editor, content);
@@ -641,9 +641,8 @@ export class PasteService {
     }
 
     /**
-     * Measures the range Obsidian inserted for a rich paste, then cleans URLs and pulls
-     * remote images into the vault. Runs after the native handler so the measurement sees
-     * the converted Markdown.
+     * Measures the range Obsidian inserted for a rich paste, then applies the rich-content
+     * rules. Runs after the native handler so the measurement sees the converted Markdown.
      */
     private scheduleRichPostProcess(editor: Editor, info: MarkdownView | MarkdownFileInfo): void {
         const settings = this.getSettings();
@@ -652,6 +651,7 @@ export class PasteService {
             !settings.textQuotes &&
             !settings.textDashes &&
             !settings.linkEnabled &&
+            !settings.linkTitles &&
             settings.imageMode === 'off' &&
             !settings.quoteContinuation &&
             !settings.textSnippets.some(snippet => snippet.enabled)
@@ -681,7 +681,7 @@ export class PasteService {
         }, 0);
     }
 
-    /** Cleans URLs and downloads images inside a freshly pasted rich-content range. */
+    /** Applies text, link and image rules inside a freshly pasted rich-content range. */
     private async processRichRange(
         editor: Editor,
         info: MarkdownView | MarkdownFileInfo,
@@ -693,6 +693,7 @@ export class PasteService {
         this.pendingRanges.add(range);
         const settings = this.getSettings();
         let imagesFailed = 0;
+        let titlesFailed = 0;
         let text = range.inserted;
 
         // Content copied out of a browser arrives as HTML, which is how most people paste
@@ -727,17 +728,59 @@ export class PasteService {
             }
         }
 
+        const allowLinkTitle = !isInsideMarkdownLinkDestination(range.valueBefore, range.startOffset, selectionEnd);
+        const needsTitle = allowLinkTitle && this.titles.hasWork(text);
+        const titleLines =
+            allowLinkTitle && !needsTitle && settings.linkTitles ? standaloneWebUrlLines(text, { allowBlockQuotes: true }) : null;
+        if (needsTitle) {
+            const progress = this.showTitleProgress(strings.notices.fetchingTitle);
+            try {
+                const materialized = await this.titles.materializeTitle(text);
+                if (materialized === null) titlesFailed = 1;
+                else {
+                    const subject = formatTitledLink(materialized.title, materialized.url);
+                    const ruled = applyTextSnippets(subject, this.getSettings().urlSnippets).text;
+                    text = composeTitledLink(subject, ruled);
+                }
+            } finally {
+                this.hideTitleProgress(progress);
+            }
+        } else if (titleLines !== null) {
+            const progressMessage = titleLines.length > 1 ? strings.notices.fetchingTitles : strings.notices.fetchingTitle;
+            const progress = this.showTitleProgress(progressMessage);
+            try {
+                const materialized = await this.titles.materializeTitles(text, { allowBlockQuotes: true });
+                if (materialized !== null) {
+                    const rebuilt = this.rebuildTitleBatch(text, titleLines, materialized);
+                    text = rebuilt.text;
+                    titlesFailed = rebuilt.failed;
+                }
+            } finally {
+                this.hideTitleProgress(progress);
+            }
+        }
+
+        let titleBoundary: ((value: string, offset: number) => boolean) | undefined;
+        if (needsTitle) {
+            titleBoundary = (value, offset) => !extendsUrl(value[offset - 1]) && !extendsUrl(value[offset + range.inserted.length]);
+        } else if (titleLines !== null) {
+            titleBoundary = (value, offset) =>
+                (!extendsUrl(range.inserted[0]) || !extendsUrl(value[offset - 1])) &&
+                (!extendsUrl(range.inserted[range.inserted.length - 1]) || !extendsUrl(value[offset + range.inserted.length]));
+        }
+
         try {
             if (!this.canEdit(info, targetFile)) {
                 void this.images.discardFiles(downloadedFiles);
                 return;
             }
-            if (text !== range.inserted && !this.replaceRange(editor, range, text)) {
+            if (text !== range.inserted && !this.replaceRange(editor, range, text, titleBoundary)) {
                 // The pasted range is gone or was edited, so nothing references the
                 // downloads and they must not linger as orphaned attachments
                 void this.images.discardFiles(downloadedFiles);
             }
             this.reportImageFailures(imagesFailed);
+            this.reportTitleFailures(titlesFailed);
         } finally {
             this.pendingRanges.delete(range);
         }
@@ -835,40 +878,50 @@ export class PasteService {
             const materialized = await this.titles.materializeTitles(range.inserted, { allowBlockQuotes: true });
             if (!this.canEdit(info, targetFile) || materialized === null) return;
 
-            let resultIndex = 0;
-            let failed = 0;
-            const rebuilt = range.inserted
-                .split('\n')
-                .map(line => {
-                    if (!line.slice((BLOCKQUOTE_PREFIX.exec(line)?.[0] ?? '').length).trim()) return line;
-                    const parts = lines[resultIndex];
-                    const result = materialized[resultIndex];
-                    resultIndex += 1;
-                    if (result === null) {
-                        failed += 1;
-                        return line;
-                    }
-                    const subject = formatTitledLink(result.title, result.url);
-                    const ruled = applyTextSnippets(subject, this.getSettings().urlSnippets).text;
-                    return `${parts.leading}${composeTitledLink(subject, ruled)}${parts.trailing}`;
-                })
-                .join('\n');
+            const rebuilt = this.rebuildTitleBatch(range.inserted, lines, materialized);
 
             const standalone = (value: string, offset: number): boolean =>
                 (!extendsUrl(range.inserted[0]) || !extendsUrl(value[offset - 1])) &&
                 (!extendsUrl(range.inserted[range.inserted.length - 1]) || !extendsUrl(value[offset + range.inserted.length]));
-            if (rebuilt !== range.inserted) this.replaceRange(editor, range, rebuilt, standalone);
-            this.reportTitleFailures(failed);
+            if (rebuilt.text !== range.inserted) this.replaceRange(editor, range, rebuilt.text, standalone);
+            this.reportTitleFailures(rebuilt.failed);
         } finally {
             this.hideTitleProgress(progress);
             this.pendingRanges.delete(range);
         }
     }
 
+    /** Replaces the URL on each non-blank line with its fetched title. */
+    private rebuildTitleBatch(
+        text: string,
+        lines: readonly { leading: string; trailing: string }[],
+        materialized: readonly ({ title: string; url: string } | null)[]
+    ): { text: string; failed: number } {
+        let resultIndex = 0;
+        let failed = 0;
+        const rebuilt = text
+            .split('\n')
+            .map(line => {
+                if (!line.slice((BLOCKQUOTE_PREFIX.exec(line)?.[0] ?? '').length).trim()) return line;
+                const parts = lines[resultIndex];
+                const result = materialized[resultIndex];
+                resultIndex += 1;
+                if (result === null) {
+                    failed += 1;
+                    return line;
+                }
+                const subject = formatTitledLink(result.title, result.url);
+                const ruled = applyTextSnippets(subject, this.getSettings().urlSnippets).text;
+                return `${parts.leading}${composeTitledLink(subject, ruled)}${parts.trailing}`;
+            })
+            .join('\n');
+        return { text: rebuilt, failed };
+    }
+
     /**
-     * Claims a paste of exactly one image address into an empty frontmatter value, after
-     * "key: " or a "- " sequence item with nothing else on the line. Anywhere else in
-     * frontmatter the YAML around the paste could break, so the paste stays native.
+     * Claims one web image address or copied browser image in an empty frontmatter value,
+     * after "key: " or a "- " sequence item with nothing else on the line. Anywhere else
+     * in frontmatter the YAML around the paste could break, so the paste stays native.
      * Obsidian Bases reads a cover image from such a property, and a saved copy works
      * offline where the web address does not.
      */
@@ -878,21 +931,84 @@ export class PasteService {
         info: MarkdownView | MarkdownFileInfo,
         content: string
     ): boolean {
-        if (clipboard.files.length > 0) return false;
+        const from = editor.posToOffset(editor.getCursor('from'));
+        const to = editor.posToOffset(editor.getCursor('to'));
+        if (!isFrontmatterValueSlot(content, from, to)) return false;
+
+        if (clipboard.files.length > 0) {
+            const html = clipboard.getData('text/html');
+            const source = imageSourcesFromHtml(html)[0] ?? standaloneWebUrl(clipboard.getData('text/plain').trim()) ?? '';
+            if (this.getSettings().imageMode === 'off' || !isSingleImageFile(clipboard.files) || !htmlHasImages(html) || !isHttpUrl(source))
+                return false;
+
+            const targetFile = info.file;
+            editor.replaceSelection(source);
+            this.realignPendingRanges(null, from, content.slice(from, to), source);
+            void this.runFrontmatterClipboardImagePass(
+                editor,
+                info,
+                targetFile,
+                asyncPasteRange(from, source, content, editor.getValue()),
+                clipboard.files[0],
+                source
+            );
+            return true;
+        }
 
         const url = standaloneWebUrl(clipboard.getData('text/plain').trim());
         if (this.getSettings().imageMode !== 'download' || url === null || !isObviousImageUrl(url) || !this.images.hasWork(url))
             return false;
-
-        const from = editor.posToOffset(editor.getCursor('from'));
-        const to = editor.posToOffset(editor.getCursor('to'));
-        if (!isFrontmatterValueSlot(content, from, to)) return false;
 
         const targetFile = info.file;
         editor.replaceSelection(url);
         this.realignPendingRanges(null, from, content.slice(from, to), url);
         void this.runFrontmatterImagePass(editor, info, targetFile, asyncPasteRange(from, url, content, editor.getValue()));
         return true;
+    }
+
+    /** Saves a copied browser bitmap and writes the property-safe link after the save completes. */
+    private async runFrontmatterClipboardImagePass(
+        editor: Editor,
+        info: MarkdownView | MarkdownFileInfo,
+        targetFile: TFile | null,
+        range: AsyncPasteRange,
+        file: File,
+        source: string
+    ): Promise<void> {
+        this.pendingRanges.add(range);
+        try {
+            let saved: { file: TFile } | null = null;
+            try {
+                saved = await this.images.saveClipboardImage(
+                    file,
+                    source,
+                    () => targetFile?.path ?? '',
+                    null,
+                    null,
+                    this.imageNaming(editor)
+                );
+            } catch (error) {
+                logError('Could not save a pasted image', error);
+            }
+
+            if (!this.canEdit(info, targetFile)) {
+                if (saved) void this.images.discardFiles([saved.file]);
+                return;
+            }
+            if (!saved) {
+                this.reportImageFailures(1);
+                return;
+            }
+
+            const slotIntact = (value: string, offset: number): boolean =>
+                isFrontmatterValueSlot(value, offset, offset + range.inserted.length);
+            const link = this.images.propertyLink(saved.file, targetFile?.path ?? '');
+            if (!this.replaceRange(editor, range, link, slotIntact)) {
+                void this.images.discardFiles([saved.file]);
+            }
+        } finally {
+            this.pendingRanges.delete(range);
+        }
     }
 
     /**

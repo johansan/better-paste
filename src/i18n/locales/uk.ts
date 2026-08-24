@@ -148,9 +148,11 @@ export const STRINGS_UK: TranslationStrings = {
             customScreenshotDesc:
                 'Знімок екрана не має назви джерела, тому його {{name}} стає «Pasted image» з міткою часу, як в Obsidian.',
             namingInfoTitle: 'Коли застосовується формат імені файлу',
-            namingInfoLead: 'Важливо! У цих двох випадках Better Paste не може перейменувати файли:',
-            namingInfoExplorer: 'Скопіюйте файл у Finder або Провіднику та вставте його',
-            namingInfoDrag: 'Перетягніть файл у нотатку',
+            namingInfoLead: 'Важливо! Better Paste не може:',
+            namingInfoExplorer: 'Перейменувати файл, який ви копіюєте у Finder або Провіднику та вставляєте',
+            namingInfoDrag: 'Перейменувати файл, який ви перетягуєте в нотатку',
+            namingInfoMobile:
+                'Обробити вставлення, зроблене власною командою Obsidian «Вставити» на мобільному пристрої. Замість неї використовуйте «{command}».',
             customMomentLink: 'Формат Moment',
             customExample: 'Приклад: {value}',
             customExampleNote: 'Моя нотатка',

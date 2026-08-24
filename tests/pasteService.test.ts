@@ -1700,6 +1700,101 @@ describe('handleEditorPaste: rich content', () => {
         expect(editor.getValue()).toBe('text ![[image-0.png]] [link](https://example.com/b)');
     });
 
+    it('fetches titles for URL lists converted from rich clipboard content', async () => {
+        const { service, fetchedTitles } = build({ linkEnabled: false });
+        const editor = new FakeEditor('');
+        const first = 'https://github.com/example/project/issues?q=open';
+        const second = 'https://github.com/example/project/discussions';
+        const html = `<ul><li><a href="${first}">${first}</a></li><li><a href="${second}">${second}</a></li></ul>`;
+
+        await pasteRich(service, editor, html, `- ${first}\n- ${second}`);
+
+        expect(fetchedTitles).toEqual([first, second]);
+        expect(editor.getValue()).toBe(`- [Example page](${first})\n- [Example page](${second})`);
+    });
+
+    it('fetches a title for one bare URL converted from rich clipboard content', async () => {
+        const { service, fetchedTitles } = build({ linkEnabled: false });
+        const editor = new FakeEditor('');
+        const url = 'https://github.com/example/project/issues';
+
+        await pasteRich(service, editor, `<a href="${url}">${url}</a>`, url);
+
+        expect(fetchedTitles).toEqual([url]);
+        expect(editor.getValue()).toBe(`[Example page](${url})`);
+    });
+
+    it('keeps a URL extension typed while a rich title fetch is pending', async () => {
+        const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, imageMode: 'off', linkEnabled: false };
+        let finishTitleFetch: (result: { title: string; url: string }) => void = () => undefined;
+        const titleResult = new Promise<{ title: string; url: string }>(resolve => {
+            finishTitleFetch = resolve;
+        });
+        const titles = {
+            hasWork: () => true,
+            materializeTitle: () => titleResult,
+            dispose: () => undefined
+        } as unknown as LinkTitleService;
+        const service = new PasteService(() => settings, fakeImages(settings), titles);
+        const editor = new FakeEditor('');
+        const url = 'https://example.com/page';
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ html: `<a href="${url}">${url}</a>` }), editor.asEditor(), INFO)).toBe(false);
+        editor.replaceSelection(url);
+        await new Promise(resolve => setTimeout(resolve, 0));
+        editor.replaceSelection('/docs');
+        finishTitleFetch({ title: 'Example page', url });
+        await titleResult;
+        await settle();
+
+        expect(editor.getValue()).toBe(`${url}/docs`);
+    });
+
+    it('keeps a URL extension typed while rich list titles are pending', async () => {
+        const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, imageMode: 'off', linkEnabled: false };
+        let finishTitleFetch: (result: { title: string; url: string }[]) => void = () => undefined;
+        const titleResult = new Promise<{ title: string; url: string }[]>(resolve => {
+            finishTitleFetch = resolve;
+        });
+        const titles = {
+            hasWork: () => false,
+            materializeTitles: () => titleResult,
+            dispose: () => undefined
+        } as unknown as LinkTitleService;
+        const service = new PasteService(() => settings, fakeImages(settings), titles);
+        const editor = new FakeEditor('');
+        const first = 'https://example.com/one';
+        const second = 'https://example.com/two';
+        const converted = `- ${first}\n- ${second}`;
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ html: '<ul><li>one</li><li>two</li></ul>' }), editor.asEditor(), INFO)).toBe(
+            false
+        );
+        editor.replaceSelection(converted);
+        await new Promise(resolve => setTimeout(resolve, 0));
+        editor.replaceSelection('/docs');
+        finishTitleFetch([
+            { title: 'One', url: first },
+            { title: 'Two', url: second }
+        ]);
+        await titleResult;
+        await settle();
+
+        expect(editor.getValue()).toBe(`${converted}/docs`);
+    });
+
+    it('does not fetch a title inside an existing Markdown link destination from rich clipboard content', async () => {
+        const { service, fetchedTitles } = build();
+        const pasted = 'https://example.com/page?utm_source=news';
+        const prefix = '[Title](';
+        const editor = new FakeEditor(`${prefix})`, prefix.length);
+
+        await pasteRich(service, editor, `<a href="${pasted}">${pasted}</a>`, pasted);
+
+        expect(editor.getValue()).toBe('[Title](https://example.com/page)');
+        expect(fetchedTitles).toEqual([]);
+    });
+
     it('continues converted rich content inside a block quote', async () => {
         const { service } = build();
         const editor = new FakeEditor('> ');
@@ -2241,9 +2336,45 @@ describe('runSnippet', () => {
     });
 });
 
-describe('handleEditorPaste: image URL in frontmatter', () => {
+describe('handleEditorPaste: web image in frontmatter', () => {
     const URL = 'https://example.com/pic.png';
     const urlEvent = (): ClipboardEvent => fakeClipboardEvent({ plain: URL });
+
+    it('saves a copied browser image and writes a quoted plain wikilink', async () => {
+        const { service, saved } = build();
+        const source = 'https://example.com/pathfinder.webp';
+        const event = fakeClipboardEvent({
+            plain: source,
+            html: `<img src="${source}">`,
+            files: [fakeFile('image.png', 'image/png')]
+        });
+        const doc = '---\ncover: \n---\n';
+        const editor = new FakeEditor(doc, '---\ncover: '.length);
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe(`---\ncover: ${source}\n---\n`);
+        await settle();
+
+        expect(saved).toHaveLength(1);
+        expect(saved[0]).toMatchObject({ source, size: null, cssClass: null });
+        expect(editor.getValue()).toBe('---\ncover: "[[pathfinder.png]]"\n---\n');
+    });
+
+    it('keeps the copied image address when its bitmap cannot be saved', async () => {
+        const { service } = build({}, true);
+        const source = 'https://example.com/pathfinder.webp';
+        const event = fakeClipboardEvent({
+            html: `<img src="${source}">`,
+            files: [fakeFile('image.png', 'image/png')]
+        });
+        const doc = '---\ncover: \n---\n';
+        const editor = new FakeEditor(doc, '---\ncover: '.length);
+
+        expect(service.handleEditorPaste(event, editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(editor.getValue()).toBe(`---\ncover: ${source}\n---\n`);
+    });
 
     it('saves the image and writes a quoted plain wikilink', async () => {
         const { service } = build();

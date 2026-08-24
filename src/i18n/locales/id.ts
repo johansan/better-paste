@@ -126,9 +126,11 @@ export const STRINGS_ID: TranslationStrings = {
             customScreenshotDesc:
                 'Tangkapan layar tidak punya nama sumber, sehingga {{name}}-nya menjadi "Pasted image" dengan stempel waktu, seperti di Obsidian.',
             namingInfoTitle: 'Kapan format nama berkas berlaku',
-            namingInfoLead: 'Penting! Dalam dua situasi berikut, Better Paste tidak bisa mengganti nama berkas:',
-            namingInfoExplorer: 'Salin berkas di Finder atau File Explorer lalu tempel',
-            namingInfoDrag: 'Seret berkas ke catatan',
+            namingInfoLead: 'Penting! Better Paste tidak bisa melakukan hal berikut:',
+            namingInfoExplorer: 'Mengganti nama berkas yang Anda salin di Finder atau File Explorer lalu tempel',
+            namingInfoDrag: 'Mengganti nama berkas yang Anda seret ke catatan',
+            namingInfoMobile:
+                'Memproses apa yang ditempel dengan perintah tempel bawaan Obsidian di ponsel. Gunakan "{command}" sebagai gantinya.',
             customMomentLink: 'Format Moment',
             customExample: 'Contoh: {value}',
             customExampleNote: 'Catatan saya',

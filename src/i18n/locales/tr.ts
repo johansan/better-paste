@@ -132,9 +132,11 @@ export const STRINGS_TR: TranslationStrings = {
             customScreenshotDesc:
                 'Ekran görüntüsünün kaynak adı olmadığından {{name}} değeri, Obsidian’daki gibi zaman damgalı "Pasted image" olur.',
             namingInfoTitle: 'Dosya adı biçiminin uygulandığı durumlar',
-            namingInfoLead: 'Önemli! Better Paste şu iki durumda dosyaları yeniden adlandıramaz:',
-            namingInfoExplorer: 'Finder veya Dosya Gezgini’nde bir dosyayı kopyalayıp yapıştırın',
-            namingInfoDrag: 'Bir dosyayı nota sürükleyin',
+            namingInfoLead: 'Önemli! Better Paste şunları yapamaz:',
+            namingInfoExplorer: 'Finder veya Dosya Gezgini’nde kopyalayıp yapıştırdığınız bir dosyayı yeniden adlandırmak',
+            namingInfoDrag: 'Bir nota sürüklediğiniz dosyayı yeniden adlandırmak',
+            namingInfoMobile:
+                'Mobilde Obsidian’ın kendi Yapıştır komutuyla yapıştırılanları işlemek. Bunun yerine "{command}" komutunu kullanın.',
             customMomentLink: 'Moment biçimi',
             customExample: 'Örnek: {value}',
             customExampleNote: 'Notum',

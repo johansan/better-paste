@@ -132,9 +132,10 @@ export const STRINGS_FA: TranslationStrings = {
             customScreenshotDesc:
                 'نماگرفت نام منبع ندارد، پس {{name}} آن به «Pasted image» همراه با مهر زمانی تبدیل می‌شود، مانند خود Obsidian.',
             namingInfoTitle: 'زمانی که قالب نام پرونده اعمال می‌شود',
-            namingInfoLead: 'مهم! در این دو حالت، Better Paste نمی‌تواند نام پرونده‌ها را تغییر دهد:',
-            namingInfoExplorer: 'پرونده‌ای را در Finder یا File Explorer کپی کنید و بچسبانید',
-            namingInfoDrag: 'پرونده‌ای را به یادداشت بکشید',
+            namingInfoLead: 'مهم! Better Paste نمی‌تواند این کارها را انجام دهد:',
+            namingInfoExplorer: 'تغییر نام پرونده‌ای که در Finder یا File Explorer کپی می‌کنید و می‌چسبانید',
+            namingInfoDrag: 'تغییر نام پرونده‌ای که به یادداشت می‌کشید',
+            namingInfoMobile: 'پردازش آنچه در موبایل با فرمان چسباندن خود Obsidian چسبانده می‌شود. به‌جای آن از «{command}» استفاده کنید.',
             customMomentLink: 'قالب Moment',
             customExample: 'نمونه: {value}',
             customExampleNote: 'یادداشت من',

@@ -24,7 +24,7 @@ import { DEFAULT_SETTINGS } from './defaults';
 import { aliases, format, strings } from '../i18n';
 import { DYNAMIC_DESCRIPTION_KEYS, LIST_KEY_SUFFIX, SETTINGS_CLASS, TEXT_SNIPPET_KEY_PREFIX, toggle } from './pages/context';
 import type { DynamicDescriptionKey, SettingsPageContext } from './pages/context';
-import { createImageLandingDefinitions } from './pages/imagesPage';
+import { createImageLandingDefinitions, renderNamingInfo } from './pages/imagesPage';
 import { createLinkLandingDefinitions } from './pages/linksPage';
 import { createTextProcessingDefinitions } from './pages/textProcessingPage';
 import { createStructureDefinitions } from './pages/structurePage';
@@ -123,6 +123,10 @@ export class BetterPasteSettingTab extends PluginSettingTab {
                             placeholder: DEFAULT_SETTINGS.noteProperty,
                             defaultValue: DEFAULT_SETTINGS.noteProperty
                         }
+                    },
+                    {
+                        name: strings.settings.images.namingInfoTitle,
+                        render: setting => renderNamingInfo(setting)
                     }
                 ]
             },

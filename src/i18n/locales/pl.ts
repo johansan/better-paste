@@ -136,9 +136,11 @@ export const STRINGS_PL: TranslationStrings = {
             customScreenshotDesc:
                 'Zrzut ekranu nie ma nazwy źródła, więc jego {{name}} staje się „Pasted image” ze znacznikiem czasu, jak w Obsidianie.',
             namingInfoTitle: 'Kiedy format nazwy pliku ma zastosowanie',
-            namingInfoLead: 'Ważne! W tych dwóch sytuacjach Better Paste nie może zmienić nazw plików:',
-            namingInfoExplorer: 'Skopiuj plik w Finderze lub Eksploratorze i wklej go',
-            namingInfoDrag: 'Przeciągnij plik do notatki',
+            namingInfoLead: 'Ważne! Better Paste nie może:',
+            namingInfoExplorer: 'Zmienić nazwy pliku, który kopiujesz w Finderze lub Eksploratorze i wklejasz',
+            namingInfoDrag: 'Zmienić nazwy pliku, który przeciągasz do notatki',
+            namingInfoMobile:
+                'Przetworzyć tego, co wklejasz na telefonie własnym poleceniem Obsidiana „Wklej”. Zamiast tego używaj „{command}”.',
             customMomentLink: 'Format Moment',
             customExample: 'Przykład: {value}',
             customExampleNote: 'Moja notatka',
