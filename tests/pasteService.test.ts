@@ -1063,6 +1063,7 @@ describe('image embed options', () => {
 
 describe('handleEditorPaste: link titles', () => {
     const obsidianUrl = 'obsidian://open?vault=Notes&file=Folder%2FMy%20Note';
+    const devonthinkUrl = 'x-devonthink-item://10BA9397-2667-4C62-8959-6E0396521CA9?reveal=1';
 
     it('inserts a titled link for a standalone Obsidian open URL', () => {
         const { service } = build({ linkTitles: true, linkEnabled: false });
@@ -1086,6 +1087,25 @@ describe('handleEditorPaste: link titles', () => {
 
         expect(service.handleEditorPaste(fakeClipboardEvent({ plain: obsidianUrl }), editor.asEditor(), INFO)).toBe(true);
         expect(editor.getValue()).toBe(`Before [selected text](${obsidianUrl}) after`);
+    });
+
+    it('uses the selection as an app URL label', () => {
+        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false });
+        const editor = selecting('Before selected text after', 'selected text');
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: devonthinkUrl }), editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe(`Before [selected text](${devonthinkUrl}) after`);
+        expect(fetchedTitles).toEqual([]);
+    });
+
+    it('uses the selection as an app URI without slashes', () => {
+        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false });
+        const editor = selecting('Play selected track next', 'selected track');
+        const spotifyUrl = 'spotify:track:4uLU6hMCjMI75M1A2tKUQC';
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: spotifyUrl }), editor.asEditor(), INFO)).toBe(true);
+        expect(editor.getValue()).toBe(`Play [selected track](${spotifyUrl}) next`);
+        expect(fetchedTitles).toEqual([]);
     });
 
     it('applies URL snippets to an Obsidian URL link', () => {
@@ -1354,6 +1374,17 @@ describe('handleEditorPaste: link titles', () => {
         await settle();
 
         expect(editor.getValue()).toBe('[Title](https://example.com/page)');
+        expect(fetchedTitles).toEqual([]);
+    });
+
+    it('leaves an app URL native inside a selected Markdown link destination', () => {
+        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false });
+        const editor = selecting('[](<like here>)', '<like here>');
+        const handled = service.handleEditorPaste(fakeClipboardEvent({ plain: devonthinkUrl }), editor.asEditor(), INFO);
+
+        expect(handled).toBe(false);
+        if (!handled) editor.replaceSelection(devonthinkUrl);
+        expect(editor.getValue()).toBe(`[](${devonthinkUrl})`);
         expect(fetchedTitles).toEqual([]);
     });
 
@@ -2101,6 +2132,36 @@ describe('explicit paste commands', () => {
         try {
             await service.pasteProcessed(editor.asEditor(), INFO);
             expect(editor.getValue()).toBe(`Read the [documentation](${url}) next`);
+            expect(fetchedTitles).toEqual([]);
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
+    it('uses the invocation selection as an app URL label', async () => {
+        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false });
+        const editor = selecting('Read the document next', 'document');
+        const url = 'x-devonthink-item://10BA9397-2667-4C62-8959-6E0396521CA9';
+        vi.stubGlobal('navigator', { clipboard: { readText: async () => url } });
+
+        try {
+            await service.pasteProcessed(editor.asEditor(), INFO);
+            expect(editor.getValue()).toBe(`Read the [document](${url}) next`);
+            expect(fetchedTitles).toEqual([]);
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
+    it('inserts an app URL directly inside an existing Markdown link', async () => {
+        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false });
+        const editor = selecting('[](<like here>)', '<like here>');
+        const url = 'x-devonthink-item://10BA9397-2667-4C62-8959-6E0396521CA9';
+        vi.stubGlobal('navigator', { clipboard: { readText: async () => url } });
+
+        try {
+            await service.pasteProcessed(editor.asEditor(), INFO);
+            expect(editor.getValue()).toBe(`[](${url})`);
             expect(fetchedTitles).toEqual([]);
         } finally {
             vi.unstubAllGlobals();

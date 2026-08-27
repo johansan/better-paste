@@ -62,6 +62,7 @@ import {
     formatTitledLink,
     isObviousImageUrl,
     obsidianUrlTitle,
+    standaloneAppUrl,
     standaloneWebUrl,
     standaloneWebUrlLines
 } from './LinkTitleService';
@@ -357,13 +358,23 @@ export class PasteService {
         const localTitle = allowLinkTitle && settings.linkTitles ? obsidianUrlTitle(result.text) : null;
         const localSubject = localTitle ? formatTitledLink(localTitle.title, localTitle.url) : null;
         const localLink = localSubject ? composeTitledLink(localSubject, applyTextSnippets(localSubject, settings.urlSnippets).text) : null;
+        const appUrl = allowLinkTitle && settings.linkTitles ? standaloneAppUrl(result.text) : null;
+        const selectionUrl = needsTitle ? result.text : (localTitle?.url ?? appUrl);
+        const selectedLink = selectionUrl ? linkFromSelection(editor.getSelection(), plain, selectionUrl) : null;
         // A document transform takes the paste over because it can change clean text on its own
-        if (rebased === null && quoted === null && !result.changed && !needsImages && !needsTitle && !needsTitleBatch && localLink === null)
+        if (
+            rebased === null &&
+            quoted === null &&
+            !result.changed &&
+            !needsImages &&
+            !needsTitle &&
+            !needsTitleBatch &&
+            localLink === null &&
+            selectedLink === null
+        )
             return false;
 
         const targetFile = info.file;
-        const selectedLink =
-            needsTitle || localTitle ? linkFromSelection(editor.getSelection(), plain, localTitle?.url ?? result.text) : null;
         const inserted = selectedLink ?? localLink ?? rebased?.inserted ?? quoted ?? result.text;
         // The rebase may reach back before the selection, to replace the destination's checkbox
         const from = selectedLink === null && localLink === null && rebased !== null ? rebased.from : startOffset;
@@ -518,11 +529,11 @@ export class PasteService {
         const localTitle = allowLinkTitle && settings.linkTitles ? obsidianUrlTitle(result.text) : null;
         const localSubject = localTitle ? formatTitledLink(localTitle.title, localTitle.url) : null;
         const localLink = localSubject ? composeTitledLink(localSubject, applyTextSnippets(localSubject, settings.urlSnippets).text) : null;
+        const appUrl = allowLinkTitle && settings.linkTitles ? standaloneAppUrl(result.text) : null;
         const invocationSelection = valueAtInvocation.slice(fromOffset, toOffset);
+        const selectionUrl = needsTitle ? result.text : (localTitle?.url ?? appUrl);
         const selectedLink =
-            (needsTitle || localTitle) && valueBefore === valueAtInvocation
-                ? linkFromSelection(invocationSelection, clipboardText, localTitle?.url ?? result.text)
-                : null;
+            selectionUrl && valueBefore === valueAtInvocation ? linkFromSelection(invocationSelection, clipboardText, selectionUrl) : null;
         const inserted = selectedLink ?? localLink ?? rebased?.inserted ?? quoted ?? result.text;
         // The rebase may reach back before the selection, to replace the destination's checkbox
         const insertFrom = selectedLink === null && localLink === null && rebased !== null ? rebased.from : fromOffset;

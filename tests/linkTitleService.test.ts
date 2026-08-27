@@ -25,6 +25,7 @@ import {
     isObviousImageUrl,
     LinkTitleService,
     obsidianUrlTitle,
+    standaloneAppUrl,
     standaloneWebUrl,
     standaloneWebUrlLines
 } from '../src/paste/LinkTitleService';
@@ -92,6 +93,18 @@ describe('link title candidates', () => {
         expect(standaloneWebUrl('https://example.com/page')).toBe('https://example.com/page');
         expect(standaloneWebUrl('See https://example.com/page')).toBeNull();
         expect(standaloneWebUrl('file:///tmp/a')).toBeNull();
+    });
+
+    it('accepts standalone app addresses with custom URL schemes', () => {
+        const devonthink = 'x-devonthink-item://10BA9397-2667-4C62-8959-6E0396521CA9?reveal=1';
+
+        expect(standaloneAppUrl(devonthink)).toBe(devonthink);
+        expect(standaloneAppUrl('things:///show?id=ABC')).toBe('things:///show?id=ABC');
+        expect(standaloneAppUrl('spotify:track:4uLU6hMCjMI75M1A2tKUQC')).toBe('spotify:track:4uLU6hMCjMI75M1A2tKUQC');
+        expect(standaloneAppUrl('obsidian://search?query=example')).toBe('obsidian://search?query=example');
+        expect(standaloneAppUrl('https://example.com/page')).toBeNull();
+        expect(standaloneAppUrl('javascript://alert%281%29')).toBeNull();
+        expect(standaloneAppUrl('x-example://item extra')).toBeNull();
     });
 
     it('recognises image paths without making a request', () => {

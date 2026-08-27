@@ -48,6 +48,20 @@ export function standaloneWebUrl(text: string): string | null {
     }
 }
 
+/** Returns a standalone app address with a custom URL scheme, or null for web and unsafe schemes. */
+export function standaloneAppUrl(text: string): string | null {
+    if (!/^[a-z][a-z0-9+.-]*:\S+$/i.test(text)) return null;
+
+    try {
+        const protocol = new URL(text).protocol.toLowerCase();
+        if (protocol === 'http:' || protocol === 'https:' || protocol === 'javascript:' || protocol === 'data:' || protocol === 'blob:')
+            return null;
+        return text;
+    } catch {
+        return null;
+    }
+}
+
 /** Returns the note title and original address from a standalone Obsidian open URL. */
 export function obsidianUrlTitle(text: string): { title: string; url: string } | null {
     if (!text || /\s/.test(text)) return null;
