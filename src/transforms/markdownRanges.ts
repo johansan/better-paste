@@ -185,6 +185,8 @@ export function markdownCodeRanges(text: string): TextRange[] {
                 indentedCodeAllowed = true;
                 paragraphOpen = false;
             } else if (/^(?: {4}|\t)/.test(content)) {
+                const stripped = content.replace(/^[ \t]+/, '');
+                const listItem = listContentIndent >= 0 ? LIST_ITEM_LINE.exec(stripped) : null;
                 // The flag carries through the block: lines of a code block stay code,
                 // continuation lines of a paragraph stay prose and keep their backtick spans.
                 // Inside a list item, code starts four columns past the item's content
@@ -192,7 +194,7 @@ export function markdownCodeRanges(text: string): TextRange[] {
                 if (indentedCodeAllowed && (listContentIndent < 0 || indentWidthOf(content) >= listContentIndent + 4)) {
                     ranges.push({ start: lineStart, end: lineEnd });
                     paragraphOpen = false;
-                } else if (listContentIndent >= 0 && indentWidthOf(content) < listContentIndent) {
+                } else if (listContentIndent >= 0 && indentWidthOf(content) < listContentIndent && listItem === null) {
                     // Indented too little to continue the list item and too much to be
                     // prose, so the renderer shows it as indented code below the list
                     ranges.push({ start: lineStart, end: lineEnd });
@@ -205,7 +207,6 @@ export function markdownCodeRanges(text: string): TextRange[] {
                 } else {
                     // A fence indented as a list continuation opens a code block even
                     // though a fence at the left margin allows at most three spaces
-                    const stripped = content.replace(/^[ \t]+/, '');
                     const nested = listContentIndent >= 0 ? fenceDelimiterOf(stripped) : null;
                     if (nested) {
                         fence = {
@@ -220,7 +221,7 @@ export function markdownCodeRanges(text: string): TextRange[] {
                         // A nested list item deepens the content indent, so the
                         // indented-code threshold follows the list down; otherwise a
                         // depth-two item after a blank line reads as code
-                        const item = listContentIndent >= 0 ? LIST_ITEM_LINE.exec(stripped) : null;
+                        const item = listItem;
                         paragraphOpen = item === null;
                         if (item) {
                             let extra = 0;

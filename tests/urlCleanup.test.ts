@@ -227,9 +227,10 @@ describe('cleanUrl', () => {
         expect(cleanUrlsInText(input, options()).text).toBe("[x](https://example.com/search?q=O'Reilly)");
     });
 
-    it('strips a scroll-to-text fragment but keeps the anchor', () => {
-        expect(cleanUrl('https://example.com/a#section:~:text=hello', options())).toBe('https://example.com/a#section');
-        expect(cleanUrl('https://example.com/a#:~:text=hello', options())).toBe('https://example.com/a');
+    it('keeps scroll-to-text fragments because they select content at the destination', () => {
+        expect(cleanUrl('https://example.com/a#section:~:text=hello', options())).toBe('https://example.com/a#section:~:text=hello');
+        expect(cleanUrl('https://example.com/a#:~:text=hello', options())).toBe('https://example.com/a#:~:text=hello');
+        expect(cleanUrl('https://example.com/a?utm_source=news#:~:text=hello', options())).toBe('https://example.com/a#:~:text=hello');
     });
 
     it('keeps ordinary fragments', () => {
@@ -370,9 +371,9 @@ describe('cleanUrlsInText', () => {
         expect(result.text).toBe('[a](https://one.com/)[[Note]]');
     });
 
-    it('cleans a highlight-fragment link pasted flush against a second link', () => {
+    it('keeps a highlight-fragment link pasted flush against a second link', () => {
         const result = cleanUrlsInText('[quote](https://one.com/page#:~:text=exact%20words)[source](https://two.com/)', options());
-        expect(result.text).toBe('[quote](https://one.com/page)[source](https://two.com/)');
+        expect(result.text).toBe('[quote](https://one.com/page#:~:text=exact%20words)[source](https://two.com/)');
     });
 
     it('cleans a link pasted flush against bold text without deleting it', () => {
@@ -402,7 +403,7 @@ describe('cleanUrlsInText', () => {
             'old ~~https://example.com/read~~ gone'
         );
         expect(cleanUrlsInText('Read **https://example.com/page#:~:text=foo** now', options()).text).toBe(
-            'Read **https://example.com/page** now'
+            'Read **https://example.com/page#:~:text=foo** now'
         );
     });
 

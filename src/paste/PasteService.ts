@@ -17,7 +17,7 @@
  */
 
 import { Notice, parseYaml } from 'obsidian';
-import type { Editor, MarkdownFileInfo, MarkdownView, TFile } from 'obsidian';
+import type { Editor, EditorPosition, MarkdownFileInfo, MarkdownView, TFile } from 'obsidian';
 import { runTextPipeline } from '../transforms';
 import { frontmatterRanges, normalizeInvisibleCharacters, straightenDashes, straightenQuotes } from '../transforms/typography';
 import { applyCommaPlacement } from '../transforms/textProcessing';
@@ -105,6 +105,23 @@ function asyncPasteRange(startOffset: number, inserted: string, valueBefore: str
         beforeContext: valueAfter.slice(Math.max(0, startOffset - RANGE_CONTEXT), startOffset),
         afterContext: valueAfter.slice(startOffset + inserted.length, startOffset + inserted.length + RANGE_CONTEXT)
     };
+}
+
+/** Returns the caret position after inserting `text` at `from`. */
+function positionAfterText(from: EditorPosition, text: string): EditorPosition {
+    const lines = text.split('\n');
+    if (lines.length === 1) return { line: from.line, ch: from.ch + text.length };
+    return { line: from.line + lines.length - 1, ch: lines[lines.length - 1].length };
+}
+
+/** Replaces one range and moves the caret in the same editor transaction. */
+function replaceRangeWithCursor(editor: Editor, text: string, from: EditorPosition, to: EditorPosition): void {
+    // Live Preview table cells commit through a nested editor. A separate cursor move can
+    // run against the old table source and land in another cell before the change commits.
+    editor.transaction({
+        changes: [{ from, to, text }],
+        selection: { from: positionAfterText(from, text) }
+    });
 }
 
 /**
@@ -378,12 +395,12 @@ export class PasteService {
         const inserted = selectedLink ?? localLink ?? rebased?.inserted ?? quoted ?? result.text;
         // The rebase may reach back before the selection, to replace the destination's checkbox
         const from = selectedLink === null && localLink === null && rebased !== null ? rebased.from : startOffset;
-        editor.replaceRange(inserted, editor.offsetToPos(from), editor.offsetToPos(endOffset));
-        editor.setCursor(editor.offsetToPos(from + inserted.length));
+        replaceRangeWithCursor(editor, inserted, editor.offsetToPos(from), editor.offsetToPos(endOffset));
         // An earlier paste may still be downloading; its snapshots must learn about this
         // insert, otherwise its rewrite is abandoned as stale when it completes
         this.realignPendingRanges(null, from, valueBefore.slice(from, endOffset), inserted);
-        const range = asyncPasteRange(from, inserted, valueBefore, editor.getValue());
+        const valueAfter = valueBefore.slice(0, from) + inserted + valueBefore.slice(endOffset);
+        const range = asyncPasteRange(from, inserted, valueBefore, valueAfter);
 
         if (needsImages) void this.runImagePass(editor, info, targetFile, () => targetFile?.path ?? '', range);
         else if (needsTitle && selectedLink === null) void this.runTitlePass(editor, info, targetFile, range);
@@ -463,8 +480,7 @@ export class PasteService {
         }
 
         if (editor.getValue() === valueBefore) {
-            editor.replaceRange(text, editor.offsetToPos(fromOffset), editor.offsetToPos(toOffset));
-            editor.setCursor(editor.offsetToPos(fromOffset + text.length));
+            replaceRangeWithCursor(editor, text, editor.offsetToPos(fromOffset), editor.offsetToPos(toOffset));
             this.realignPendingRanges(null, fromOffset, valueBefore.slice(fromOffset, toOffset), text);
         } else {
             // The document changed while the image was being written, so the recorded
@@ -1139,10 +1155,11 @@ export class PasteService {
         const cursorOffset = editor.posToOffset(editor.getCursor());
         const cursorWasInRange = cursorOffset >= offset && cursorOffset <= offset + inserted.length;
 
-        editor.replaceRange(next, editor.offsetToPos(offset), editor.offsetToPos(offset + inserted.length));
+        const from = editor.offsetToPos(offset);
+        const to = editor.offsetToPos(offset + inserted.length);
+        if (cursorWasInRange) replaceRangeWithCursor(editor, next, from, to);
+        else editor.replaceRange(next, from, to);
         this.realignPendingRanges(range, offset, inserted, next);
-
-        if (cursorWasInRange) editor.setCursor(editor.offsetToPos(offset + next.length));
         return true;
     }
 
@@ -1175,8 +1192,7 @@ export class PasteService {
         text: string
     ): number {
         if (editor.getValue() === valueAtInvocation) {
-            editor.replaceRange(text, editor.offsetToPos(fromOffset), editor.offsetToPos(toOffset));
-            editor.setCursor(editor.offsetToPos(fromOffset + text.length));
+            replaceRangeWithCursor(editor, text, editor.offsetToPos(fromOffset), editor.offsetToPos(toOffset));
             this.realignPendingRanges(null, fromOffset, valueAtInvocation.slice(fromOffset, toOffset), text);
             return fromOffset;
         }

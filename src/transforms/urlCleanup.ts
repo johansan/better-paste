@@ -391,21 +391,6 @@ function shouldRemoveParam(name: string, host: string, globalParams: readonly st
 }
 
 /**
- * Drops a scroll-to-text fragment while keeping a real anchor. Browsers append these when
- * you copy a link to highlighted text; they are long, brittle, and never wanted in a note.
- */
-function cleanFragment(fragment: string): string {
-    if (!fragment) return '';
-
-    const textFragment = fragment.indexOf(':~:');
-    if (textFragment < 0) return fragment;
-
-    // '#section:~:text=foo' keeps '#section'; '#:~:text=foo' drops the fragment entirely
-    const remainder = fragment.slice(0, textFragment);
-    return remainder === '#' ? '' : remainder;
-}
-
-/**
  * Cleans a single URL. Returns the input unchanged when it is not an http(s) URL or when
  * nothing is removed, so URLs that need no cleaning keep their exact original spelling.
  */
@@ -438,7 +423,7 @@ export function cleanUrl(raw: string, options: UrlCleanupOptions): string {
     const kept = pairs.filter(pair => !shouldRemoveParam(pair.name, host, options.globalParams, options.removals));
 
     const nextQuery = kept.map(pair => pair.raw).join('&');
-    const rebuilt = `${base}${nextQuery ? `?${nextQuery}` : ''}${cleanFragment(fragment)}`;
+    const rebuilt = `${base}${nextQuery ? `?${nextQuery}` : ''}${fragment}`;
 
     return rebuilt === raw ? raw : rebuilt;
 }

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Editor, EditorPosition, EditorSelection } from 'obsidian';
+import type { Editor, EditorPosition, EditorSelection, EditorTransaction } from 'obsidian';
 
 /**
  * A document model implementing the handful of Editor methods PasteService uses.
@@ -92,6 +92,23 @@ export class FakeEditor {
         this.value = this.value.slice(0, fromOffset) + text + this.value.slice(toOffset);
         this.anchor = fromOffset + text.length;
         this.head = this.anchor;
+    }
+
+    transaction(transaction: EditorTransaction): void {
+        if (transaction.replaceSelection !== undefined) this.replaceSelection(transaction.replaceSelection);
+
+        const changes = (transaction.changes ?? [])
+            .map(change => ({ from: this.posToOffset(change.from), to: this.posToOffset(change.to ?? change.from), text: change.text }))
+            .sort((left, right) => right.from - left.from);
+        for (const change of changes) {
+            this.value = this.value.slice(0, change.from) + change.text + this.value.slice(change.to);
+        }
+
+        const selection = transaction.selections?.[0] ?? transaction.selection;
+        if (selection) {
+            this.anchor = this.posToOffset(selection.from);
+            this.head = this.posToOffset(selection.to ?? selection.from);
+        }
     }
 
     /** Types text at the current cursor, used to simulate the user editing mid-download. */

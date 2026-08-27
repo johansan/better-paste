@@ -209,6 +209,11 @@ describe('isInsideVerbatimContext', () => {
         expect(atCursor('- a\n  - b\n    - c |')).toBe(false);
     });
 
+    it('is false in later sibling items at each nested depth', () => {
+        expect(atCursor('- 1.1\n- 1.2\n    - 2.1\n    - |')).toBe(false);
+        expect(atCursor('- 1.1\n    - 2.1\n        - 3.1\n        - |')).toBe(false);
+    });
+
     it('is false in a nested list item inside a blockquote', () => {
         expect(atCursor('> - item\n> \t- nested |')).toBe(false);
     });

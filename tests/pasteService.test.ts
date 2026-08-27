@@ -1553,6 +1553,38 @@ describe('handleEditorPaste: link titles', () => {
         expect(editor.getValue()).toBe('- item\n\t- [Example page](https://example.com/page)');
     });
 
+    it('fetches a title in a later sibling of a nested list', async () => {
+        const { service, fetchedTitles } = build({ linkTitles: true, linkEnabled: false });
+        const doc = '- 1.1\n- 1.2\n    - 2.1\n    - ';
+        const editor = new FakeEditor(doc, doc.length);
+        const url = 'https://example.com/page';
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO)).toBe(true);
+        await settle();
+
+        expect(fetchedTitles).toEqual([url]);
+        expect(editor.getValue()).toBe(`- 1.1\n- 1.2\n    - 2.1\n    - [Example page](${url})`);
+    });
+
+    it('inserts a URL and its caret in one transaction inside a Markdown table', async () => {
+        const { service } = build({ linkTitles: true, linkEnabled: false });
+        const doc = '| column 1 | column 2 |\n| -------- | -------- |\n|          |          |';
+        const editor = new FakeEditor(doc, doc.indexOf('|          |') + 2);
+        const transaction = vi.spyOn(editor, 'transaction');
+        const url = 'https://example.com/page';
+
+        expect(service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO)).toBe(true);
+        expect(transaction).toHaveBeenCalledTimes(1);
+        expect(transaction).toHaveBeenCalledWith({
+            changes: [{ from: { line: 2, ch: 2 }, to: { line: 2, ch: 2 }, text: url }],
+            selection: { from: { line: 2, ch: 2 + url.length } }
+        });
+        await settle();
+
+        expect(transaction).toHaveBeenCalledTimes(2);
+        expect(editor.getValue()).toBe(`| column 1 | column 2 |\n| -------- | -------- |\n| [Example page](${url})         |          |`);
+    });
+
     it('shows title fetching progress and keeps the URL without running snippets when fetching fails', async () => {
         vi.useFakeTimers();
         const settings: BetterPasteSettings = {
