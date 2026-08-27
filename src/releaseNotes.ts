@@ -51,7 +51,7 @@ export interface ReleaseNote {
 /** Newest first. A new release goes at the top. */
 const RELEASE_NOTES: ReleaseNote[] = [
     {
-        version: '1.0.14',
+        version: '1.0.15',
         date: '2026-08-27',
         fixed: [
             'Fixed app links pasted over selected text so the text becomes the link title, including DEVONthink item links.',
