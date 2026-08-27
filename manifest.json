@@ -1,7 +1,7 @@
 {
   "id": "better-paste",
   "name": "Better Paste",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "minAppVersion": "1.13.1",
   "description": "Clean up what you paste. Save images into the vault, strip tracking from links, unwrap terminal output, and normalize AI typography.",
   "author": "Johan Sanneblad",
