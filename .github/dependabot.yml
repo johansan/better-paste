@@ -6,6 +6,8 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
     ignore:
+      # Obsidian 1.13.1 requires @codemirror/state 6.5.0 exactly.
+      - dependency-name: '@codemirror/state'
       # typescript-eslint 8 requires typescript >=4.8.4 <6.1.0, so a major
       # typescript bump fails to install.
       - dependency-name: typescript
