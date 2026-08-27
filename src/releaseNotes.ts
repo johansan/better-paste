@@ -55,7 +55,7 @@ const RELEASE_NOTES: ReleaseNote[] = [
         date: '2026-08-27',
         fixed: [
             'Fixed app links pasted over selected text so the text becomes the link title, including DEVONthink item links.',
-            'Fixed links created with "Copy link to highlight" so they open at the selected passage [#27](https://github.com/johansan/better-paste/issues/27).',
+            'Kept text highlights when removing URL parameters. For example, `?utm_source=news#:~:text=hello` becomes `#:~:text=hello` [#27](https://github.com/johansan/better-paste/issues/27).',
             'Fixed page titles not appearing when you pasted a link directly before a heading or tag [#32](https://github.com/johansan/better-paste/issues/32).',
             'Fixed links disappearing or moving the cursor when pasted into some table cells in Live Preview [#33](https://github.com/johansan/better-paste/issues/33).',
             'Fixed page titles not appearing for links pasted into later items in a nested list [#34](https://github.com/johansan/better-paste/issues/34).'
