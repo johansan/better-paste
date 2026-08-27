@@ -56,6 +56,7 @@ const RELEASE_NOTES: ReleaseNote[] = [
         fixed: [
             'Fixed pasting app links into selected text, including links to items in DEVONthink.',
             'Kept links to highlighted text pointing at the selected passage [#27](https://github.com/johansan/better-paste/issues/27).',
+            'Fixed link title fetching when an address is pasted directly before a heading or tag [#32](https://github.com/johansan/better-paste/issues/32).',
             'Fixed URL pastes in Live Preview table cells [#33](https://github.com/johansan/better-paste/issues/33).',
             'Fixed link title fetching in later sibling items of nested lists [#34](https://github.com/johansan/better-paste/issues/34).'
         ]

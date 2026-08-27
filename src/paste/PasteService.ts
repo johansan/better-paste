@@ -192,6 +192,21 @@ function extendsUrl(char: string | undefined): boolean {
     return char !== undefined && !/[\s<>"`\\\u201C\u201D]/.test(char);
 }
 
+/** True when title replacement keeps URL-shaped neighbours intact. */
+function titleBoundaryIntact(value: string, offset: number, range: AsyncPasteRange): boolean {
+    if (extendsUrl(range.inserted[0]) && extendsUrl(value[offset - 1])) return false;
+
+    if (extendsUrl(range.inserted[range.inserted.length - 1]) && extendsUrl(value[offset + range.inserted.length])) {
+        const start = offset + range.inserted.length;
+        const context = range.afterContext;
+        // A hash already at the paste boundary starts a heading or tag. Its recorded
+        // context must still match, otherwise the address may have been extended later.
+        if (value[start] !== '#' || context.length === 0 || value.slice(start, start + context.length) !== context) return false;
+    }
+
+    return true;
+}
+
 /** True when the clipboard carries exactly one image file. */
 export function isSingleImageFile(files: FileList | readonly File[]): boolean {
     const list = Array.from(files);
@@ -787,14 +802,8 @@ export class PasteService {
             }
         }
 
-        let titleBoundary: ((value: string, offset: number) => boolean) | undefined;
-        if (needsTitle) {
-            titleBoundary = (value, offset) => !extendsUrl(value[offset - 1]) && !extendsUrl(value[offset + range.inserted.length]);
-        } else if (titleLines !== null) {
-            titleBoundary = (value, offset) =>
-                (!extendsUrl(range.inserted[0]) || !extendsUrl(value[offset - 1])) &&
-                (!extendsUrl(range.inserted[range.inserted.length - 1]) || !extendsUrl(value[offset + range.inserted.length]));
-        }
+        const titleBoundary =
+            needsTitle || titleLines !== null ? (value: string, offset: number) => titleBoundaryIntact(value, offset, range) : undefined;
 
         try {
             if (!this.canEdit(info, targetFile)) {
@@ -875,12 +884,7 @@ export class PasteService {
                 const subject = formatTitledLink(materialized.title, materialized.url);
                 const ruled = applyTextSnippets(subject, this.getSettings().urlSnippets).text;
                 const link = composeTitledLink(subject, ruled);
-                // The address must still stand alone: a character that would extend a
-                // URL on either side means the user reshaped it during the fetch, and
-                // linking only the pasted half would tear their address apart
-                const standalone = (value: string, offset: number): boolean =>
-                    !extendsUrl(value[offset - 1]) && !extendsUrl(value[offset + range.inserted.length]);
-                this.replaceRange(editor, range, link, standalone);
+                this.replaceRange(editor, range, link, (value, offset) => titleBoundaryIntact(value, offset, range));
             }
         } finally {
             this.hideTitleProgress(progress);
@@ -907,10 +911,9 @@ export class PasteService {
 
             const rebuilt = this.rebuildTitleBatch(range.inserted, lines, materialized);
 
-            const standalone = (value: string, offset: number): boolean =>
-                (!extendsUrl(range.inserted[0]) || !extendsUrl(value[offset - 1])) &&
-                (!extendsUrl(range.inserted[range.inserted.length - 1]) || !extendsUrl(value[offset + range.inserted.length]));
-            if (rebuilt.text !== range.inserted) this.replaceRange(editor, range, rebuilt.text, standalone);
+            if (rebuilt.text !== range.inserted) {
+                this.replaceRange(editor, range, rebuilt.text, (value, offset) => titleBoundaryIntact(value, offset, range));
+            }
             this.reportTitleFailures(rebuilt.failed);
         } finally {
             this.hideTitleProgress(progress);

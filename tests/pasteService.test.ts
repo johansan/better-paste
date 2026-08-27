@@ -1352,6 +1352,30 @@ describe('handleEditorPaste: link titles', () => {
         expect(editor.getValue()).toBe('[Example page](https://example.com/page)');
     });
 
+    it.each([
+        ['a heading marker', '# H1', 0, '[Example page](https://example.com/page)# H1'],
+        ['a tag in a list item', '- #tag', 2, '- [Example page](https://example.com/page)#tag']
+    ])('fetches a title before %s', async (_case, content, cursor, expected) => {
+        const { service } = build({ linkTitles: true, linkEnabled: false });
+        const editor = new FakeEditor(content, cursor);
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: 'https://example.com/page' }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe(expected);
+    });
+
+    it.each(['/docs', '?query=open'])('keeps an existing URL suffix outside title replacement: %s', async suffix => {
+        const { service } = build({ linkTitles: true, linkEnabled: false });
+        const url = 'https://example.com/page';
+        const editor = new FakeEditor(suffix, 0);
+
+        service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
+        await settle();
+
+        expect(editor.getValue()).toBe(`${url}${suffix}`);
+    });
+
     it('does not fetch a title inside an existing Markdown link destination', async () => {
         const { service, fetchedTitles } = build({ linkTitles: true });
         const prefix = '[Title](';
@@ -1664,7 +1688,7 @@ describe('handleEditorPaste: link titles', () => {
         expect(fetchedTitles).toEqual([]);
     });
 
-    it('keeps a URL extension typed while its title is being fetched', async () => {
+    it.each(['/docs', '#section'])('keeps a URL extension typed while its title is being fetched: %s', async extension => {
         const settings: BetterPasteSettings = { ...DEFAULT_SETTINGS, linkTitles: true, linkEnabled: false };
         let finishTitleFetch: (result: { title: string; url: string }) => void = () => undefined;
         const titleResult = new Promise<{ title: string; url: string }>(resolve => {
@@ -1681,12 +1705,12 @@ describe('handleEditorPaste: link titles', () => {
         const url = 'https://example.com/page';
 
         service.handleEditorPaste(fakeClipboardEvent({ plain: url }), editor.asEditor(), INFO);
-        editor.replaceSelection('/docs');
+        editor.replaceSelection(extension);
         finishTitleFetch({ title: 'Example page', url });
         await titleResult;
         await settle();
 
-        expect(editor.getValue()).toBe(`${url}/docs`);
+        expect(editor.getValue()).toBe(`${url}${extension}`);
     });
 
     it('fetches a title when the selection is the pasted URL itself', async () => {
@@ -1785,6 +1809,16 @@ describe('handleEditorPaste: rich content', () => {
 
         expect(fetchedTitles).toEqual([url]);
         expect(editor.getValue()).toBe(`[Example page](${url})`);
+    });
+
+    it('fetches a rich link title before an existing hash marker', async () => {
+        const { service } = build({ linkEnabled: false });
+        const editor = new FakeEditor('# H1', 0);
+        const url = 'https://github.com/example/project/issues';
+
+        await pasteRich(service, editor, `<a href="${url}">${url}</a>`, url);
+
+        expect(editor.getValue()).toBe(`[Example page](${url})# H1`);
     });
 
     it.each([
