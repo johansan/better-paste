@@ -40,7 +40,7 @@
     "eslint": "^9.39.5",
     "eslint-plugin-obsidianmd": "^0.4.2",
     "globals": "^17.9.0",
-    "knip": "^6.32.2",
+    "knip": "^6.33.0",
     "markdownlint-cli2": "^0.23.2",
     "obsidian": "^1.13.1",
     "prettier": "^3.9.6",
